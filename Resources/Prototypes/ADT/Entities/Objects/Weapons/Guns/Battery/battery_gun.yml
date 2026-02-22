@@ -1,0 +1,530 @@
+- type: entity
+  name: ion rifle
+  parent: [BaseWeaponBattery, ADTBaseMagneticGun]
+  id: ADTWeaponIonRifle
+  description: An ion-electronic disruptor rifle specifically designed to fight cyborgs and mechs.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/ion_rifle.rsi
+    layers:
+      - state: base
+        map: ["enum.GunVisualLayers.Base"]
+      - state: mag-unshaded-0
+        map: ["enum.GunVisualLayers.MagUnshaded"]
+        shader: unshaded
+  - type: Gun
+    fireRate: 1
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/taser.ogg
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTProjectileIonRifle
+    fireCost: 125
+  - type: RunAndGunSpreadModifier
+    modifier: 0.1
+  - type: MeleeWeapon
+    resetOnHandSelected: false
+    attackRate: 1
+    damage:
+      types:
+        Blunt: 9
+    soundHit:
+      collection: GenericHit
+  - type: AltFireMelee
+  - type: MagazineVisuals
+    magState: mag
+    steps: 5
+    zeroVisible: true
+  - type: Clothing
+    sprite: ADT/Objects/Weapons/Guns/Battery/ion_rifle.rsi
+  - type: Battery
+    maxCharge: 1000
+    startingCharge: 1000
+  - type: CursorOffsetRequiresWield
+  - type: EyeCursorOffset
+    maxOffset: 3
+    pvsIncrease: 0.3
+    offsetSpeed: 0.3
+  - type: Wieldable
+    unwieldOnUse: false
+  - type: Tag
+    tags:
+    - ADTBsoWeapon
+  - type: GunExecutionBlacklist
+
+- type: entity
+  name: laser rifle
+  parent: BaseWeaponBattery
+  id: ADTWeaponLaserCarbineBorg
+  description: This modified laser rifle fires nearly harmless beams in the 40-watt range, for target practice.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Battery/laser_gun.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Battery/laser_gun.rsi
+  - type: Gun
+    selectedMode: SemiAuto
+    availableModes:
+    - SemiAuto
+  - type: HitscanBatteryAmmoProvider
+    proto: RedLaser
+    fireCost: 62.5
+  - type: StaticPrice
+    price: 300
+  - type: BatterySelfRecharger
+    autoRecharge: true
+    autoRechargeRate: 10
+
+- type: entity
+  name: disabler
+  parent: WeaponDisabler
+  id: ADTWeaponDisablerBorg
+  description: A self-defense weapon that exhausts organic targets, weakening them until they collapse.
+  components:
+  - type: BatterySelfRecharger
+    autoRecharge: true
+    autoRechargeRate: 20
+
+- type: entity
+  name: disabler
+  parent: BaseWeaponBatterySmall
+  id: ADTWeaponPulseTimePatrol
+  description: A self-defense weapon that exhausts organic targets, weakening them until they collapse.
+  suffix: "ОБВА"
+  components:
+    - type: BatterySelfRecharger
+      autoRecharge: true
+      autoRechargeRate: 50
+    - type: Sprite
+      sprite: ADT/Objects/Weapons/Guns/Battery/tsd_gun.rsi
+      layers:
+        - state: base
+          map: ["enum.GunVisualLayers.Base"]
+        - state: mag-unshaded-0
+          map: ["enum.GunVisualLayers.MagUnshaded"]
+          shader: unshaded
+    - type: Clothing
+      sprite: ADT/Objects/Weapons/Guns/Battery/tsd_gun.rsi
+      quickEquip: false
+      slots:
+        - suitStorage
+        - Belt
+    - type: Gun
+      fireRate: 1.5
+      soundGunshot:
+        path: /Audio/ADT/Weapons/Guns/Gunshots/gunshot_tsd.ogg
+    - type: ProjectileBatteryAmmoProvider
+      proto: ADTADTBulletMagnumHighVelocityTranquilizer
+      fireCost: 150
+    - type: MagazineVisuals
+      magState: mag
+      steps: 5
+      zeroVisible: true
+    - type: Appearance
+    - type: Battery
+      maxCharge: 2000
+      startingCharge: 2000
+    - type: DNAGunLocker
+    - type: RMCMagneticItem
+
+- type: entity
+  name: Cutter
+  parent: BaseWeaponBatterySmall
+  id: ADTWeaponCutter
+  description: A self-defense weapon that exhausts organic targets, weakening them until they collapse.
+  components:
+    - type: Item
+      size: Normal
+      shape:
+      - 0,1,0,2
+      - 1,1,1,1
+      - 2,0,2,2
+    - type: MaterialStorage
+      storageLimit: 0
+      materialWhiteList: [RawPlasma, Plasma]
+      canEjectStoredMaterials: false
+    - type: BatteryRecharge
+      multiplier: 1.25
+    - type: Sprite
+      sprite: ADT/Objects/Weapons/Guns/Battery/cutter.rsi
+      state: icon
+    - type: Gun
+      fireRate: 0.6
+      soundGunshot:
+        path: /Audio/Weapons/plasma_cutter.ogg
+    - type: ProjectileBatteryAmmoProvider
+      proto: ADTBulletCutter
+      fireCost: 100
+    - type: Battery
+      maxCharge: 2500
+      startingCharge: 2500
+    - type: Appearance
+
+- type: entity
+  name: Advanced Cutter
+  parent: ADTWeaponCutter
+  id: ADTWeaponCutterAdv
+  description: A self-defense weapon that exhausts organic targets, weakening them until they collapse.
+  components:
+    - type: Sprite
+      sprite: ADT/Objects/Weapons/Guns/Battery/cutteradv.rsi
+      state: icon
+    - type: Gun
+      fireRate: 1
+      soundGunshot:
+        path: /Audio/Weapons/plasma_cutter.ogg
+    - type: ProjectileBatteryAmmoProvider
+      proto: ADTBulletCutterAdv
+      fireCost: 75
+    - type: Appearance
+
+- type: entity
+  name: X-01 multiphas laser pistol
+  parent: BaseWeaponBatterySmall
+  id: ADTWeaponPistolX01
+  description: new version of antique gun witout selfrcharge
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/multifazpistol.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      visible: false
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: Appearance
+  - type: MagazineVisuals
+    magState: mag
+    steps: 5
+    zeroVisible: false
+  - type: Clothing
+    sprite: ADT/Objects/Weapons/Guns/Battery/multifazpistol.rsi
+  - type: MeleeWeapon
+    resetOnHandSelected: false
+    attackRate: 1
+    damage:
+      types:
+        Blunt: 9
+    soundHit:
+      collection: GenericHit
+  - type: AltFireMelee
+  - type: RunAndGunSpreadModifier
+    modifier: 0.1
+  - type: Gun
+    fireRate: 3
+    projectileSpeed: 60
+    selectedMode: FullAuto
+    availableModes:
+    - SemiAuto
+    - FullAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTBulletDisabler
+    fireCost: 30
+  - type: BatteryWeaponFireModes
+    fireModes:
+    - proto: ADTBulletDisabler
+      fireCost: 30
+    - proto: ADTBulletLaser
+      fireCost: 30
+    - proto: ADTBulletIon
+      fireCost: 90
+  - type: Battery
+    maxCharge: 900
+    startingCharge: 900
+  - type: Tag
+    tags:
+    - HighRiskItem
+  - type: StealTarget
+    stealGroup: ADTHosWeapon
+  - type: StaticPrice
+    price: 7500
+  - type: Item
+    size: Normal
+
+- type: entity
+  name: Miniature Energy Crossbow
+  parent: BaseWeaponBatterySmall
+  id: ADTWeaponMiniatureEnergyCrossbow
+  description: The syndicate's energy crossbow, small, silent and deadly.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/miniature_ebow.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: Gun
+    resetOnHandSelected: false
+    soundGunshot:
+      path: /Audio/ADT/Weapons/Guns/Gunshots/heavy_shot_suppressed.ogg
+      params:
+        volume: -5
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTBulletMic
+    fireCost: 900
+  - type: BatterySelfRecharger
+    autoRecharge: true
+    autoRechargeRate: 300
+  - type: MagazineVisuals
+    magState: mag
+    steps: 2
+    zeroVisible: true
+  - type: Appearance
+
+- type: entity
+  name: Energy Crossbow
+  parent: ADTWeaponMiniatureEnergyCrossbow
+  id: ADTWeaponEnergyCrossbow
+  description: Energy crossbow, big, powerful and stily.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/ebow.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTBulletEnergyCrossbow
+    fireCost: 900
+  - type: Item
+    size: Ginormous
+  - type: Construction
+    graph: EnergyCrossbowGraph
+    node: crossbow
+  - type: Gun
+    resetOnHandSelected: false
+    soundGunshot:
+      path: /Audio/ADT/Weapons/Guns/Gunshots/heavy_shot_suppressed.ogg
+      params:
+        volume: -5
+    fireRate: 0.5
+  - type: UpgradeableGun
+    whitelist:
+      tags:
+      - PKAUpgrade
+  - type: ContainerContainer
+    containers:
+      upgrades: !type:Container
+  - type: BatterySelfRecharger
+    autoRecharge: true
+    autoRechargeRate: 225
+
+- type: entity
+  name: vulpizator
+  parent: [ WeaponDisablerPractice, BaseSecurityCommandContraband ]
+  id: ADTWeaponVulpizator
+  description: A self-defense weapon that... turns you into vulpkanin..
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Rifles/vulpizator.rsi
+    layers:
+      - state: base
+        map: ["enum.GunVisualLayers.Base"]
+  - type: Clothing
+    sprite: ADT/Objects/Weapons/Guns/Rifles/vulpizator.rsi
+    quickEquip: false
+    slots:
+      - suitStorage
+      - Belt
+  - type: BasicEntityAmmoProvider
+    proto: ADTProjectilePolyboltVulpkanin
+  - type: DNAGunLocker
+
+- type: entity
+  name: ion carbine
+  parent: [BaseWeaponBattery, ADTBaseMagneticGun]
+  id: ADTWeaponIonCarbine
+  description: An ion-electronic disruptor carbine specifically designed to fight cyborgs and mechs.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/ion_carbine.rsi
+    layers:
+      - state: base
+        map: ["enum.GunVisualLayers.Base"]
+      - state: mag-unshaded-0
+        map: ["enum.GunVisualLayers.MagUnshaded"]
+        shader: unshaded
+  - type: Gun
+    fireRate: 1
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/taser.ogg
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTProjectileIonRifle
+    fireCost: 150
+  - type: RunAndGunSpreadModifier
+    modifier: 0.1
+  - type: MeleeWeapon
+    resetOnHandSelected: false
+    attackRate: 1
+    damage:
+      types:
+        Blunt: 7
+    soundHit:
+      collection: GenericHit
+  - type: AltFireMelee
+  - type: MagazineVisuals
+    magState: mag
+    steps: 5
+    zeroVisible: true
+  - type: Clothing
+    sprite: ADT/Objects/Weapons/Guns/Battery/ion_carbine.rsi
+  - type: Battery
+    maxCharge: 600
+    startingCharge: 600
+  - type: Item
+    size: Huge
+    shape:
+    - 0,0,3,1
+  - type: Tag
+    tags:
+    - ADTBsoWeapon
+
+- type: entity
+  name: toy blaster
+  parent: [BaseWeaponBatterySmall]
+  id: ADTToyBlasterGun
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Battery/laser_retro.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: MagazineVisuals
+    magState: mag
+    steps: 5
+    zeroVisible: false
+  - type: Appearance
+  - type: Clothing
+    sprite: Objects/Weapons/Guns/Battery/laser_retro.rsi
+  - type: Gun
+    selectedMode: SemiAuto
+    fireRate: 2
+    availableModes:
+    - SemiAuto
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/laser.ogg
+      params:
+        pitch: 2
+  - type: HitscanBatteryAmmoProvider
+    proto: RedLaserBlaster
+    fireCost: 125
+  - type: StaticPrice
+    price: 50
+  - type: GunExecutionBlacklist
+
+- type: entity
+  name: red toy blaster
+  parent: [ADTToyBlasterGun]
+  id: ADTToyBlasterGunRed
+  description: A hastily converted laser blaster shoots simple 30 watt lasers.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Fun/toyweapon/redblaster.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: Tag
+    tags:
+    - ADTToyBlaster
+  - type: GunExecutionBlacklist
+
+- type: entity
+  name: blue toy blaster
+  parent: [ADTToyBlasterGun]
+  id: ADTToyBlasterGunBlue
+  description: A hastily converted laser blaster shoots simple 30 watt lasers.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Fun/toyweapon/blueblaster.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: Tag
+    tags:
+    - ADTToyBlaster
+  - type: GunExecutionBlacklist
+
+- type: entity
+  name: green toy blaster
+  parent: [ADTToyBlasterGun]
+  id: ADTToyBlasterGunGreen
+  description: A hastily converted laser blaster shoots simple 30 watt lasers.
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Fun/toyweapon/greenblaster.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-unshaded-4
+      map: ["enum.GunVisualLayers.MagUnshaded"]
+      shader: unshaded
+  - type: Tag
+    tags:
+    - ADTToyBlaster
+  - type: GunExecutionBlacklist
+
+- type: entity
+  name: CC-7 "Arbiter"
+  parent: [BaseWeaponBattery, ADTBaseMagneticGun]
+  id: ADTWeaponBlasterCC7Arbiter
+  description: Arbiter
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Weapons/Guns/Battery/cc-7_arbiter.rsi
+    layers:
+      - state: base
+        map: ["enum.GunVisualLayers.Base"]
+      - state: mag-unshaded-0
+        map: ["enum.GunVisualLayers.MagUnshaded"]
+        shader: unshaded
+  - type: Gun
+    fireRate: 2
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/laser_cannon.ogg
+  - type: ProjectileBatteryAmmoProvider
+    proto: ADTBulletYellowLaser
+    fireCost: 125
+  - type: BatteryWeaponFireModes
+    fireModes:
+    - proto: ADTBulletYellowLaser
+      fireCost: 125
+    - proto: ADTBulletDisabler
+      fireCost: 156
+  - type: MagazineVisuals
+    magState: mag
+    steps: 13
+    zeroVisible: true
+  - type: Clothing
+    sprite: ADT/Objects/Weapons/Guns/Battery/cc-7_arbiter.rsi
+    quickEquip: false
+    slots:
+    - suitStorage
+    - Belt
+  - type: Item
+    size: Small
+    shape:
+    - 0,0,1,0
+    - 0,1,0,1
+  - type: Battery
+    maxCharge: 1625
+    startingCharge: 1625

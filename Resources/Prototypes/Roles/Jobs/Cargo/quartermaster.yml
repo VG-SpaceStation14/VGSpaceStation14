@@ -1,0 +1,70 @@
+- type: job
+  id: Quartermaster
+  name: job-name-qm
+  description: job-description-qm
+  playTimeTracker: JobQuartermaster
+  requireAdminNotify: true # Ganimed Rules Tweak
+  requirements:
+    - !type:RoleTimeRequirement
+      role: JobCargoTechnician
+      time: 21600 #6 hrs # Ganimed-RoleTime
+    - !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 21600 #6 hrs # Ganimed-RoleTime
+    - !type:DepartmentTimeRequirement
+      department: Cargo
+      time: 72000 #20 hours # Ganimed-RoleTime
+    - !type:OverallPlaytimeRequirement
+      time: 144000 #40 hrs Ganimed-RoleTime
+      #ADT tweak start
+#    - !type:SpeciesRequirement
+#      inverted: true
+#      species:
+#      - Vox
+      #ADT tweak end
+  weight: 10
+  startingGear: QuartermasterGear
+  icon: "JobIconQuarterMaster"
+  supervisors: job-supervisors-captain
+  canBeAntag: true # Ganimed-MRP
+  antagAdvantage: 5 # Ganimed-MRP: Heads can be antags
+  access:
+  - Cargo
+  - Salvage
+  - Quartermaster
+  - Maintenance
+  - External
+  - Command
+  - Brig
+  - Cryogenics
+  special:
+#  - !type:AddImplantSpecial # Ganimed-MRP
+#    implants: [ MindShieldImplant ] # Ganimed-MRP
+  - !type:AddComponentSpecial
+    components:
+      - type: CommandStaff
+#     - type: PhantomTyranyTarget # ADT Phantom
+
+- type: startingGear
+  id: QuartermasterGear
+  equipment:
+    # id: QuartermasterPDA # ADT: different PDAs in loadouts
+    # ears: ClothingHeadsetQM # ADT tweak
+    belt: BoxFolderClipboard
+    pocket1: AppraisalTool
+  storage:
+    back:
+    - Flash
+    - ADTtelescopicBaton #ADT-CustomADTLoadout
+
+- type: chameleonOutfit
+  id: QuartermasterChameleonOutfit
+  job: Quartermaster
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatQMsoft
+    eyes: ClothingEyesGlassesSunglasses
+    mask: ClothingMaskBreath
+    outerClothing: ClothingOuterWinterQM
+    neck: ClothingNeckCloakQm
+    gloves: ClothingHandsKnuckleDustersQM

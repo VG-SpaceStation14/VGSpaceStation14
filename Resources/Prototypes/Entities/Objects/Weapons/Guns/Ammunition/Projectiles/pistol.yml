@@ -1,0 +1,46 @@
+- type: entity
+  id: BulletPistol
+  name: bullet (.35 auto)
+  parent: BaseBullet
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 14 # ADT-Tweak 16 -> 14
+
+- type: entity
+  id: BulletPistolPractice
+  name: bullet (.35 auto practice)
+  parent: BaseBulletPractice
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 2
+
+- type: entity
+  id: BulletPistolIncendiary
+  parent: BaseBulletIncendiary
+  name: bullet (.35 auto incendiary)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 10 #ADT tweak
+        # Blunt: 3 ADT twea
+        # Heat: 14
+
+- type: entity
+  id: BulletPistolUranium
+  parent: BaseBulletUranium
+  name: bullet (.35 auto uranium)
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    damage:
+      types:
+        Radiation: 6
+        Piercing: 8 # ADT-Tweak 10 -> 8

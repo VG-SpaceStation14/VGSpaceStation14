@@ -1,0 +1,15 @@
+- type: entity
+  id: ActionHereticFleshSurgery
+  components:
+  - type: Action
+    useDelay: 30
+    itemIconStyle: NoItem
+    icon:
+      sprite: ADT/Heretic/abilities_heretic.rsi
+      state: flesh_surgery
+  - type: EntityTargetAction
+    event: !type:EventHereticFleshSurgery
+  - type: TargetAction
+  - type: HereticAction
+    messageLoc: heretic-speech-flesh-surgery
+

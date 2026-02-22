@@ -1,0 +1,125 @@
+- type: gamePreset
+  showInVote: false # secret
+  id: Heretic
+  alias:
+    - heretic
+  name: heretic-title
+  minPlayers: 15 # Ganimed-Tweak
+  description: heretic-title
+  rules:
+    - Heretic
+    - BasicRoundstartVariation
+    - SubGamemodesRule
+    - BasicStationEventScheduler
+    - MeteorSwarmScheduler
+    - CrewTransferScheduler
+
+- type: gamePreset
+  id: Changeling
+  alias:
+    - changeling
+  name: changelings-title
+  minPlayers: 15 # Ganimed-Tweak
+  showInVote: false
+  description: changelings-description
+  rules:
+    - ChangelingGameRule
+    - BasicRoundstartVariation
+    - SubGamemodesRule
+    - BasicStationEventScheduler
+    - MeteorSwarmScheduler
+    - CrewTransferScheduler
+
+#Облегченная версия предателей
+
+- type: gamePreset
+  id: TraitorLight
+  alias:
+    - traitorlight
+    - tatorlight
+  name: traitorlight-title
+  description: traitorlight-description
+  showInVote: false
+  rules:
+    - TraitorLightGameRule
+    - SubGamemodesRule
+    - BasicStationEventScheduler
+    - MeteorSwarmScheduler
+#    - SpaceTrafficControlEventScheduler #Ganimed-Tweak
+    - BasicRoundstartVariation
+    - CrewTransferScheduler #ADT tweak
+
+#Версия всего понемногу
+- type: gamePreset
+  id: AntagTrio
+  alias:
+    - antagtrio
+  name: antagtrio-title
+  description: antagtrio-description
+  showInVote: false
+  rules:
+    - TraitorDuoGameRule
+    - ChangelingDuoGameRule
+    - HereticDuoGameRule
+    - SubGamemodesRule
+    - BasicStationEventScheduler
+    - MeteorSwarmScheduler
+#    - SpaceTrafficControlEventScheduler #Ganimed-Tweak
+    - BasicRoundstartVariation
+    - CrewTransferScheduler #ADT tweak
+
+- type: gamePreset
+  id: DynamicHard
+  alias:
+    - dynamichard
+  name: dynamic-hard-title
+  description: dynamic-hard-description
+  showInVote: false
+  minPlayers: 20 # Ganimed-Tweak
+  rules:
+    - DynamicHardGamerule
+    - MeteorSwarmScheduler
+    - SpaceTrafficControlEventScheduler
+    - BasicRoundstartVariation
+  bannedRound: 3
+
+- type: gamePreset
+  id: DynamicLight
+  alias:
+    - dynamiclight
+  name: dynamic-low-title
+  description: dynamic-low-description
+  showInVote: false
+  minPlayers: 5 # Ganimed-Tweak
+  rules:
+    - DynamicLightGamerule
+    - MeteorSwarmScheduler
+    - SpaceTrafficControlEventScheduler
+    - BasicRoundstartVariation
+
+- type: gamePreset
+  id: DynamicMedium
+  alias:
+    - dynamicmedium
+  name: dynamic-medium-title
+  description: dynamic-medium-description
+  showInVote: false
+  minPlayers: 10 # Ganimed-Tweak
+  rules:
+    - DynamicMediumGamerule
+    - MeteorSwarmScheduler
+    - SpaceTrafficControlEventScheduler
+    - BasicRoundstartVariation
+  bannedRound: 2
+
+- type: gamePreset
+  id: DynamicRandom
+  alias:
+    - dynamicrandom
+  name: dynamic-random-title
+  minPlayers: 15
+  description: dynamic-random-description
+  showInVote: true
+  rules:
+    - DynamicRandomGamerule
+  bannedRound: 2

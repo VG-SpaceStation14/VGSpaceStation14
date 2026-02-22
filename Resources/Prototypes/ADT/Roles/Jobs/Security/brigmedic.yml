@@ -1,0 +1,50 @@
+- type: job
+  id: Brigmedic
+  name: job-name-brigmedic
+  description: job-description-brigmedic
+  playTimeTracker: JobBrigmedic
+  requirements:
+    - !type:DepartmentTimeRequirement
+      department: Medical
+      time: 36000 #10 hrs Ganimed-RoleTime
+    - !type:DepartmentTimeRequirement
+      department: Security
+      time: 18000 #5 hrs
+    - !type:SpeciesRequirement
+      inverted: true
+      species:
+      - Vox
+      - Resomi
+      - Shadekin
+  startingGear: BrigmedicGear
+  icon: "JobIconBrigmedic"
+  supervisors: job-supervisors-hos
+  canBeAntag: false
+  access:
+  - Medical
+  - Security
+  - Brig
+  - Maintenance
+  - External
+  extendedAccess: # Ganimed-Tweak
+  - Cryogenics
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
+
+- type: startingGear
+  id: BrigmedicGear
+  equipment:
+    ears: ClothingHeadsetBrigmedic
+    pocket1: WeaponPistolMk58
+  storage:
+    back:
+    - Flash
+    - MagazinePistol
+
+- type: chameleonOutfit
+  id: BrigmedicChameleonOutfit
+  job: Brigmedic
+  hasMindShield: true
+  equipment:
+    ears: ClothingHeadsetBrigmedic

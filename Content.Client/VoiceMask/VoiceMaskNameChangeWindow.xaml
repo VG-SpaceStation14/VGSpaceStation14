@@ -1,0 +1,34 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+               xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+               Title="{Loc 'voice-mask-name-change-window'}"
+               MinSize="5 30">
+    <BoxContainer Orientation="Vertical" Margin="5">
+        <Label Text="{Loc 'voice-mask-name-change-info'}" />
+        <BoxContainer Orientation="Horizontal" Margin="5">
+            <LineEdit Name="NameSelector" HorizontalExpand="True" />
+            <Button Name="NameSelectorSet" Text="{Loc 'voice-mask-name-change-set'}" />
+        </BoxContainer>
+        <BoxContainer Orientation="Horizontal" Margin="5">
+            <Label Text="{Loc 'voice-mask-name-change-speech-style'}" />
+            <OptionButton Name="SpeechVerbSelector" /> <!-- Populated in LoadVerbs -->
+        </BoxContainer>
+        <!-- Corvax-TTS-Start -->
+        <BoxContainer Orientation="Horizontal" Margin="5" Visible="False" Name="TTSContainer">
+            <Label Text="{Loc 'voice-mask-TTS-voice-change-info'}" />
+            <OptionButton Name="VoiceSelector" /> <!-- Populated in LoadVerbs -->
+        </BoxContainer>
+        <!-- Corvax-TTS-End -->
+        <!-- ADT Barks start -->
+        <BoxContainer Orientation="Horizontal" Margin="5" Visible="False" Name="BarksContainer">
+            <Label Text="{Loc 'voice-mask-voice-change-info'}" />
+            <OptionButton Name="BarkSelector" />
+        </BoxContainer>
+        <BoxContainer Orientation="Horizontal" Margin="5" Visible="False" Name="BarksPitchContainer">
+            <Label Text="{Loc 'voice-mask-pitch-change-info'}" />
+            <LineEdit Name="PitchSelector" VerticalExpand="True" HorizontalExpand="True"/>
+            <!-- Populated in LoadVerbs -->
+        </BoxContainer>
+        <!-- ADT Barks end -->
+
+    </BoxContainer>
+</controls:FancyWindow>

@@ -1,0 +1,65 @@
+# Best job.
+
+- type: job
+  id: ChiefMedicalOfficer
+  name: job-name-cmo
+  description: job-description-cmo
+  playTimeTracker: JobChiefMedicalOfficer
+  requireAdminNotify: true # Ganimed Rules Tweak
+  requirements:
+    - !type:RoleTimeRequirement
+      role: JobChemist
+      time: 21600 #6 hrs Ganimed-RoleTime
+    - !type:RoleTimeRequirement
+      role: JobMedicalDoctor
+      time: 21600 #6 hrs Ganimed-RoleTime
+    - !type:DepartmentTimeRequirement
+      department: Medical
+      time: 72000 #20 hrs Ganimed-RoleTime
+    - !type:OverallPlaytimeRequirement
+      time: 144000 #40 hrs Ganimed-RoleTime
+    - !type:AgeRequirement # Ganimed-MRP
+      requiredAge: 21
+  weight: 10
+  startingGear: CMOGear
+  icon: "JobIconChiefMedicalOfficer"
+  supervisors: job-supervisors-captain
+  canBeAntag: true # Ganimed-MRP
+  antagAdvantage: 5 # Ganimed-MRP: Heads can be antags
+  access:
+  - Medical
+  - Command
+  - Maintenance
+  - Chemistry
+  - ChiefMedicalOfficer
+  - Brig
+  - Cryogenics
+  special:
+#  - !type:AddImplantSpecial # Ganimed-MRP
+#    implants: [ MindShieldImplant ] # Ganimed-MRP
+  - !type:AddComponentSpecial
+    components:
+      - type: CommandStaff
+      # - type: PhantomTyranyTarget # ADT Phantom
+
+- type: startingGear
+  id: CMOGear
+  # equipment: # ADT tweak
+ #id: CMOPDA  # ADT Tweak
+    # ears: ClothingHeadsetCMO # ADT tweak
+#    belt: ClothingBeltMedicalFilled ADT tweak
+  storage:
+    back:
+    - Flash
+    - ADTtelescopicBaton #ADT-CustomADTLoadout
+- type: chameleonOutfit
+  id: ChiefMedicalOfficerChameleonOutfit
+  job: ChiefMedicalOfficer
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatBeretCmo
+    eyes: ClothingEyesHudMedical
+    mask: ClothingMaskSterile
+    neck: ClothingCloakCmo
+    outerClothing: ClothingOuterCoatLabCmo
+    gloves: ClothingHandsGlovesNitrile

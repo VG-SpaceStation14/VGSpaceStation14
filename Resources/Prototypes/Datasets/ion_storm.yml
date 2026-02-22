@@ -1,0 +1,117 @@
+# words/phrases that are used to build ion storm laws
+# 99% of this is just taken from tg and had sussy bits removed
+
+# not using uppercased version adjectives dataset since getting christmas-stealing as a syndicate codeword would suck
+- type: localizedDataset
+  id: IonStormAdjectives
+  values:
+    prefix: names_IonStormAdjectives-
+    count: 128
+
+# Allergies should be broad and appear somewhere on the station for maximum fun.
+- type: localizedDataset
+  id: IonStormAllergies
+  values:
+    prefix: names_IonStormAllergies-
+    count: 34
+
+# Severity is how bad the allergy is.
+- type: localizedDataset
+  id: IonStormAllergySeverities
+  values:
+    prefix: names_IonStormAllergySeverities-
+    count: 6
+
+# Areas are specific places, on the station or otherwise.
+- type: localizedDataset
+  id: IonStormAreas
+  values:
+    prefix: names_IonStormAreas-
+    count: 56
+
+# Abstract concepts for the law holder to decide on it's own definition of.
+- type: localizedDataset
+  id: IonStormConcepts
+  values:
+    prefix: names_IonStormConcepts-
+    count: 73
+
+# Crew is any specific job. Using jobs instead of specific crewmembers since "THE CLOWN" is easier than
+# seeing "JOHN SMITH" and having to figure out who john smith is.
+- type: localizedDataset
+  id: IonStormCrew
+  values:
+    prefix: names_IonStormCrew-
+    count: 35
+
+- type: localizedDataset
+  id: IonStormDrinks
+  values:
+    prefix: names_IonStormDrinks-
+    count: 12
+
+- type: localizedDataset
+  id: IonStormFeelings
+  values:
+    prefix: names_IonStormFeelings-
+    count: 22
+
+- type: localizedDataset
+  id: IonStormFeelingsPlural
+  values:
+    prefix: names_IonStormFeelingsPlural-
+    count: 23
+
+- type: localizedDataset
+  id: IonStormFoods
+  values:
+    prefix: names_IonStormFoods-
+    count: 19
+
+- type: localizedDataset
+  id: IonStormMusts
+  values:
+    prefix: names_IonStormMusts-
+    count: 61
+
+- type: localizedDataset
+  id: IonStormNumberBase
+  values:
+    prefix: names_IonStormNumberBase-
+    count: 18
+
+- type: localizedDataset
+  id: IonStormNumberMod
+  values:
+    prefix: names_IonStormNumberMod-
+    count: 8
+
+- type: localizedDataset
+  id: IonStormObjects
+  values:
+    prefix: names_IonStormObjects-
+    count: 179
+
+- type: localizedDataset
+  id: IonStormRequires
+  values:
+    prefix: names_IonStormRequires-
+    count: 92
+
+- type: localizedDataset
+  id: IonStormActions
+  values:
+    prefix: names_IonStormActions-
+    count: 53
+
+- type: localizedDataset
+  id: IonStormThreats
+  values:
+    prefix: names_IonStormThreats-
+    count: 73
+
+- type: localizedDataset
+  id: IonStormVerbs
+  values:
+    prefix: names_IonStormVerbs-
+    count: 24

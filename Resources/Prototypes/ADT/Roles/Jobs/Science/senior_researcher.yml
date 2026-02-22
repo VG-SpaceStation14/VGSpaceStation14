@@ -1,0 +1,33 @@
+- type: job
+  id: ADTSeniorResearcher
+  name: job-name-senior-researcher
+  description: job-description-senior-researcher
+  playTimeTracker: JobADTSeniorResearcher
+  requirements:
+    - !type:DepartmentTimeRequirement
+      department: Science
+      time: 216000 #60 hrs
+  startingGear: SeniorResearcherGear
+  icon: "JobIconSeniorResearcher"
+  supervisors: job-supervisors-rd
+  access:
+  - Research
+  - Maintenance
+
+- type: startingGear
+  id: SeniorResearcherGear
+  equipment:
+    id: SeniorResearcherPDA
+    ears: ClothingHeadsetScience
+    belt: ClothingBeltUtilityFilled
+    pocket1: AnomalyLocatorEmpty
+  # storage:
+  #   back:
+  #   - ADTHumanCubeWrapped #ADT-CustomADTLoadout # Ganimed-Remove
+
+- type: chameleonOutfit
+  id: ADTSeniorResearcherChameleonOutfit
+  job: ADTSeniorResearcher
+  hasMindShield: true
+  equipment:
+    ears: ClothingHeadsetScience

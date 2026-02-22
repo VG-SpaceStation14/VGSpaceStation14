@@ -1,0 +1,67 @@
+- type: job
+  id: Warden
+  name: job-name-warden
+  description: job-description-warden
+  playTimeTracker: JobWarden
+  requirements:
+    - !type:RoleTimeRequirement
+      role: JobSecurityOfficer
+      time: 36000 #10 hrs
+    - !type:DepartmentTimeRequirement
+      department: Security
+      time: 90000 #25 hrs Ganimed-RoleTime
+  # ADT Restrict Start
+    - !type:SpeciesRequirement
+      inverted: true
+      species:
+      - Resomi
+      - Vox
+#      - Shadekin
+  # ADT RESTRICT End
+    - !type:AgeRequirement # Ganimed-MRP
+      requiredAge: 21
+  startingGear: WardenGear
+  icon: "JobIconWarden"
+  supervisors: job-supervisors-hos
+  canBeAntag: false
+  access:
+  - Security
+  - Brig
+  - Armory
+  - Maintenance
+  - Service
+  - External
+  - Detective
+  - Cryogenics
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
+  - !type:AddComponentSpecial # goobstation
+    components:
+      - type: SecurityStaff
+
+- type: startingGear
+  id: WardenGear
+  equipment:
+    eyes: ClothingEyesGlassesSecurity
+    id: WardenPDA
+    ears: ClothingHeadsetSecurity
+    pocket1: WeaponPistolMk58
+  storage:
+    back:
+    - Flash
+    - MagazinePistol
+
+- type: chameleonOutfit
+  id: WardenChameleonOutfit
+  job: Warden
+  hasMindShield: true
+  equipment:
+    head: ClothingHeadHatWarden
+    mask: ClothingMaskGasSecurity
+    outerClothing: ClothingOuterCoatWarden
+    jumpsuit: ClothingUniformJumpsuitWarden
+    neck: Dinkystar
+    belt: ClothingBeltSecurity
+    gloves: ClothingHandsGlovesCombat
+    shoes: ClothingShoesBootsJack

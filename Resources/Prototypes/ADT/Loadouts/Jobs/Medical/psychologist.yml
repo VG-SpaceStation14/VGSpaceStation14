@@ -1,0 +1,15 @@
+# PDA
+- type: loadout
+  id: PsychologistPDA
+  equipment:
+    id: PsychologistPDA
+
+- type: loadout
+  id: ADTPsychiatristPDA
+  equipment:
+    id: ADTPsychiatristPDA
+
+- type: loadout
+  id: ADTPsychotherapistPDA
+  equipment:
+    id: ADTPsychotherapistPDA

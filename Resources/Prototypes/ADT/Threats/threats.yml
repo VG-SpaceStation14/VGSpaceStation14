@@ -1,0 +1,14 @@
+- type: ninjaHackingThreat
+  id: Pirate
+  announcement: terror-pirate
+  rule: Pirates
+
+- type: ninjaHackingThreat
+  id: Morph
+  announcement: terror-morph
+  rule: MorphSpawn
+
+#- type: ninjaHackingThreat
+#  id: Wizard
+#  announcement: terror-wizard
+#  rule: WizardSpawn
