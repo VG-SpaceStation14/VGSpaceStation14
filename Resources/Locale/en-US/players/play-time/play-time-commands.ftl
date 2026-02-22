@@ -38,6 +38,22 @@ cmd-playtime_getrole-arg-user = <user name>
 cmd-playtime_getrole-arg-role = <role|'Overall'>
 cmd-playtime_getrole-error-args = Expected exactly one or two arguments
 
+# Content.Server/ADT/Administration/Commands/PlayTimeAddDepartmentCommand
+
+cmd-playtime_adddepartment-desc = Adds playtime to all roles in a department for a player
+cmd-playtime_adddepartment-help = Usage: { $command } <username/guid> <department> <minutes>
+
+cmd-playtime_adddepartment-error-args = Invalid number of arguments. Expected: <username/guid> <department> <minutes>
+cmd-playtime_adddepartment-error-department-not-found = Department not found: { $department }
+
+cmd-playtime_adddepartment-arg-user = Username or GUID
+cmd-playtime_adddepartment-arg-department = Department ID
+cmd-playtime_adddepartment-arg-minutes = Minutes to add
+
+cmd-playtime_adddepartment-succeed = Successfully added { $minutes } minutes to all roles in department '{ $department }' for { $username }. New overall: { $overall }
+cmd-playtime_adddepartment-updated-roles = Updated roles: { $roles }
+cmd-playtime_adddepartment-failed-roles = Failed to update roles: { $roles }
+
 # - playtime_save
 cmd-playtime_save-desc = Saves the player's playtimes to the DB
 cmd-playtime_save-help = Usage: {$command} <user name>

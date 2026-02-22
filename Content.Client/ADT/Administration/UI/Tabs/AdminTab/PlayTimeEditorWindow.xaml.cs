@@ -1,3 +1,8 @@
+// Content.Client/Administration/UI/Tabs/AdminTab/PlayTimeEditorWindow.xaml.cs
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Content.Shared.Administration;
 using Content.Shared.Roles;
 using JetBrains.Annotations;
@@ -10,7 +15,6 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.LineEdit;
 
-
 namespace Content.Client.Administration.UI.Tabs.AdminTab
 {
     [GenerateTypedNameReferences]
@@ -19,7 +23,19 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
         private readonly IClientConsoleHost _consoleHost;
+        
+        // Списки для ролей и отделов
         private readonly List<(string Name, string Tracker)> _allRoles = new();
+        private readonly List<(string LocalizedName, string Id)> _allDepartments = new();
+        
+        // Переключатель между режимами: роль или отдел
+        private enum TargetType
+        {
+            Role,
+            Department
+        }
+        
+        private TargetType _currentTargetType = TargetType.Role;
 
         public PlayTimeEditorWindow()
         {
@@ -27,42 +43,105 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             IoCManager.InjectDependencies(this);
             _consoleHost = IoCManager.Resolve<IClientConsoleHost>();
 
-            InitializeRoles();
+            InitializeData();
             WireEvents();
             SetButtonsState(true);
         }
 
-        private void InitializeRoles()
+        private void InitializeData()
         {
             _allRoles.Clear();
+            _allDepartments.Clear();
 
+            // Загружаем все профессии (роли)
             foreach (var job in _prototypeManager.EnumeratePrototypes<JobPrototype>())
             {
                 _allRoles.Add((job.LocalizedName, job.PlayTimeTracker));
             }
 
+            // Загружаем все отделы
+            foreach (var dept in _prototypeManager.EnumeratePrototypes<DepartmentPrototype>())
+            {
+                // Пытаемся получить локализованное название отдела
+                var deptName = Loc.TryGetString($"department-{dept.ID}", out var localized) 
+                    ? localized 
+                    : dept.ID;
+                
+                _allDepartments.Add((deptName, dept.ID));
+            }
+
+            // Заполняем выпадающие списки
             RefreshFilteredRoles("");
+            RefreshFilteredDepartments("");
+            
+            // Настраиваем радио-кнопки для выбора типа
+            SetupTargetTypeSelector();
         }
 
-        private void WireEvents()
+        private void SetupTargetTypeSelector()
         {
-            PlayerNameLine.OnTextChanged += _ => RefreshButtons();
-            MinutesInput.OnTextChanged += _ => RefreshButtons();
-            MinutesInput.OnTextChanged += UpdateTimeButtonsLabels;
-            PlayerList.OnSelectionChanged += OnPlayerSelected;
-            RoleFilterInput.OnTextChanged += _ => RefreshFilteredRoles(RoleFilterInput.Text);
+            // Создаем контейнер для выбора типа цели
+            var typeSelector = new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Horizontal,
+                HorizontalExpand = true,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
 
-            // Полупрозрачный текст в поле ввода
-            RoleFilterInput.PlaceHolder = Loc.GetString("admin-time-panel-window-role-filtre");
+            var roleRadio = new Button
+            {
+                Text = Loc.GetString("admin-time-panel-target-role"),
+                ToggleMode = true,
+                Pressed = true,
+                HorizontalExpand = true
+            };
+            
+            var departmentRadio = new Button
+            {
+                Text = Loc.GetString("admin-time-panel-target-department"),
+                ToggleMode = true,
+                HorizontalExpand = true
+            };
 
-            AddHourButton.OnPressed += _ => AdjustMinutes(60);
-            AddDayButton.OnPressed += _ => AdjustMinutes(1440);
-            AddWeekButton.OnPressed += _ => AdjustMinutes(10080);
-            AddMonthButton.OnPressed += _ => AdjustMinutes(43200);
+            // Группируем радио-кнопки
+            roleRadio.OnToggled += args => 
+            {
+                if (args.Pressed)
+                {
+                    departmentRadio.Pressed = false;
+                    _currentTargetType = TargetType.Role;
+                    UpdateTargetSelector();
+                }
+            };
+            
+            departmentRadio.OnToggled += args => 
+            {
+                if (args.Pressed)
+                {
+                    roleRadio.Pressed = false;
+                    _currentTargetType = TargetType.Department;
+                    UpdateTargetSelector();
+                }
+            };
 
-            ApplyRoleButton.OnPressed += OnApplyRole;
-            ApplyTotalButton.OnPressed += OnApplyTotal;
-            RoleOption.OnItemSelected += args => RoleOption.SelectId(args.Id);
+            typeSelector.AddChild(roleRadio);
+            typeSelector.AddChild(departmentRadio);
+
+            // Вставляем в начало контейнера с опциями
+            OptionsContainer.AddChild(typeSelector);
+        }
+
+        private void UpdateTargetSelector()
+        {
+            // Прячем/показываем соответствующие контролы
+            RoleOption.Visible = _currentTargetType == TargetType.Role;
+            DepartmentOption.Visible = _currentTargetType == TargetType.Department;
+            RoleFilterInput.PlaceHolder = _currentTargetType == TargetType.Role 
+                ? Loc.GetString("admin-time-panel-window-role-filtre")
+                : Loc.GetString("admin-time-panel-window-department-filtre");
+            
+            RefreshFilteredRoles(RoleFilterInput.Text);
+            RefreshFilteredDepartments(RoleFilterInput.Text);
         }
 
         private void RefreshFilteredRoles(string filter)
@@ -70,11 +149,12 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             RoleOption.Clear();
             var index = 0;
 
-            foreach (var (name, tracker) in _allRoles)
-            {
-                if (!name.Contains(filter, StringComparison.OrdinalIgnoreCase))
-                    continue;
+            var sortedRoles = _allRoles
+                .Where(r => r.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(r => r.Name);
 
+            foreach (var (name, tracker) in sortedRoles)
+            {
                 RoleOption.AddItem(name);
                 RoleOption.SetItemMetadata(index++, tracker);
             }
@@ -83,9 +163,94 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
                 RoleOption.SelectId(0);
         }
 
+        private void RefreshFilteredDepartments(string filter)
+        {
+            DepartmentOption.Clear();
+            var index = 0;
+
+            var sortedDepartments = _allDepartments
+                .Where(d => d.LocalizedName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
+                           d.Id.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(d => d.LocalizedName);
+
+            foreach (var (localizedName, id) in sortedDepartments)
+            {
+                DepartmentOption.AddItem(localizedName);
+                DepartmentOption.SetItemMetadata(index++, id);
+            }
+
+            if (DepartmentOption.ItemCount > 0)
+                DepartmentOption.SelectId(0);
+        }
+
+        private void WireEvents()
+        {
+            PlayerNameLine.OnTextChanged += _ => RefreshButtons();
+            MinutesInput.OnTextChanged += _ => RefreshButtons();
+            MinutesInput.OnTextChanged += UpdateTimeButtonsLabels;
+            PlayerList.OnSelectionChanged += OnPlayerSelected;
+            RoleFilterInput.OnTextChanged += _ => 
+            {
+                if (_currentTargetType == TargetType.Role)
+                    RefreshFilteredRoles(RoleFilterInput.Text);
+                else
+                    RefreshFilteredDepartments(RoleFilterInput.Text);
+            };
+
+            // Кнопки добавления времени
+            AddHourButton.OnPressed += _ => AdjustMinutes(60);
+            AddDayButton.OnPressed += _ => AdjustMinutes(1440);
+            AddWeekButton.OnPressed += _ => AdjustMinutes(10080);
+            AddMonthButton.OnPressed += _ => AdjustMinutes(43200);
+
+            // Кнопки применения
+            ApplyRoleButton.OnPressed += OnApply;
+            ApplyTotalButton.OnPressed += OnApplyTotal;
+            
+            // Выбор в выпадающих списках
+            RoleOption.OnItemSelected += args => RoleOption.SelectId(args.Id);
+            DepartmentOption.OnItemSelected += args => DepartmentOption.SelectId(args.Id);
+        }
+
+        private void OnApply(BaseButton.ButtonEventArgs _)
+        {
+            if (string.IsNullOrWhiteSpace(PlayerNameLine.Text) || 
+                string.IsNullOrWhiteSpace(MinutesInput.Text))
+                return;
+
+            if (_currentTargetType == TargetType.Role)
+            {
+                // Добавление к конкретной роли
+                if (RoleOption.SelectedMetadata is not string role || string.IsNullOrWhiteSpace(role))
+                    return;
+
+                _consoleHost.ExecuteCommand($"playtime_addrole_as \"{PlayerNameLine.Text}\" \"{CommandParsing.Escape(role)}\" {MinutesInput.Text}");
+            }
+            else
+            {
+                // Добавление ко всем ролям отдела
+                if (DepartmentOption.SelectedMetadata is not string department || string.IsNullOrWhiteSpace(department))
+                    return;
+
+                _consoleHost.ExecuteCommand($"playtime_adddepartment_as \"{PlayerNameLine.Text}\" \"{CommandParsing.Escape(department)}\" {MinutesInput.Text}");
+            }
+        }
+
+        private void OnApplyTotal(BaseButton.ButtonEventArgs _)
+        {
+            if (string.IsNullOrWhiteSpace(PlayerNameLine.Text) || 
+                string.IsNullOrWhiteSpace(MinutesInput.Text))
+                return;
+
+            _consoleHost.ExecuteCommand($"playtime_addoverall_as \"{PlayerNameLine.Text}\" {MinutesInput.Text}");
+        }
+
         private void RefreshButtons()
         {
-            var inputValid = !string.IsNullOrWhiteSpace(PlayerNameLine.Text) && !string.IsNullOrWhiteSpace(MinutesInput.Text);
+            var inputValid = !string.IsNullOrWhiteSpace(PlayerNameLine.Text) && 
+                           !string.IsNullOrWhiteSpace(MinutesInput.Text) &&
+                           uint.TryParse(MinutesInput.Text, out _);
+            
             SetButtonsState(!inputValid);
         }
 
@@ -99,19 +264,6 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
         {
             PlayerNameLine.Text = player?.Username ?? string.Empty;
             RefreshButtons();
-        }
-
-        private void OnApplyRole(BaseButton.ButtonEventArgs _)
-        {
-            if (RoleOption.SelectedMetadata is not string role || string.IsNullOrWhiteSpace(role))
-                return;
-
-            _consoleHost.ExecuteCommand($"playtime_addrole_as \"{PlayerNameLine.Text}\" \"{CommandParsing.Escape(role)}\" {MinutesInput.Text}");
-        }
-
-        private void OnApplyTotal(BaseButton.ButtonEventArgs _)
-        {
-            _consoleHost.ExecuteCommand($"playtime_addoverall_as \"{PlayerNameLine.Text}\" {MinutesInput.Text}");
         }
 
         private void UpdateTimeButtonsLabels(LineEditEventArgs _)
@@ -138,12 +290,3 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
         }
     }
 }
-
-/*
-    ╔════════════════════════════════════╗
-    ║   Schrödinger's Cat Code   🐾      ║
-    ║   /\_/\\                           ║
-    ║  ( o.o )  Meow!                    ║
-    ║   > ^ <                            ║
-    ╚════════════════════════════════════╝
-*/
