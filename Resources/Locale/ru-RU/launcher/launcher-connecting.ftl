@@ -1,6 +1,6 @@
 ### Connecting dialog when you start up the game
 
-connecting-title = SS14 "Enterprise"
+connecting-title = SS14 "VanGuard"
 connecting-exit = Выйти
 connecting-retry = Повторить
 connecting-reconnect = Переподключиться
