@@ -1,6 +1,6 @@
 windowIconSet: /Textures/Logo/icon
-defaultWindowTitle: Space Station 14 - [RU][MRP] Enterprise # Ganimed
-splashLogo: /Textures/_Ganimed/Logo/logo-ganimed.png # Ganimed
+defaultWindowTitle: Space Station 14 - VanGuard # VG
+splashLogo: /Textures/_VG/Logo/logo-VGss14.png # VG
 multiWindow: true
 
 # PJB PLEASE
