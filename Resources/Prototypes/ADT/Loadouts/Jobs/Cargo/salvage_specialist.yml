@@ -8,6 +8,114 @@
       role: JobSalvageSpecialist
       time: 18000 #5 часов
 
+- type: loadoutEffectGroup
+  id: ADTSalvageSilverCape5hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 18000 #5 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageGoldenCape15hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 54000 #15 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvagePlatinumCape30hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 108000 #30 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageEmeraldCape60hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 216000 #60 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageDiamondCape100hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 360000 #100 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageRubieCape300hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 1080000 #300 часов
+
+# Наборы плащей для SalvageSpecialist (с эффектами)
+- type: loadout
+  id: ADTNeckSalvageCCape
+  equipment:
+    neck: ADTClothingCopperCape
+
+- type: loadout
+  id: ADTNeckSalvageSCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageSilverCape5hour
+  equipment:
+    neck: ADTClothingSilverCape
+
+- type: loadout
+  id: ADTNeckSalvageGCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageGoldenCape15hour
+  equipment:
+    neck: ADTClothingGoldenCape
+
+- type: loadout
+  id: ADTNeckSalvagePCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvagePlatinumCape30hour
+  equipment:
+    neck: ADTClothingPlatinumCape
+
+- type: loadout
+  id: ADTNeckSalvageECape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageEmeraldCape60hour
+  equipment:
+    neck: ADTClothingEmeraldCape
+
+- type: loadout
+  id: ADTNeckSalvageDCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageDiamondCape100hour
+  equipment:
+    neck: ADTClothingDiamondCape
+
+- type: loadout
+  id: ADTNeckSalvageRCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageRubieCape300hour
+  equipment:
+    neck: ADTClothingRubieCape
+
 # Jumpsuit
 - type: loadout
   id: ADTClothingUniformJumpsuitSalvageSpecialist
