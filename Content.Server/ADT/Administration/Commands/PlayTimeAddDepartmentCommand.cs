@@ -21,10 +21,11 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     public string Command => "playtime_adddepartment_as";
-    public string Description => "Adds playtime to a specific department for a player";
+    public string Description => "Adds playtime to a specific department for a player (distributed equally between roles)";
     public string Help => $"Usage: {Command} <username/guid> <department> <minutes>\n" +
                           $"Example: {Command} john Security 60\n" +
-                          $"Example: {Command} 12345678-1234-1234-1234-123456789012 Engineering 30";
+                          $"Example: {Command} 12345678-1234-1234-1234-123456789012 Engineering 30\n" +
+                          $"Note: Time is distributed equally between all roles in the department";
 
     public async void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -52,7 +53,7 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
         }
 
         // Parse minutes
-        if (!int.TryParse(args[2], out var minutes) || minutes < 0)
+        if (!int.TryParse(args[2], out var totalMinutes) || totalMinutes < 0)
         {
             shell.WriteError($"Invalid minutes value: {args[2]}");
             return;
@@ -66,11 +67,13 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
             return;
         }
 
-        var timeToAdd = TimeSpan.FromMinutes(minutes);
+        var timeToAddTotal = TimeSpan.FromMinutes(totalMinutes);
         var addedRoles = new List<string>();
         var failedRoles = new List<string>();
-
-        // Add time to each role in the department
+        
+        // Get all valid roles in the department
+        var validRoles = new List<(string Tracker, string LocalizedName)>();
+        
         foreach (var jobId in department.Roles)
         {
             if (!_prototypeManager.TryIndex<JobPrototype>(jobId, out var job))
@@ -86,16 +89,32 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
                 continue;
             }
 
+            validRoles.Add((tracker, job.LocalizedName));
+        }
+
+        if (validRoles.Count == 0)
+        {
+            shell.WriteError($"No valid roles found in department: {departmentId}");
+            return;
+        }
+
+        // Distribute time equally between all valid roles
+        var timePerRole = TimeSpan.FromMinutes(totalMinutes / (double)validRoles.Count);
+        var minutesPerRole = totalMinutes / (double)validRoles.Count;
+        
+        // Add time to each role
+        foreach (var (tracker, localizedName) in validRoles)
+        {
             if (_playerManager.TryGetSessionById(userId, out var player))
             {
-                _playTimeTracking.AddTimeToTracker(player, tracker, timeToAdd);
+                _playTimeTracking.AddTimeToTracker(player, tracker, timePerRole);
             }
             else
             {
-                await _playTimeTracking.AddTimeToTrackerById(userId, tracker, timeToAdd);
+                await _playTimeTracking.AddTimeToTrackerById(userId, tracker, timePerRole);
             }
             
-            addedRoles.Add(job.LocalizedName);
+            addedRoles.Add(localizedName);
         }
 
         // Get updated overall time
@@ -109,10 +128,10 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
             overall = await _playTimeTracking.GetOverallPlaytimeById(userId);
         }
 
-        // Format the result message (ВСЕГДА В МИНУТАХ)
-        var resultMessage = $"Successfully added {minutes} minutes to all roles in department '{departmentId}' for {args[0]}\n" +
-                           $"Added to {addedRoles.Count} roles\n" +
-                           $"Total department time added: {minutes * addedRoles.Count} minutes";
+        // Format the result message
+        var resultMessage = $"Successfully added {totalMinutes} minutes total to department '{departmentId}' for {args[0]}\n" +
+                           $"Time distributed equally between {validRoles.Count} roles\n" +
+                           $"Added {minutesPerRole:F2} minutes to each role";
 
         if (addedRoles.Count > 0)
         {
@@ -123,6 +142,8 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
         {
             resultMessage += $"\nFailed to update roles: {string.Join(", ", failedRoles)}";
         }
+
+        resultMessage += $"\nOverall playtime: {overall.TotalMinutes:F0} minutes";
 
         shell.WriteLine(resultMessage);
     }
@@ -152,7 +173,7 @@ public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
 
         if (args.Length == 3)
         {
-            return CompletionResult.FromHint("Minutes to add");
+            return CompletionResult.FromHint("Minutes to add (total)");
         }
 
         return CompletionResult.Empty;
