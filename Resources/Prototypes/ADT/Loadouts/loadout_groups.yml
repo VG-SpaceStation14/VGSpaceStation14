@@ -824,6 +824,7 @@
   maxLimit: 1
   loadouts:
   - ADTClothingUniformJumpsuitSalvageSpecialist
+  - ADTUniformJumpsuitExplorer # VG-Loadouts-Add
 
 # ШАХТЁР
 - type: loadoutGroup
