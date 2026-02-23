@@ -12,12 +12,6 @@
 
 </div>
 
-<p align="center">
-  <img src="https://img.shields.io/github/commit-activity/y/ss14-ganimed/ganimed14?style=flat-square" alt="GitHub commit activity">
-  <img src="https://img.shields.io/github/issues/ss14-ganimed/ganimed14?style=flat-square" alt="GitHub Issues">
-  <img src="https://img.shields.io/github/issues-pr-closed/ss14-ganimed/ganimed14?style=flat-square" alt="GitHub Closed PRs">
-</p>
-
 ---
 
 ## 🚀 О проекте 
@@ -29,31 +23,6 @@
 - Уникальный геймплей, поддерживаемый целым рядом сообществ.
 - Интенсивное взаимодействие игроков в замкнутом пространстве станции.
 - Постоянное развитие благодаря движку [Robust Toolbox](https://github.com/space-wizards/RobustToolbox), написанный на C#.
-
----
-
-<p align="center">
-  <b>✨ Активность проекта</b>
-</p>
-<p align="center">
-  <i>Следите за динамикой проекта и вовлечённостью сообщества:</i>
-</p>
-
-<div align="center">
-
-![Активность PR](https://repobeats.axiom.co/api/embed/4ebb037939c72b15a842f7e154f3cba94e4bfa1a.svg "Repobeats analytics image")
-
-</div>
-
----
-
-## 🌐 Участники проекта
-
-Этот проект невозможен без усилий нашего сообщества. Вот те, кто внёс наибольший вклад:
-
-[![Участники](https://contrib.rocks/image?repo=ss14-ganimed/ganimed14)](https://github.com/Albuka1/VGSpaceStation14/ganimed14/graphs/contributors)
-
----
 
 ## Лицензия
 
