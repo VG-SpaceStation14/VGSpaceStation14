@@ -14,6 +14,82 @@ using Robust.Shared.Prototypes;
 namespace Content.Server.ADT.Administration.Commands;
 
 [AdminCommand(AdminFlags.Moderator)]
+public sealed class PlayTimeAddOverallAsyncCommand : IConsoleCommand
+{
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly PlayTimeTrackingManager _playTimeTracking = default!;
+    [Dependency] private readonly IPlayerLocator _playerLocator = default!;
+
+    public string Command => "playtime_addoverall_as";
+    public string Description => Loc.GetString("cmd-playtime_addoverall-desc");
+    public string Help => Loc.GetString("cmd-playtime_addoverall-help", ("command", Command));
+
+    public async void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (args.Length != 2)
+        {
+            shell.WriteError(Loc.GetString("cmd-playtime_addoverall-error-args"));
+            return;
+        }
+
+        if (!int.TryParse(args[1], out var minutes))
+        {
+            shell.WriteError(Loc.GetString("parse-minutes-fail", ("minutes", args[1])));
+            return;
+        }
+
+        NetUserId userId;
+        if (Guid.TryParse(args[0], out var guid))
+        {
+            userId = new NetUserId(guid);
+        }
+        else
+        {
+            var dbGuid = await _playerLocator.LookupIdByNameAsync(args[0]);
+            if (dbGuid == null)
+            {
+                shell.WriteError(Loc.GetString("parse-session-fail", ("username", args[0])));
+                return;
+            }
+            userId = dbGuid.UserId;
+        }
+
+        if (_playerManager.TryGetSessionById(userId, out var player))
+        {
+            _playTimeTracking.AddTimeToOverallPlaytime(player, TimeSpan.FromMinutes(minutes));
+            var overall = _playTimeTracking.GetOverallPlaytime(player);
+
+            shell.WriteLine(Loc.GetString(
+                "cmd-playtime_addoverall-succeed",
+                ("username", args[0]),
+                ("time", overall)));
+        }
+        else
+        {
+            await _playTimeTracking.AddTimeToOverallPlaytimeById(userId, TimeSpan.FromMinutes(minutes));
+            var overall = await _playTimeTracking.GetOverallPlaytimeById(userId);
+
+            shell.WriteLine(Loc.GetString(
+                "cmd-playtime_addoverall-succeed",
+                ("username", args[0]),
+                ("time", overall)));
+        }
+    }
+
+    public CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        if (args.Length == 1)
+            return CompletionResult.FromHintOptions(CompletionHelper.SessionNames(),
+                Loc.GetString("cmd-playtime_addoverall-arg-user"));
+
+        if (args.Length == 2)
+            return CompletionResult.FromHint(Loc.GetString("cmd-playtime_addoverall-arg-minutes"));
+
+        return CompletionResult.Empty;
+    }
+}
+
+[AdminCommand(AdminFlags.Moderator)]
 public sealed class PlayTimeAddRoleAsyncCommand : IConsoleCommand
 {
     [Dependency] private readonly IPlayerManager _playerManager = default!;
