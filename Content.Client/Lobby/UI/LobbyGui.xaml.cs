@@ -1,5 +1,3 @@
-using Content.Client.ADT.Discord;
-using Content.Client.Corvax.Sponsors;
 using Content.Client.Message;
 using Content.Client.UserInterface.Systems.EscapeMenu;
 using Content.Shared.ADT.CCVar;
@@ -16,18 +14,8 @@ namespace Content.Client.Lobby.UI
     public sealed partial class LobbyGui : UIScreen
     {
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
-        [Dependency] private readonly SponsorsManager _sponsorsManager = default!;
-        [Dependency] private readonly DiscordIdManager _discordIdManager = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
-        private float _updateTimer;
-        private bool _panelUpdate = false;
-        // Цвета для кнопок (ADT-Const-Start)
-        private static readonly Color ColorBlue = Color.FromHex("#1966ff");   // Синий
-        private static readonly Color ColorRed = Color.FromHex("#AB3232"); // Красный
-
-        private static readonly Color ColorGreen = Color.FromHex("#5DA130");   // Зелёный
-        private static readonly Color ColorOrange = Color.FromHex("#FFA500");  // Оранжевый
-        // (ADT-Const-End)
+        private bool _panelUpdate = false; // Больше не используется, но оставим для совместимости
 
         public LobbyGui()
         {
@@ -35,13 +23,14 @@ namespace Content.Client.Lobby.UI
             IoCManager.InjectDependencies(this);
             SetAnchorPreset(MainContainer, LayoutPreset.Wide);
             SetAnchorPreset(Background, LayoutPreset.Wide);
-            SetAnchorPreset(ShowInterfaceContainer, LayoutPreset.Wide); // ADT-Tweak
-            SetAnchorPreset(ShowInterface, LayoutPreset.BottomLeft); // ADT-Tweak
+            SetAnchorPreset(ShowInterfaceContainer, LayoutPreset.Wide);
+            SetAnchorPreset(ShowInterface, LayoutPreset.BottomLeft);
 
             LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
 
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
+            
             // ADT-Tweak-Start
             HideInterface.OnPressed += _ =>
             {
@@ -51,18 +40,6 @@ namespace Content.Client.Lobby.UI
             {
                 SwitchState(LobbyGuiState.Default);
             };
-
-            if (_cfg.GetCVar(ADTCCVars.ExtraLobbyPanelEnabled))
-            {
-                LobbyPanelLeftTop.Visible = true;
-                _panelUpdate = true;
-                UpdateButtons();
-            }
-            else
-            {
-                _panelUpdate = false;
-                LobbyPanelLeftTop.Visible = false;
-            }
             // ADT-Tweak-End
 
             CollapseButton.OnPressed += _ => TogglePanel(false);
@@ -73,6 +50,7 @@ namespace Content.Client.Lobby.UI
         {
             DefaultState.Visible = false;
             CharacterSetupState.Visible = false;
+            
             // ADT-Tweak-Start
             ShowInterfaceContainer.Visible = false;
             MainContainer.Visible = true;
@@ -107,72 +85,6 @@ namespace Content.Client.Lobby.UI
                 // ADT-Tweak-End
             }
         }
-        // ADT-Tweak-Start: Обновление кнопок
-        protected override void FrameUpdate(FrameEventArgs args)
-        {
-            if (!_panelUpdate)
-                return;
-
-            base.FrameUpdate(args);
-
-            // Обновляем раз в 5 секунд
-            _updateTimer += args.DeltaSeconds;
-            if (_updateTimer > 5.0f)
-            {
-                _updateTimer = 0;
-                UpdateButtons();
-            }
-        }
-        // ADT-Tweak-End
-        // ADT-Tweak-Start: Покраска кнопок в зависимости от спонсорки и привязки к Discord
-        private void UpdateButtons()
-        {
-            // Проверяем статус спонсорки
-            if (_sponsorsManager?.TryGetInfo(out var sponsorInfo) == true)
-            {
-                UpdateSponsorButtonColor(true, sponsorInfo.Tier);
-            }
-            else
-            {
-                UpdateSponsorButtonColor(false, null);
-            }
-            SponsorInfoButton.Visible = true;
-
-            // Проверяем статус Discord
-            UpdateDiscordLinkButtonColor(_discordIdManager?.TryGetDiscordId(out _));
-            DiscordLinkButton.Visible = true;
-        }
-
-        public void UpdateSponsorButtonColor(bool hasSponsor, int? sponsorTier)
-        {
-            if (SponsorInfoButton == null)
-                return;
-
-            SponsorInfoButton.ModulateSelfOverride = hasSponsor
-                ? ColorBlue  // Синий
-                : ColorRed;  // Красный
-
-            SponsorInfoButton.Text = hasSponsor && sponsorTier != null
-                ? Loc.GetString("ui-lobby-sponsor-button-level", ("sponsorTier", sponsorTier))
-                : Loc.GetString("ui-lobby-sponsor-button-main-level");
-        }
-
-        public void UpdateDiscordLinkButtonColor(bool? isLinked)
-        {
-            if (DiscordLinkButton == null)
-                return;
-
-            var (color, text) = isLinked switch
-            {
-                true  => (ColorGreen, Loc.GetString("ui-lobby-discord-menu-link")),    // Зелёный
-                false => (ColorRed, Loc.GetString("ui-lobby-discord-menu-make-link")), // Красный
-                null  => (ColorOrange, Loc.GetString("ui-lobby-discord-menu-error"))   // Оранжевый
-            };
-
-            DiscordLinkButton.ModulateSelfOverride = color;
-            DiscordLinkButton.Text = text;
-        }
-        // ADT-Tweak-end
 
         private void TogglePanel(bool value)
         {
