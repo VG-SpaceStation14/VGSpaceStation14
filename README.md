@@ -5,7 +5,7 @@
 <div align="center">
 
   [![Discord](https://img.shields.io/discord/958370404773294160?label=Join%20our%20Discord&logo=discord&logoColor=white&style=for-the-badge)](soon)
-  [![Wiki](https://img.shields.io/badge/Wiki-Explore%20Our%20Wiki-blue?style=for-the-badge)](soon)
+  [![Wiki](https://img.shields.io/badge/Wiki-Explore%20Our%20Wiki-blue?style=for-the-badge)](https://vanguardproject.ru/)
   [![Steam](https://img.shields.io/badge/Steam-Play%20on%20Steam-blue?style=for-the-badge)](https://store.steampowered.com/app/1255460/Space_Station_14/)
   [![Client](https://img.shields.io/badge/Download-Client-blue?style=for-the-badge)](https://spacestation14.io/about/nightlies/)
   [![GitHub](https://img.shields.io/github/stars/Albuka1/VGSpaceStation14?style=for-the-badge&logo=github)](https://github.com/Albuka1/VGSpaceStation14.git)
