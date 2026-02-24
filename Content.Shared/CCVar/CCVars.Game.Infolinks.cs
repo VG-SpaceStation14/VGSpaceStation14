@@ -26,7 +26,7 @@ public sealed partial class CCVars
     ///     Link to website to show in the launcher.
     /// </summary>
     public static readonly CVarDef<string> InfoLinksWebsite =
-        CVarDef.Create("infolinks.website", "https://vanguardproject.ru/game/sop-security.html", CVar.SERVER | CVar.REPLICATED); // VG-Tweak
+        CVarDef.Create("infolinks.website", "https://vanguardproject.ru/index.html", CVar.SERVER | CVar.REPLICATED); // VG-Tweak
 
     /// <summary>
     ///     Link to wiki to show in the launcher.
