@@ -1,5 +1,5 @@
 # Holiday names
-holiday-name-vg-birthday = Birthday of Enterprise server
+holiday-name-vg-birthday = Birthday of server
 
 # Custom congrats
 holiday-custom-vg-birthday = ...
