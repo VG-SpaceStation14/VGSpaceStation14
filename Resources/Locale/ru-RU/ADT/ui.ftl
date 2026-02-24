@@ -1,7 +1,7 @@
 adt-other-credits-tab = Другие
 
 ### Esc меню
-ui-escape-website = Boosty
+ui-escape-website = Wiki
 
 ### Окно очереди
 queue-title = В очереди
