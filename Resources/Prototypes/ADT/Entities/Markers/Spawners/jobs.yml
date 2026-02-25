@@ -58,6 +58,18 @@
       - state: scientist
 
 - type: entity
+  id: ADTSpawnPointSenRoboticist
+  parent: SpawnPointJobBase
+  name: senroboticist
+  components:
+  - type: SpawnPoint
+    job_id: ADTSenRoboticist
+  - type: Sprite
+    layers:
+      - state: green
+      - state: scientist
+
+- type: entity
   id: SpawnADTBlueShieldOfficer
   parent: ADTSpawnPointJobBase
   name: ADTBlueShieldOfficer
