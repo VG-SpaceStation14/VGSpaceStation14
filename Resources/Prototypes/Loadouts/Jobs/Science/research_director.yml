@@ -25,7 +25,7 @@
     proto: MasterRD
 
 - type: loadout
-  id: ResearchDirectorMantle
+  id: ResearchDirectorMantle2
   equipment:
     neck: ClothingNeckMantleRD
 

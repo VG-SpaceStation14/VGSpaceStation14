@@ -38,6 +38,18 @@
 
 - type: entity
   parent: IDCardStandard
+  id: VGSenRoboticistIDCard
+  name: Sen roboticist ID card
+  components:
+  - type: Sprite
+    layers:
+    - state: default
+    - state: idroboticist
+  - type: PresetIdCard
+    job: ADTSenRoboticist
+
+- type: entity
+  parent: IDCardStandard
   id: ADTBlueShieldOfficerIDCard
   name: Blue Shield Officer ID card
   components:

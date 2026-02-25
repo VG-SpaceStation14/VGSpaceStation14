@@ -57,6 +57,7 @@ job-name-geneticist = генетик
 job-name-no-id = нет ID
 job-name-prisoner = заключённый
 job-name-roboticist = робототехник
+job-name-sen-roboticist = старший робототехник
 job-name-syndicate = синдикат
 job-name-unknown = неизвестно
 job-name-virologist = вирусолог

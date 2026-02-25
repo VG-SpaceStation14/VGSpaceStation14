@@ -8,6 +8,9 @@
   id: JobRoboticist
 
 - type: playTimeTracker
+  id: JobSenRoboticist
+
+- type: playTimeTracker
   id: JobADTBlueShieldOfficer
 
 - type: playTimeTracker

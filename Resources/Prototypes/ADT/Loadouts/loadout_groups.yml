@@ -353,6 +353,49 @@
   - SeniorEngineerJumpsuit
   - SeniorEngineerJumpskirt
 
+# SENIOR ROBOTICIST
+
+- type: loadoutGroup
+  id: SenRoboticistHead
+  name: loadout-group-senior-roboticis-head
+  minLimit: 0
+  loadouts:
+  - SeniorResearcherBeret
+
+- type: loadoutGroup
+  id: SenRoboticistNeack
+  name: loadout-group-senior-roboticis-neack
+  minLimit: 0
+  loadouts:
+  - ClothingNeckCloakRdOriginal
+
+- type: loadoutGroup
+  id: ADTSenRoboticistJumpsuit
+  name: loadout-group-senior-roboticis-jumpsuit
+  minLimit: 1
+  maxLimit: 1
+  loadouts:
+  - SeniorResearcherJumpsuit
+  - SeniorResearcherJumpskirt
+
+- type: loadoutGroup
+  id: ADTSenRoboticistGloves
+  name: loadout-group-senior-roboticis-gloves
+  minLimit: 0
+  loadouts:
+  - LatexGloves
+  - ClothingHandsGlovesRobohands
+  # - NitrileGloves # ADT-Tweak (почему у НРа их нет (тем более они медицинские), а у доцента - есть?)
+  - ADTPurpleGloves
+
+- type: loadoutGroup
+  id: ADTSenRoboticistOuterClothing
+  name: loadout-group-senior-roboticis-outerclothing
+  minLimit: 0
+  loadouts:
+  - SeniorResearcherLabCoat
+  - ADTOuterClothingCoatsCrazySci
+
 # SENIOR RESEARCHER
 
 - type: loadoutGroup

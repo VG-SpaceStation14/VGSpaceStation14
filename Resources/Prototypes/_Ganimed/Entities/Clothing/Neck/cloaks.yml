@@ -116,6 +116,15 @@
     sprite: _Ganimed/Clothing/Neck/Cloaks/original_rd.rsi
 
 - type: entity
+  parent: ClothingNeckBase
+  id: ClothingNeckCloakRdotoOriginal
+  name: robototech science cloak
+  description: A black cloak with red stripes, showing your status as the harbringer of cutting-edge technology.
+  components:
+  - type: Sprite
+    sprite: _Ganimed/Clothing/Neck/Cloaks/original_rd.rsi
+
+- type: entity
   parent: [ClothingNeckBase, BaseCommandContraband]
   id: ClothingNeckCloakCapAlt
   name: captain's gilded cloak

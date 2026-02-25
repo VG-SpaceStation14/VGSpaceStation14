@@ -6,6 +6,8 @@ JobADTMiner = шахтёр
 
 JobRoboticist = робототехник
 
+JobSenRoboticist = старший робототехник
+
 job-name-magistrat = магистрат
 JobMagistrat = магистрат
 

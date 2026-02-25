@@ -150,6 +150,28 @@
   # ADT tweak end
 
 - type: roleLoadout
+  id: JobADTSenRoboticist
+  groups:
+  - Inventory # Corvax-Loadouts
+  - GroupTankHarness
+  - SenRoboticistHead # ADT-Tweak-senior
+  - SenRoboticistNeack # VG-Tweak-loadouts
+  - Glasses
+  - ADTSenRoboticistJumpsuit # ADT-Tweak-senior
+  - ADTSenRoboticistGloves # ADT-Tweak-senior
+  - ScientistBackpack
+  - ADTSenRoboticistOuterClothing # ADT-Tweak-senior
+  - ScientistShoes
+  - Survival
+  - Trinkets
+  # ADT tweak start
+  - ADTTop
+  - ADTBottom
+  - ADTSocks
+  - GroupSpeciesBreathTool
+  # ADT tweak end
+
+- type: roleLoadout
   id: JobADTSeniorEngineer
   groups:
   - Inventory # Corvax-Loadouts

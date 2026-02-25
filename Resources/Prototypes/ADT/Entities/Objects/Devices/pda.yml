@@ -125,6 +125,38 @@
       visible: false
 
 - type: entity
+  parent: ADTBasePDA
+  id: VGSenRoboticistPDA
+  name: Sen roboticist PDA
+  description: It's covered with an unknown gooey substance.
+  components:
+  - type: Pda
+    id: VGSenRoboticistIDCard
+  - type: PdaBorderColor
+    borderColor: "#171716"
+    accentVColor: "#d90000"
+  - type: Icon
+    state: pda-roboticist
+  - type: Appearance
+    appearanceDataInit:
+     enum.PdaVisuals.PdaType:
+      !type:String
+      pda-roboticist
+  - type: Sprite
+    sprite: ADT/Objects/Devices/pda.rsi
+    layers:
+    - map: [ "enum.PdaVisualLayers.Base" ]
+      state: "pda-roboticist"
+    - state: "light_overlay"
+      map: [ "enum.PdaVisualLayers.Flashlight" ]
+      shader: "unshaded"
+      visible: false
+    - state: "id_overlay"
+      map: [ "enum.PdaVisualLayers.IdLight" ]
+      shader: "unshaded"
+      visible: false
+
+- type: entity
   parent: ADTBaseMedicalPDA
   id: ADTPathologistPDA
   name: pathologist's PDA

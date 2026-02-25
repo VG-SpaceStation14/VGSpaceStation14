@@ -1,0 +1,29 @@
+- type: job
+  id: ADTSenRoboticist
+  name: job-name-sen-roboticist
+  description: job-description-sen-roboticist
+  playTimeTracker: JobSenRoboticist
+  requirements:
+    - !type:DepartmentTimeRequirement
+      department: Science
+      time: 216000 #50 hrs
+  startingGear: ADTSenRoboticistGear
+  icon: "JobIconRoboticist"
+  supervisors: job-supervisors-rd
+  access:
+  - Research
+  - Maintenance
+
+- type: startingGear
+  id: ADTSenRoboticistGear
+  equipment:
+    ears: ClothingHeadsetRobotics
+    pocket1: BorgTranslatorImplanter
+    belt: ClothingBeltUtilityEngineering
+
+- type: chameleonOutfit
+  id: ADTSenRoboticistChameleonOutfit
+  job: ADTSenRoboticist
+  hasMindShield: true
+  equipment:
+    ears: ClothingHeadsetRobotics

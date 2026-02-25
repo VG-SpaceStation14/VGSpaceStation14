@@ -1,0 +1,39 @@
+# Head
+
+- type: loadout
+  id: SenRoboticistBeret
+  equipment:
+    head: ClothingHeadHatBeretRND
+
+# Neack
+
+- type: loadout
+  id: SenRoboticistRdOriginal
+  equipment:
+    neck: ClothingNeckCloakRdOriginal
+
+# Jumpsuit
+
+- type: loadout
+  id: SenRoboticistJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSeniorResearcher
+
+- type: loadout
+  id: SenRoboticistJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtSeniorResearcher
+
+# OuterClothing
+
+- type: loadout
+  id: SenRoboticistLabCoat
+  equipment:
+    outerClothing: ClothingOuterCoatLabSeniorResearcher
+
+# ID
+
+- type: loadout
+  id: SenRoboticistPDA
+  equipment:
+    id: VGSenRoboticistPDA
