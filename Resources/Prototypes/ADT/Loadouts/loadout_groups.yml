@@ -882,7 +882,7 @@
   minLimit: 0
   maxLimit: 1
   loadouts:
-  - ADTNeckSalvageSpecialistCape
+  - ADTNeckSalvageCCape
   - ADTNeckSalvageSCape
   - ADTNeckSalvageGCape
   - ADTNeckSalvagePCape
