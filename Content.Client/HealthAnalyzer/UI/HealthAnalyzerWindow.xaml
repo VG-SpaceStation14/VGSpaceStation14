@@ -59,7 +59,7 @@
 
             </BoxContainer>
 
-            <PanelContainer StyleClasses="LowDivider" />
+            <PanelContainer Name="DamageGroupsDivider" StyleClasses="LowDivider" />
 
             <BoxContainer
                 Name="GroupsContainer"

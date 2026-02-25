@@ -186,41 +186,45 @@ namespace Content.Client.HealthAnalyzer.UI
                 _ => Loc.GetString("health-analyzer-window-entity-unknown-text"),
             };
         }
-        // ADT-Tweak start: - Draw Damage Groups in a two column grid in their own boxes.
+        
+        // ADT-Tweak start: - Draw Damage Groups in a vertical list with standard font
         private void DrawDiagnosticGroups(
             Dictionary<string, FixedPoint2> groups,
             IReadOnlyDictionary<string, FixedPoint2> damageDict)
         {
             GroupsContainer.RemoveAllChildren();
 
-            var gridContainer = new GridContainer
+            // Растягиваем контейнер на всю ширину
+            GroupsContainer.HorizontalExpand = true;
+            
+            // Вертикальный список для групп повреждений
+            var listContainer = new BoxContainer
             {
-                Columns = 2,
+                Orientation = BoxContainer.LayoutOrientation.Vertical,
+                HorizontalExpand = true,
+                SeparationOverride = 4,
             };
 
-            GroupsContainer.AddChild(gridContainer);
+            GroupsContainer.AddChild(listContainer);
 
-            var columnIndex = 0;
             foreach (var (damageGroupId, damageAmount) in groups)
             {
+                // Пропускаем группы без урона
+                if (damageAmount <= 0)
+                    continue;
+                    
                 var groupTitleText = $"{Loc.GetString(
                     "health-analyzer-window-damage-group-text",
                     ("damageGroup", _prototypes.Index<DamageGroupPrototype>(damageGroupId).LocalizedName),
                     ("amount", damageAmount)
                 )}";
 
-                // Create a bordered box for each damage group
+                // Создаём блок для группы
                 var groupBox = new PanelContainer
                 {
                     Margin = new Thickness(2),
-                    MinWidth = 200,
+                    HorizontalExpand = true,
                 };
-
-                // Boxes in the second column get right aligned
-                if (columnIndex % 2 == 1)
-                {
-                    groupBox.HorizontalAlignment = HAlignment.Right;
-                }
 
                 groupBox.PanelOverride = new StyleBoxFlat
                 {
@@ -236,16 +240,19 @@ namespace Content.Client.HealthAnalyzer.UI
                 {
                     Align = BoxContainer.AlignMode.Begin,
                     Orientation = BoxContainer.LayoutOrientation.Vertical,
+                    HorizontalExpand = true,
                 };
 
+                // Заголовок группы с иконкой
                 var titleRow = CreateDiagnosticGroupTitleRow(groupTitleText, (float)damageAmount, damageGroupId);
                 groupContainer.AddChild(titleRow);
 
-                // Add divider line under the title row
+                // Разделитель
                 var divider = new PanelContainer
                 {
                     MinHeight = 1,
                     Margin = new Thickness(0, 0, 0, 4),
+                    HorizontalExpand = true,
                 };
                 divider.PanelOverride = new StyleBoxFlat(Color.Gray);
                 groupContainer.AddChild(divider);
@@ -264,16 +271,19 @@ namespace Content.Client.HealthAnalyzer.UI
                     {
                         Orientation = BoxContainer.LayoutOrientation.Horizontal,
                         Margin = new Thickness(0, 2),
+                        HorizontalExpand = true,
                     };
 
-                    // Add damage type icon
+                    // Иконка типа повреждения
                     damageRow.AddChild(new TextureRect
                     {
                         SetSize = new Vector2(15, 15),
                         Texture = GetTexture(typeId),
                         Margin = new Thickness(0, 0, 4, 0),
+                        VerticalAlignment = VAlignment.Center,
                     });
 
+                    // Название типа (стандартный шрифт)
                     var typeLabel = new Label
                     {
                         Text = damageTypeName,
@@ -281,6 +291,7 @@ namespace Content.Client.HealthAnalyzer.UI
                         HorizontalAlignment = HAlignment.Left,
                     };
 
+                    // Значение урона (стандартный шрифт)
                     var amountLabel = new Label
                     {
                         Text = typeAmount.ToString(),
@@ -293,8 +304,7 @@ namespace Content.Client.HealthAnalyzer.UI
                 }
 
                 groupBox.AddChild(groupContainer);
-                gridContainer.AddChild(groupBox);
-                columnIndex++;
+                listContainer.AddChild(groupBox);
             }
         }
 
@@ -311,6 +321,9 @@ namespace Content.Client.HealthAnalyzer.UI
             if (!hasChemicals || reagents == null)
                 return;
 
+            // Растягиваем контейнер на всю ширину
+            ChemicalsContainer.HorizontalExpand = true;
+
             // Sort by quantity descending
             var sortedReagents = reagents.OrderByDescending(r => r.Quantity).ToList();
 
@@ -323,13 +336,13 @@ namespace Content.Client.HealthAnalyzer.UI
                 {
                     reagentName = reagentProto.LocalizedName;
                     reagentColor = reagentProto.SubstanceColor;
-
                 }
 
                 var rowContainer = new BoxContainer
                 {
                     Orientation = BoxContainer.LayoutOrientation.Horizontal,
                     Margin = new Thickness(0, 2),
+                    HorizontalExpand = true,
                 };
 
                 // Color bar
@@ -376,14 +389,6 @@ namespace Content.Client.HealthAnalyzer.UI
             return _spriteSystem.Frame0(rsiSprite);
         }
 
-        private static Label CreateDiagnosticItemLabel(string text)
-        {
-            return new Label
-            {
-                Text = text,
-            };
-        }
-
         // ADT-Tweak start: - damage group titles get a color gradient and exclamations to indicate severity
         private BoxContainer CreateDiagnosticGroupTitleRow(string text, float damageAmount, string damageGroupId)
         {
@@ -400,10 +405,12 @@ namespace Content.Client.HealthAnalyzer.UI
                 > 50f => " !",
                 _ => ""
             };
+            
             var titleRow = new BoxContainer
             {
                 Orientation = BoxContainer.LayoutOrientation.Horizontal,
                 Margin = new Thickness(0, 0, 0, 4),
+                HorizontalExpand = true,
             };
 
             var groupId = damageGroupId.ToLowerInvariant();
@@ -417,11 +424,12 @@ namespace Content.Client.HealthAnalyzer.UI
                 VerticalAlignment = VAlignment.Center,
             });
 
+            // Название группы (стандартный шрифт, без FontSizeOverride)
             var titleLabel = new Label
             {
                 Text = text + exclamations,
                 HorizontalExpand = true,
-                HorizontalAlignment = HAlignment.Center,
+                HorizontalAlignment = HAlignment.Left,
                 FontColorOverride = titleColor,
             };
 
