@@ -143,6 +143,7 @@
   - ADTRoboticist
   - ADTSeniorResearcher
   # ADT-Tweak
+  - ADTSenRoboticist # VG tweak
 
 - type: department
   id: Silicon

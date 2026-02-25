@@ -360,14 +360,14 @@
   name: loadout-group-senior-roboticis-head
   minLimit: 0
   loadouts:
-  - SeniorResearcherBeret
+  - ClothingHeadHatBeretRobotech
 
 - type: loadoutGroup
   id: SenRoboticistNeack
   name: loadout-group-senior-roboticis-neack
   minLimit: 0
   loadouts:
-  - ClothingNeckCloakRdOriginal
+  - ClothingNeckCloakRdotoOriginal
 
 - type: loadoutGroup
   id: ADTSenRoboticistJumpsuit
@@ -375,8 +375,8 @@
   minLimit: 1
   maxLimit: 1
   loadouts:
-  - SeniorResearcherJumpsuit
-  - SeniorResearcherJumpskirt
+  - ClothingUniformJumpsuitSenRoboticist
+  - ClothingUniformJumpskirtRoboticist
 
 - type: loadoutGroup
   id: ADTSenRoboticistGloves
@@ -393,8 +393,8 @@
   name: loadout-group-senior-roboticis-outerclothing
   minLimit: 0
   loadouts:
-  - SeniorResearcherLabCoat
-  - ADTOuterClothingCoatsCrazySci
+  - ClothingOuterCoatRoboOriginal
+  - ClothingOuterCoatRobo
 
 # SENIOR RESEARCHER
 
