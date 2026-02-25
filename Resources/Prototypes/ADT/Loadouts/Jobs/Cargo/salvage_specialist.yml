@@ -64,9 +64,9 @@
 
 # Наборы плащей для SalvageSpecialist (с эффектами)
 - type: loadout
-  id: ADTNeckSalvageCCape
+  id: ADTNeckSalvageSpecialistCape
   equipment:
-    neck: ADTClothingCopperCape
+    neck: ClothingNeckCloakSalvagerSupreme
 
 - type: loadout
   id: ADTNeckSalvageSCape
@@ -121,6 +121,11 @@
   id: ADTClothingUniformJumpsuitSalvageSpecialist
   equipment:
     jumpsuit: ClothingUniformJumpsuitSalvageSpecialist
+
+- type: loadout
+  id: ADTClothingUniformJumpsuitSalvageSpecialistAlt
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
 
 - type: loadout
   id: ADTUniformJumpsuitExplorer

@@ -52,6 +52,11 @@
     neck: ClothingNeckCloakQm
 
 - type: loadout
+  id: QuartermasterLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakQM
+
+- type: loadout
   id: QuartermasterMantle
   equipment: 
     neck: ClothingNeckMantleQM

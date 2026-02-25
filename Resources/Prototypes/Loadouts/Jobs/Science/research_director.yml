@@ -24,7 +24,7 @@
   - !type:GroupLoadoutEffect
     proto: MasterRD
 
-- type: startingGear
+- type: loadout
   id: ResearchDirectorMantle
   equipment:
     neck: ClothingNeckMantleRD
@@ -33,6 +33,11 @@
   id: ResearchDirectorCloak
   equipment:
     neck: ClothingNeckCloakRd
+
+- type: loadout
+  id: ResearchDirectorLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakRD
 
 # Jumpsuit
 - type: loadout

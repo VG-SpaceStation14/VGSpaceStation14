@@ -77,6 +77,7 @@ loadout-group-atmos-id-adt = Атмосферный техник, ID
 loadout-research-director-ears-adt = Научный руководитель, ухо
 loadout-group-reserch-director-id-adt = Научный руководитель, ID
 loadout-group-senior-researcher-head = Старший Научный Сотрудник, голова
+loadout-group-senior-researcher-neack = Старший Научный Сотрудник, шея
 loadout-group-senior-researcher-jumpsuit = Старший Научный Сотрудник, комбинезон
 loadout-group-senior-researcher-gloves = Старший Научный Сотрудник, перчатки
 loadout-group-senior-researcher-outerclothing = Старший Научный Сотрудник, верхняя одежда
