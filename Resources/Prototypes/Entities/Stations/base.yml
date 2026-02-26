@@ -62,8 +62,8 @@
             - type: TradeStation
           paths:
         # ADT Trade Station Start
-            # - /Maps/Shuttles/trading_outpost.yml
-            - /Maps/ADTMaps/Shuttles/adt_trade_outpost.yml
+            - /Maps/Shuttles/trading_outpost.yml #VG-Tweak
+           # - /Maps/ADTMaps/Shuttles/adt_trade_outpost.yml #VG-Tweak
         # ADT Trade Station End
         # Spawn last
         ruins: !type:GridSpawnGroup

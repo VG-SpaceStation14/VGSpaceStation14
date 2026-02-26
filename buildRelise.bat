@@ -3,7 +3,7 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 :: ========== НАСТРОЙКИ (измени под себя) ==========
-set "SERVER_DIR=D:\ss14server\VGSpaceStation14"
+set "SERVER_DIR=D:\ss14myserver\VGSpaceStation14"
 set "BACKUP_DIR=%SERVER_DIR%\DatabaseBackups"
 :: =================================================
 

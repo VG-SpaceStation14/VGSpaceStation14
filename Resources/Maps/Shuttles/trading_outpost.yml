@@ -38,7 +38,7 @@ entities:
   - uid: 2
     components:
     - type: MetaData
-      name: Automated Trade Station
+      name: Торговая станция 
     - type: Transform
       pos: -2.9375,-1.625
       parent: invalid
