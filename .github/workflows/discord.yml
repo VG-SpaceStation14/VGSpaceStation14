@@ -1,0 +1,18 @@
+name: Discord Notification
+
+on: [push]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **Новый коммит!**
+            Автор: {{ commit.author.name }}
+            Сообщение: {{ commit.message }}
+            Репозиторий: {{ repository.name }}
