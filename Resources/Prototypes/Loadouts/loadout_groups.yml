@@ -1134,6 +1134,7 @@
   minLimit: 0
   loadouts:
   - ResearchDirectorMantle
+  - ResearchDirectorRDMantle
   - ResearchDirectorCloak
   - ResearchDirectorLongCloak
 
