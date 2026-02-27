@@ -14,6 +14,9 @@ SOLUTION_PATH = Path("..") / "SpaceStation14.sln"
 CURRENT_HOOKS_VERSION = "2"
 QUIET = len(sys.argv) == 2 and sys.argv[1] == "--quiet"
 
+# ВАШ ФОРК ДВИЖКА
+YOUR_ENGINE_FORK = "https://github.com/VG-SpaceStation14/RobustToolbox.git"
+
 
 def run_command(command: List[str], capture: bool = False) -> subprocess.CompletedProcess:
     """
@@ -40,7 +43,7 @@ def run_command(command: List[str], capture: bool = False) -> subprocess.Complet
 
 def update_submodules():
     """
-    Updates all submodules.
+    Updates all submodules, forcing use of your engine fork.
     """
 
     if ('GITHUB_ACTIONS' in os.environ):
@@ -52,15 +55,50 @@ def update_submodules():
     if shutil.which("git") is None:
         raise FileNotFoundError("git not found in PATH")
 
-    # If the status doesn't match, force VS to reload the solution.
-    # status = run_command(["git", "submodule", "status"], capture=True)
-    run_command(["git", "submodule", "update", "--init", "--recursive"])
-    # status2 = run_command(["git", "submodule", "status"], capture=True)
+    # Принудительно устанавливаем URL подмодуля на ваш форк
+    try:
+        # Проверяем существует ли подмодуль
+        result = subprocess.run(
+            ["git", "config", "--file", ".gitmodules", "--get", "submodule.RobustToolbox.url"],
+            cwd="..",
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            current_url = result.stdout.strip()
+            if current_url != YOUR_ENGINE_FORK:
+                print(f"Меняем URL подмодуля с {current_url} на {YOUR_ENGINE_FORK}")
+                
+                # Меняем URL в .gitmodules
+                subprocess.run(
+                    ["git", "config", "--file", ".gitmodules", "submodule.RobustToolbox.url", YOUR_ENGINE_FORK],
+                    cwd="..",
+                    check=True
+                )
+                
+                # Синхронизируем с локальной конфигурацией
+                subprocess.run(["git", "submodule", "sync"], cwd="..", check=True)
+                
+                # Переинициализируем подмодуль
+                subprocess.run(["git", "submodule", "update", "--init", "--force"], cwd="..", check=True)
+                
+                print("Подмодуль успешно переключен на ваш форк!")
+        else:
+            # Если подмодуль не настроен, добавляем его
+            print("Подмодуль RobustToolbox не найден, добавляем ваш форк...")
+            subprocess.run(
+                ["git", "submodule", "add", YOUR_ENGINE_FORK, "RobustToolbox"],
+                cwd="..",
+                check=True
+            )
+            
+    except Exception as e:
+        print(f"Предупреждение при настройке подмодуля: {e}")
+        # Продолжаем выполнение - стандартное обновление подмодулей
 
-    # Something changed.
-    # if status.stdout != status2.stdout:
-    #     print("Git submodules changed. Reloading solution.")
-    #     reset_solution()
+    # Стандартное обновление подмодулей
+    run_command(["git", "submodule", "update", "--init", "--recursive"])
 
 
 def install_hooks():
