@@ -3,6 +3,7 @@ server-info-guidebook-button = Руководство
 server-info-discord-button = Discord
 server-info-website-button = Сайт
 server-info-wiki-button = Wiki
+server-info-github-button = github
 server-info-forum-button = Форум
 server-info-telegram-button = Telegram
 server-info-report-button = Сообщить об ошибке

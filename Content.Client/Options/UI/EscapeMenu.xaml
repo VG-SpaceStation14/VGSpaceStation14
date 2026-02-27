@@ -12,6 +12,7 @@
         <Button Access="Public" Name="GuidebookButton" Text="{Loc 'ui-escape-guidebook'}" />
         <Button Access="Public" Name="WebSiteButton" Text="{Loc 'ui-escape-website'}" />
         <Button Access="Public" Name="WikiButton" Text="{Loc 'ui-escape-wiki'}" />
+        <Button Access="Public" Name="DiscordButton" Text="{Loc 'ui-escape-discord'}" />
         <changelog:ChangelogButton Access="Public" Name="ChangelogButton" />
         <PanelContainer StyleClasses="LowDivider" Margin="0 2.5 0 2.5" />
         <Button Access="Public" Name="OptionsButton" Text="{Loc 'ui-escape-options'}" />
