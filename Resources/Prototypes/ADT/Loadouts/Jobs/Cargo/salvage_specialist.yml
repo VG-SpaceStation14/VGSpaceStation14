@@ -106,7 +106,7 @@
   - !type:GroupLoadoutEffect
     proto: ADTSalvageDiamondCape100hour
   equipment:
-    neck: ClothingNeckCloakSalvagerSupreme
+    neck: ADTClothingDiamondCape
 
 - type: loadout
   id: ADTNeckSalvageRCape
@@ -121,11 +121,6 @@
   id: ADTClothingUniformJumpsuitSalvageSpecialist
   equipment:
     jumpsuit: ClothingUniformJumpsuitSalvageSpecialist
-
-- type: loadout
-  id: ADTClothingUniformJumpsuitSalvageSpecialistAlt
-  equipment:
-    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
 
 - type: loadout
   id: ADTUniformJumpsuitExplorer

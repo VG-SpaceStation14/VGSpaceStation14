@@ -314,7 +314,3 @@ Resources/MapImages
 
 # Direnv stuff
 .direnv/
-
-# backupbd
-bin/Content.Server/Database/
-DatabaseBackups/

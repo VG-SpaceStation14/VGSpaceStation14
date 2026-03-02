@@ -26,6 +26,7 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using Content.Shared.Damage.Components;
 
 namespace Content.Client.HealthAnalyzer.UI
 {

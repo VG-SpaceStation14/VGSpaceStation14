@@ -363,13 +363,6 @@
   - SeniorResearcherBeret
 
 - type: loadoutGroup
-  id: SeniorResearcherNeack
-  name: loadout-group-senior-researcher-neack
-  minLimit: 0
-  loadouts:
-  - ClothingNeckCloakRdOriginal
-
-- type: loadoutGroup
   id: ADTSeniorResearcherJumpsuit
   name: loadout-group-senior-researcher-jumpsuit
   minLimit: 1
@@ -831,7 +824,6 @@
   maxLimit: 1
   loadouts:
   - ADTClothingUniformJumpsuitSalvageSpecialist
-  - ADTClothingUniformJumpsuitSalvageSpecialistAlt # VG-Tweak
   - ADTUniformJumpsuitExplorer # VG-Loadouts-Add
 
 # ШАХТЁР

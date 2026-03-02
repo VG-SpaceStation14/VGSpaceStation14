@@ -6,7 +6,7 @@
     requirement:
       !type:RoleTimeRequirement
       role: JobResearchDirector
-      time: 72000 #20 hrs
+      time: 20h
 
 # Head
 
@@ -24,8 +24,8 @@
   - !type:GroupLoadoutEffect
     proto: MasterRD
 
-- type: loadout
-  id: ResearchDirectorRDMantle
+- type: startingGear
+  id: ResearchDirectorMantle
   equipment:
     neck: ClothingNeckMantleRD
 
@@ -33,11 +33,6 @@
   id: ResearchDirectorCloak
   equipment:
     neck: ClothingNeckCloakRd
-
-- type: loadout
-  id: ResearchDirectorLongCloak
-  equipment:
-    neck: ClothingNeckLongCloakRD
 
 # Jumpsuit
 - type: loadout

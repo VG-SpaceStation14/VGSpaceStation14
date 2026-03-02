@@ -125,8 +125,7 @@
         salvage: !type:GridSpawnGroup
           nameGrid: false
           paths:
-          - /Maps/_VG/Shuttles/newsalvegeshuttle.yml #VG-Tweak
-          # - /Maps/ADTMaps/Shuttles/pioneer.yml #VG-Tweak
+          - /Maps/ADTMaps/Shuttles/pioneer.yml
         mining_guest: !type:GridSpawnGroup
           nameGrid: false
           paths:
