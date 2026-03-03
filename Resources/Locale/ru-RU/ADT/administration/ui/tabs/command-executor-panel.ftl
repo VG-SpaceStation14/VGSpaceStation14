@@ -11,3 +11,4 @@ admin-command-executor-executed = Выполнено команд: { $count }
 
 # Футер
 admin-panel-footer-powered = Powered by Schrödinger
+admin-panel-footer-powered-albuka = Powered by Albuka 
