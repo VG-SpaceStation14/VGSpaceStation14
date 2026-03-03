@@ -18,9 +18,12 @@
       speechSounds: Vulpa
     - type: Vocal
       sounds:
-        Male: NesMaleVulpa
-        Female: NesFemaleVulpa
-        Unsexed: NesFemaleVulpa
+        Male: MaleVulpkanin
+        Female: FemaleVulpkanin
+        Unsexed: MaleVulpkanin
+        # Male: NesMaleVulpa VG-Tweak
+        # Female: NesFemaleVulpa VG-Tweak
+        # Unsexed: NesFemaleVulpa VG-Tweak
     - type: Icon
       sprite: ADT/Mobs/Species/Vulpkanin/parts.rsi
       state: vulpkanin_m

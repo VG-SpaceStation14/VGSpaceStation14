@@ -602,6 +602,8 @@
       collection: VulpkaninWhines
     Howl:
       collection: VulpkaninHowls
+    Heckaet:
+      collection: VulpHeckaetSound
     Gasp:
       collection: MaleGasp
     DefaultDeathgasp:
@@ -636,6 +638,8 @@
       collection: VulpkaninWhines
     Howl:
       collection: VulpkaninHowls
+    Heckaet:
+      collection: VulpHeckaetSound
     Gasp:
       collection: FemaleGasp
     DefaultDeathgasp:
