@@ -9,9 +9,19 @@
         stomach:
           maxVol: 50.0
     - type: Metabolizer
+      maxReagents: 4
       metabolizerTypes: [ Vulpkanin ]
       groups:
+      - id: Food
+        rateModifier: 1.0
+      - id: Drink
+        rateModifier: 1.2  # Вульпакины пьют быстрее?
+      - id: Medicine
+        rateModifier: 0.6  # Лекарства усваиваются хуже
+      - id: Poison
+        rateModifier: 0.7  # Яды тоже хуже усваиваются (иммунитет?)
       - id: Alcohol
+        rateModifier: 0.2  # Очень плохо с алкоголем
 
 
 - type: entity
