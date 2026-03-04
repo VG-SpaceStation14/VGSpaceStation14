@@ -66,7 +66,7 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         if (component.Playlist.Count == 0)
             return null;
 
-        // Если очередь пуста или shuffle изменился, перестраиваем очередь
+        // Если очередь пуста, перестраиваем очередь
         if (component.Queue.Count == 0)
         {
             component.Queue.Clear();
@@ -260,45 +260,60 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
                 {
                     comp.SelectAccumulator = 0f;
                     comp.Selecting = false;
-
                     TryUpdateVisualState(uid, comp);
                 }
             }
 
             // VG-Tweak start
-            // Проверяем, закончился ли текущий трек и нужно ли авто-переключение
-            if (comp.AutoAdvance && comp.AudioStream != null && TryComp<AudioComponent>(comp.AudioStream, out var audio))
+            // Проверяем, закончился ли текущий трек
+            if (comp.AutoAdvance && comp.AudioStream != null)
             {
+                if (!TryComp<AudioComponent>(comp.AudioStream, out var audio))
+                {
+                    // Аудио компонент пропал - трек точно закончился
+                    TryAdvanceToNextTrack(uid, comp);
+                    continue;
+                }
+
                 // Получаем длину трека из прототипа
                 if (_protoManager.TryIndex(comp.SelectedSongId, out var trackProto))
                 {
                     var length = (float)Audio.GetAudioLength(trackProto.Path.Path.ToString()).TotalSeconds;
                     
-                    if (!audio.Playing || audio.PlaybackPosition >= length - 0.1f) // Небольшой допуск на погрешности
+                    // Проверяем по позиции воспроизведения
+                    if (audio.PlaybackPosition >= length - 0.2f) // Небольшой допуск
                     {
-                        // Трек закончился естественно
-                        var nextTrack = GetNextTrack(uid, comp);
-                        if (nextTrack != null && _protoManager.Resolve(nextTrack.Value, out var nextProto))
-                        {
-                            comp.SelectedSongId = nextTrack.Value;
-                            comp.AudioStream = Audio.Stop(comp.AudioStream);
-                            comp.AudioStream = Audio.PlayPvs(nextProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(comp.Volume, comp.MinSlider, comp.MaxSlider, comp.MinVolume, comp.MaxVolume)))?.Entity;
-                            comp.AutoAdvance = true;
-                            Dirty(uid, comp);
-                        }
-                        else
-                        {
-                            // Конец плейлиста без повтора
-                            comp.AutoAdvance = false;
-                            comp.AudioStream = Audio.Stop(comp.AudioStream);
-                            Dirty(uid, comp);
-                        }
+                        TryAdvanceToNextTrack(uid, comp);
                     }
                 }
             }
             // VG-Tweak end
         }
     }
+
+    // VG-Tweak start
+    private void TryAdvanceToNextTrack(EntityUid uid, JukeboxComponent comp)
+    {
+        var nextTrack = GetNextTrack(uid, comp);
+        if (nextTrack != null && _protoManager.Resolve(nextTrack.Value, out var nextProto))
+        {
+            comp.SelectedSongId = nextTrack.Value;
+            comp.AudioStream = Audio.Stop(comp.AudioStream);
+            comp.AudioStream = Audio.PlayPvs(nextProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(comp.Volume, comp.MinSlider, comp.MaxSlider, comp.MinVolume, comp.MaxVolume)))?.Entity;
+            comp.AutoAdvance = true;
+            Dirty(uid, comp);
+        }
+        else
+        {
+            // Конец плейлиста без повтора
+            comp.AutoAdvance = false;
+            comp.AudioStream = Audio.Stop(comp.AudioStream);
+            comp.SelectedSongId = null;
+            comp.CurrentQueueIndex = -1;
+            Dirty(uid, comp);
+        }
+    }
+    // VG-Tweak end
 
     /// ADT-Tweak start
     private void SetJukeboxVolume(EntityUid uid, JukeboxComponent component, float volume)
