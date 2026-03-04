@@ -37,6 +37,7 @@ public sealed partial class JukeboxComponent : Component
 
     [ViewVariables]
     public float SelectAccumulator;
+
     /// ADT-Tweak start
     [ViewVariables, AutoNetworkedField]
     public float Volume = 50f;
@@ -46,6 +47,44 @@ public sealed partial class JukeboxComponent : Component
     public float MinSlider = 0f;
     public float MaxSlider = 100f;
     /// ADT-Tweak end
+
+    /// VG-Tweak start
+    /// <summary>
+    /// Current repeat mode for the jukebox.
+    /// </summary>
+    [ViewVariables, AutoNetworkedField]
+    public JukeboxRepeatMode RepeatMode = JukeboxRepeatMode.NoRepeat;
+
+    /// <summary>
+    /// Whether shuffle is enabled.
+    /// </summary>
+    [ViewVariables, AutoNetworkedField]
+    public bool ShuffleEnabled;
+
+    /// <summary>
+    /// The full playlist of available tracks.
+    /// </summary>
+    [ViewVariables, AutoNetworkedField]
+    public List<ProtoId<JukeboxPrototype>> Playlist = new();
+
+    /// <summary>
+    /// The shuffled/ordered queue of tracks to play.
+    /// </summary>
+    [ViewVariables]
+    public List<ProtoId<JukeboxPrototype>> Queue = new();
+
+    /// <summary>
+    /// Current index in the queue.
+    /// </summary>
+    [ViewVariables, AutoNetworkedField]
+    public int CurrentQueueIndex = -1;
+
+    /// <summary>
+    /// Whether we're currently playing and should auto-advance to next track.
+    /// </summary>
+    [ViewVariables]
+    public bool AutoAdvance;
+    /// VG-Tweak end
 }
 
 [Serializable, NetSerializable]
@@ -76,6 +115,28 @@ public sealed class JukeboxSetVolumeMessage(float volume) : BoundUserInterfaceMe
     public float Volume { get; } = volume;
 }
 /// ADT-Tweak end
+
+/// VG-Tweak start
+[Serializable, NetSerializable]
+public sealed class JukeboxSetRepeatMessage(JukeboxRepeatMode mode) : BoundUserInterfaceMessage
+{
+    public JukeboxRepeatMode Mode { get; } = mode;
+}
+
+[Serializable, NetSerializable]
+public sealed class JukeboxSetShuffleMessage(bool enabled) : BoundUserInterfaceMessage
+{
+    public bool Enabled { get; } = enabled;
+}
+
+[Serializable, NetSerializable]
+public enum JukeboxRepeatMode : byte
+{
+    NoRepeat,
+    RepeatOne,
+    RepeatAll
+}
+/// VG-Tweak end
 
 [Serializable, NetSerializable]
 public enum JukeboxVisuals : byte

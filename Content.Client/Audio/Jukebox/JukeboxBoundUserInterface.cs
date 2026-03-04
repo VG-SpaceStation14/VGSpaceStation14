@@ -44,6 +44,19 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         _menu.OnSongSelected += SelectSong;
         _menu.SetTime += SetTime;
         _menu.SetVolume += SetVolume; // ADT-Tweak
+
+        // VG-Tweak start
+        _menu.OnRepeatModeChanged += mode =>
+        {
+            SendMessage(new JukeboxSetRepeatMessage(mode));
+        };
+
+        _menu.OnShuffleToggled += enabled =>
+        {
+            SendMessage(new JukeboxSetShuffleMessage(enabled));
+        };
+        // VG-Tweak end
+
         PopulateMusic();
         Reload();
     }
@@ -58,6 +71,12 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
 
         _menu.SetAudioStream(jukebox.AudioStream);
         _menu.SetVolumeSlider(jukebox.Volume); // ADT-Tweak
+
+        // VG-Tweak start
+        _menu.SetRepeatMode(jukebox.RepeatMode);
+        _menu.SetShuffleEnabled(jukebox.ShuffleEnabled);
+        // VG-Tweak end
+
         if (_protoManager.Resolve(jukebox.SelectedSongId, out var songProto))
         {
             var length = EntMan.System<AudioSystem>().GetAudioLength(songProto.Path.Path.ToString());
@@ -83,12 +102,6 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
     {
         var sentTime = time;
 
-        // You may be wondering, what the fuck is this
-        // Well we want to be able to predict the playback slider change, of which there are many ways to do it
-        // We can't just use SendPredictedMessage because it will reset every tick and audio updates every frame
-        // so it will go BRRRRT
-        // Using ping gets us close enough that it SHOULD, MOST OF THE TIME, fall within the 0.1 second tolerance
-        // that's still on engine so our playback position never gets corrected.
         if (EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox) &&
             EntMan.TryGetComponent(jukebox.AudioStream, out AudioComponent? audioComp))
         {
@@ -99,17 +112,10 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
     }
 
     /// ADT-Tweak start
-    /// First applies the volume locally for prediction (if components are available),
-    /// then sends a message to the server for synchronization.
-    /// Uses MapToRange to convert the slider value to the actual audio component volume range.
-    /// </summary>
-    /// <param name="volume">Volume value from the UI slider (typically from 0 to 1).</param>
-
     public void SetVolume(float volume)
     {
         var sentVolume = volume;
 
-        // Prediction
         if (EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox) &&
             EntMan.TryGetComponent(jukebox.AudioStream, out AudioComponent? audioComp))
         {

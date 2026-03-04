@@ -32,6 +32,11 @@ public sealed partial class JukeboxMenu : FancyWindow
     public event Action<float>? SetTime;
     public event Action<float>? SetVolume; /// ADT-Tweak
 
+    // VG-Tweak start
+    public event Action<JukeboxRepeatMode>? OnRepeatModeChanged;
+    public event Action<bool>? OnShuffleToggled;
+    // VG-Tweak end
+
     private EntityUid? _audio;
 
     private float _lockTimer;
@@ -63,6 +68,49 @@ public sealed partial class JukeboxMenu : FancyWindow
         };
         PlaybackSlider.OnReleased += PlaybackSliderKeyUp;
         VolumeSlider.OnReleased += VolumeSliderKeyUp; /// ADT-Tweak
+
+        // VG-Tweak start
+        RepeatButton.OnToggled += args =>
+        {
+            JukeboxRepeatMode newMode;
+
+            if (!args.Pressed)
+            {
+                newMode = JukeboxRepeatMode.NoRepeat;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
+            }
+            else if (RepeatButton.Text == Loc.GetString("jukebox-menu-buttonrepeat-off"))
+            {
+                newMode = JukeboxRepeatMode.RepeatAll;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-all");
+            }
+            else if (RepeatButton.Text == Loc.GetString("jukebox-menu-buttonrepeat-all"))
+            {
+                newMode = JukeboxRepeatMode.RepeatOne;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-one");
+            }
+            else
+            {
+                newMode = JukeboxRepeatMode.NoRepeat;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
+            }
+
+            OnRepeatModeChanged?.Invoke(newMode);
+        };
+
+        ShuffleButton.OnToggled += args =>
+        {
+            OnShuffleToggled?.Invoke(args.Pressed);
+            if (args.Pressed)
+            {
+                ShuffleButton.Text = Loc.GetString("jukebox-menu-buttonshuffle-on");
+            }
+            else
+            {
+                ShuffleButton.Text = Loc.GetString("jukebox-menu-buttonshuffle");
+            }
+        };
+        // VG-Tweak end
 
         VolumeSlider.MaxValue = 100f; /// ADT-Tweak
 
@@ -136,6 +184,40 @@ public sealed partial class JukeboxMenu : FancyWindow
         VolumeSlider.Value = volume;
     }
     /// ADT-Tweak end
+
+    // VG-Tweak start
+    public void SetRepeatMode(JukeboxRepeatMode mode)
+    {
+        switch (mode)
+        {
+            case JukeboxRepeatMode.NoRepeat:
+                RepeatButton.Pressed = false;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
+                break;
+            case JukeboxRepeatMode.RepeatOne:
+                RepeatButton.Pressed = true;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-one");
+                break;
+            case JukeboxRepeatMode.RepeatAll:
+                RepeatButton.Pressed = true;
+                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-all");
+                break;
+        }
+    }
+
+    public void SetShuffleEnabled(bool enabled)
+    {
+        ShuffleButton.Pressed = enabled;
+        if (enabled)
+        {
+            ShuffleButton.Text = Loc.GetString("jukebox-menu-buttonshuffle-on");
+        }
+        else
+        {
+            ShuffleButton.Text = Loc.GetString("jukebox-menu-buttonshuffle");
+        }
+    }
+    // VG-Tweak end
 
     protected override void FrameUpdate(FrameEventArgs args)
     {

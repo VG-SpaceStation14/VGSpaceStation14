@@ -8,15 +8,17 @@ using Robust.Shared.Audio.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+using System.Linq;
 using JukeboxComponent = Content.Shared.Audio.Jukebox.JukeboxComponent;
 
 namespace Content.Server.Audio.Jukebox;
-
 
 public sealed class JukeboxSystem : SharedJukeboxSystem
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly AppearanceSystem _appearanceSystem = default!;
+    [Dependency] private readonly IRobustRandom _random = default!; // VG-Tweak
 
     public override void Initialize()
     {
@@ -27,6 +29,10 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         SubscribeLocalEvent<JukeboxComponent, JukeboxStopMessage>(OnJukeboxStop);
         SubscribeLocalEvent<JukeboxComponent, JukeboxSetTimeMessage>(OnJukeboxSetTime);
         SubscribeLocalEvent<JukeboxComponent, JukeboxSetVolumeMessage>(OnJukeboxSetVolume); /// ADT-Tweak
+        // VG-Tweak start
+        SubscribeLocalEvent<JukeboxComponent, JukeboxSetRepeatMessage>(OnJukeboxSetRepeat);
+        SubscribeLocalEvent<JukeboxComponent, JukeboxSetShuffleMessage>(OnJukeboxSetShuffle);
+        // VG-Tweak end
         SubscribeLocalEvent<JukeboxComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<JukeboxComponent, ComponentShutdown>(OnComponentShutdown);
 
@@ -35,17 +41,109 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
 
     private void OnComponentInit(EntityUid uid, JukeboxComponent component, ComponentInit args)
     {
+        // VG-Tweak start
+        RefreshPlaylist(uid, component);
+        // VG-Tweak end
+
         if (HasComp<ApcPowerReceiverComponent>(uid))
         {
             TryUpdateVisualState(uid, component);
         }
     }
 
+    // VG-Tweak start
+    private void RefreshPlaylist(EntityUid uid, JukeboxComponent component)
+    {
+        component.Playlist.Clear();
+        foreach (var proto in _protoManager.EnumeratePrototypes<JukeboxPrototype>())
+        {
+            component.Playlist.Add(proto.ID);
+        }
+    }
+
+    private ProtoId<JukeboxPrototype>? GetNextTrack(EntityUid uid, JukeboxComponent component)
+    {
+        if (component.Playlist.Count == 0)
+            return null;
+
+        // Если очередь пуста или shuffle изменился, перестраиваем очередь
+        if (component.Queue.Count == 0)
+        {
+            component.Queue.Clear();
+            component.Queue.AddRange(component.ShuffleEnabled
+                ? component.Playlist.OrderBy(_ => _random.Next()).ToList()
+                : component.Playlist.ToList());
+            component.CurrentQueueIndex = -1;
+        }
+
+        switch (component.RepeatMode)
+        {
+            case JukeboxRepeatMode.RepeatOne:
+                // Просто играем тот же трек
+                return component.SelectedSongId;
+
+            case JukeboxRepeatMode.RepeatAll:
+                // Переходим к следующему в очереди, зацикливаем
+                component.CurrentQueueIndex++;
+                if (component.CurrentQueueIndex >= component.Queue.Count)
+                    component.CurrentQueueIndex = 0;
+                return component.Queue[component.CurrentQueueIndex];
+
+            case JukeboxRepeatMode.NoRepeat:
+            default:
+                // Переходим к следующему в очереди, останавливаемся если в конце
+                component.CurrentQueueIndex++;
+                if (component.CurrentQueueIndex >= component.Queue.Count)
+                {
+                    component.CurrentQueueIndex = -1;
+                    return null;
+                }
+                return component.Queue[component.CurrentQueueIndex];
+        }
+    }
+
+    private void OnJukeboxSetRepeat(EntityUid uid, JukeboxComponent component, JukeboxSetRepeatMessage args)
+    {
+        component.RepeatMode = args.Mode;
+        Dirty(uid, component);
+    }
+
+    private void OnJukeboxSetShuffle(EntityUid uid, JukeboxComponent component, JukeboxSetShuffleMessage args)
+    {
+        if (component.ShuffleEnabled == args.Enabled)
+            return;
+
+        component.ShuffleEnabled = args.Enabled;
+
+        // Перестраиваем очередь с новым режимом перемешивания
+        component.Queue.Clear();
+        component.Queue.AddRange(component.ShuffleEnabled
+            ? component.Playlist.OrderBy(_ => _random.Next()).ToList()
+            : component.Playlist.ToList());
+
+        // Пытаемся найти текущий трек в новой очереди
+        if (component.SelectedSongId != null)
+        {
+            var index = component.Queue.IndexOf(component.SelectedSongId.Value);
+            component.CurrentQueueIndex = index >= 0 ? index : 0;
+        }
+        else
+        {
+            component.CurrentQueueIndex = -1;
+        }
+
+        Dirty(uid, component);
+    }
+    // VG-Tweak end
+
     private void OnJukeboxPlay(EntityUid uid, JukeboxComponent component, ref JukeboxPlayingMessage args)
     {
         if (Exists(component.AudioStream))
         {
             Audio.SetState(component.AudioStream, AudioState.Playing);
+            // VG-Tweak start
+            component.AutoAdvance = true;
+            // VG-Tweak end
         }
         else
         {
@@ -54,7 +152,15 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
             if (string.IsNullOrEmpty(component.SelectedSongId) ||
                 !_protoManager.Resolve(component.SelectedSongId, out var jukeboxProto))
             {
-                return;
+                // VG-Tweak start
+                // Пробуем играть первый трек из очереди
+                var nextTrack = GetNextTrack(uid, component);
+                if (nextTrack == null || !_protoManager.Resolve(nextTrack.Value, out jukeboxProto))
+                    return;
+
+                component.SelectedSongId = nextTrack.Value;
+                component.AutoAdvance = true;
+                // VG-Tweak end
             }
 
             component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(component.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume)))?.Entity; /// ADT-Tweak
@@ -65,6 +171,9 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
     private void OnJukeboxPause(Entity<JukeboxComponent> ent, ref JukeboxPauseMessage args)
     {
         Audio.SetState(ent.Comp.AudioStream, AudioState.Paused);
+        // VG-Tweak start
+        ent.Comp.AutoAdvance = false;
+        // VG-Tweak end
     }
 
     private void OnJukeboxSetTime(EntityUid uid, JukeboxComponent component, JukeboxSetTimeMessage args)
@@ -106,6 +215,9 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
     private void Stop(Entity<JukeboxComponent> entity)
     {
         Audio.SetState(entity.Comp.AudioStream, AudioState.Stopped);
+        // VG-Tweak start
+        entity.Comp.AutoAdvance = false;
+        // VG-Tweak end
         Dirty(entity);
     }
 
@@ -117,6 +229,18 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
             DirectSetVisualState(uid, JukeboxVisualState.Select);
             component.Selecting = true;
             component.AudioStream = Audio.Stop(component.AudioStream);
+
+            // VG-Tweak start
+            // Обновляем очередь, чтобы начинать с выбранной песни
+            component.Queue.Clear();
+            component.Queue.AddRange(component.ShuffleEnabled
+                ? component.Playlist.OrderBy(_ => _random.Next()).ToList()
+                : component.Playlist.ToList());
+
+            var index = component.Queue.IndexOf(args.SongId);
+            component.CurrentQueueIndex = index >= 0 ? index : 0;
+            component.AutoAdvance = false;
+            // VG-Tweak end
         }
 
         Dirty(uid, component);
@@ -140,6 +264,39 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
                     TryUpdateVisualState(uid, comp);
                 }
             }
+
+            // VG-Tweak start
+            // Проверяем, закончился ли текущий трек и нужно ли авто-переключение
+            if (comp.AutoAdvance && comp.AudioStream != null && TryComp<AudioComponent>(comp.AudioStream, out var audio))
+            {
+                // Получаем длину трека из прототипа
+                if (_protoManager.TryIndex(comp.SelectedSongId, out var trackProto))
+                {
+                    var length = (float)Audio.GetAudioLength(trackProto.Path.Path.ToString()).TotalSeconds;
+                    
+                    if (!audio.Playing || audio.PlaybackPosition >= length - 0.1f) // Небольшой допуск на погрешности
+                    {
+                        // Трек закончился естественно
+                        var nextTrack = GetNextTrack(uid, comp);
+                        if (nextTrack != null && _protoManager.Resolve(nextTrack.Value, out var nextProto))
+                        {
+                            comp.SelectedSongId = nextTrack.Value;
+                            comp.AudioStream = Audio.Stop(comp.AudioStream);
+                            comp.AudioStream = Audio.PlayPvs(nextProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(comp.Volume, comp.MinSlider, comp.MaxSlider, comp.MinVolume, comp.MaxVolume)))?.Entity;
+                            comp.AutoAdvance = true;
+                            Dirty(uid, comp);
+                        }
+                        else
+                        {
+                            // Конец плейлиста без повтора
+                            comp.AutoAdvance = false;
+                            comp.AudioStream = Audio.Stop(comp.AudioStream);
+                            Dirty(uid, comp);
+                        }
+                    }
+                }
+            }
+            // VG-Tweak end
         }
     }
 
