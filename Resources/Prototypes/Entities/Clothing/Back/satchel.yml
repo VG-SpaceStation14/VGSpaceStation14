@@ -1,6 +1,6 @@
 - type: entity
-  parent: ClothingBackpack
-  id: ClothingBackpackSatchel
+  parent: [ClothingBackpack, ClothingBackpackSatchelFoldableBase]
+  id: ClothingBackpackSatchel 
   name: satchel
   description: A trendy looking satchel.
   components:
@@ -151,7 +151,7 @@
     sprite: Clothing/Back/Satchels/hydroponics.rsi
 
 - type: entity
-  parent: [ClothingBackpackSatchel, ClothingBackpackSatchelFoldableBase] # Ganimed-Tweak (two-sided satchels)
+  parent: [ClothingBackpackSatchel, ClothingBackpackSatchelFoldableBase] #VG-Tweak (two-sided satchels)
   id: ClothingBackpackSatchelCargo
   name: cargo satchel
   description: A robust satchel for stealing cargo's loot.
@@ -160,7 +160,7 @@
       sprite: Clothing/Back/Satchels/cargo.rsi
 
 - type: entity
-  parent: [ClothingBackpackSatchel, ClothingBackpackSatchelFoldableBase] # Ganimed-Tweak (two-sided satchels)
+  parent: [ClothingBackpackSatchel, ClothingBackpackSatchelFoldableBase] #VG-Tweak (two-sided satchels)
   id: ClothingBackpackSatchelSalvage
   name: salvage satchel
   description: A robust satchel for stashing your loot.
