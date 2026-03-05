@@ -9,8 +9,13 @@ namespace Content.Shared.ADT.MiningShop;
 [Access(typeof(SharedMiningShopSystem))]
 public sealed partial class MiningShopComponent : Component
 {
+    // VG-Tweak Start: change to per-user orders
+    /// <summary>
+    /// Orders per user. Key is the user EntityUid.
+    /// </summary>
     [DataField, AutoNetworkedField]
-    public List<MiningShopEntry> OrderList = new();
+    public Dictionary<EntityUid, List<MiningShopEntry>> OrdersByUser = new();
+    // VG-Tweak End
 
     [DataField, AutoNetworkedField]
     public Vector2 MinOffset = new(-0.2f, -0.2f);

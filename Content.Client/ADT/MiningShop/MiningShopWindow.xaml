@@ -20,8 +20,18 @@
                     HorizontalExpand="True"
                     VerticalExpand="True"/>
         </BoxContainer>
-        <BoxContainer Orientation="Horizontal">
-            <RichTextLabel Name="YourPurchases" Access="Public" MaxWidth="1000" /> </BoxContainer>
+        <!-- VG-Tweak Start: move clear button inside a fixed container -->
+        <BoxContainer Orientation="Vertical" Margin="0 0 0 5">
+            <BoxContainer Orientation="Horizontal">
+                <RichTextLabel Name="YourPurchases" Access="Public" MaxWidth="1000" />
+                <Control HorizontalExpand="True" />
+            </BoxContainer>
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                <Control HorizontalExpand="True" />
+                <Button Name="ClearCart" Access="Public" Text="Очистить корзину" MaxWidth="150" />
+            </BoxContainer>
+        </BoxContainer>
+        <!-- VG-Tweak End -->
         <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Name="Sections" Access="Public" />
         </ScrollContainer>

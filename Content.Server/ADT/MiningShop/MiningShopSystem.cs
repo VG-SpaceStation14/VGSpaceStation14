@@ -16,29 +16,62 @@ public sealed class MiningShopSystem : SharedMiningShopSystem
     protected override void OnVendBui(Entity<MiningShopComponent> vendor, ref MiningShopBuiMsg args)
     {
         base.OnVendBui(vendor, ref args);
+        var msg = new MiningShopRefreshBuiMsg();
+        _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, msg, args.Actor);
+    }
 
+    protected override void OnRemoveItemBui(Entity<MiningShopComponent> vendor, ref MiningShopRemoveItemBuiMsg args)
+    {
+        base.OnRemoveItemBui(vendor, ref args);
+        var msg = new MiningShopRefreshBuiMsg();
+        _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, msg, args.Actor);
+    }
+
+    protected override void OnClearCartBui(Entity<MiningShopComponent> vendor, ref MiningShopClearCartBuiMsg args)
+    {
+        base.OnClearCartBui(vendor, ref args);
         var msg = new MiningShopRefreshBuiMsg();
         _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, msg, args.Actor);
     }
 
     protected override void OnVendBuiExpress(Entity<MiningShopComponent> vendor, ref MiningShopExpressDeliveryBuiMsg args)
     {
-        base.OnVendBuiExpress(vendor, ref args);
-
-        var msg = new MiningShopExpressDeliveryBuiMsg();
-        _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, msg, args.Actor);
-
         var actor = args.Actor;
-        if (vendor.Comp.OrderList.Count <= 0)
+
+        if (!vendor.Comp.OrdersByUser.TryGetValue(actor, out var userOrders) || userOrders.Count == 0)
             return;
+
+        uint totalCost = 0;
+        foreach (var entry in userOrders)
+        {
+            totalCost += entry.Price ?? 0;
+        }
+
         if (!TryComp(actor, out TransformComponent? xform))
             return;
 
-        List<EntProtoId> ids = vendor.Comp.OrderList.Select(entry => entry.Id).ToList();
+        var idCard = _miningPoints.TryFindIdCard(actor);
+        if (idCard == null)
+            return;
 
+        // VG-Tweak: explicitly check for null component
+        var pointsComp = idCard.Value.Comp;
+        if (pointsComp == null)
+            return;
+
+        if (pointsComp.Points < totalCost)
+            return;
+
+        if (!_miningPoints.RemovePoints(idCard.Value, totalCost))
+            return;
+
+        List<EntProtoId> ids = userOrders.Select(entry => entry.Id).ToList();
         _droppod.CreateDroppod(xform.Coordinates, ids);
-        vendor.Comp.OrderList.Clear();
+
+        vendor.Comp.OrdersByUser.Remove(actor);
         Dirty(vendor.Owner, vendor.Comp);
-        _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, new MiningShopRefreshBuiMsg(), args.Actor);
+
+        var msg = new MiningShopRefreshBuiMsg();
+        _ui.ServerSendUiMessage(vendor.Owner, args.UiKey, msg, args.Actor);
     }
 }

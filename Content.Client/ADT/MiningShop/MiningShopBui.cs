@@ -12,6 +12,10 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static System.StringComparison;
 using static Robust.Client.UserInterface.Controls.LineEdit;
+// VG-Tweak: add aliases to resolve name conflict
+using SharedMiningShopEntry = Content.Shared.ADT.MiningShop.MiningShopEntry;
+using ClientMiningShopEntry = Content.Client.ADT.MiningShop.MiningShopEntry;
+// VG-Tweak End
 
 namespace Content.Client.ADT.MiningShop;
 
@@ -24,6 +28,7 @@ public sealed class MiningShopBui : BoundUserInterface
     private readonly MiningPointsSystem _miningPoints;
     private MiningShopWindow? _window;
     private List<SharedMiningShopSectionPrototype> _sections = new();
+
     public MiningShopBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
         _miningPoints = EntMan.System<MiningPointsSystem>();
@@ -48,7 +53,7 @@ public sealed class MiningShopBui : BoundUserInterface
 
             foreach (var entry in section.Entries)
             {
-                var uiEntry = new MiningShopEntry();
+                var uiEntry = new ClientMiningShopEntry(); // VG-Tweak: explicit client type
 
                 if (_prototype.TryIndex(entry.Id, out var entity))
                 {
@@ -81,7 +86,8 @@ public sealed class MiningShopBui : BoundUserInterface
                     uiEntry.TooltipLabel.TooltipDelay = 0;
                     uiEntry.TooltipLabel.TooltipSupplier = _ => tooltip;
 
-                    uiEntry.Panel.Button.OnPressed += _ => OnButtonPressed(entry);
+                    // VG-Tweak: entry is shared type, correct
+                    uiEntry.Panel.Button.OnPressed += _ => OnAddToCartPressed(entry);
                 }
 
                 uiSection.Entries.AddChild(uiEntry);
@@ -90,6 +96,7 @@ public sealed class MiningShopBui : BoundUserInterface
             _window.Sections.AddChild(uiSection);
         }
 
+        _window.ClearCart.OnPressed += _ => OnClearCartPressed();
         _window.Express.OnPressed += _ => OnExpressDeliveryButtonPressed();
         _window.Search.OnTextChanged += OnSearchChanged;
 
@@ -98,11 +105,17 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.OpenCentered();
     }
 
-    private void OnButtonPressed(Content.Shared.ADT.MiningShop.MiningShopEntry entry)
+    // VG-Tweak: parameter type is shared
+    private void OnAddToCartPressed(SharedMiningShopEntry entry)
     {
         var msg = new MiningShopBuiMsg(entry);
         SendMessage(msg);
-        Refresh();
+    }
+
+    private void OnClearCartPressed()
+    {
+        var msg = new MiningShopClearCartBuiMsg();
+        SendMessage(msg);
     }
 
     private void OnExpressDeliveryButtonPressed()
@@ -125,7 +138,7 @@ public sealed class MiningShopBui : BoundUserInterface
             var any = false;
             foreach (var entriesControl in section.Entries.Children)
             {
-                if (entriesControl is not MiningShopEntry entry)
+                if (entriesControl is not ClientMiningShopEntry entry) // VG-Tweak: client type
                     continue;
 
                 if (string.IsNullOrWhiteSpace(args.Text))
@@ -149,24 +162,27 @@ public sealed class MiningShopBui : BoundUserInterface
         if (!EntMan.TryGetComponent(Owner, out MiningShopComponent? vendor))
             return;
 
-        List<string> names = new List<string>();
+        var user = _player.LocalEntity.Value;
 
-        foreach (var order in vendor.OrderList)
+        // VG-Tweak: use system method
+        List<SharedMiningShopEntry> userOrders = new(); // VG-Tweak: shared type
+        if (EntMan.System<SharedMiningShopSystem>().TryGetUserOrders(Owner, user, out var orders))
+            userOrders = orders;
+
+        var names = userOrders.Select(entry =>
         {
-            var name = _prototype.TryIndex(order.Id, out var entity) ? entity.Name : order.Name;
-            if (name != null)
-                names.Add(name);
-        }
-        var orders = string.Join(", ", names);
+            var name = _prototype.TryIndex(entry.Id, out var entity) ? entity.Name : entry.Name;
+            return name ?? "?";
+        }).ToList();
+        var ordersString = string.Join(", ", names);
 
-        var userpoints = _miningPoints.TryFindIdCard(_player.LocalEntity.Value)?.Comp?.Points ?? 0;
+        var userpoints = _miningPoints.TryFindIdCard(user)?.Comp?.Points ?? 0;
 
-        _window.YourPurchases.Text = $"Заказы: {orders}";
-
+        _window.YourPurchases.Text = $"Заказы: {ordersString}";
         _window.Express.Text = $"Экспресс доставка";
-
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
 
+        // Update button states based on affordability
         var sections = _prototype.EnumeratePrototypes<SharedMiningShopSectionPrototype>();
 
         for (var sectionIndex = 0; sectionIndex < _sections.Count; sectionIndex++)
@@ -175,21 +191,14 @@ public sealed class MiningShopBui : BoundUserInterface
             var uiSection = (MiningShopSection)_window.Sections.GetChild(sectionIndex);
             uiSection.Label.SetMessage(GetSectionName(section));
 
-            var sectionDisabled = false;
-
             for (var entryIndex = 0; entryIndex < section.Entries.Count; entryIndex++)
             {
-                var entry = section.Entries[entryIndex];
-                var uiEntry = (MiningShopEntry)uiSection.Entries.GetChild(entryIndex);
-                var disabled = sectionDisabled;
+                var entry = section.Entries[entryIndex]; // shared entry
+                var uiEntry = (ClientMiningShopEntry)uiSection.Entries.GetChild(entryIndex); // client entry
+                var price = entry.Price ?? 0;
+                var disabled = userpoints < price;
 
-                if (userpoints < entry.Price)
-                {
-                    disabled = true;
-                }
-
-                uiEntry.Price.Text = $"{entry.Price}P";
-
+                uiEntry.Price.Text = $"{price}P";
                 uiEntry.Panel.Button.Disabled = disabled;
             }
         }
