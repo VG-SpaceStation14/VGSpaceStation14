@@ -37,6 +37,18 @@ public sealed partial class MiningShopPanel : Control
         panel.BorderColor = BorderColor;
     }
 
+    // VG-Tweak: new method for external control
+    public void SetCustomColor(bool disabled, bool hovered)
+    {
+        var panel = (StyleBoxFlat) Panel.PanelOverride!;
+        if (disabled)
+            panel.BackgroundColor = DisabledColor;
+        else
+            panel.BackgroundColor = hovered ? HoveredColor : Color;
+
+        panel.BorderColor = BorderColor;
+    }
+
     protected override void EnteredTree()
     {
         base.EnteredTree();

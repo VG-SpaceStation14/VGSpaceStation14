@@ -20,4 +20,3 @@ public sealed partial class MiningShopButton : Button
         OnDrawModeChanged?.Invoke();
     }
 }
-

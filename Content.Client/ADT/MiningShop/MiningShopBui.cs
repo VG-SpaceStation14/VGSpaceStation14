@@ -12,10 +12,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static System.StringComparison;
 using static Robust.Client.UserInterface.Controls.LineEdit;
-// VG-Tweak: add aliases to resolve name conflict
 using SharedMiningShopEntry = Content.Shared.ADT.MiningShop.MiningShopEntry;
 using ClientMiningShopEntry = Content.Client.ADT.MiningShop.MiningShopEntry;
-// VG-Tweak End
 
 namespace Content.Client.ADT.MiningShop;
 
@@ -53,41 +51,25 @@ public sealed class MiningShopBui : BoundUserInterface
 
             foreach (var entry in section.Entries)
             {
-                var uiEntry = new ClientMiningShopEntry(); // VG-Tweak: explicit client type
+                var uiEntry = new ClientMiningShopEntry();
 
                 if (_prototype.TryIndex(entry.Id, out var entity))
                 {
                     uiEntry.Texture.Textures = SpriteComponent.GetPrototypeTextures(entity, _resource)
                         .Select(o => o.Default)
                         .ToList();
-                    uiEntry.Panel.Button.Label.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
-
-                    var name = entity.Name;
-                    var color = MiningShopPanel.DefaultColor;
-                    var borderColor = MiningShopPanel.DefaultBorderColor;
-                    var hoverColor = MiningShopPanel.DefaultBorderColor;
-
-                    uiEntry.Panel.Color = color;
-                    uiEntry.Panel.BorderColor = borderColor;
-                    uiEntry.Panel.HoveredColor = hoverColor;
-
-                    var msg = new FormattedMessage();
-                    msg.AddText(name);
-                    msg.PushNewline();
-
+                    
+                    uiEntry.ItemName.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
+                    
+                    var description = new FormattedMessage();
                     if (!string.IsNullOrWhiteSpace(entity.Description))
-                        msg.AddText(entity.Description);
+                        description.AddText(entity.Description);
+                    uiEntry.Description.SetMessage(description);
 
-                    var tooltip = new Tooltip();
-                    tooltip.SetMessage(msg);
-                    tooltip.MaxWidth = 250f;
+                    // VG-Tweak: set initial background
+                    uiEntry.SetBackgroundColor(Color.FromHex("#162031"), Color.FromHex("#4972A1"));
 
-                    uiEntry.TooltipLabel.ToolTip = entity.Description;
-                    uiEntry.TooltipLabel.TooltipDelay = 0;
-                    uiEntry.TooltipLabel.TooltipSupplier = _ => tooltip;
-
-                    // VG-Tweak: entry is shared type, correct
-                    uiEntry.Panel.Button.OnPressed += _ => OnAddToCartPressed(entry);
+                    uiEntry.BuyButton.OnPressed += _ => OnAddToCartPressed(entry);
                 }
 
                 uiSection.Entries.AddChild(uiEntry);
@@ -105,7 +87,6 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.OpenCentered();
     }
 
-    // VG-Tweak: parameter type is shared
     private void OnAddToCartPressed(SharedMiningShopEntry entry)
     {
         var msg = new MiningShopBuiMsg(entry);
@@ -138,13 +119,17 @@ public sealed class MiningShopBui : BoundUserInterface
             var any = false;
             foreach (var entriesControl in section.Entries.Children)
             {
-                if (entriesControl is not ClientMiningShopEntry entry) // VG-Tweak: client type
+                if (entriesControl is not ClientMiningShopEntry entry)
                     continue;
 
                 if (string.IsNullOrWhiteSpace(args.Text))
                     entry.Visible = true;
                 else
-                    entry.Visible = entry.Panel.Button.Label.Text?.Contains(args.Text, OrdinalIgnoreCase) ?? false;
+                {
+                    var nameMatch = entry.ItemName.Text?.Contains(args.Text, OrdinalIgnoreCase) ?? false;
+                    var descMatch = entry.Description.Text?.Contains(args.Text, OrdinalIgnoreCase) ?? false;
+                    entry.Visible = nameMatch || descMatch;
+                }
 
                 if (entry.Visible)
                     any = true;
@@ -164,8 +149,7 @@ public sealed class MiningShopBui : BoundUserInterface
 
         var user = _player.LocalEntity.Value;
 
-        // VG-Tweak: use system method
-        List<SharedMiningShopEntry> userOrders = new(); // VG-Tweak: shared type
+        List<SharedMiningShopEntry> userOrders = new();
         if (EntMan.System<SharedMiningShopSystem>().TryGetUserOrders(Owner, user, out var orders))
             userOrders = orders;
 
@@ -182,7 +166,6 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.Express.Text = $"Экспресс доставка";
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
 
-        // Update button states based on affordability
         var sections = _prototype.EnumeratePrototypes<SharedMiningShopSectionPrototype>();
 
         for (var sectionIndex = 0; sectionIndex < _sections.Count; sectionIndex++)
@@ -193,13 +176,15 @@ public sealed class MiningShopBui : BoundUserInterface
 
             for (var entryIndex = 0; entryIndex < section.Entries.Count; entryIndex++)
             {
-                var entry = section.Entries[entryIndex]; // shared entry
-                var uiEntry = (ClientMiningShopEntry)uiSection.Entries.GetChild(entryIndex); // client entry
+                var entry = section.Entries[entryIndex];
+                var uiEntry = (ClientMiningShopEntry)uiSection.Entries.GetChild(entryIndex);
                 var price = entry.Price ?? 0;
                 var disabled = userpoints < price;
 
-                uiEntry.Price.Text = $"{price}P";
-                uiEntry.Panel.Button.Disabled = disabled;
+                uiEntry.Price.Text = $"{price} P";
+                uiEntry.BuyButton.Disabled = disabled;
+                // VG-Tweak: update background color based on disabled state
+                uiEntry.SetDisabled(disabled);
             }
         }
     }
@@ -225,7 +210,6 @@ public sealed class MiningShopBui : BoundUserInterface
         var name = new FormattedMessage();
         name.PushTag(new MarkupNode("bold", new MarkupParameter(section.Name.ToUpperInvariant()), null));
         name.AddText(section.Name.ToUpperInvariant());
-
         name.Pop();
         return name;
     }
