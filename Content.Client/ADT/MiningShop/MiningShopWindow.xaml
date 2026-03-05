@@ -2,8 +2,8 @@
     xmlns="https://spacestation14.io"
     xmlns:controls="clr-namespace:Content.Client.ADT.MiningShop"
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
-    MinSize="650 700"
-    SetSize="650 700"
+    MinSize="650 750"
+    SetSize="650 750"
     Resizable="False">
     <BoxContainer Orientation="Vertical">
         <BoxContainer Orientation="Horizontal">
@@ -15,7 +15,7 @@
         <BoxContainer Name="Main"
                     Orientation="Horizontal"
                     Margin="5">
-        <Button Name="Express"
+            <Button Name="Express"
                     Access="Public"
                     HorizontalExpand="True"
                     VerticalExpand="True"/>
@@ -27,9 +27,17 @@
             </BoxContainer>
             <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
                 <Control HorizontalExpand="True" />
-                <Button Name="ClearCart" Access="Public" Text="Очистить корзину" MaxWidth="150" />
+                <Button Name="ClearCart" Access="Public" Text="Очистить корзину" MaxWidth="150" Visible="False" />
             </BoxContainer>
         </BoxContainer>
+        
+        <!-- VG-Tweak Start: two-row category buttons with uniform width using BoxContainer with custom spacing -->
+        <BoxContainer Orientation="Vertical" HorizontalExpand="True" Margin="0 5 0 5">
+            <BoxContainer Orientation="Horizontal" Name="CategoryButtonsRow1" Access="Public" SeparationOverride="5" HorizontalExpand="True" />
+            <BoxContainer Orientation="Horizontal" Name="CategoryButtonsRow2" Access="Public" SeparationOverride="5" HorizontalExpand="True" Margin="5 0 0 0" />
+        </BoxContainer>
+        <!-- VG-Tweak End -->
+        
         <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Orientation="Vertical" Name="Sections" Access="Public" />
         </ScrollContainer>

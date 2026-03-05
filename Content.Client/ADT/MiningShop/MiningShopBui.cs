@@ -5,8 +5,11 @@ using Content.Shared.ADT.Salvage.Systems;
 using Content.Shared.Roles.Jobs;
 using JetBrains.Annotations;
 using Robust.Client.GameObjects;
+using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Client.ResourceManagement;
+using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -26,6 +29,8 @@ public sealed class MiningShopBui : BoundUserInterface
     private readonly MiningPointsSystem _miningPoints;
     private MiningShopWindow? _window;
     private List<SharedMiningShopSectionPrototype> _sections = new();
+    private string? _selectedCategory;
+    private Dictionary<string, Button> _categoryButtons = new();
 
     public MiningShopBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
@@ -40,41 +45,74 @@ public sealed class MiningShopBui : BoundUserInterface
 
         if (!EntMan.TryGetComponent(Owner, out MiningShopComponent? vendor))
             return;
+        
         var sections = _prototype.EnumeratePrototypes<SharedMiningShopSectionPrototype>().ToList();
         sections.Sort((x, y) => x.Name[0].CompareTo(x.Name[0]));
+        _sections = sections;
+
+        // Add "All" category button at the beginning
+        var allButton = new Button
+        {
+            Text = "ВСЕ",
+            HorizontalExpand = true,
+            ToggleMode = true,
+            StyleClasses = { "ButtonSquare" },
+            Pressed = true
+        };
+        allButton.OnToggled += args => OnAllCategorySelected(args.Pressed);
+        _categoryButtons["ALL"] = allButton;
+
+        // Create category buttons in two rows with uniform width
+        var halfCount = (sections.Count + 2) / 2; // +1 for All button, then /2
+        var firstRowButtons = new List<Button>();
+        var secondRowButtons = new List<Button>();
+
+        firstRowButtons.Add(allButton);
+
+        for (var i = 0; i < sections.Count; i++)
+        {
+            var section = sections[i];
+            var button = new Button
+            {
+                Text = section.Name.ToUpperInvariant(),
+                HorizontalExpand = true,
+                ToggleMode = true,
+                StyleClasses = { "ButtonSquare" }
+            };
+            button.OnToggled += args => OnCategorySelected(section, args.Pressed);
+            
+            if (firstRowButtons.Count < halfCount)
+                firstRowButtons.Add(button);
+            else
+                secondRowButtons.Add(button);
+            
+            _categoryButtons[section.ID] = button;
+        }
+
+        foreach (var button in firstRowButtons)
+            _window.CategoryButtonsRow1.AddChild(button);
+            
+        foreach (var button in secondRowButtons)
+            _window.CategoryButtonsRow2.AddChild(button);
+
+        // Add spacers if needed to maintain alignment
+        if (firstRowButtons.Count < halfCount)
+        {
+            var spacerCount = halfCount - firstRowButtons.Count;
+            for (var i = 0; i < spacerCount; i++)
+                _window.CategoryButtonsRow1.AddChild(new Control { HorizontalExpand = true });
+        }
+        
+        if (secondRowButtons.Count < sections.Count + 1 - halfCount)
+        {
+            var spacerCount = (sections.Count + 1 - halfCount) - secondRowButtons.Count;
+            for (var i = 0; i < spacerCount; i++)
+                _window.CategoryButtonsRow2.AddChild(new Control { HorizontalExpand = true });
+        }
 
         foreach (var section in sections)
         {
-            var uiSection = new MiningShopSection();
-            uiSection.Label.SetMessage(GetSectionName(section));
-            _sections.Add(section);
-
-            foreach (var entry in section.Entries)
-            {
-                var uiEntry = new ClientMiningShopEntry();
-
-                if (_prototype.TryIndex(entry.Id, out var entity))
-                {
-                    uiEntry.Texture.Textures = SpriteComponent.GetPrototypeTextures(entity, _resource)
-                        .Select(o => o.Default)
-                        .ToList();
-                    
-                    uiEntry.ItemName.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
-                    
-                    var description = new FormattedMessage();
-                    if (!string.IsNullOrWhiteSpace(entity.Description))
-                        description.AddText(entity.Description);
-                    uiEntry.Description.SetMessage(description);
-
-                    // VG-Tweak: set initial background
-                    uiEntry.SetBackgroundColor(Color.FromHex("#162031"), Color.FromHex("#4972A1"));
-
-                    uiEntry.BuyButton.OnPressed += _ => OnAddToCartPressed(entry);
-                }
-
-                uiSection.Entries.AddChild(uiEntry);
-            }
-
+            var uiSection = CreateSection(section);
             _window.Sections.AddChild(uiSection);
         }
 
@@ -85,6 +123,159 @@ public sealed class MiningShopBui : BoundUserInterface
         Refresh();
 
         _window.OpenCentered();
+    }
+
+    private void OnAllCategorySelected(bool pressed)
+    {
+        if (pressed)
+        {
+            _selectedCategory = null;
+            foreach (var btn in _categoryButtons.Values)
+            {
+                if (btn != _categoryButtons["ALL"])
+                    btn.Pressed = false;
+            }
+        }
+        else
+        {
+            if (_sections.Count > 0)
+            {
+                var firstSection = _sections[0];
+                _selectedCategory = firstSection.ID;
+                _categoryButtons[firstSection.ID].Pressed = true;
+            }
+        }
+        
+        UpdateSectionsVisibility();
+    }
+
+    private void OnCategorySelected(SharedMiningShopSectionPrototype section, bool pressed)
+    {
+        if (pressed)
+        {
+            _selectedCategory = section.ID;
+            foreach (var btn in _categoryButtons.Values)
+            {
+                if (btn.Text != section.Name.ToUpperInvariant() && btn != _categoryButtons["ALL"])
+                    btn.Pressed = false;
+            }
+            _categoryButtons["ALL"].Pressed = false;
+        }
+        else
+        {
+            _selectedCategory = null;
+            _categoryButtons["ALL"].Pressed = true;
+        }
+        
+        UpdateSectionsVisibility();
+    }
+
+    private void UpdateSectionsVisibility()
+    {
+        if (_window == null)
+            return;
+
+        // Если есть текст поиска, применяем фильтр поиска
+        if (_window.Search != null && !string.IsNullOrWhiteSpace(_window.Search.Text))
+        {
+            ApplySearchFilter(_window.Search.Text);
+            return;
+        }
+
+        // Иначе восстанавливаем видимость по категориям
+        for (var i = 0; i < _window.Sections.ChildCount; i++)
+        {
+            var section = _window.Sections.GetChild(i);
+            if (section is MiningShopSection uiSection && i < _sections.Count)
+            {
+                var sectionData = _sections[i];
+                uiSection.Visible = _selectedCategory == null || sectionData.ID == _selectedCategory;
+            }
+        }
+    }
+
+    private void ApplySearchFilter(string searchText)
+    {
+        if (_window == null)
+            return;
+
+        foreach (var sectionControl in _window.Sections.Children)
+        {
+            if (sectionControl is not MiningShopSection section)
+                continue;
+
+            var any = false;
+            foreach (var entriesControl in section.Entries.Children)
+            {
+                if (entriesControl is not ClientMiningShopEntry entry)
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(searchText))
+                    entry.Visible = true;
+                else
+                {
+                    var nameMatch = entry.ItemName.Text?.Contains(searchText, OrdinalIgnoreCase) ?? false;
+                    var descMatch = entry.Description.Text?.Contains(searchText, OrdinalIgnoreCase) ?? false;
+                    entry.Visible = nameMatch || descMatch;
+                }
+
+                if (entry.Visible)
+                    any = true;
+            }
+
+            section.Visible = any;
+        }
+    }
+
+    // VG-Tweak Start: сброс фильтра поиска
+    private void ResetSearchFilter()
+    {
+        if (_window == null)
+            return;
+        foreach (var sectionControl in _window.Sections.Children)
+        {
+            if (sectionControl is not MiningShopSection section)
+                continue;
+            foreach (var entriesControl in section.Entries.Children)
+            {
+                if (entriesControl is ClientMiningShopEntry entry)
+                    entry.Visible = true;
+            }
+        }
+    }
+    // VG-Tweak End
+
+    private MiningShopSection CreateSection(SharedMiningShopSectionPrototype section)
+    {
+        var uiSection = new MiningShopSection();
+        uiSection.Label.SetMessage(GetSectionName(section));
+
+        foreach (var entry in section.Entries)
+        {
+            var uiEntry = new ClientMiningShopEntry();
+
+            if (_prototype.TryIndex(entry.Id, out var entity))
+            {
+                uiEntry.Texture.Textures = SpriteComponent.GetPrototypeTextures(entity, _resource)
+                    .Select(o => o.Default)
+                    .ToList();
+                
+                uiEntry.ItemName.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
+                
+                var description = new FormattedMessage();
+                if (!string.IsNullOrWhiteSpace(entity.Description))
+                    description.AddText(entity.Description);
+                uiEntry.Description.SetMessage(description);
+
+                uiEntry.SetBackgroundColor(Color.FromHex("#162031"), Color.FromHex("#4972A1"));
+
+                uiEntry.BuyButton.OnPressed += _ => OnAddToCartPressed(entry);
+            }
+
+            uiSection.Entries.AddChild(uiEntry);
+        }
+
+        return uiSection;
     }
 
     private void OnAddToCartPressed(SharedMiningShopEntry entry)
@@ -111,31 +302,15 @@ public sealed class MiningShopBui : BoundUserInterface
         if (_window == null)
             return;
 
-        foreach (var sectionControl in _window.Sections.Children)
+        if (string.IsNullOrWhiteSpace(args.Text))
         {
-            if (sectionControl is not MiningShopSection section)
-                continue;
-
-            var any = false;
-            foreach (var entriesControl in section.Entries.Children)
-            {
-                if (entriesControl is not ClientMiningShopEntry entry)
-                    continue;
-
-                if (string.IsNullOrWhiteSpace(args.Text))
-                    entry.Visible = true;
-                else
-                {
-                    var nameMatch = entry.ItemName.Text?.Contains(args.Text, OrdinalIgnoreCase) ?? false;
-                    var descMatch = entry.Description.Text?.Contains(args.Text, OrdinalIgnoreCase) ?? false;
-                    entry.Visible = nameMatch || descMatch;
-                }
-
-                if (entry.Visible)
-                    any = true;
-            }
-
-            section.Visible = any;
+            // VG-Tweak: сбрасываем фильтр записей, затем обновляем видимость по категориям
+            ResetSearchFilter();
+            UpdateSectionsVisibility();
+        }
+        else
+        {
+            ApplySearchFilter(args.Text);
         }
     }
 
@@ -166,7 +341,7 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.Express.Text = $"Экспресс доставка";
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
 
-        var sections = _prototype.EnumeratePrototypes<SharedMiningShopSectionPrototype>();
+        _window.ClearCart.Visible = userOrders.Count > 0;
 
         for (var sectionIndex = 0; sectionIndex < _sections.Count; sectionIndex++)
         {
@@ -183,9 +358,14 @@ public sealed class MiningShopBui : BoundUserInterface
 
                 uiEntry.Price.Text = $"{price} P";
                 uiEntry.BuyButton.Disabled = disabled;
-                // VG-Tweak: update background color based on disabled state
                 uiEntry.SetDisabled(disabled);
             }
+        }
+
+        // Reapply search filter if needed
+        if (_window.Search != null && !string.IsNullOrWhiteSpace(_window.Search.Text))
+        {
+            ApplySearchFilter(_window.Search.Text);
         }
     }
 
