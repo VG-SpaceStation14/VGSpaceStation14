@@ -136,11 +136,15 @@
             32:
               sprite: ADT/Mobs/Species/Vulpkanin/displacement.rsi
               state: shoes
+    #VG-Tweak Start
     - type: InteractionPopup
       successChance: 1
-      interactSuccessString: hugging-success-generic
-      interactSuccessSound: /Audio/Effects/thudswoosh.ogg
-      messagePerceivedByOthers: hugging-success-generic-others
+      interactSuccessString: petting-success-generic
+      interactSuccessSound: /Audio/Voice/Vulpkanin/dog_snarl1.ogg
+      messagePerceivedByOthers: petting-success-soft-floofy-others
+      interactSuccessSpawn: EffectHearts
+      interactDelay: 4
+    #VG-Tweak End
     #- type: Vocal
      # maleScream: /Audio/Voice/Human/malescream_1.ogg
       #femaleScream: /Audio/Voice/Human/femalescream_2.ogg

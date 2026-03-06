@@ -9,9 +9,9 @@ connecting-redial = Перезапустить
 connecting-redial-wait = Пожалуйста подождите: { TOSTRING($time, "G3") }
 connecting-in-progress = Подключение к серверу...
 connecting-disconnected = Отключён от сервера:
-connecting-tip = Ага.
+connecting-tip = Не умирай!.
 connecting-window-tip = Совет { $numberTip }
-connecting-version = версия 1.0
+connecting-version = версия 2.5
 connecting-fail-reason =
     Не удалось подключиться к серверу:
     { $reason }

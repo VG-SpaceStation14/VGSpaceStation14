@@ -175,14 +175,12 @@ public sealed class MiningShopBui : BoundUserInterface
         if (_window == null)
             return;
 
-        // Если есть текст поиска, применяем фильтр поиска
         if (_window.Search != null && !string.IsNullOrWhiteSpace(_window.Search.Text))
         {
             ApplySearchFilter(_window.Search.Text);
             return;
         }
 
-        // Иначе восстанавливаем видимость по категориям
         for (var i = 0; i < _window.Sections.ChildCount; i++)
         {
             var section = _window.Sections.GetChild(i);
@@ -227,7 +225,6 @@ public sealed class MiningShopBui : BoundUserInterface
         }
     }
 
-    // VG-Tweak Start: сброс фильтра поиска
     private void ResetSearchFilter()
     {
         if (_window == null)
@@ -243,7 +240,6 @@ public sealed class MiningShopBui : BoundUserInterface
             }
         }
     }
-    // VG-Tweak End
 
     private MiningShopSection CreateSection(SharedMiningShopSectionPrototype section)
     {
@@ -304,7 +300,6 @@ public sealed class MiningShopBui : BoundUserInterface
 
         if (string.IsNullOrWhiteSpace(args.Text))
         {
-            // VG-Tweak: сбрасываем фильтр записей, затем обновляем видимость по категориям
             ResetSearchFilter();
             UpdateSectionsVisibility();
         }
@@ -337,11 +332,22 @@ public sealed class MiningShopBui : BoundUserInterface
 
         var userpoints = _miningPoints.TryFindIdCard(user)?.Comp?.Points ?? 0;
 
+        // VG-Tweak: calculate total cost and show/hide elements
+        bool hasOrders = userOrders.Count > 0;
+        uint totalCost = 0;
+        foreach (var entry in userOrders)
+        {
+            totalCost += entry.Price ?? 0;
+        }
+        
+        _window.TotalCostLabel.Text = $"Сумма: {totalCost} P";
+        _window.TotalCostLabel.Visible = hasOrders;
+        _window.ClearCart.Visible = hasOrders;
+        // VG-Tweak End
+
         _window.YourPurchases.Text = $"Заказы: {ordersString}";
         _window.Express.Text = $"Экспресс доставка";
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
-
-        _window.ClearCart.Visible = userOrders.Count > 0;
 
         for (var sectionIndex = 0; sectionIndex < _sections.Count; sectionIndex++)
         {
@@ -362,7 +368,6 @@ public sealed class MiningShopBui : BoundUserInterface
             }
         }
 
-        // Reapply search filter if needed
         if (_window.Search != null && !string.IsNullOrWhiteSpace(_window.Search.Text))
         {
             ApplySearchFilter(_window.Search.Text);

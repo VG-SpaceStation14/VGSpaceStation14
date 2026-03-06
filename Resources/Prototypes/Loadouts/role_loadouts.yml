@@ -389,7 +389,7 @@
   - GroupTankHarness
     #ADT Loadouts Start
   - ADTSalvageSpecialistJumpsuit
-  - ADTSalvageSpecialistNeck
+  - ADTSalvageNeck  #VG-Tweak
     #ADT Loadouts End
   - SalvageSpecialistBackpack
   - ADTSalvageSpecialistEars # ADT tweak

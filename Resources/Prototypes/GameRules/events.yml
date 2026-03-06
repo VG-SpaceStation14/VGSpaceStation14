@@ -14,7 +14,7 @@
     - id: GreytideVirus
     - id: IonStorm # its calm like 90% of the time smh
     - id: KudzuGrowth
-    - id: MassHallucinations
+  #  - id: MassHallucinations VG-Tweak - он меня заебал, ушам больно сука
     - id: MimicVendorRule
     - id: MouseMigration
     - id: PowerGridCheck
