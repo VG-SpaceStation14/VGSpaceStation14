@@ -1,66 +1,241 @@
 ﻿<Document>
-  # Space Law
-  On Space Station 14, stations operate under abbreviated space law. All crew, passengers, and visitors aboard the station are expected to follow these laws.
+  # Корпоративный Закон (КЗ)
+  Корпоративный Закон (КЗ) - Уголовно-правовой, административный и процессуальный кодекс NanoTrasen, принятый 1 января 2532 года. Этот закон применяется на любой территории, принадлежащей корпорации NanoTrasen, будь то космическая станция, аванпост или звездолёт (далее совокупно именуемые как «объект» или «режимный объект»), для осуществления наказания нарушителей правопорядка.
 
-  Foreign invaders, such as nuclear operatives, ninjas, and pirates, are not protected under space law. Traitors are not foreign invaders so are usually protected by space law.
+  Его действие распространяется на всех сотрудников и собственность корпорации, союзных корпораций, а также на иных посетителей с их имуществом, объявивших о своем прибытии в сектор объекта NanoTrasen и получивших разрешение на нахождение в его пределах или ближайшем окружающем пространстве. Представитель любой из указанных ранее категорий далее будет именоваться как «лицо».
 
-  Space Law is not the server rules, but some rules reference Space Law and require it to be followed by certain people or to some degree.
+  Разрешение на нахождение может быть выдано или отозвано по распоряжению Капитана, Главы персонала или Центрального командования. Способ взаимодействия с лицами, не желающими или не стремящимися получить такое разрешение, остаётся на усмотрение уполномоченных сотрудников объекта.
 
-  ## Treatment Of Prisoners
-  Prisoners still have certain rights that must be upheld by law enforcement:
-  - Prisoners must be granted adequate medical care.
-  - Prisoners must be allowed access to basic communications equipment (Radios) so long as they are not abused.
-  - Prisoners must be granted clothing, food, water, shelter and safety. If the brig is no longer safe, confinement must be established in another location.
-  - Prisoners must be given access to legal counsel during an interrogation if requested and available.
-  - Prisoners must be given their shift mandated PDA after confinement has finished, unless there is solid proof of PDA tampering. In case of tampering, the PDA is to be secured and replaced with a new unit.
-  - Prisoners must be granted freedom of movement, and should not be restrained with handcuffs or other devices after incarceration unless there is an undue risk to life and limb. Similarly, any prisoners held for permanent confinement should be held in the communal brig, and should not be confined to a solitary cell unless they pose a risk to life and limb.
+  Все статьи закона были проверены и одобрены государствами, с которыми корпорация NanoTrasen сотрудничает в сфере найма персонала, соответственно Корпоративный Закон в должной мере соблюдает гражданские права персонала NT и защищает их честь и достоинство. Таким образом, никто из присутствующих на территории NT не имеет права апеллировать к законам своей страны в случае возникновения спорной ситуации по поводу соблюдения законов корпорации.
 
-  ## Search and Seizure
-  A personnel search is a seizure of the objects in a person's backpack, hands, coat, belt, and pockets. If any contraband is found during a search, the officer may choose to further the search into a detainment or simply confiscate the restricted items. Non-restricted items may be seized by Security if they were used to facilitate a crime. After the search is conducted, all legal items are to be returned to the person. A crewmate may legally decline any search conducted without probable cause or a warrant while the alert level is green. It should be noted that if the alert level is blue or above, all personnel searches are legal.
+  В случае, если Стандартные Рабочие Процедуры или Регламенты отделов прямо противоречат Корпоративному Закону, закон имеет наименьший приоритет - как следствие, выполнение соответствующих разделов СРП или Регламента не может считаться нарушением Корпоративного закона.
 
-  A departmental search is the sweep of an entire area or department for contraband. It is recommended that the officers be extremely thorough, checking all lockers, crates, and doors. These can only be done with permission or, ideally, a warrant signed by the department head or highest-ranking command staff, which is the captain in most cases.
+  ## ОПРС - Основные Права Разумных Существ
+  Основные Права Разумных Существ (ОПРС) на территории объектов корпорации NanoTrasen имеют преимущество над всеми остальными законами и сводами правил.
 
-  ## Implantation
-  Any prisoner in custody can be subjected to implantation or implant extraction procedures, so long as it's within reason. The process of adding or extracting an implant should not prolong the detainees sentence, meaning you can not hold them longer to perform the procedure, unless stated otherwise. A former inmate can be requested to undergo implantation/extraction at a later point in time; if they fit the circumstances during their confinement, they must comply. The following have been listed out with special circumstances, anything not in this list can still be applied, given proper legal context. A prisoner can still receive implantation/extraction procedures without meeting the circumstances if they give their clear permission.
+  ### Механизм защиты прав
+  Служба безопасности объекта NanoTrasen обязана уважать и защищать основные права всех разумных существ, находящихся на территории объекта NanoTrasen. Каждый имеет право искать защиты своих основных прав также у командного состава и Агента Внутренних Дел, и эти лица обязаны оказывать содействие в рамках своей компетенции. В случаях, когда способы защиты прав неэффективны или объективно невозможны, лицо имеет право обращаться любым возможным способом к Центральному Командованию сектора.
 
-  [color=#a4885c]Tracking Implants:[/color] Trackers can be applied to any suspect that has been convicted of a violent crime (the red linked crimes).
+  ### Основные Права Разумных Существ
+  [color=#a4885c]Право на жизнь:[/color] Никто не имеет права отнять жизнь без решения суда, капитана или ЦК. Ликвидация - крайняя мера, она может применяться лишь в исключительных случаях. Каждый имеет право на клонирование, никто не может быть лишен этого права, даже представители враждебной корпорации. Отказ клонировать равнозначен убийству.
 
-  [color=#a4885c]Mind Shields:[/color] Mind Shields can be administered to any suspect charged with a crime if there is reasonable and articulable suspicion to believe they committed the crime while under mind control. If there is undeniable proof of ongoing mind control on the station, such as a successful deconversion, all the following statements apply:
+  [color=#a4885c]Право на достоинство:[/color] Морально-нравственная категория, означающая уважение и самоуважение разумной личности. Никто не может и не имеет права принудить разумное существо к унижающим его достоинство действиям. Никто не может быть без добровольного согласия подвергнут медицинским, научным или иным опытам.
 
-  - Crew can be required to be shielded and may be forcibly implanted if they refuse.
-  - If a suspect refuses to cooperate or the implant fails to function they can be charged with Refusal of Mental Shielding.
-  - Unlike standard implantation you may indefinitely extend the duration of a prisoner's sentence until you finish issuing Mind Shields, so long as active attempts are made to procure implants and complete the implantation procedure.
+  [color=#a4885c]Право на свободу и неприкосновенность:[/color] Лишить права на свободу можно лишь решением ЦК или СБ в связи с нарушением КЗ или карантинными действиями, а также при возникновении чрезвычайной ситуации.
 
-  Usage of contraband implanters is a detainable offense, but it's not reasonable to detain someone solely for having an unidentified implant inside them.
+  [color=#a4885c]Право на неприкосновенность частной жизни:[/color] Никто не обязан сообщать или передавать данные о своей частной жизни.
 
-  ## Implant Removal
-  Any prisoner in custody can be subjected to implant extraction for a specific implant if there is reasonable suspicion they have it implanted. Detainees may not be forced or coerced into performing implant extraction on themselves against their will.
+  [color=#a4885c]Право на охрану здоровья и медицинскую помощь:[/color] Включает в себя право на эвтаназию при тяжелой болезни.
 
-  ## Sentencing
-  From a server rules perspective, security officers are only responsible for ensuring that they only place sentences over 15 minutes where space law would allow permanent confinement. Informing the Warden is highly recommended, even for timed sentences. As long as those requirements are met, security officers not giving inappropriate sentence lengths is considered an in-character issue, not a rule issue.
+  [color=#a4885c]Право на владение имуществом:[/color] Никто не имеет права изъять имущество, если оно не является контрабандой и владение им не запрещено законом.
 
-  The captain, HOS, and warden are responsible, within reason, for ensuring security officers place appropriate sentences that follow space law. If they are aware of an inappropriate sentence, including excessively long sentences, and if there is not an urgent threat or danger that they must prioritize, then they must work to correct that sentence. Unreasonable failures, as determined by game admins, of the captain, HOS, or warden to ensure space law is followed will be considered a rule issue, not an in-character issue.
+  [color=#a4885c]Презумпция невиновности:[/color] Каждый, обвиняемый в совершении преступления, имеет право считаться невиновным до тех пор, пока его виновность не будет установлена законным порядком путем гласного разбирательства, при котором ему обеспечиваются все возможности для защиты.
 
-  Use common sense and humanity when issuing punishments. You should not always seek out the highest punishment you can, you don't have to always give the maximum time or always look to demote someone. Prisoners cooperating and on good behavior should have their sentences reduced. Always take in account the severity and only charge for what is needed for someone to learn their lesson.
+  [color=#a4885c]Право на свободу вероисповедания:[/color] Религиозные объединения отделены от корпорации и равны перед её законом.
 
-  [color=#a4885c]Stackable Crimes:[/color] Crimes are to be considered 'stackable' in the sense that if you charge someone with two or more different crimes, you should combine the times you would give them for each crime. Linked crimes, shown in matching colors and suffixes on the Quick Crime Guide, can not be stacked and instead override each other, you should pick the highest crime that matches the case.
+  За нарушение прав разумных существ следует наказание по специализированной под конкретное нарушение статье КЗ. Любое существо, получившее разум (например, в результате экспериментов исследовательского отдела, под действием космической магии или аномалии), является объектом исследований и не имеет защиты ОПРС до тех пор, пока научный руководитель, капитан или ЦК не решит обратное по каждому конкретному существу. За существ, которые обрели разум, несёт ответственность их создатель.
 
-  - Example: A suspect has committed a 2-01 (possession: major) and a 3-01 (possession: highly illegal). The maximum sentence here would be 10 minutes due to them being linked crimes, and 3-01 is the greater crime.
-  - Example 2: A suspect commits a 3-04 (Secure trespassing) and a 3-06 (manslaughter). Those crimes stack since they are not linked crimes. You could sentence for a maximum of 20 minutes, but context matters heavily, and maximum sentences should only be used for the worst offenders.
+  Любое гуманоидное и органическое существо, изначально обладающее разумом и как-либо оказавшееся на объекте NanoTrasen, также находится под защитой ОПРС.
 
-  [color=#a4885c]Repeater Offenders:[/color] Repeated crimes are when someone is released for a crime and then goes to commit the same crime within the same shift. Repeated crimes can be charged with tacked-on time; first repeat: 3:00, second repeat: 6:00, third repeat: permanent confinement. It should be noted each tacked-on time is directly linked to one type of crime, so for example, if someone does their first repeat of trespass and petty theft, you can charge them with an extra 6 minutes.
+  Корпоративный закон является основным законом на объектах корпорации и имеет преимущество над любыми другими законами местных и планетарных правительств. Любое разумное существо на станции обязано исполнять требования Корпоративного Закона.
 
-  [color=#a4885c]Accessory, Attempting, And Intention:[/color] If someone intentionally, knowingly and substantially assists someone in enacting a crime they can be charged with the relevant crimes, such as an engineer giving someone tools, who says they are going to break into an area. Same goes for a clear and solid attempt at a crime, or a person who shows clear intent to act out a crime, such as a syndicate nuclear operative arming a nuke but getting arrested before it goes off, they can still be charged with station-wide destruction. Does not apply to crimes that have an attempted listing already, like attempted murder.
+  ## Обращение с Заключенными
+  Лица, содержащиеся под стражей, сохраняют определенные права, которые должны соблюдаться сотрудниками правопорядка:
+  - Заключенным должна быть предоставлена адекватная медицинская помощь.
+  - Заключенным должен быть предоставлен доступ к базовым средствам связи (рациям) при условии, что они не используются во зло.
+  - Заключенным должны быть предоставлены одежда, еда, вода, убежище и безопасность. Если бриг более не безопасен, содержание под стражей должно быть организовано в ином месте.
+  - Заключенным должен быть предоставлен доступ к Агенту Внутренних Дел во время допроса, если это запрошено и доступно.
+  - Заключенным должен быть возвращен их КПК после завершения заключения, если только нет неопровержимых доказательств вмешательства в КПК. В случае вмешательства КПК подлежит изъятию и замене новым устройством.
+  - Заключенным должна быть предоставлена свобода передвижения в пределах брига, и они не должны быть скованы наручниками или иными устройствами после водворения в камеру, если только нет неоправданного риска для жизни и здоровья. Лица, содержащиеся в перманентном заключении, должны содержаться в общем бриге и не должны быть изолированы в одиночной камере, если только они не представляют непосредственной угрозы для жизни и здоровья окружающих.
 
-  ## Normal Punishments
-  - [color=#a4885c]Warning:[/color] For minor crimes, fix the issue, then warn the person not to attempt the crime again. If they still proceed to do it at a later date, a brig time may be better.
-  - [color=#a4885c]Confinement:[/color] The typical punishment, being confined in a cell for a temporary amount of time according to the crimes.
-  - [color=#a4885c]Demotion:[/color] Entails removing all departmental gear they have on their person and revoking the involved department access off their ID. This requires the captain's or involved department head's approval. Demotions should only be issued if the person pose a threat to their own department or are in a position where they have/can abuse their job's gear to commit further crimes.
+  ## Обыск и Изъятие
+  Личный обыск — это досмотр предметов, находящихся при лице: в рюкзаке, карманах, на поясе, в руках, а также изъятие верхней одежды для досмотра. Если в ходе обыска обнаружена контрабанда, офицер вправе произвести задержание для дальнейшего разбирательства либо ограничиться изъятием запрещенных предметов. Не запрещенные предметы могут быть изъяты службой безопасности, если они были использованы при совершении преступления. По завершении обыска все законные предметы подлежат возврату владельцу. Лицо может на законных основаниях отказаться от любого обыска, проводимого без достаточных оснований или ордера, если уровень тревоги зеленый. При уровне тревоги синий или выше любые личные обыски являются законными.
 
-  ## Major Punishments
-  - [color=#a4885c]Permanent Confinement:[/color] Being held in the permanent brig for the entire duration of the shift. A person is eligible for permanent confinement if their timed sentence would exceed 15 minutes. Any persons subject to this punishment are required to be transported in cuffs to CentComm at the end of the shift. A permanent prisoner can not be deprived of anything covered by the section "Treatment Of Prisoners".
-  - [color=#a4885c]Execution:[/color] A humane way of dealing with extremely unruly crewmates. Within reason, a prisoner who has been given the death sentence may pick how they wish to be killed, common methods are firing line, lethal injection, exile, and high voltage electrocution. Another alternate method of "execution" is the process of placing a staff's mind into a borg, this is allowed so long as it is lawful. Execution can only be issued with the captain's or acting captain's approval; if the HoS is acting captain or there is no acting captain, all heads of staff are to hold a vote on the matter.
+  Обыск отдела — это проверка целого помещения или отдела на предмет наличия контрабанды. Рекомендуется проводить такие обыски с особой тщательностью, проверяя все шкафы, ящики и контейнеры. Обыск отдела может проводиться только с санкции Капитана или главы соответствующего отдела.
 
-  ## Crime Listing
-  - [textlink="Crime Listing" link="SpaceLawCrimeList"]
+  ## Имплантация
+  Любое лицо, содержащееся под стражей, может быть подвергнуто процедуре имплантации или извлечения имплантов, если это обоснованно. Процедура не должна продлевать срок заключения, если иное не оговорено особо. Лицо, уже отбывшее наказание, может быть обязано явиться для имплантации/извлечения позднее, если соответствующие основания имели место в период его заключения; в таком случае оно обязано подчиниться. Лицо может пройти процедуру имплантации/извлечения и без наличия особых оснований, если добровольно даст на то согласие.
+
+  [color=#a4885c]Трекеры:[/color] Могут быть применены к любому лицу, осужденному за насильственное преступление.
+
+  [color=#a4885c]Защита Разума:[/color] Может быть установлена любому лицу, обвиняемому в преступлении, если есть разумные основания полагать, что преступление совершено под внешним ментальным воздействием. При наличии неопровержимых доказательств ментальной угрозы на объекте:
+  - Члены экипажа могут быть обязаны пройти экранирование и могут быть имплантированы принудительно в случае отказа.
+  - В случае отказа от сотрудничества или нефункциональности импланта лицо может быть обвинено в Отказе от ментального экранирования.
+  - Срок заключения может быть продлен на время, необходимое для проведения процедуры, при условии, что предпринимаются активные попытки получить импланты и завершить имплантацию.
+
+  Использование контрабандных имплантеров является основанием для задержания, однако наличие неопознанного импланта само по себе не может служить единственным основанием для задержания.
+
+  ## Извлечение Имплантов
+  Любое лицо, содержащееся под стражей, может быть подвергнуто извлечению импланта при наличии разумных подозрений о его наличии. Задержанный не может быть принужден к самостоятельному извлечению импланта против своей воли.
+
+  ## Назначение Наказания
+  Служба безопасности обязана следить за тем, чтобы назначаемые сроки заключения соответствовали тяжести совершенного деяния. Информирование смотрителя обязательно, даже при назначении срочных приговоров.
+
+  Капитан, Глава Службы Безопасности и смотритель несут ответственность за то, чтобы офицеры назначали наказания в соответствии с Корпоративным Законом. Если им известно о неправомерном приговоре, в том числе о чрезмерно длительном сроке, и если отсутствует непосредственная угроза, требующая их первоочередного внимания, они обязаны принять меры к исправлению приговора. Необоснованное бездействие со стороны капитана, ГСБ или смотрителя по обеспечению соблюдения Корпоративного Закона является нарушением правил сервера, а не внутриигровым вопросом.
+
+  Руководствуйтесь здравым смыслом и принципами гуманизма при назначении наказаний. Не следует всегда стремиться к максимально строгому наказанию. В отношении заключенных, демонстрирующих сотрудничество и примерное поведение, срок наказания должен быть сокращен. Всегда учитывайте тяжесть деяния и предъявляйте обвинения соразмерно содеянному, в степени, достаточной для осознания виновным своей ошибки.
+
+  [color=#a4885c]Суммирование преступлений:[/color] Преступления суммируются следующим образом: за каждое последующее преступление той же категории тяжести назначается половина максимального срока, установленного для первого преступления данной категории. Преступления, относящиеся к разным категориям тяжести, суммируются полностью.
+
+  [color=#a4885c]Рецидив:[/color] Повторное совершение преступления той же категории после отбытия наказания в течение одной смены увеличивает срок наказания на +5 минут за каждый рецидив.
+
+  [color=#a4885c]Соучастие, покушение и намерение:[/color] Лицо, умышленно и существенно содействовавшее совершению преступления, подлежит ответственности по соответствующим статьям. Покушение на преступление, а также демонстрация явного намерения совершить преступление приравниваются к совершенному преступлению.
+
+  ## Обычные наказания
+  [color=#a4885c]Предупреждение:[/color] Применяется за малозначительные деяния. Лицу разъясняется недопустимость подобного поведения. При повторном совершении деяния возможно применение более строгих мер.
+
+  [color=#a4885c]Заключение:[/color] Содержание в камере брига на определенный срок в соответствии с тяжестью совершенного деяния.
+
+  [color=#a4885c]Понижение в должности:[/color] Изъятие всего оборудования, выданного отделом, и лишение соответствующего доступа на ID-карте. Требуется одобрение Капитана или главы отдела. Применяется в случаях, когда лицо представляет угрозу для своего отдела либо использует (или может использовать) служебное положение для совершения противоправных действий.
+
+  [color=#a4885c]Увольнение:[/color] Расторжение трудового договора. Влечет за собой изъятие всего имущества корпорации и блокировку доступа.
+
+  [color=#a4885c]Штраф:[/color] Денежное взыскание. Средства перечисляются на счет корпорации.
+
+  [color=#a4885c]Каторжные работы:[/color] Выполнение физического труда (добыча руды) для возмещения ущерба, причиненного корпорации.
+
+  ## Исключительные наказания
+  [color=#a4885c]Перманентное заключение:[/color] Содержание в бриге постоянного содержания до конца смены. Применяется к лицам, чей суммарный срок заключения превышает 30 минут, либо в случаях, особо оговоренных в статьях. По окончании смены заключенный в наручниках передается представителям Центрального Командования. Перманентный заключенный не может быть лишен прав, предусмотренных разделом «Обращение с заключенными».
+
+  [color=#a4885c]Имплантация:[/color] Принудительное введение импланта (трекера или защиты разума). Применяется в случаях, предусмотренных соответствующими статьями или при тяжких и особо тяжких преступлениях.
+
+  [color=#a4885c]Казнь:[/color] Крайняя мера, применяемая в отношении лиц, совершивших исключительные по тяжести деяния. При вынесении смертного приговора осужденному может быть предоставлен выбор способа казни (расстрел, смертельная инъекция, высоковольтный разряд, изгнание в открытый космос). Допустимой альтернативой является перемещение сознания в борга. Казнь может быть назначена только с одобрения Капитана; если Капитан отсутствует или ГСБ исполняет его обязанности, вопрос решается голосованием глав отделов.
+
+  ## Справочник статей
+
+  ### Группы связанных преступлений
+  Преступления, отмеченные одинаковыми суффиксами, являются связанными и не суммируются при назначении наказания. Применяется наибольший срок из вменяемых связанных преступлений.
+
+  [color=#a4885c]Суффиксы:[/color]
+  - (D) - Преступления против собственности (Damage/Destruction)
+  - (E) - Преступления против правосудия (Enforcement/Compliance)
+  - (H) - Хищения (Theft/Hijacking)
+  - (P) - Незаконный оборот (Possession/Contraband)
+  - (R) - Преступления против порядка (Riot/Disturbance)
+  - (V) - Насильственные преступления (Violence)
+
+  ## Проступки (1XX)
+  За первое нарушение, как правило, выносится предупреждение. Максимальное наказание за несколько проступков или рецидив - до 5 минут заключения.
+
+  [color=#a4885c]1-00 Унижение (D):[/color] Публичное совершение действий, направленных на унижение чести и достоинства лица или группы лиц без их согласия.
+
+  [color=#a4885c]1-05 Владение опасным инструментом (P):[/color] Владение опасным инструментом без соответствующей должности или разрешения главы отдела. Примеры: поварской тесак, хирургическая пила, топорик ботаника, шахтерский ПКА.
+
+  [color=#a4885c]1-06 Хулиганство (D):[/color] Грубое нарушение общественного порядка, уродование имущества станции оскорбительными или не представляющими ценности арт-объектами, снятие напольного покрытия. Декорирование личного/рабочего пространства не является нарушением.
+
+  ## Нарушения (2XX)
+  Максимальное наказание за каждое нарушение - до 10 минут заключения.
+
+  [color=#a4885c]2-00 Нападение (V):[/color] Совершение насильственных действий с целью нанесения вреда здоровью, а также угроза убийством или нанесением тяжких телесных повреждений.
+
+  [color=#a4885c]2-01 Невыполнение прямого приказа (E):[/color] Игнорирование законного приказа вышестоящего сотрудника или представителя Центрального Командования.
+
+  [color=#a4885c]2-02 Незаконное пребывание в закрытых зонах (T):[/color] Нахождение в зонах, к которым у лица отсутствует законный доступ, включая попытку взлома шлюзов с целью проникновения. Применяется даже в отношении полуоткрытых зон (например, барная стойка).
+
+  [color=#a4885c]2-03 Мелкая кража (H):[/color] Хищение имущества из закрытых зон или у сотрудников. Наличие доступа к зоне не снимает ответственности, если имущество взято без разрешения.
+
+  [color=#a4885c]2-04 Эксплуатация ограниченных наркотиков (P):[/color] Производство, хранение или распространение ограниченных наркотических веществ. Наличие в организме не является нарушением.
+
+  [color=#a4885c]2-05 Владение опасным предметом (P):[/color] Владение средством самообороны или самодельным неогнестрельным оружием без разрешения. Примеры: луки, жгучие растения, устройство принудительной телепортации, нелетальные боеприпасы, неизвестные импланты, а также иная контрабанда, не относящаяся к оружию или вражескому снаряжению.
+
+  [color=#a4885c]2-06 Вандализм (D):[/color] Нанесение урона имуществу станции или станционным животным, несогласованная перестройка помещений, взлом и вмешательство в работу второстепенного оборудования (вендоматы, автолаты, протолаты и т.п.).
+
+  ## Преступления (3XX)
+  Максимальное наказание за каждое преступление - до 20 минут заключения.
+
+  [color=#a4885c]3-00 Причинение увечий (V):[/color] Причинение серьезного вреда здоровью: кровотечение, потеря зрения/конечности, введение в критическое состояние и т.п.
+
+  [color=#a4885c]3-01 Халатность:[/color] Пренебрежение обязанностями, повлекшее вред здоровью или повреждение станции, включая нарушение СРП и техники безопасности. При отказе от выполнения обязанностей в обязательном порядке назначается увольнение.
+
+  [color=#a4885c]3-03 Кража (H):[/color] Хищение командного имущества (включая униформу), особо важного оборудования, артефактов, оружия, крупных сумм денег, предметов из ограниченных и стратегических зон.
+
+  [color=#a4885c]3-06 Саботаж (D):[/color] Воспрепятствование работе отдела или станции: ложные сигналы опасности, подрывы, повреждение проводки, вмешательство в работу важного оборудования (ЛКП, система AIR и т.п.).
+
+  [color=#a4885c]3-07 Сопротивление законным процедурам (E):[/color] Сопротивление при проведении законного ареста, обыска, увольнения и иных законных процедур.
+
+  ## Тяжкие преступления (4XX)
+  Максимальное наказание за каждое тяжкое преступление - до 30 минут заключения.
+
+  [color=#a4885c]4-00 Убийство (V):[/color] Причинение смерти члену экипажа, включая непредумышленное убийство (применяются соответствующие модификаторы). Попытки реанимации не снимают обвинения.
+
+  [color=#a4885c]4-01 Преступная халатность:[/color] Пренебрежение обязанностями, повлекшее смерть члена экипажа или разрушение станции. Также: превышение полномочий, отдача преступных приказов, злоупотребление доступом.
+
+  [color=#a4885c]4-02 Проникновение в ограниченную зону (T):[/color] Незаконное нахождение во внутренних отсеках отделов особой важности, попытка взлома.
+
+  [color=#a4885c]4-03 Похищение (H):[/color] Захват, перемещение и удержание лица против его воли.
+
+  [color=#a4885c]4-04 Эксплуатация опасных ограниченных веществ (P):[/color] Производство, хранение, распространение или применение опасных веществ. Наличие в организме не является нарушением.
+
+  [color=#a4885c]4-05 Владение боевым снаряжением (P):[/color] Владение без разрешения: энергооружие, огнестрельное оружие, заводское холодное оружие, боевые импланты, взрывчатка, летальные боеприпасы, а также контрабанда, являющаяся оружием.
+
+  [color=#a4885c]4-06 Грандиозный саботаж (D):[/color] Создание угрозы экипажу или нанесение значительного ущерба: ложные сигналы, повлекшие красный код, серьезные подрывы, саботаж ATMOS, повреждение шаттлов.
+
+  [color=#a4885c]4-07 Демонстрация (R):[/color] Участие в несанкционированных массовых собраниях (петиции, протесты, марши), в том числе в одиночку (по соответствующей категории тяжести).
+
+  ## Сверхтяжкие преступления (5XX)
+  Наказание - от 30 до 60 минут заключения, перманентное заключение либо казнь.
+
+  [color=#a4885c]5-00 Уничтожение тела (V):[/color] Действия, направленные на невозможность реанимации, уничтожение или сокрытие тела.
+
+  [color=#a4885c]5-01 Особая степень преступной халатности:[/color] Халатность или превышение полномочий, повлекшие массовые смерти или значительное разрушение станции.
+
+  [color=#a4885c]5-04 Эксплуатация запрещенных веществ (P):[/color] Производство, хранение, распространение, применение или употребление запрещенных веществ.
+
+  [color=#a4885c]5-05 Владение вражеской экипировкой (P):[/color] Владение снаряжением, состоящим на вооружении враждебных корпораций и группировок.
+
+  ## Преступления особой тяжести (6XX)
+  Наказание - перманентное заключение либо казнь.
+
+  [color=#a4885c]6-00 Массовое убийство (V):[/color] Причинение смерти трем или более лицам за короткий промежуток времени.
+
+  [color=#a4885c]6-02 Проникновение в стратегическую зону (T):[/color] Незаконное нахождение в помещениях особой стратегической важности: генератор гравитации, AI Upload, AI Satellite, арсенал, хранилище, зона сингулярности, отсек суперматерии.
+
+  [color=#a4885c]6-06 Критическое повреждение (D):[/color] Нанесение урона, повлекшего невозможность функционирования большинства отделов или станции в целом.
+
+  ## Модификаторы наказаний
+
+  [color=#a4885c]Крайняя необходимость:[/color] Действия, совершенные для защиты жизни и здоровья или сохранности объекта. [color=#48bb78]Снятие обвинений.[/color]
+
+  [color=#a4885c]Ментальный контроль:[/color] Совершение действий под влиянием контроля сознания. [color=#48bb78]Снятие обвинений.[/color]
+
+  [color=#a4885c]Явка с повинной:[/color] Добровольная сдача представителям СБ. [color=#48bb78]Сокращение наказания на 50%.[/color]
+
+  [color=#a4885c]Сотрудничество:[/color] Содействие следствию. [color=#48bb78]Сокращение наказания на 50%.[/color]
+
+  [color=#a4885c]Отсутствие умысла:[/color] Деяние совершено по неосторожности. [color=#fbbf24]Наказание по статье предыдущей степени тяжести.[/color]
+
+  [color=#a4885c]Пособничество:[/color] Содействие совершению преступления. [color=#f56565]Полное наказание по соответствующим статьям.[/color]
+
+  [color=#a4885c]Отказ от сотрудничества:[/color] Отказ от дачи показаний. [color=#f56565]Увеличение наказания на 50%.[/color]
+
+  [color=#a4885c]Рецидив:[/color] Повторное преступление той же категории. [color=#f56565]+5 минут за каждый рецидив.[/color]
+
+  [color=#a4885c]Должностное преступление:[/color] Нарушение, совершенное должностным лицом. [color=#f56565]Увеличение наказания на 50%.[/color]
+
+  [color=#a4885c]Преступление против должностного лица:[/color] Посягательство на представителя власти. [color=#f56565]Увеличение наказания на 50%.[/color]
+
+  [color=#a4885c]Коллективное преступление:[/color] Совершенное группой лиц по предварительному сговору. [color=#f56565]Увеличение наказания на 50%.[/color]
+
+  ## Степени тяжести и виды наказаний
+
+  [color=#a4885c]I (Проступок):[/color] Правовое наказание не предусмотрено. Административно: устное предупреждение, штраф до 200 кр.
+
+  [color=#a4885c]II (Нарушение):[/color] Правовое наказание: заключение до 10 минут. Административно: штраф до 400 кр, понижение в должности.
+
+  [color=#a4885c]III (Преступление):[/color] Правовое наказание: заключение от 10 до 20 минут, каторга (1000 ед. руды). Административно: штраф 600-1200 кр, понижение, увольнение.
+
+  [color=#a4885c]IV (Тяжкое преступление):[/color] Правовое наказание: заключение от 20 до 30 минут, перманентное заключение, каторга (2500 ед. руды). Административно: увольнение, имплантация.
+
+  [color=#a4885c]V (Сверхтяжкое преступление):[/color] Правовое наказание: заключение от 30 до 60 минут, перманентное заключение, каторга (4000 ед. руды), казнь. Административно: увольнение, имплантация.
+
+  [color=#a4885c]VI (Особая тяжесть):[/color] Правовое наказание: перманентное заключение, пожизненная каторга, казнь. Административно: всегда увольнение.
+
+  ## Формула расчета комплексного наказания
+  S + (n-1) × (S/2), где S - срок за одно нарушение данной категории, n - количество нарушений данной категории.
+
+  [color=#a4885c]Пример 1:[/color] Статьи 300 (20 мин), 301 (20 мин) и 303 (20 мин). Расчет: 20 + 10 + 10 = 40 минут. (Первое преступление 3-й категории - полный срок, последующие - половина).
+
+  [color=#a4885c]Пример 2:[/color] Статьи 300 (20 мин), 301 (20 мин) и 401 (30 мин), 402 (30 мин). Расчет: 20 + 10 + 30 + 15 = 75 минут. (Каждая категория тяжести рассчитывается отдельно).
+
+  В случае сомнений в трактовке закона окончательное решение остается за Капитаном объекта или представителями Центрального Командования.
 </Document>

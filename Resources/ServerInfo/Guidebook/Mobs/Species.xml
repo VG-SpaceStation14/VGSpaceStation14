@@ -13,8 +13,8 @@
   <GuideEntityEmbed Entity="MobMoth" Caption="Ниан"/>
   <GuideEntityEmbed Entity="MobReptilian" Caption="Унатх"/>
   <GuideEntityEmbed Entity="MobVulpkanin" Caption="Вульпканин"/>
-  <GuideEntityEmbed Entity="MobSlimePerson" Caption="Слаймолюд"/>
   <GuideEntityEmbed Entity="MobTajaran" Caption="Таяр"/>
+  <GuideEntityEmbed Entity="MobSlimePerson" Caption="Слаймолюд"/>
   </Box>
 
 </Document>
