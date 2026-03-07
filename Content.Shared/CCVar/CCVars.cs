@@ -38,7 +38,7 @@ public sealed partial class CCVars : CVars
     public static readonly CVarDef<bool> DebugPow3rDisableParallel =
         CVarDef.Create("debug.pow3r_disable_parallel", false, CVar.SERVERONLY);
     
-    /// Ganimed Edit
+    /// VG Edit
     /// <summary>
     ///     When true, you have to press the change speed button to sprint.
     /// </summary>

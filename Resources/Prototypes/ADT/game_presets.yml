@@ -4,7 +4,7 @@
   alias:
     - heretic
   name: heretic-title
-  minPlayers: 15 # Ganimed-Tweak
+  minPlayers: 15 # VG-Tweak
   description: heretic-title
   rules:
     - Heretic
@@ -19,7 +19,7 @@
   alias:
     - changeling
   name: changelings-title
-  minPlayers: 15 # Ganimed-Tweak
+  minPlayers: 15 # VG-Tweak
   showInVote: false
   description: changelings-description
   rules:
@@ -45,7 +45,7 @@
     - SubGamemodesRule
     - BasicStationEventScheduler
     - MeteorSwarmScheduler
-#    - SpaceTrafficControlEventScheduler #Ganimed-Tweak
+#    - SpaceTrafficControlEventScheduler #VG-Tweak
     - BasicRoundstartVariation
     - CrewTransferScheduler #ADT tweak
 
@@ -64,7 +64,7 @@
     - SubGamemodesRule
     - BasicStationEventScheduler
     - MeteorSwarmScheduler
-#    - SpaceTrafficControlEventScheduler #Ganimed-Tweak
+#    - SpaceTrafficControlEventScheduler #VG-Tweak
     - BasicRoundstartVariation
     - CrewTransferScheduler #ADT tweak
 
@@ -75,7 +75,7 @@
   name: dynamic-hard-title
   description: dynamic-hard-description
   showInVote: false
-  minPlayers: 20 # Ganimed-Tweak
+  minPlayers: 20 # VG-Tweak
   rules:
     - DynamicHardGamerule
     - MeteorSwarmScheduler
@@ -90,7 +90,7 @@
   name: dynamic-low-title
   description: dynamic-low-description
   showInVote: false
-  minPlayers: 5 # Ganimed-Tweak
+  minPlayers: 5 # VG-Tweak
   rules:
     - DynamicLightGamerule
     - MeteorSwarmScheduler
@@ -104,7 +104,7 @@
   name: dynamic-medium-title
   description: dynamic-medium-description
   showInVote: false
-  minPlayers: 10 # Ganimed-Tweak
+  minPlayers: 10 # VG-Tweak
   rules:
     - DynamicMediumGamerule
     - MeteorSwarmScheduler

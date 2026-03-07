@@ -3,17 +3,17 @@
   name: job-name-ADTBlueShieldOfficer
   description: job-description-ADTBlueShieldOfficer
   playTimeTracker: JobADTBlueShieldOfficer
-  requireAdminNotify: true # Ganimed Rules Tweak
+  requireAdminNotify: true # VG Rules Tweak
   requirements:
     - !type:DepartmentTimeRequirement
       department: Command
-      time: 72000 #20 hrs Ganimed-RoleTime
+      time: 72000 #20 hrs VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Security
-      time: 72000 #20 hrs Ganimed-RoleTime
+      time: 72000 #20 hrs VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Medical
-      time: 36000 #10 hrs Ganimed-RoleTime
+      time: 36000 #10 hrs VG-RoleTime
     - !type:AgeRequirement
       requiredAge: 21
     - !type:SpeciesRequirement
@@ -23,7 +23,7 @@
       - Vox
       - Shadekin
   # ADT RESTRICT End
-    - !type:TraitsRequirement # Ganimed-MRP: BSO undergoes medical examination
+    - !type:TraitsRequirement # VG-MRP: BSO undergoes medical examination
       inverted: true
       traits:
       - Pacifist
@@ -60,7 +60,7 @@
             tags:
             - ADTBsoWeapon
         - type: Necksnap
-        - type: AntagImmune # Ganimed-MRP: Loyalty implant
+        - type: AntagImmune # VG-MRP: Loyalty implant
         - type: Combo
           availableMoves:
             - actionsNeeds:

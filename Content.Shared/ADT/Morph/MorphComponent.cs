@@ -85,7 +85,7 @@ public sealed partial class MorphComponent : Component
     /// объява цк после массового размножения
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite), DataField("soundReplication")]
-    public SoundSpecifier? SoundReplication = new SoundPathSpecifier("/Audio/Announcements/announce.ogg") // Ganimed edit
+    public SoundSpecifier? SoundReplication = new SoundPathSpecifier("/Audio/Announcements/announce.ogg") // VG edit
     {
         Params = AudioParams.Default.WithVolume(-3f),
     };

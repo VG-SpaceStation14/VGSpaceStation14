@@ -39,7 +39,7 @@
     - !type:SpeciesRequirement
       inverted: true
       species:
-      - Resomi # Ganimed edit
+      - Resomi # VG edit
       - Vox
   weight: 15
   startingGear: ADTCentcomConsultantGear

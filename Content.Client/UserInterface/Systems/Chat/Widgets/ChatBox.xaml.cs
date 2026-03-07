@@ -23,8 +23,8 @@ public partial class ChatBox : UIWidget
 {
     [Dependency] private readonly IEntityManager _entManager = default!;
     [Dependency] private readonly ILogManager _log = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!; // Ganimed, EE - Chat stacking
-    [Dependency] private readonly ILocalizationManager _loc = default!; // Ganimed, EE - Chat stacking
+    [Dependency] private readonly IConfigurationManager _cfg = default!; // VG, EE - Chat stacking
+    [Dependency] private readonly ILocalizationManager _loc = default!; // VG, EE - Chat stacking
 
     private readonly ISawmill _sawmill;
     private readonly ChatUIController _controller;
@@ -33,11 +33,11 @@ public partial class ChatBox : UIWidget
 
     public ChatSelectChannel SelectedChannel => ChatInput.ChannelSelector.SelectedChannel;
 
-    // Ganimed, EE - Chat stacking
+    // VG, EE - Chat stacking
     private int _chatStackAmount = 0;
     private bool _chatStackEnabled => _chatStackAmount > 0;
     private List<ChatStackData> _chatStackList;
-    // Ganimed, EE - Chat stacking
+    // VG, EE - Chat stacking
 
     public ChatBox()
     {
@@ -57,13 +57,13 @@ public partial class ChatBox : UIWidget
         _controller.HighlightsUpdated += OnHighlightsUpdated;
         _controller.RegisterChat(this);
 
-        // Ganimed, EE - Chat stacking
+        // VG, EE - Chat stacking
         _chatStackList = new List<ChatStackData>(_chatStackAmount);
         _cfg.OnValueChanged(CCVars.ChatStackLastLines, UpdateChatStack, true);
-        //  Ganimed, EE end - Chat stacking
+        //  VG, EE end - Chat stacking
     }
 
-    // Ganimed, EE - Chat stacking
+    // VG, EE - Chat stacking
     private void UpdateChatStack(int value)
     {
         _chatStackAmount = value >= 0 ? value : 0;
@@ -90,7 +90,7 @@ public partial class ChatBox : UIWidget
 
         var color = msg.MessageColorOverride ?? msg.Channel.TextColor();
 
-        // Ganimed, EE - Chat stacking
+        // VG, EE - Chat stacking
         var index = _chatStackList.FindIndex(data => data.WrappedMessage == msg.WrappedMessage);
 
         if (index == -1) // this also handles chatstack being disabled, since FindIndex won't find anything in an empty array
@@ -101,7 +101,7 @@ public partial class ChatBox : UIWidget
         }
 
         UpdateRepeatingLine(index);
-        // Ganimed, End EE - Chat stacking
+        // VG, End EE - Chat stacking
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public partial class ChatBox : UIWidget
     /// <remarks>
     /// zero index is the very last line in chat, 1 is the line before the last one, 2 is the line before that, etc.
     /// </remarks>
-    // Ganimed, EE - Chat stacking
+    // VG, EE - Chat stacking
     private void UpdateRepeatingLine(int index)
     {
         _chatStackList[index].RepeatCount++;
@@ -127,7 +127,7 @@ public partial class ChatBox : UIWidget
         }
     }
 
-    // Ganimed, EE - Chat stacking
+    // VG, EE - Chat stacking
     private void TrackNewMessage(string wrappedMessage, Color colorOverride)
     {
         if (!_chatStackEnabled)
@@ -152,7 +152,7 @@ public partial class ChatBox : UIWidget
     public void Repopulate()
     {
         Contents.Clear();
-        _chatStackList = new List<ChatStackData>(_chatStackAmount); // Ganimed, EE - Chat stacking
+        _chatStackList = new List<ChatStackData>(_chatStackAmount); // VG, EE - Chat stacking
 
         foreach (var message in _controller.History)
         {
@@ -180,16 +180,16 @@ public partial class ChatBox : UIWidget
         _controller.UpdateHighlights(highlighs);
     }
 
-    public void AddLine(string message, Color color, int repeat = 0) // Ganimed - Chat stacking - repeatr)
+    public void AddLine(string message, Color color, int repeat = 0) // VG - Chat stacking - repeatr)
     {
         int sizeIncrease = 11;
 
-        var formatted = new FormattedMessage(4); // Ganimed, EE - Chat stacking - up from
+        var formatted = new FormattedMessage(4); // VG, EE - Chat stacking - up from
         formatted.PushColor(color);
         formatted.AddMarkupOrThrow(message);
         formatted.Pop();
 
-        // Ganimed, EE - Chat stacking
+        // VG, EE - Chat stacking
         if (repeat != 0)
         {
             var displayRepeat = repeat + 1;
@@ -199,7 +199,7 @@ public partial class ChatBox : UIWidget
                                 ));
         }
         Contents.AddMessage(formatted);
-        // Ganimed, End EE - Chat stacking
+        // VG, End EE - Chat stacking
     }
 
     public void Focus(ChatSelectChannel? channel = null)
@@ -294,11 +294,11 @@ public partial class ChatBox : UIWidget
         ChatInput.Input.OnKeyBindDown -= OnInputKeyBindDown;
         ChatInput.Input.OnTextChanged -= OnTextChanged;
         ChatInput.ChannelSelector.OnChannelSelect -= OnChannelSelect;
-        _cfg.UnsubValueChanged(CCVars.ChatStackLastLines, UpdateChatStack); // Ganimed, EE - Chat stacking
+        _cfg.UnsubValueChanged(CCVars.ChatStackLastLines, UpdateChatStack); // VG, EE - Chat stacking
     }
 }
 
-// Ganimed, EE - StackChat
+// VG, EE - StackChat
 public sealed partial class ChatStackData
 {
     public string WrappedMessage;

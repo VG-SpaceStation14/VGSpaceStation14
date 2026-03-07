@@ -40,7 +40,7 @@
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff
-      - type: AntagImmune # Ganimed-MRP: Loyalty implant
+      - type: AntagImmune # VG-MRP: Loyalty implant
 
 - type: startingGear
   id: MagistratGear

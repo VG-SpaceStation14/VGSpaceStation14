@@ -63,10 +63,10 @@
     - id: ClothingHandsGlovesKravMaga
     - id: ADTClothingNeckBodyCamera #ADT bodycam
     - id: ADTBookSRPsec
-    # - id: ADTBookPCDsec # Ganimed-Remove
-    # - id: ADTClothingNeckShockCollar # Ganimed-Remove
+    # - id: ADTBookPCDsec # VG-Remove
+    # - id: ADTClothingNeckShockCollar # VG-Remove
     #   amount: 2
-    # - id: RemoteSignaller # Ganimed-Remove
+    # - id: RemoteSignaller # VG-Remove
     #   amount: 2
     - id: ADTSecShuttleConsoleCircuitboard
     - id: BoxTapeRecorder

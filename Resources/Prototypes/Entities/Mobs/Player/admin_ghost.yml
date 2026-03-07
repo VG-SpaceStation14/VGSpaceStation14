@@ -113,8 +113,8 @@
     damageCoefficient: 0
   # Corvax-Start
   - type: MovementSpeedModifier
-    baseWalkSpeed: 12 # Ganimed-Tweak (Shift to run)
-    baseSprintSpeed: 30 # Ganimed-Tweak
+    baseWalkSpeed: 12 # VG-Tweak (Shift to run)
+    baseSprintSpeed: 30 # VG-Tweak
   # Corvax-End
   - type: SupermatterImmune # ADT-Tweak
 

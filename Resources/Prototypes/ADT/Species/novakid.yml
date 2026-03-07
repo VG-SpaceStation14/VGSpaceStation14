@@ -1,7 +1,7 @@
 - type: species
   id: NovakidSpecies
   name: species-name-novakid
-  roundStart: false  # Ganimed-MRP
+  roundStart: false  # VG-MRP
   prototype: MobNovakid
   sprites: MobNovakidSprites
   defaultSkinTone: "#34a223"

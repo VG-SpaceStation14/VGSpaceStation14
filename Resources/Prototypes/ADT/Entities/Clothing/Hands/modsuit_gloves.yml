@@ -1,7 +1,7 @@
 - type: entity
   parent: ClothingHandsBase
   id: ADTClothingHandsModsuitBase
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: base MOD gauntlets
   description: A pair of gauntlets for a MODsuit.
   components:
@@ -24,7 +24,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitAtmos
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: atmos MOD gauntlets
   components:
   - type: Sprite
@@ -41,7 +41,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitClown
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: clown MOD gauntlets
   components:
   - type: Sprite
@@ -58,7 +58,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitEngineering
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: atmos MOD gauntlets
   components:
   - type: Sprite
@@ -75,7 +75,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitMedical
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: atmos MOD gauntlets
   components:
   - type: Sprite
@@ -92,7 +92,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitMining
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: mining MOD gauntlets
   components:
   - type: Sprite
@@ -109,7 +109,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitSecurity
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: security MOD gauntlets
   components:
   - type: Sprite
@@ -133,7 +133,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitScience
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: Science MOD gauntlets
   components:
   - type: Sprite
@@ -150,7 +150,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitSafeguard
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: safeguard MOD gauntlets
   components:
   - type: Sprite
@@ -175,7 +175,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitBso
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: bso MOD gauntlets
   components:
   - type: Sprite
@@ -200,7 +200,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitAdvanced
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: advanced MOD gauntlets
   components:
   - type: Sprite
@@ -218,7 +218,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitSyndicate
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: syndicate MOD gauntlets
   components:
   - type: Sprite
@@ -242,7 +242,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitSyndicateElite
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: elite syndicate MOD gauntlets
   components:
   - type: Sprite
@@ -267,7 +267,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitSyndicateCommander
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: comm syndicate MOD gauntlets
   components:
   - type: Sprite
@@ -292,7 +292,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitCMO
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: CMO MOD gauntlets
   components:
   - type: Sprite
@@ -309,7 +309,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitCaptain
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: captain MOD gauntlets
   components:
   - type: Sprite
@@ -358,7 +358,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitWard
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: warden MOD gauntlets
   components:
   - type: Sprite
@@ -382,7 +382,7 @@
 - type: entity
   parent: ADTClothingHandsModsuitBase
   id: ADTClothingHandsModsuitBrigmedic
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: Brigmedic MOD gauntlets
   components:
   - type: Sprite

@@ -4,7 +4,7 @@ using Robust.Shared.Network;
 
 namespace Content.Client.Corvax.Sponsors;
 
-public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
+public sealed class SponsorsManager : ISponsorsManager // VG-Sponsors
 {
     [Dependency] private readonly IClientNetManager _netMgr = default!;
 
@@ -21,11 +21,11 @@ public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
         return _info != null;
     }
 
-    // Ganimed-Sponsors start
+    // VG-Sponsors start
     bool ISponsorsManager.TryGetInfo(Robust.Shared.Network.NetUserId userId, [NotNullWhen(true)] out SponsorInfo? sponsor)
     {
         sponsor = null;
         return false;
     }
-    // Ganimed-Sponsors end
+    // VG-Sponsors end
 }

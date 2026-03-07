@@ -1,0 +1,21 @@
+#VG-add-start: two-sided satchels
+- type: entity 
+  abstract: true
+  id: ClothingBackpackSatchelFoldableBase
+  components:
+  - type: Foldable 
+    canFoldInsideContainer: true
+    unfoldVerbText: holster-unfold-verb-text
+    foldVerbText: holster-fold-verb-text
+  - type: FoldableClothing
+    foldedEquippedPrefix: mirrored # don't forget to add the mirrored sprite in rsi for ALL new satchels
+#VG-add-end
+
+- type: entity
+  id: ClothingBackpackSatchelCaptainWhite
+  parent: [ClothingBackpackSatchel, ClothingBackpackSatchelFoldableBase] #VG-Tweak (two-sided satchels)
+  name: white captain's satchel
+  description: Is it your imagination, or is there a stain on it?
+  components:
+  - type: Sprite
+    sprite: _VG/Clothing/Back/Satchels/white_captain_satchel.rsi

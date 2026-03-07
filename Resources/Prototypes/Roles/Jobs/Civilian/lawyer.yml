@@ -5,10 +5,10 @@
   playTimeTracker: JobLawyer
   requirements:
     - !type:OverallPlaytimeRequirement
-      time: 15h # Ganimed-RoleTime
+      time: 15h # VG-RoleTime
 #  - !type:DepartmentTimeRequirement
 #    department: Security
-#    time: 5h # Ganimed-RoleTime
+#    time: 5h # VG-RoleTime
     #ADT tweak start
     #- !type:SpeciesRequirement
     #  inverted: true
@@ -17,7 +17,7 @@
     #ADT tweak end
   startingGear: LawyerGear
   icon: "JobIconLawyer"
-  supervisors: job-supervisors-magistrate # Ganimed-Tweak
+  supervisors: job-supervisors-magistrate # VG-Tweak
   access:
   - Service
   - Lawyer

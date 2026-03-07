@@ -23,7 +23,7 @@
       - Vox
 #      - Shadekin
   # ADT RESTRICT End
-    - !type:AgeRequirement # Ganimed-MRP
+    - !type:AgeRequirement # VG-MRP
       requiredAge: 21
   startingGear: SeniorOfficerGear
   icon: "JobIconSeniorOfficer"
@@ -36,7 +36,7 @@
   - Service
   - External
   - Cryogenics
-  extendedAccess: # Ganimed-Tweak
+  extendedAccess: # VG-Tweak
   - Detective
   special:
   - !type:AddImplantSpecial
@@ -52,7 +52,7 @@
     pocket2: SpeedLoaderMagnum
   # storage:
   #   back:
-  #   - ADTHumanCubeWrapped #ADT-CustomADTLoadout # Ganimed-Remove
+  #   - ADTHumanCubeWrapped #ADT-CustomADTLoadout # VG-Remove
 
 - type: chameleonOutfit
   id: ADTSeniorOfficerChameleonOutfit

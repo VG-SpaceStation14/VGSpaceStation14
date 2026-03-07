@@ -8,9 +8,9 @@ using Content.Shared.Interaction.Events;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
-using Robust.Shared.Utility; // Ganimed edit
-using Content.Server.Forensics; // Ganimed edit
-using Content.Server.Forensics.Components; // Ganimed edit
+using Robust.Shared.Utility; // VG edit
+using Content.Server.Forensics; // VG edit
+using Content.Server.Forensics.Components; // VG edit
 using static Content.Shared.Storage.EntitySpawnCollection;
 
 namespace Content.Server.Storage.EntitySystems
@@ -23,7 +23,7 @@ namespace Content.Server.Storage.EntitySystems
         [Dependency] private readonly PricingSystem _pricing = default!;
         [Dependency] private readonly SharedAudioSystem _audio = default!;
         [Dependency] private readonly SharedTransformSystem _transform = default!;
-        [Dependency] private readonly ForensicsSystem _forensicsSystem = default!; // Ganimed edit
+        [Dependency] private readonly ForensicsSystem _forensicsSystem = default!; // VG edit
 
         public override void Initialize()
         {
@@ -78,7 +78,7 @@ namespace Content.Server.Storage.EntitySystems
             var spawnEntities = GetSpawns(component.Items, _random);
             EntityUid? entityToPlaceInHands = null;
 
-            // Ganimed edit start
+            // VG edit start
             for (int i = 0; i < spawnEntities.Count; i++)
             {
                 var proto = spawnEntities[i];
@@ -96,7 +96,7 @@ namespace Content.Server.Storage.EntitySystems
                         _forensicsSystem.CopyForensicsFrom(parentForensics, entityToPlaceInHands.Value);
                     }
                 }
-            // Ganimed edit end
+            // VG edit end
 
                 _adminLogger.Add(LogType.EntitySpawn, LogImpact.Low, $"{ToPrettyString(args.User)} used {ToPrettyString(uid)} which spawned {ToPrettyString(entityToPlaceInHands.Value)}");
             }

@@ -6,9 +6,9 @@
   - type: StorageFill
     contents:
       - id: ADTClothingEyesGlassesMed
-        orGroup: BrigmedicGlasses # Ganimed-Tweak
+        orGroup: BrigmedicGlasses # VG-Tweak
       - id: ClothingEyesHudMedSec
-        orGroup: BrigmedicGlasses # Ganimed-Tweak
+        orGroup: BrigmedicGlasses # VG-Tweak
       - id: WeaponDisabler
       - id: TrackingImplanter
         amount: 4
@@ -50,9 +50,9 @@
   - type: StorageFill
     contents:
       - id: ADTClothingEyesGlassesMed
-        orGroup: BrigmedicGlasses # Ganimed-Tweak
+        orGroup: BrigmedicGlasses # VG-Tweak
       - id: ClothingEyesHudMedSec
-        orGroup: BrigmedicGlasses # Ganimed-Tweak
+        orGroup: BrigmedicGlasses # VG-Tweak
       - id: WeaponDisabler
       - id: TrackingImplanter
         amount: 4
@@ -72,10 +72,10 @@
         prob: 0.05
       - id: ClothingOuterVestSecurityMedic # Corvax-Resprite
         prob: 0.5
-        orGroup: BrigmedicOuterClothing # Ganimed-Tweak
+        orGroup: BrigmedicOuterClothing # VG-Tweak
       - id: ClothingOuterCoatLabSecurityMedic # Corvax-Resprite
         prob: 0.5
-        orGroup: BrigmedicOuterClothing # Ganimed-Tweak
+        orGroup: BrigmedicOuterClothing # VG-Tweak
       - id: BoxSyringe
       - id: BoxPillCanister
       - id: BoxBodyBag
@@ -86,4 +86,4 @@
       - id: ADTHandheldCrewMonitorBrigmedic
       - id: ADTBookSRPsec
       - id: ADTBookSRPmed
-      # - id: ADTBookPCDsec # Ganimed-Remove
+      # - id: ADTBookPCDsec # VG-Remove

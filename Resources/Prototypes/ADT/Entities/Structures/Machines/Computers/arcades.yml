@@ -101,7 +101,7 @@
     - WhoopieCushion
     - Whistle
     - ADTPlushieSchrodinger
-    # Ganimed-Plushies-Start
+    # VG-Plushies-Start
     - PlushieCaptain
     - PlushieHeadOfSecurity
     - PlushieInternalAffairsAgent
@@ -119,7 +119,7 @@
     - PlushieLizardHart
     - PlushieLizardReesa
     - PlushieLizardMetaku
-    # Ganimed-Plushies-End
+    # VG-Plushies-End
   - type: Computer
     board: MinesweeperCircuitboard
   - type: ActivatableUI

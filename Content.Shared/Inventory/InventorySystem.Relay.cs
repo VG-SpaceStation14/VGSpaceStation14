@@ -1,7 +1,7 @@
 using Content.Shared.Armor;
 using Content.Shared.Atmos;
 using Content.Shared.Chat;
-using Content.Shared.Clothing.Components; // Ganimed edit
+using Content.Shared.Clothing.Components; // VG edit
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Hypospray.Events;
 using Content.Shared.Climbing.Events;
@@ -137,10 +137,10 @@ public partial class InventorySystem
         var enumerator = new InventorySlotEnumerator(inventory, args.TargetSlots);
         while (enumerator.NextItem(out var item))
         {
-            // Ganimed edit start
+            // VG edit start
             if (TryComp<MaskComponent>(item, out var mask) && mask.IsToggled)
                 continue;
-            // Ganimed edit end
+            // VG edit end
 
             RaiseLocalEvent(item, ev);
         }
@@ -158,10 +158,10 @@ public partial class InventorySystem
         var enumerator = new InventorySlotEnumerator(inventory, args.TargetSlots);
         while (enumerator.NextItem(out var item))
         {
-            // Ganimed edit start
+            // VG edit start
             if (TryComp<MaskComponent>(item, out var mask) && mask.IsToggled)
                 continue;
-            // Ganimed edit end
+            // VG edit end
             RaiseLocalEvent(item, ev);
         }
     }

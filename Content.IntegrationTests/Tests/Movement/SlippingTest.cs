@@ -2,10 +2,10 @@
 using Content.IntegrationTests.Tests.Helpers;
 using Content.Shared.Movement.Components;
 using Content.Shared.Slippery;
-using Robust.Shared.Configuration; // Ganimed Edit
+using Robust.Shared.Configuration; // VG Edit
 using Content.Shared.Stunnable;
 using Robust.Shared.Input;
-using Robust.Shared.IoC; // Ganimed Edit
+using Robust.Shared.IoC; // VG Edit
 using Robust.Shared.Maths;
 
 namespace Content.IntegrationTests.Tests.Movement;

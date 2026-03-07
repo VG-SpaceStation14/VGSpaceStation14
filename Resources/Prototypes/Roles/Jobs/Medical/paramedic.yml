@@ -6,9 +6,9 @@
   requirements:
   - !type:RoleTimeRequirement
     role: JobMedicalDoctor
-    time: 4h # Ganimed-RoleTime
+    time: 4h # VG-RoleTime
   - !type:OverallPlaytimeRequirement
-    time: 15h # Ganimed-RoleTime
+    time: 15h # VG-RoleTime
   startingGear: ParamedicGear
   icon: "JobIconParamedic"
   supervisors: job-supervisors-cmo

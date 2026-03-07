@@ -23,7 +23,7 @@
     activeSound:
       path: /Audio/Ambience/Objects/light_hum.ogg
       params:
-        volume: -12 # Ganimed edit
+        volume: -12 # VG edit
         maxDistance: 1
   - type: Appearance
   - type: GenericVisualizer

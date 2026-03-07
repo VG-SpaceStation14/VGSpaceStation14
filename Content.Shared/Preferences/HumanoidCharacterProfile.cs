@@ -863,7 +863,7 @@ namespace Content.Shared.Preferences
 
                 var total = groups.GetOrNew(category.ID);
                 var newTotal = total + traitProto.Cost;
-                // Ganimed edit trait points end
+                // VG edit trait points end
 
                 if (newTotal > category.MaxTraitPoints)
                 // ADT-Tweak end

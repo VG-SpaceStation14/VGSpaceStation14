@@ -1,5 +1,5 @@
 using Content.Server.Access;
-using Content.Server.Forensics; // Ganimed edit
+using Content.Server.Forensics; // VG edit
 using Content.Server.Atmos.Components;
 using Content.Server.Atmos.EntitySystems;
 using Content.Shared.Doors.Components;
@@ -12,7 +12,7 @@ namespace Content.Server.Doors.Systems;
 public sealed class DoorSystem : SharedDoorSystem
 {
     [Dependency] private readonly AirtightSystem _airtightSystem = default!;
-    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!; // Ganimed edit
+    [Dependency] private readonly ForensicsSystem _forensicsSystem = default!; // VG edit
 
     public override void Initialize()
     {
@@ -53,7 +53,7 @@ public sealed class DoorSystem : SharedDoorSystem
         UpdateBoltLightStatus(ent);
     }
 
-    // Ganimed edit start    
+    // VG edit start    
     public override void StartOpening(EntityUid uid, DoorComponent? door = null, EntityUid? user = null, bool predicted = false)
     {
         base.StartOpening(uid, door, user, predicted);
@@ -69,5 +69,5 @@ public sealed class DoorSystem : SharedDoorSystem
         if (user.HasValue)
             _forensicsSystem.ApplyEvidence(user.Value, uid);
     }
-    // Ganimed edit end
+    // VG edit end
 }

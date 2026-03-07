@@ -669,7 +669,7 @@
 
 # HoS
 
-# - type: entity # Ganimed-MRP
+# - type: entity # VG-MRP
 #  parent: HoSIDCard
 #  id: ADTSheriffIDCard
 #  name: sheriff ID card

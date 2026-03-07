@@ -3,7 +3,7 @@
   name: job-name-captain
   description: job-description-captain
   playTimeTracker: JobCaptain
-  requireAdminNotify: true # Ganimed Rules Tweak
+  requireAdminNotify: true # VG Rules Tweak
   requirements:
 #    - !type:DepartmentTimeRequirement
 #      department: Engineering
@@ -16,16 +16,16 @@
 #      time: 14400 # 4 hours
     - !type:RoleTimeRequirement
       role: JobHeadOfPersonnel
-      time: 5h # Ganimed-RoleTime
+      time: 5h # VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Security
-      time: 20h # Ganimed-RoleTime
+      time: 20h # VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Command
-      time: 25h # Ganimed-RoleTime
+      time: 25h # VG-RoleTime
     - !type:OverallPlaytimeRequirement
-      time: 100h # Ganimed-RoleTime
-    - !type:TraitsRequirement # Ganimed-MRP: Captain must be proficient in communication
+      time: 100h # VG-RoleTime
+    - !type:TraitsRequirement # VG-MRP: Captain must be proficient in communication
       inverted: true
       traits:
 #     - Monolingual
@@ -38,7 +38,7 @@
       - Resomi
       - Vox
   # ADT RESTRICT End
-    - !type:AgeRequirement # Ganimed-MRP
+    - !type:AgeRequirement # VG-MRP
       requiredAge: 24
   weight: 20
   startingGear: CaptainGear
@@ -55,7 +55,7 @@
     components:
       - type: CommandStaff
       # - type: PhantomTyranyTarget # ADT Phantom
-      - type: AntagImmune # Ganimed-MRP: Loyalty implant
+      - type: AntagImmune # VG-MRP: Loyalty implant
 
 - type: startingGear
   id: CaptainGear

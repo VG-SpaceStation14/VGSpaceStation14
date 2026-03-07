@@ -2,8 +2,8 @@
   id: ADT_Cluster
   mapName: 'Cluster'
   mapPath: /Maps/ADTMaps/ADTStations/adt_cluster.yml
-  minPlayers: 7 # Ganimed-Tweak (20 -> 7)
-  maxPlayers: 25 # Ganimed-Tweak (35 -> 25)
+  minPlayers: 7 # VG-Tweak (20 -> 7)
+  maxPlayers: 25 # VG-Tweak (35 -> 25)
   stations:
     ADT_Cluster:
       stationProto: StandardNanotrasenStation

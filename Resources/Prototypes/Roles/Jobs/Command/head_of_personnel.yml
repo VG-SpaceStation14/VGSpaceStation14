@@ -3,7 +3,7 @@
   name: job-name-hop
   description: job-description-hop
   playTimeTracker: JobHeadOfPersonnel
-  requireAdminNotify: true # Ganimed Rules Tweak
+  requireAdminNotify: true # VG Rules Tweak
   requirements:
 #    - !type:DepartmentTimeRequirement
 #      department: Engineering
@@ -19,29 +19,29 @@
 #      time: 9000 # 2.5 hrs
 #    - !type:DepartmentTimeRequirement
 #      department: Cargo
-#      time: 18000 #5 hrs # Ganimed-RoleTime
+#      time: 18000 #5 hrs # VG-RoleTime
     - !type:OverallPlaytimeRequirement
       time: 50h # Corvax-RoleTime
     - !type:DepartmentTimeRequirement
       department: Command
-      time: 15h # Ganimed-RoleTime
+      time: 15h # VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Civilian
-      time: 10h # Ganimed-RoleTime
+      time: 10h # VG-RoleTime
 #       ADT tweak start
     - !type:SpeciesRequirement
       inverted: true
       species:
       - Vox
 #       ADT tweak end
-    - !type:AgeRequirement # Ganimed-MRP
+    - !type:AgeRequirement # VG-MRP
       requiredAge: 21
   weight: 20
   startingGear: HoPGear
   icon: "JobIconHeadOfPersonnel"
   supervisors: job-supervisors-captain
-  canBeAntag: true # Ganimed-MRP
-  antagAdvantage: 5 # Ganimed-MRP: Heads can be antags
+  canBeAntag: true # VG-MRP
+  antagAdvantage: 5 # VG-MRP: Heads can be antags
   access:
   - Command
   - HeadOfPersonnel
@@ -70,8 +70,8 @@
   - Atmospherics
   - Medical
   special:
-#  - !type:AddImplantSpecial # Ganimed-MRP
-#    implants: [ MindShieldImplant ] # Ganimed-MRP
+#  - !type:AddImplantSpecial # VG-MRP
+#    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff

@@ -35,7 +35,7 @@
     ADTClothingOuterHoodyWhite: 3 #ADT-Tweak
     ADTClothingUnderwearSocksKneeHolyday: 2 #ADT-Tweak
     ADTClothingUnderwearSocksThighHolyday: 2 #ADT-Tweak
-    ClothingUniformTurtleneckColorWhite: 2 #Ganimed-Tweak-Turtlenecks-Start
+    ClothingUniformTurtleneckColorWhite: 2 #VG-Tweak-Turtlenecks-Start
     ClothingUniformTurtleneckColorGrey: 2
     ClothingUniformTurtleneckColorBlack: 2
     ClothingUniformTurtleneckColorBlue: 2
@@ -66,7 +66,7 @@
     ClothingUniformTurtleneckSkirtColorPurple: 2
     ClothingUniformTurtleneckSkirtColorLightBrown: 2
     ClothingUniformTurtleneckSkirtColorBrown: 2
-    ClothingUniformTurtleneckSkirtColorMaroon: 2 #Ganimed-Tweak-Turtlenecks-End
+    ClothingUniformTurtleneckSkirtColorMaroon: 2 #VG-Tweak-Turtlenecks-End
 
   emaggedInventory:
     ClothingNeckScarfStripedSyndieGreen: 3

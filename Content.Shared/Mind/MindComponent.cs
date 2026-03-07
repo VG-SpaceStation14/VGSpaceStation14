@@ -115,7 +115,7 @@ public sealed partial class MindComponent : Component
     public bool PreventSuicide { get; set; }
 
     /// <summary>
-    ///     Ganimed incognito edit
+    ///     VG incognito edit
     /// </summary>
     [DataField("incognito")]
     public bool Incognito { get; set; }

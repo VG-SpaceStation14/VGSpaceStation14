@@ -91,7 +91,7 @@ public sealed partial class StationEventComponent : Component
     public bool OccursDuringRoundEnd = true;
 
     /// <summary>
-    /// Ganimed edit
+    /// VG edit
     /// Минимальные требования по людям в департаментах.
     /// Если пусто — проверка не выполняется.
     /// </summary>

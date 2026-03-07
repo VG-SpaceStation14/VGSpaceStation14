@@ -32,7 +32,7 @@
       shader: unshaded
     state: base
   - type: PointLight
-    color: "#FFEDDE" # 5500K color temp # Ganimed-Edit
+    color: "#FFEDDE" # 5500K color temp # VG-Edit
     energy: 0.8
     radius: 10
     softness: 1
@@ -169,12 +169,12 @@
   - type: PoweredLight
     hasLampOnSpawn: LedLightTube
   - type: PointLight
-    # Ganimed-Edit-Start
+    # VG-Edit-Start
     radius: 14
     energy: 1.1
     softness: 0.9
     color: "#FAFFFF" # ADT-Sound-Update
-    # Ganimed-Edit-End
+    # VG-Edit-End
   - type: DamageOnInteract
     damage:
       types:
@@ -187,12 +187,12 @@
   suffix: Always Powered, LED
   components:
   - type: PointLight
-    # Ganimed-Edit-Start
+    # VG-Edit-Start
     radius: 14
     energy: 1.1
     softness: 0.9
     color: "#FAFFFF" # ADT-Sound-Update
-    # Ganimed-Edit-End
+    # VG-Edit-End
 
 #Exterior lights
 - type: entity

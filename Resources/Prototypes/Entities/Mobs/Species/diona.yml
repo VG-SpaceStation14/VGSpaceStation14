@@ -120,9 +120,9 @@
       DionaCollectiveMind: Speak
   - type: SizeAttributeWhitelist
     tall: true
-    tallscale: 1.1 # Ganimed-Tweak
+    tallscale: 1.1 # VG-Tweak
     short: true
-    shortscale: 0.9 # Ganimed-Tweak
+    shortscale: 0.9 # VG-Tweak
   - type: CollectiveMindRank
   # ADT tweak end
 

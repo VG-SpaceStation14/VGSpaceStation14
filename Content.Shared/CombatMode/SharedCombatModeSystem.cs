@@ -3,10 +3,10 @@ using Content.Shared.Mech.Components;
 using Content.Shared.Mind;
 using Content.Shared.MouseRotator;
 using Content.Shared.Movement.Components;
-using Content.Shared.Movement.Systems; // Ganimed edit
+using Content.Shared.Movement.Systems; // VG edit
 using Content.Shared.Popups;
 using Robust.Shared.Network;
-using Robust.Shared.Physics.Events; // Ganimed edit
+using Robust.Shared.Physics.Events; // VG edit
 using Robust.Shared.Timing;
 
 namespace Content.Shared.CombatMode;
@@ -25,10 +25,10 @@ public abstract class SharedCombatModeSystem : EntitySystem
         SubscribeLocalEvent<CombatModeComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CombatModeComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<CombatModeComponent, ToggleCombatActionEvent>(OnActionPerform);
-        SubscribeLocalEvent<CombatModeComponent, AttemptMobCollideEvent>(OnCollide); // Ganimed edit
+        SubscribeLocalEvent<CombatModeComponent, AttemptMobCollideEvent>(OnCollide); // VG edit
     }
 
-    // Ganimed edit start
+    // VG edit start
     private void OnCollide(EntityUid uid, CombatModeComponent component, ref AttemptMobCollideEvent args)
     {
         if (!component.IsInCombatMode)
@@ -36,7 +36,7 @@ public abstract class SharedCombatModeSystem : EntitySystem
             args.Cancelled = true;
         }
     }
-    // Ganimed edit end
+    // VG edit end
 
     private void OnMapInit(EntityUid uid, CombatModeComponent component, MapInitEvent args)
     {
@@ -101,14 +101,14 @@ public abstract class SharedCombatModeSystem : EntitySystem
     {
         if (value)
         {
-            // Ganimed edit start
+            // VG edit start
             var rot = EnsureComp<MouseRotatorComponent>(uid);
             if (TryComp<CombatModeComponent>(uid, out var comp) && comp.SmoothRotation) // no idea under which (intended) circumstances this can fail (if any), so i'll avoid Comp<>().
             {
                 rot.AngleTolerance = Angle.FromDegrees(1); // arbitrary
                 rot.Simple4DirMode = false;
             }
-            // Ganimed edit end
+            // VG edit end
             EnsureComp<NoRotateOnMoveComponent>(uid);
 
             // ADT Mech start

@@ -3,19 +3,19 @@
   name: job-name-qm
   description: job-description-qm
   playTimeTracker: JobQuartermaster
-  requireAdminNotify: true # Ganimed Rules Tweak
+  requireAdminNotify: true # VG Rules Tweak
   requirements:
     - !type:RoleTimeRequirement
       role: JobCargoTechnician
-      time: 6h # Ganimed-RoleTime
+      time: 6h # VG-RoleTime
     - !type:RoleTimeRequirement
       role: JobSalvageSpecialist
-      time: 6h # Ganimed-RoleTime
+      time: 6h # VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Cargo
-      time: 20h # Ganimed-RoleTime
+      time: 20h # VG-RoleTime
     - !type:OverallPlaytimeRequirement
-      time: 40h # Ganimed-RoleTime
+      time: 40h # VG-RoleTime
       #ADT tweak start
 #    - !type:SpeciesRequirement
 #      inverted: true
@@ -26,8 +26,8 @@
   startingGear: QuartermasterGear
   icon: "JobIconQuarterMaster"
   supervisors: job-supervisors-captain
-  canBeAntag: true # Ganimed-MRP
-  antagAdvantage: 5 # Ganimed-MRP: Heads can be antags
+  canBeAntag: true # VG-MRP
+  antagAdvantage: 5 # VG-MRP: Heads can be antags
   access:
   - Cargo
   - Salvage
@@ -38,8 +38,8 @@
   - Brig
   - Cryogenics
   special:
-#  - !type:AddImplantSpecial # Ganimed-MRP
-#    implants: [ MindShieldImplant ] # Ganimed-MRP
+#  - !type:AddImplantSpecial # VG-MRP
+#    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff

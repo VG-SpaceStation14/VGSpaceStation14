@@ -125,7 +125,7 @@ public partial class RitualSacrificeBehavior : RitualCustomBehavior
                 knowledgeGain += bro.ConvertedCount / 2;
             if (args.EntityManager.TryGetComponent<HeadRevolutionaryComponent>(uids[i], out var rev))
                 knowledgeGain += rev.ConvertedCount / 3;
-            // Ganimed
+            // VG
             // start the sacrifing process -space
             if (args.EntityManager.TryGetComponent<TransformComponent>(uids[i], out var transform))
             {
@@ -156,7 +156,7 @@ public partial class RitualSacrificeBehavior : RitualCustomBehavior
         args.EntityManager.EventBus.RaiseLocalEvent(args.Performer, new EventHereticUpdateTargets());
     }
 
-    // Ganimed
+    // VG
     // sacrifice function to safely teleport them away -space
     private void SafeSacrifice(RitualData args, EntityUid uid)
     {

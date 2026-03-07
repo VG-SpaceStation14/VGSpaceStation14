@@ -102,7 +102,7 @@
     reoccurrenceDelay: 1
     earliestStart: 12
     minimumPlayers: 25
-    departmentPlayerLimits: # Ganimed edit
+    departmentPlayerLimits: # VG edit
       Engineering: 1
   - type: MeteorSwarm
     announcementSound: /Audio/Announcements/meteors_start.ogg # Corvax-Announcements

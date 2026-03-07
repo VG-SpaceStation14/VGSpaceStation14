@@ -58,10 +58,10 @@ public partial struct EntitySpawnEntry
 
     [DataField] public int Amount = 1;
 
-    // Ganimed edit start
+    // VG edit start
     [DataField("inheritParentForensics")]
     public bool InheritParentForensics = true;
-    // Ganimed edit end
+    // VG edit end
 
     /// <summary>
     ///     How many of this can be spawned, in total.

@@ -36,7 +36,7 @@
       sprite: Corvax/Sponsor/NEKISH/Clothing/Back/Satchels/hos.rsi
 
 - type: entity
-  parent: ClothingBeltSecurityFilled # Ganimed Edit
+  parent: ClothingBeltSecurityFilled # VG Edit
   id: ClothingBeltHoS
   name: leather security belt
   description: Stylish, dark leather belt
@@ -104,9 +104,9 @@
   suffix: Sponsor
   components:
     - type: Sprite
-      sprite: _Ganimed/Clothing/Uniforms/Jumpsuit/USSP/sponsor_ussp.rsi # backmen-sprite
+      sprite: _VG/Clothing/Uniforms/Jumpsuit/USSP/sponsor_ussp.rsi # backmen-sprite
     - type: Clothing
-      sprite: _Ganimed/Clothing/Uniforms/Jumpsuit/USSP/sponsor_ussp.rsi # backmen-sprite
+      sprite: _VG/Clothing/Uniforms/Jumpsuit/USSP/sponsor_ussp.rsi # backmen-sprite
 
 - type: entity
   parent: ClothingShoesBaseButcherable

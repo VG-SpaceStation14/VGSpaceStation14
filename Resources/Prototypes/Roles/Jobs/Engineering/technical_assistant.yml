@@ -21,7 +21,7 @@
   startingGear: TechnicalAssistantGear
   icon: "JobIconTechnicalAssistant"
   supervisors: job-supervisors-engineering
-  canBeAntag: true # Ganimed-MRP: Available not only for newbies
+  canBeAntag: true # VG-MRP: Available not only for newbies
   access:
   - Maintenance
   - Engineering

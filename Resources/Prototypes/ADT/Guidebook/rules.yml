@@ -94,7 +94,7 @@
   ruleEntry: true
   text: "/ServerInfo/ADT/Guidebook/ServerRules/Rule10.xml"
 
-#- type: entity #Ganimed-Tweak
+#- type: entity #VG-Tweak
 #  parent: BasePlushie
 #  id: ADTIconAdventureTime
 #  name: AdventureTime

@@ -70,7 +70,7 @@
           hide: true
           nameGrid: true
           minCount: 0 #ADT tweak, moved to magnet
-          maxCount: 2 #ADT tweak, moved to magnet # Ganimed-Tweak (0 -> 2)
+          maxCount: 2 #ADT tweak, moved to magnet # VG-Tweak (0 -> 2)
           stationGrid: false
           paths:
           - /Maps/Ruins/abandoned_outpost.yml
@@ -92,8 +92,8 @@
           minimumDistance: 150
           maximumDistance: 300
           stationGrid: false
-          minCount: 2 # Ganimed-Tweak (12 -> 2)
-          maxCount: 6 # Ganimed-Tweak (16 -> 6)
+          minCount: 2 # VG-Tweak (12 -> 2)
+          maxCount: 6 # VG-Tweak (16 -> 6)
           addComponents:
           - type: Gravity
             enabled: true

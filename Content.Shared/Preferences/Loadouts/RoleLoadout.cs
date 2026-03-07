@@ -3,7 +3,7 @@ using System.Linq;
 using Content.Shared.CCVar;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Random;
-using Content.Shared.Preferences.Loadouts.Effects; // Ganimed sponsor
+using Content.Shared.Preferences.Loadouts.Effects; // VG sponsor
 using Robust.Shared.Collections;
 using Robust.Shared.Network;
 using Robust.Shared.Configuration;
@@ -113,10 +113,10 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         // In some instances we might not have picked up a new group for existing data.
         foreach (var groupProto in roleProto.Groups)
         {
-            // Ganimed sponsor start
+            // VG sponsor start
             if (!SelectedLoadouts.ContainsKey(groupProto))
                 SelectedLoadouts[groupProto] = new List<Loadout>(); 
-            // Ganimed sponsor end
+            // VG sponsor end
         }
 
         // Reset points to recalculate.
@@ -332,7 +332,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     /// </summary>
     public bool AddLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup, ProtoId<LoadoutPrototype> selectedLoadout, IPrototypeManager protoManager)
     {
-        // Ganimed sponsor start
+        // VG sponsor start
         if (!SelectedLoadouts.TryGetValue(selectedGroup, out var groupLoadouts))
             return false;
 
@@ -364,7 +364,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
             items.Clear();
         }
-        // Ganimed sponsor end
+        // VG sponsor end
 
         groupLoadouts.Add(new Loadout()
         {
@@ -374,7 +374,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         return true;
     }
 
-    // Ganimed sponsor start
+    // VG sponsor start
     private bool Conflicts(LoadoutPrototype a, LoadoutPrototype b)
     {
         foreach (var slot in a.Equipment.Keys)
@@ -385,22 +385,22 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
         return false;
     }
-    // Ganimed sponsor end
+    // VG sponsor end
 
     public bool RemoveLoadout(ProtoId<LoadoutGroupPrototype> selectedGroup, ProtoId<LoadoutPrototype> selectedLoadout, IPrototypeManager protoManager)
     {
-        if (!SelectedLoadouts.TryGetValue(selectedGroup, out var groupLoadouts)) // Ganimed sponsor
+        if (!SelectedLoadouts.TryGetValue(selectedGroup, out var groupLoadouts)) // VG sponsor
             return false;
 
         for (var i = 0; i < groupLoadouts.Count; i++)
         {
-            // Ganimed sponsor start
+            // VG sponsor start
             if (groupLoadouts[i].Prototype == selectedLoadout)
             {
                 groupLoadouts.RemoveAt(i);
                 return true;
             }
-            // Ganimed sponsor end
+            // VG sponsor end
         }
 
         return false;

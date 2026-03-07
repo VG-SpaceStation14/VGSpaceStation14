@@ -10,16 +10,16 @@
   - type: StaticPrice
     price: 750
   - type: Sprite
-    sprite: _Ganimed/Structures/Storage/tanks.rsi
+    sprite: _VG/Structures/Storage/tanks.rsi
     layers:
       - state: fueltank-2
-      - state: generictank-1-1 # Ganimed-Tweak
+      - state: generictank-1-1 # VG-Tweak
         map: ["enum.SolutionContainerLayers.Fill"]
         visible: false
   - type: Appearance
   - type: SolutionContainerVisuals
     maxFillLevels: 5
-    fillBaseName: generictank-1- # Ganimed-Tweak
+    fillBaseName: generictank-1- # VG-Tweak
   - type: ExaminableSolution
     solution: tank
   - type: ReagentTank
@@ -56,10 +56,10 @@
   - type: StaticPrice
     price: 2500
   - type: Sprite
-    sprite: _Ganimed/Structures/Storage/tanks.rsi
+    sprite: _VG/Structures/Storage/tanks.rsi
     layers:
       - state: highfueltank-2
-      - state: highgenerictank-2-1 # Ganimed-Tweak
+      - state: highgenerictank-2-1 # VG-Tweak
         map: ["enum.SolutionContainerLayers.Fill"]
         visible: false
   - type: SolutionContainerVisuals
@@ -88,10 +88,10 @@
   - type: StaticPrice
     price: 500
   - type: Sprite
-    sprite: _Ganimed/Structures/Storage/tanks.rsi
+    sprite: _VG/Structures/Storage/tanks.rsi
     layers:
       - state: watertank-2
-      - state: generictank-1-1 # Ganimed-Tweak
+      - state: generictank-1-1 # VG-Tweak
         map: ["enum.SolutionContainerLayers.Fill"]
         visible: false
   - type: Appearance
@@ -120,7 +120,7 @@
   description: Seems like a good place to stand and waste time. It has a stock of paper cups on the side.
   components:
   - type: Sprite
-    sprite: _Ganimed/Structures/Storage/tanks.rsi
+    sprite: _VG/Structures/Storage/tanks.rsi
     layers:
       - state: watercooler-2
       - state: watercooler-2-1
@@ -172,16 +172,16 @@
   - type: StaticPrice
     price: 2500
   - type: Sprite
-    sprite: _Ganimed/Structures/Storage/tanks.rsi
+    sprite: _VG/Structures/Storage/tanks.rsi
     layers:
       - state: highwatertank-2
-      - state: highgenerictank-2-1 # Ganimed-Tweak
+      - state: highgenerictank-2-1 # VG-Tweak
         map: ["enum.SolutionContainerLayers.Fill"]
         visible: false
   - type: Appearance
   - type: SolutionContainerVisuals
     maxFillLevels: 7
-    fillBaseName: highgenerictank-2- # Ganimed-Tweak
+    fillBaseName: highgenerictank-2- # VG-Tweak
   - type: SolutionContainerManager
     solutions:
       tank:
@@ -204,15 +204,15 @@
     - type: StaticPrice
       price: 500
     - type: Sprite
-      sprite: _Ganimed/Structures/Storage/tanks.rsi
+      sprite: _VG/Structures/Storage/tanks.rsi
       layers:
         - state: generictank-1
-        - state: generictank-1-1 # Ganimed-Tweak
+        - state: generictank-1-1 # VG-Tweak
           map: ["enum.SolutionContainerLayers.Fill"]
           visible: false
     - type: Appearance
     - type: SolutionContainerVisuals
       maxFillLevels: 5
-      fillBaseName: generictank-1- # Ganimed-Tweak
+      fillBaseName: generictank-1- # VG-Tweak
     - type: ExaminableSolution
       solution: tank

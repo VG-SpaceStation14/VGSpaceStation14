@@ -51,7 +51,7 @@ public sealed class MesonVisionOverlay : Overlay
 
         foreach (var entity in _entity.GetEntities())
         {
-            // Ganimed edit start
+            // VG edit start
             if (!_spriteQuery.TryGetComponent(entity, out var sprite) ||
                 !_xformQuery.TryGetComponent(entity, out var xform) ||
                 xform.MapID != mapId ||
@@ -59,18 +59,18 @@ public sealed class MesonVisionOverlay : Overlay
             {
                 continue;
             }
-            // Ganimed edit end
+            // VG edit end
 
             var worldPos = _xformSystem.GetWorldPosition(xform);
             if (!worldBounds.Contains(worldPos)) continue;
 
-            // Ganimed edit start
+            // VG edit start
             var isWall = _entity.HasComponent<SunShadowCastComponent>(entity) || _entity.HasComponent<IsRoofComponent>(entity);
             var isDoor = _entity.HasComponent<DoorComponent>(entity);
 
             if (!isWall && !isDoor)
                 continue;
-            // Ganimed edit end 
+            // VG edit end 
 
             _entries.Add(new MesonVisionRenderEntry(
                 (entity, sprite, xform),

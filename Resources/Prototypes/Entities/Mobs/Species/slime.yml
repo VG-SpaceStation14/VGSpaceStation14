@@ -143,14 +143,14 @@
     - Tail
   - type: SizeAttributeWhitelist # Frontier
     tall: true
-    tallscale: 1 # Ganimed-Tweak
+    tallscale: 1 # VG-Tweak
     short: true
-    shortscale: 0.9 # Ganimed-Tweak
+    shortscale: 0.9 # VG-Tweak
   #End ADT tweak
-  # Ganimed-Tweak-Start
+  # VG-Tweak-Start
   - type: Sprite
     scale: 0.95, 0.95
-  # Ganimed-Tweak-End
+  # VG-Tweak-End
 
 - type: entity
   parent: MobHumanDummy

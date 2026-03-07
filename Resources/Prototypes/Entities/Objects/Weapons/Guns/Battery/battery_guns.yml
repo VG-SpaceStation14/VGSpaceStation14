@@ -284,12 +284,12 @@
 
 - type: entity
   name: practice laser rifle
-  parent: [BaseWeaponBattery, BaseGunWieldable] #Ganimed_Tweak
+  parent: [BaseWeaponBattery, BaseGunWieldable] #VG_Tweak
   id: WeaponLaserCarbinePractice
   description: This modified laser rifle fires nearly harmless beams in the 40-watt range, for target practice.
   components:
   - type: Sprite
-    sprite: _Ganimed/Objects/Weapons/Guns/Battery/laser_gun.rsi #Ganimed-resprite
+    sprite: _VG/Objects/Weapons/Guns/Battery/laser_gun.rsi #VG-resprite
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]
@@ -302,7 +302,7 @@
     zeroVisible: false
   - type: Appearance
   - type: Clothing
-    sprite: _Ganimed/Objects/Weapons/Guns/Battery/laser_gun.rsi
+    sprite: _VG/Objects/Weapons/Guns/Battery/laser_gun.rsi
   - type: MeleeWeapon
     resetOnHandSelected: false
     attackRate: 1
@@ -320,7 +320,7 @@
     - SemiAuto
   - type: HitscanBatteryAmmoProvider
     proto: RedLaserPractice
-    fireCost: 50 #Ganimed_Tweak 28.5 -> 50
+    fireCost: 50 #VG_Tweak 28.5 -> 50
   - type: StaticPrice
     price: 300
   # ADT TWEAK START - добавляем аттачменты из второго прототипа

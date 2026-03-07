@@ -138,7 +138,7 @@
     tall: true
     tallscale: 1.15
     short: true
-    shortscale: 0.95 # Ganimed-Tweak
+    shortscale: 0.95 # VG-Tweak
   # ADT tweak end
 
 - type: entity

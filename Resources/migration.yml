@@ -834,23 +834,23 @@ ADTClothingHeadHatsGuardOfficer: ADTClothingHeadHatsCorrectionsOfficerCap
 ADTClothingUniformGuardOfficer: ADTClothingUniformCorrectionsOfficer
 
 # ADT 2025-11-08
-# ChemDispenser: EnergyChemDispenser # Ganimed-Remove
-# ChemDispenserEmpty: EnergyChemDispenser # Ganimed-Remove
+# ChemDispenser: EnergyChemDispenser # VG-Remove
+# ChemDispenserEmpty: EnergyChemDispenser # VG-Remove
 
-# Ganimed 2025-06-14
+# VG 2025-06-14
 ADTPoweredShuttleLight: AlwaysPoweredWallLight
 ADTPoweredShuttleLightLED: AlwaysPoweredWallLight
 ADTPoweredShuttleLightRed: AlwaysPoweredWallLight
 ADTPoweredShuttleLightOrange: AlwaysPoweredWallLight
 ADTPoweredShuttleLightSodium: AlwaysPoweredWallLight
 
-# Ganimed 2025-07-10
+# VG 2025-07-10
 GhostBarSpawner: null
 
-# Ganimed 2025-11-03
+# VG 2025-11-03
 ADTDrinkBeerCanPack: null
 
-# Ganimed 2026-01-04
+# VG 2026-01-04
 ADTClothingNeckShockCollar: ClothingBackpackElectropack
 ChemDispenser: EnergyChemDispenser
 ChemDispenserEmpty: EnergyChemDispenser
@@ -887,6 +887,6 @@ ADTSpawnMobXenoDrone: SpawnMobXenoDrone
 ADTSpawnMobXenoQueen: SpawnMobXenoQueen
 ADTSpawnMobXenoRavager: SpawnMobXenoRavager
 
-# Ganimed 2026-01-24 (No roundstart energy dispensers)
+# VG 2026-01-24 (No roundstart energy dispensers)
 EnergyChemDispenser: ChemDispenser
 EnergyChemDispenserMachineCircuitboard: ChemDispenserMachineCircuitboard

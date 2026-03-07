@@ -7,7 +7,7 @@
   guides: [ Traitors ]
   requirements:
   - !type:OverallPlaytimeRequirement
-    time: 20h # Ganimed-RoleTime
+    time: 20h # VG-RoleTime
 
 - type: antag
   id: TraitorSleeper
@@ -18,7 +18,7 @@
   guides: [ Traitors ]
   requirements:
   - !type:OverallPlaytimeRequirement
-    time: 20h # Ganimed-RoleTime
+    time: 20h # VG-RoleTime
 
 # Syndicate Operative Outfit - Monkey
 - type: startingGear

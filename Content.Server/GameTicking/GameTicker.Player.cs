@@ -85,7 +85,7 @@ namespace Content.Server.GameTicking
                             $"Первый заход: {firstSeenTime}, Дата создания аккаунта: {creationDate}\n" +
                             "Администрации быть внимательней, у данного игрока меньше 10ч на нашем сервере.",
                             colorOverrid: Color.White
-                        ); // Ganimed-edit-AdminAnnouncement
+                        ); // VG-edit-AdminAnnouncement
 
                         // Получаем всех администраторов
                         var clients = _adminManager.ActiveAdmins

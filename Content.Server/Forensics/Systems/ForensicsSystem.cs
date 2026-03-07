@@ -291,7 +291,7 @@ namespace Content.Server.Forensics
             return DNA;
         }
 
-        public void ApplyEvidence(EntityUid user, EntityUid target) // Ganimed edit
+        public void ApplyEvidence(EntityUid user, EntityUid target) // VG edit
         {
             if (HasComp<IgnoresFingerprintsComponent>(target))
                 return;

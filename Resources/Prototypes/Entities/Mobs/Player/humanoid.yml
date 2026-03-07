@@ -39,7 +39,7 @@
       state: icon
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSergeantMajor # Ganimed edit (NamesFirstDeadSquad)
+      - NamesFirstMilitaryNTSergeantMajor # VG edit (NamesFirstDeadSquad)
       - NamesLastDeadSquadCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -83,7 +83,7 @@
       roleLoadout: [ RoleSurvivalEVA ]
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSergeantMajor # Ganimed edit (NamesFirstDeadSquad)
+      - NamesFirstMilitaryNTSergeantMajor # VG edit (NamesFirstDeadSquad)
       - NamesLastDeadSquadCallsign
       nameFormat: name-format-standard
 
@@ -553,7 +553,7 @@
       job: CBURN
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSergeants # Ganimed edit (ADTNamesFirstMilitaryRXBZZ (OH GOD, WTF IS RXBZZ))
+      - NamesFirstMilitaryNTSergeants # VG edit (ADTNamesFirstMilitaryRXBZZ (OH GOD, WTF IS RXBZZ))
       - NamesLastERTCallsign
       nameFormat: name-format-standard
 

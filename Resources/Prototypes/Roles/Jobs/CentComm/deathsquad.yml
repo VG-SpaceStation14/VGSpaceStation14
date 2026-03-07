@@ -4,7 +4,7 @@
   description: job-description-deathsquad
   playTimeTracker: JobDeathSquad
   setPreference: false
-  requirements: # Ganimed-RoleTime
+  requirements: # VG-RoleTime
   - !type:DepartmentTimeRequirement
     department: Security
     time: 36000 # 10 hrs

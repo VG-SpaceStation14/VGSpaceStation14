@@ -9,7 +9,7 @@
       state: ertleader
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialSergeants # Ganimed edit (ADTCmndNamesFirstMilitary)
+      - NamesFirstMilitaryNTSpecialSergeants # VG edit (ADTCmndNamesFirstMilitary)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -61,7 +61,7 @@
       prototypes: [ ADTERTLeaderGear ]
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialSergeants # Ganimed edit (ADTCmndNamesFirstMilitary)
+      - NamesFirstMilitaryNTSpecialSergeants # VG edit (ADTCmndNamesFirstMilitary)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
 
@@ -116,7 +116,7 @@
       state: ertjanitor
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTPrivates # Ganimed edit (NamesFirstERTEngineer)
+      - NamesFirstMilitaryNTPrivates # VG edit (NamesFirstERTEngineer)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -153,7 +153,7 @@
         settings: short
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTPrivates # Ganimed edit (NamesFirstERTEngineer)
+      - NamesFirstMilitaryNTPrivates # VG edit (NamesFirstERTEngineer)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: Loadout
@@ -222,7 +222,7 @@
       state: ertengineer
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialistCorporals # Ganimed edit (NamesFirstERTEngineer)
+      - NamesFirstMilitaryNTSpecialistCorporals # VG edit (NamesFirstERTEngineer)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -259,7 +259,7 @@
         settings: short
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialistCorporals # Ganimed edit (NamesFirstERTEngineer)
+      - NamesFirstMilitaryNTSpecialistCorporals # VG edit (NamesFirstERTEngineer)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: Loadout
@@ -328,7 +328,7 @@
       state: ertsecurity
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSergeants # Ganimed edit (NamesFirstERTMilitary)
+      - NamesFirstMilitaryNTSergeants # VG edit (NamesFirstERTMilitary)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -365,7 +365,7 @@
         settings: short
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSergeants # Ganimed edit (NamesFirstERTMilitary)
+      - NamesFirstMilitaryNTSergeants # VG edit (NamesFirstERTMilitary)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: Loadout
@@ -430,7 +430,7 @@
       state: ertmedical
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialistCorporals # Ganimed edit (NamesFirstERTMedical)
+      - NamesFirstMilitaryNTSpecialistCorporals # VG edit (NamesFirstERTMedical)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: RandomHumanoidSpawner
@@ -467,7 +467,7 @@
         settings: short
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialistCorporals # Ganimed edit (NamesFirstERTMedical)
+      - NamesFirstMilitaryNTSpecialistCorporals # VG edit (NamesFirstERTMedical)
       - NamesLastERTCallsign
       nameFormat: name-format-standard
     - type: Loadout
@@ -571,7 +571,7 @@
     - type: GhostTakeoverAvailable
     - type: RandomMetadata
       nameSegments:
-      - NamesFirstMilitaryNTSpecialSergeants # Ganimed edit (ADTCmndNamesFirstMilitary)
+      - NamesFirstMilitaryNTSpecialSergeants # VG edit (ADTCmndNamesFirstMilitary)
       - NamesLastERTCallsign  # Corvax Localization
       nameFormat: name-format-standard
 # end Капитан РХБЗЗ

@@ -1,7 +1,7 @@
 - type: species
   id: UrsusSpecies
   name: species-name-ursus
-  roundStart: false # Ganimed-MRP
+  roundStart: false # VG-MRP
   prototype: MobUrsus
   sprites: MobUrsusSprites
   defaultSkinTone: "#964B00"

@@ -1,7 +1,7 @@
 using System.Numerics;
-using Content.Shared.CCVar; // Ganimed Edit
+using Content.Shared.CCVar; // VG Edit
 using Content.Shared.Movement.Systems;
-using Robust.Shared.Configuration; // Ganimed Edit
+using Robust.Shared.Configuration; // VG Edit
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -82,12 +82,12 @@ namespace Content.Shared.Movement.Components
         public const float WalkingSoundModifier = 1.5f;
 
 
-        /// Ganimed-Start-edit
+        /// VG-Start-edit
         //NOTE I don't think I'm supposed to do this
         public bool Sprinting => IoCManager.Resolve<IConfigurationManager>().GetCVar(CCVars.GamePressToSprint)
             ? (HeldMoveButtons & MoveButtons.Walk) != 0x0
             : (HeldMoveButtons & MoveButtons.Walk) == 0x0;
-        /// Ganimed-End-edit
+        /// VG-End-edit
 
         [ViewVariables(VVAccess.ReadWrite)]
         public bool CanMove = true;

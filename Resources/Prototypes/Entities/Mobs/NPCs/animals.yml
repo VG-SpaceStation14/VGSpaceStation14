@@ -464,10 +464,10 @@
       types:
         Piercing: 0
   - type: SupermatterIgnore # ADT-Tweak
-  # Ganimed-Tweak-Start
+  # VG-Tweak-Start
   - type: FoodConsumptionSpeedModifier
     modifier: 2
-  # Ganimed-Tweak-End
+  # VG-Tweak-End
 
 - type: entity
   name: glockroach

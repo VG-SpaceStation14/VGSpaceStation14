@@ -470,7 +470,7 @@
 # Borgs
 - type: language
   id: BorgTalk
-  roundstart: false # Ganimed-Tweak
+  roundstart: false # VG-Tweak
   uiColor: "#9faffc"
   parent: BaseVocalLanguage
   speech: !type:Generic
@@ -519,7 +519,7 @@
 # Spoken by the Ursus race.
 - type: language
   id: Urs
-  roundstart: false # Ganimed-Tweak
+  roundstart: false # VG-Tweak
   uiColor: "#b36b00"
   parent: BaseVocalLanguage
   speech: !type:Generic
@@ -554,7 +554,7 @@
 # Spoken by the Arkane race.
 - type: language
   id: Arkane
-  roundstart: false # Ganimed-Tweak
+  roundstart: false # VG-Tweak
   uiColor: "#e478ff"
   parent: BaseVocalLanguage
   speech: !type:Generic

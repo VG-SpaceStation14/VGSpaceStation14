@@ -98,7 +98,7 @@
       - id: CherrySeeds
       - id: CottonSeeds
       - id: ADTStrawberrySeeds # ADT Tweak
-      - id: CucumberSeeds # Ganimed-Edit
+      - id: CucumberSeeds # VG-Edit
 
 - type: entity
   id: CrateHydroponicsTray

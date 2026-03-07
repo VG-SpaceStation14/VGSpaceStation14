@@ -158,10 +158,10 @@ namespace Content.Shared.Localizations
         {
             time = TimeSpan.FromMinutes(Math.Ceiling(time.TotalMinutes));
             var hours = (int)time.TotalHours;
-            // Ganimed edit start
+            // VG edit start
             var minutes = time.Minutes;
             return Loc.GetString($"zzzz-fmt-playtime", ("hours", hours), ("minutes", minutes));
-            // Ganimed edit stop
+            // VG edit stop
         }
 
         public static string FormatPlaytimeMinutes(TimeSpan time)

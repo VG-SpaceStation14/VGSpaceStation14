@@ -155,7 +155,7 @@ public sealed partial class SpeciesWindow : FancyWindow
         }
 
         var proto = _proto.Index(protoId);
-        // Ganimed edit
+        // VG edit
         var highPriorityJob = Profile.JobPriorities.FirstOrDefault(x => x.Value == JobPriority.High);
 
         if (highPriorityJob.Equals(default(KeyValuePair<ProtoId<JobPrototype>, JobPriority>)))
@@ -163,7 +163,7 @@ public sealed partial class SpeciesWindow : FancyWindow
             return;
         }
         var job = highPriorityJob.Key;
-        // Ganimed edit
+        // VG edit
 
         CurrentSpecies = protoId;
 

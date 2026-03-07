@@ -15,7 +15,7 @@ using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Mind;
-using Content.Shared.Database; // Ganimed edit
+using Content.Shared.Database; // VG edit
 using Content.Shared.Players.RateLimiting;
 using JetBrains.Annotations;
 using Robust.Server.Player;
@@ -37,7 +37,7 @@ namespace Content.Server.Administration.Systems
 
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly IAdminManager _adminManager = default!;
-        [Dependency] private readonly IBanManager _banManager = default!; // Ganimed edit
+        [Dependency] private readonly IBanManager _banManager = default!; // VG edit
         [Dependency] private readonly IConfigurationManager _config = default!;
         [Dependency] private readonly IGameTiming _timing = default!;
         [Dependency] private readonly IPlayerLocator _playerLocator = default!;
@@ -80,13 +80,13 @@ namespace Content.Server.Administration.Systems
         // Should be shorter than DescriptionMax
         private const ushort MessageLengthCap = 3000;
 
-        // ganimed edit start
+        // VG edit start
         private readonly TimeSpan _messageCooldown = TimeSpan.FromSeconds(2);
 
         private readonly Queue<(NetUserId Channel, string Text, TimeSpan Timestamp)> _recentMessages = new();
         private const int MaxRecentMessages = 10;
         private const int SpamCheckMessageCount = 3;
-        // ganimed edit stop
+        // VG edit stop
 
         // Text to be used to cut off messages that are too long. Should be shorter than MessageLengthCap
         private const string TooLongText = "... **(too long)**";
@@ -659,7 +659,7 @@ namespace Content.Server.Administration.Systems
                 return;
             }
 
-            // ganimed edit start
+            // VG edit start
             var currentTime = _timing.RealTime;
 
             if (IsOnCooldown(message.UserId, currentTime) && senderAdmin == null)
@@ -669,7 +669,7 @@ namespace Content.Server.Administration.Systems
                 _banManager.CreateServerBan(senderSession.UserId, senderSession.Name, null, null, null, 0, NoteSeverity.High, "Автоматическая блокировка AHelp за спам — если это случилось по ошибке свяжитесь с администрацией в Discord");
 
             AddToRecentMessages(message.UserId, message.Text, currentTime);
-            // ganimed edit stop
+            // VG edit stop
 
             if (_rateLimit.CountAction(eventArgs.SenderSession, RateLimitKey) != RateLimitStatus.Allowed)
                 return;
@@ -902,7 +902,7 @@ namespace Content.Server.Administration.Systems
             public bool OnCall;
         }
 
-        // ganimed edit start
+        // VG edit start
         private void AddToRecentMessages(NetUserId channelId, string text, TimeSpan timestamp)
         {
             _recentMessages.Enqueue((channelId, text, timestamp));
@@ -937,7 +937,7 @@ namespace Content.Server.Administration.Systems
         {
             return _recentMessages;
         }
-        // ganimed edit stop
+        // VG edit stop
     }
 
     public sealed class AHelpMessageParams

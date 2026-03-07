@@ -25,7 +25,7 @@ using Content.Client.Voting;
 using Content.Shared.Administration.Logs;
 using Content.Client.Lobby;
 using Content.Client.Players.RateLimiting;
-using Content.Shared.Corvax.Sponsors; // Ganimed-Sponsors
+using Content.Shared.Corvax.Sponsors; // VG-Sponsors
 using Content.Shared.Administration.Managers;
 using Content.Shared.Chat;
 using Content.Shared.IoC;
@@ -71,7 +71,7 @@ namespace Content.Client.IoC
             collection.Register<TitleWindowManager>();
             collection.Register<ClientsidePlaytimeTrackingManager>();
             collection.Register<SponsorsManager>(); // Corvax-Sponsors
-            collection.Register<ISponsorsManager, SponsorsManager>(true); // Ganimed-Sponsors
+            collection.Register<ISponsorsManager, SponsorsManager>(true); // VG-Sponsors
             collection.Register<JoinQueueManager>(); // Corvax-Queue
             collection.Register<DiscordAuthManager>(); // Corvax-DiscordAuth
             collection.Register<ExportManager>(); // ADT Export

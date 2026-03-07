@@ -33,8 +33,8 @@ public sealed partial class AccessibilityTab : Control
         Control.AddOptionCheckBox(ADTCCVars.EnableLanguageFonts, EnableLanguageFonts);
         // ADT Settings end
 
-        Control.AddOptionCheckBox(CCVars.TransliterationEnToRu, TranslitEnToRuCheckBox); // Ganimed - Transliteration
-        Control.AddOptionCheckBox(CCVars.TransliterationRuToEn, TranslitRuToEnCheckBox); // Ganimed - Transliteration
+        Control.AddOptionCheckBox(CCVars.TransliterationEnToRu, TranslitEnToRuCheckBox); // VG - Transliteration
+        Control.AddOptionCheckBox(CCVars.TransliterationRuToEn, TranslitRuToEnCheckBox); // VG - Transliteration
 
         Control.Initialize();
     }

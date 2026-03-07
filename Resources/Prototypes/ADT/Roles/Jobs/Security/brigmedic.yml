@@ -6,7 +6,7 @@
   requirements:
     - !type:DepartmentTimeRequirement
       department: Medical
-      time: 36000 #10 hrs Ganimed-RoleTime
+      time: 36000 #10 hrs VG-RoleTime
     - !type:DepartmentTimeRequirement
       department: Security
       time: 18000 #5 hrs
@@ -26,7 +26,7 @@
   - Brig
   - Maintenance
   - External
-  extendedAccess: # Ganimed-Tweak
+  extendedAccess: # VG-Tweak
   - Cryogenics
   special:
   - !type:AddImplantSpecial

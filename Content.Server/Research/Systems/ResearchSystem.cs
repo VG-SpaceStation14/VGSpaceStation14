@@ -97,7 +97,7 @@ namespace Content.Server.Research.Systems
                     continue;
                 server.NextUpdateTime = _timing.CurTime + server.ResearchConsoleUpdateTime;
 
-                UpdateServer(uid, (int)server.ResearchConsoleUpdateTime.TotalSeconds, server); // Ganimed edit
+                UpdateServer(uid, (int)server.ResearchConsoleUpdateTime.TotalSeconds, server); // VG edit
             }
         }
     }

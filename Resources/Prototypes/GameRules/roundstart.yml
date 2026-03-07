@@ -345,7 +345,7 @@
   id: Wizard
   components:
   - type: GameRule
-    minPlayers: 15 # Ganimed-Tweak
+    minPlayers: 15 # VG-Tweak
   - type: AntagSelection
     agentName: wizard-round-end-name
     selectionTime: PrePlayerSpawn

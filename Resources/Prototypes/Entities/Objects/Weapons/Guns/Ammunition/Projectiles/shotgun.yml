@@ -45,7 +45,7 @@
     damage:
       types:
         Piercing: 15
-        Structural: 10 # Ganimed-Tweak
+        Structural: 10 # VG-Tweak
 
 
 - type: entity
@@ -67,9 +67,9 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 6 # Ganimed-Tweak
-        Blunt: 3 # Ganimed-Tweak
-        Heat: 6 # Ganimed-Tweak
+        Piercing: 6 # VG-Tweak
+        Blunt: 3 # VG-Tweak
+        Heat: 6 # VG-Tweak
   - type: IgnitionSource
     ignited: true
 

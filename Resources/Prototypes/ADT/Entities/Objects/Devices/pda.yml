@@ -801,7 +801,7 @@
 
 # HoS
 
-# - type: entity # Ganimed-MRP
+# - type: entity # VG-MRP
 #  parent: HoSPDA
 #  id: ADTSheriffPDA
 #  name: sheriff PDA

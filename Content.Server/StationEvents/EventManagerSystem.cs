@@ -9,12 +9,12 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Content.Shared.EntityTable.EntitySelectors;
 using Content.Shared.EntityTable;
-using Content.Shared.Roles; // Ganimed edit
-using Content.Shared.Mind; // Ganimed edit
-using Content.Shared.Mind.Components; // Ganimed edit
-using Content.Shared.Mobs.Components; // Ganimed edit
-using Content.Shared.Mobs; // Ganimed edit
-using Content.Shared.Roles.Jobs; // Ganimed edit
+using Content.Shared.Roles; // VG edit
+using Content.Shared.Mind; // VG edit
+using Content.Shared.Mind.Components; // VG edit
+using Content.Shared.Mobs.Components; // VG edit
+using Content.Shared.Mobs; // VG edit
+using Content.Shared.Roles.Jobs; // VG edit
 
 namespace Content.Server.StationEvents;
 
@@ -28,10 +28,10 @@ public sealed class EventManagerSystem : EntitySystem
     [Dependency] public readonly GameTicker GameTicker = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
 
-    // Ganimed edit start
+    // VG edit start
     [Dependency] private readonly SharedJobSystem _jobs = default!;
     [Dependency] private readonly SharedMindSystem _minds = default!;
-    // Ganimed edit end
+    // VG edit end
 
     public bool EventsEnabled { get; private set; }
     private void SetEnabled(bool value) => EventsEnabled = value;
@@ -285,7 +285,7 @@ public sealed class EventManagerSystem : EntitySystem
 
         if (_roundEnd.IsRoundEndRequested() && !stationEvent.OccursDuringRoundEnd)
             return false;
-        // Ganimed edit start
+        // VG edit start
         // Проверка департаментов
         if (!CheckDepartmentLimits(stationEvent.DepartmentPlayerLimits))
             return false;
@@ -336,7 +336,7 @@ public sealed class EventManagerSystem : EntitySystem
             }
 
             if (have < need)
-        // Ganimed edit end
+        // VG edit end
                 return false;
         }
 

@@ -1,7 +1,7 @@
 - type: entity
   parent: ClothingOuterHardsuitEVA
   id: ADTClothingOuterModsuitBodyBase
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: base MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -45,7 +45,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyAtmos
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: atmos MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -83,7 +83,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyClown
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: clown MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -112,7 +112,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyEngineering
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: engineering MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -147,7 +147,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyMedical
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: medical MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -178,7 +178,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyMining
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: mining MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -212,7 +212,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodySecurity
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: security MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -244,7 +244,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyScience
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: Science MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -275,7 +275,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodySafeguard
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: safeguard MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -309,7 +309,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyBso
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: bso MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -344,7 +344,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyAdvanced
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: advanced MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -381,7 +381,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodySyndicate
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: syndicate MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -420,7 +420,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodySyndicate
   id: ADTClothingOuterModsuitBodySyndicateElite
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: elite syndicate MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -462,7 +462,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodySyndicate
   id: ADTClothingOuterModsuitBodySyndicateCommander
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: commander syndicate MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -504,7 +504,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyCMO
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: CMO MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -561,7 +561,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyCaptain
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: captain MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -643,7 +643,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyWard
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: warden MOD chestplate
   description: A chestplate for a MODsuit.
   components:
@@ -677,7 +677,7 @@
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase
   id: ADTClothingOuterModsuitBodyBrigmedic
-  categories: [ HideSpawnMenu ] # Ganimed-Edit
+  categories: [ HideSpawnMenu ] # VG-Edit
   name: Brigmedic MOD chestplate
   description: A chestplate for a MODsuit.
   components:

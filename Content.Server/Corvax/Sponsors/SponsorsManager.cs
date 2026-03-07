@@ -17,7 +17,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Server.Corvax.Sponsors;
 
-public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
+public sealed class SponsorsManager : ISponsorsManager // VG-Sponsors
 {
     [Dependency] private readonly IServerNetManager _netMgr = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -48,7 +48,7 @@ public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
         _netMgr.Connected += OnConnected;
         _netMgr.Disconnect += OnDisconnect;
 
-        IoCManager.Register<ISponsorsManager, SponsorsManager>(true); // Ganimed-Sponsors
+        IoCManager.Register<ISponsorsManager, SponsorsManager>(true); // VG-Sponsors
 
         _sawmill.Info($"[Init] Sponsor API URL (from CVar): '{_apiUrl}'");
     }
@@ -58,13 +58,13 @@ public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
         return _cachedSponsors.TryGetValue(userId, out sponsor);
     }
 
-    // Ganimed-Sponsors start
+    // VG-Sponsors start
     bool ISponsorsManager.TryGetInfo([NotNullWhen(true)] out SponsorInfo? info)
     {
         info = null;
         return false;
     }
-    // Ganimed-Sponsors end
+    // VG-Sponsors end
 
     private async Task OnConnecting(NetConnectingArgs e)
     {
@@ -78,12 +78,12 @@ public sealed class SponsorsManager : ISponsorsManager // Ganimed-Sponsors
 
         var isExpired = info.ExpireDate.ToLocalTime() <= DateTime.Now;
 
-        // Ganimed-Sponsors start
+        // VG-Sponsors start
         if (isExpired)
         {
             _cachedSponsors.Remove(e.UserId);
             return;
-        // Ganimed-Sponsors end
+        // VG-Sponsors end
         }
 
         if (info.Tier == null)

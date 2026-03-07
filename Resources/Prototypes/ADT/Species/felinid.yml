@@ -1,7 +1,7 @@
 - type: species
   id: Felinid
   name: Фелинид
-  roundStart: false  # Ganimed-MRP
+  roundStart: false  # VG-MRP
   prototype: MobFelinid
   sprites: MobHumanSprites
   markingLimits: MobFelinidMarkingLimits

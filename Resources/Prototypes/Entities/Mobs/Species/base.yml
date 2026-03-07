@@ -35,9 +35,9 @@
     - map: [ "shoes" ]
     - map: [ "ears" ]
     - map: [ "eyes" ]
-    - map: [ "id" ]  #Ganimed-Tweak
-    - map: [ "outerClothing" ]  # Ganimed-Tweak
-    - map: [ "belt" ]  #Ganimed-Tweak
+    - map: [ "id" ]  #VG-Tweak
+    - map: [ "outerClothing" ]  # VG-Tweak
+    - map: [ "belt" ]  #VG-Tweak
     - map: [ "neck" ]
     - map: [ "back" ]
     - map: [ "enum.HumanoidVisualLayers.SnoutCover" ]
@@ -210,7 +210,7 @@
       Female: FemaleHuman
       Unsexed: MaleHuman
   - type: Emoting
-    chatEmoteCooldown: 1.0 # Ganimed edit
+    chatEmoteCooldown: 1.0 # VG edit
   - type: BodyEmotes
     soundsId: GeneralBodyEmotes
   - type: Grammar

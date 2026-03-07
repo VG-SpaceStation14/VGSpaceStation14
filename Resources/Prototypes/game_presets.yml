@@ -9,7 +9,7 @@
     - MeteorSwarmScheduler
     - RampingStationEventScheduler
     # - SpaceTrafficControlEventScheduler
-#    # - SpaceTrafficControlFriendlyEventScheduler #Ganimed-Tweak
+#    # - SpaceTrafficControlFriendlyEventScheduler #VG-Tweak
     - BasicRoundstartVariation
     - CrewTransferScheduler #ADT tweak
   bannedRound: 2 #ADT tweak
@@ -88,7 +88,7 @@
   rules:
   - ExtendedStationEventScheduler #ADT extended
   - MeteorSwarmScheduler
-#  # - SpaceTrafficControlFriendlyEventScheduler # Ganimed-Tweak
+#  # - SpaceTrafficControlFriendlyEventScheduler # VG-Tweak
   - BasicRoundstartVariation
   - CrewTransferScheduler #ADT tweak
 
@@ -101,7 +101,7 @@
   showInVote: false #ADT_Tweak
   description: greenshift-description
   rules:
-#  # - SpaceTrafficControlFriendlyEventScheduler #Ganimed-Tweak
+#  # - SpaceTrafficControlFriendlyEventScheduler #VG-Tweak
   - BasicRoundstartVariation
   - CrewTransferScheduler #ADT tweak
 
@@ -169,7 +169,7 @@
   name: death-match-title
   description: death-match-description
   maxPlayers: 15
-  showInVote: false # Ganimed-Tweak
+  showInVote: false # VG-Tweak
   supportedMaps: DeathMatchMapPool
   rules:
     - DeathMatch31
@@ -257,7 +257,7 @@
   - Zombie
   - BasicStationEventScheduler
   - MeteorSwarmScheduler
-#  # - SpaceTrafficControlEventScheduler #Ganimed-Tweak
+#  # - SpaceTrafficControlEventScheduler #VG-Tweak
   - BasicRoundstartVariation
   - CrewTransferScheduler #ADT tweak
 

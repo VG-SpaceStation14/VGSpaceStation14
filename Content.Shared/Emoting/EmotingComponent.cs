@@ -12,9 +12,9 @@ public sealed partial class EmotingComponent : Component
 
     [DataField, AutoNetworkedField]
     [ViewVariables(VVAccess.ReadWrite)]
-    public TimeSpan ChatEmoteCooldown = TimeSpan.FromSeconds(0.5); // ganimed edit
+    public TimeSpan ChatEmoteCooldown = TimeSpan.FromSeconds(0.5); // VG edit
 
     [ViewVariables]
     [Access(typeof(SharedChatSystem), Friend = AccessPermissions.ReadWrite, Other = AccessPermissions.Read)]
-    public TimeSpan? LastChatEmoteTime; // ganimed edit
+    public TimeSpan? LastChatEmoteTime; // VG edit
 }

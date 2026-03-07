@@ -5,27 +5,27 @@
   name: job-name-cmo
   description: job-description-cmo
   playTimeTracker: JobChiefMedicalOfficer
-  requireAdminNotify: true # Ganimed Rules Tweak
+  requireAdminNotify: true # VG Rules Tweak
   requirements:
     - !type:RoleTimeRequirement
       role: JobChemist
-      time: 6h # Ganimed-RoleTime
+      time: 6h # VG-RoleTime
     - !type:RoleTimeRequirement
       role: JobMedicalDoctor
       time: 6h # animed-RoleTime
     - !type:DepartmentTimeRequirement
       department: Medical
-      time: 20h # Ganimed-RoleTime
+      time: 20h # VG-RoleTime
     - !type:OverallPlaytimeRequirement
-      time: 40h # Ganimed-RoleTime
-    - !type:AgeRequirement # Ganimed-MRP
+      time: 40h # VG-RoleTime
+    - !type:AgeRequirement # VG-MRP
       requiredAge: 21
   weight: 10
   startingGear: CMOGear
   icon: "JobIconChiefMedicalOfficer"
   supervisors: job-supervisors-captain
-  canBeAntag: true # Ganimed-MRP
-  antagAdvantage: 5 # Ganimed-MRP: Heads can be antags
+  canBeAntag: true # VG-MRP
+  antagAdvantage: 5 # VG-MRP: Heads can be antags
   access:
   - Medical
   - Command
@@ -35,8 +35,8 @@
   - Brig
   - Cryogenics
   special:
-#  - !type:AddImplantSpecial # Ganimed-MRP
-#    implants: [ MindShieldImplant ] # Ganimed-MRP
+#  - !type:AddImplantSpecial # VG-MRP
+#    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff

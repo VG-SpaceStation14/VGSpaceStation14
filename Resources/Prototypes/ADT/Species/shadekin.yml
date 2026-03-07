@@ -1,7 +1,7 @@
 - type: species
   id: Shadekin
   name: species-name-shadekin
-  roundStart: false # Ganimed-MRP
+  roundStart: false # VG-MRP
   prototype: MobShadekin
   sprites: MobShadekinSprites
   defaultSkinTone: "#FFFFFF"

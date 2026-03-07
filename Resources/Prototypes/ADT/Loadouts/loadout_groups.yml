@@ -1215,7 +1215,7 @@
 #  maxLimit: 1
 #  loadouts:
 #  - HoSPDA
-#  - ADTSheriffPDA #Ganimed-MRP
+#  - ADTSheriffPDA #VG-MRP
 
 - type: loadoutGroup
   id: ADTlawyerID

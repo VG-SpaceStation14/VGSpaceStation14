@@ -1,7 +1,7 @@
 - type: species
   id: DemonSpecies
   name: species-name-demon
-  roundStart: false  # Ganimed-MRP
+  roundStart: false  # VG-MRP
   prototype: MobDemon
   sprites: MobDemonSprites
   shortDesc: species-short-desc-demon

@@ -63,23 +63,23 @@ public sealed class ToggleableFontTag : IMarkupTag
                     size = vectorFont.Size;
                     break;
                 case StackedFont stackedFont:
-                    // Ganimed edit start
+                    // VG edit start
                     if (stackedFont.Stack.Length > 0 && stackedFont.Stack[0] is VectorFont stackVectorFont)
                         size = stackVectorFont.Size;
-                    // Ganime edit end
+                    // VG edit end
                     break;
             }
         }
 
-        /// Ganimed edit start
+        /// VG edit start
         var isRadioMessage = node.Attributes.ContainsKey("defaultFont") &&
                              node.Attributes.ContainsKey("defaultSize");
-        /// Ganimed edit end
+        /// VG edit end
 
         if (cfg.GetCVar(ADTCCVars.EnableLanguageFonts))
         {
             if (node.Attributes.TryGetValue("size", out var sizeParameter))
-        /// Ganimed edit start
+        /// VG edit start
                 size = (int)(sizeParameter.LongValue ?? size);
         }
         else if (isRadioMessage)
@@ -97,7 +97,7 @@ public sealed class ToggleableFontTag : IMarkupTag
 
             if (node.Attributes.TryGetValue("defaultFont", out var dFont) && dFont.TryGetString(out var dFontStr))
                 fontId = dFontStr;
-        /// Ganimed edit end
+        /// VG edit end
         }
         else
         {
