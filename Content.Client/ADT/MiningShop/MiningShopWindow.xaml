@@ -12,15 +12,8 @@
             <Control HorizontalExpand="True" SizeFlagsStretchRatio="0.25" />
             <Label Name="PointsLabel" Access="Public" HorizontalExpand="True" Align="Right" />
         </BoxContainer>
-        <BoxContainer Name="Main"
-                    Orientation="Horizontal"
-                    Margin="5">
-            <Button Name="Express"
-                    Access="Public"
-                    HorizontalExpand="True"
-                    VerticalExpand="True"/>
-        </BoxContainer>
-        <!-- VG-Tweak Start: reorganized order section with total on left -->
+        
+        <!-- VG-Tweak Start: moved Express button to bottom section -->
         <BoxContainer Orientation="Vertical" Margin="0 0 0 5">
             <BoxContainer Orientation="Horizontal">
                 <RichTextLabel Name="YourPurchases" Access="Public" MaxWidth="1000" />
@@ -29,7 +22,9 @@
             <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
                 <Label Name="TotalCostLabel" Access="Public" Text="Сумма: 0 P" StyleClasses="LabelHeading" MinWidth="100" Visible="False" />
                 <Control HorizontalExpand="True" />
-                <Button Name="ClearCart" Access="Public" Text="Очистить корзину" MaxWidth="150" Visible="False" />
+                <!-- VG-Tweak: ClearCart now on left, Express on right -->
+                <Button Name="ClearCart" Access="Public" Text="Очистить корзину" MaxWidth="150" Visible="False" Margin="0 0 5 0" />
+                <Button Name="Express" Access="Public" Text="Экспресс доставка" MinWidth="150" StyleClasses="ButtonSquare" />
             </BoxContainer>
         </BoxContainer>
         <!-- VG-Tweak End -->

@@ -332,7 +332,7 @@ public sealed class MiningShopBui : BoundUserInterface
 
         var userpoints = _miningPoints.TryFindIdCard(user)?.Comp?.Points ?? 0;
 
-        // VG-Tweak: calculate total cost and show/hide elements
+        // Calculate total cost and show/hide elements
         bool hasOrders = userOrders.Count > 0;
         uint totalCost = 0;
         foreach (var entry in userOrders)
@@ -343,10 +343,8 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.TotalCostLabel.Text = $"Сумма: {totalCost} P";
         _window.TotalCostLabel.Visible = hasOrders;
         _window.ClearCart.Visible = hasOrders;
-        // VG-Tweak End
 
         _window.YourPurchases.Text = $"Заказы: {ordersString}";
-        _window.Express.Text = $"Экспресс доставка";
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
 
         for (var sectionIndex = 0; sectionIndex < _sections.Count; sectionIndex++)
