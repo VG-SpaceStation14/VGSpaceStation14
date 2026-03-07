@@ -50,7 +50,7 @@
   equipment:
     # id: QuartermasterPDA # ADT: different PDAs in loadouts
     # ears: ClothingHeadsetQM # ADT tweak
-    ears: ClothingHeadsetQM
+    # ears: ClothingHeadsetQM # VG Tweak
     belt: BoxFolderClipboardThreePapers
     pocket1: AppraisalTool
   storage:
