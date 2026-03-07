@@ -1,5 +1,5 @@
 - type: constructionGraph
-  id: ADTPhazon
+  id: ADTPhazonConstruction  # VG-Tweak ADTPhazon -> ADTPhazonConstruction
   start: start
   graph:
   - node: start
@@ -67,9 +67,6 @@
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
           data: 8
-
-#i omitted the steps involving inserting machine parts because
-#currently mechs don't support upgrading. add them back in once that's squared away.
 
       - tag: ADTPhazonWeaponControlModule
         name: construction-graph-tag-phazon-weapon-control-module
