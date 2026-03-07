@@ -1,11 +1,13 @@
 - type: constructionGraph
-  id: ADTOdysseus
+  id: ADTPhazon
   start: start
   graph:
   - node: start
     edges:
-    - to: odysseus
+    - to: phazon
       steps:
+      - assemblyId: ADTPhazonChassis
+        guideString: mech-construction-guide-string
 
       - tool: Anchoring
         doAfter: 1
@@ -35,8 +37,8 @@
           key: "enum.MechAssemblyVisuals.State"
           data: 4
 
-      - tag: ADTOdysseusCentralControlModule
-        name: construction-graph-tag-odysseus-central-module
+      - tag: ADTPhazonCentralControlModule
+        name: construction-graph-tag-phazon-central-module
         icon:
           sprite: "Objects/Misc/module.rsi"
           state: "mainboard"
@@ -52,8 +54,8 @@
           key: "enum.MechAssemblyVisuals.State"
           data: 6
 
-      - tag: ADTOdysseusPeripheralsControlModule
-        name: construction-graph-tag-odysseus-peripherals-module
+      - tag: ADTPhazonPeripheralsControlModule
+        name: construction-graph-tag-phazon-peripherals-module
         icon:
           sprite: "Objects/Misc/module.rsi"
           state: id_mod
@@ -72,12 +74,11 @@
 #i omitted the steps involving inserting machine parts because
 #currently mechs don't support upgrading. add them back in once that's squared away.
 
-      - component: PowerCell
-        name: construction-graph-tag-power-cell
-        store: battery-container
+      - tag: ADTPhazonWeaponControlModule
+        name: construction-graph-tag-phazon-weapon-control-module
         icon:
-          sprite: Objects/Power/power_cells.rsi
-          state: small
+          sprite: "Objects/Misc/module.rsi"
+          state: "mainboard"
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
@@ -90,49 +91,124 @@
           key: "enum.MechAssemblyVisuals.State"
           data: 10
 
-      - material: Steel
-        amount: 5
+      - component: PowerCell
+        name: construction-graph-tag-power-cell
+        store: battery-container
+        icon:
+          sprite: Objects/Power/power_cells.rsi
+          state: small
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 13
+
+      - tool: Screwing
+        doAfter: 1
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 14
+
+      - tag: ADTMicroManipulatorStockPart
+        name: construction-graph-tag-manipulator-stock-part
+        icon:
+          sprite: "Objects/Misc/stock_parts.rsi"
+          state: micro_mani
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 15
+
+      - tag: ADTMicroManipulatorStockPart
+        name: construction-graph-tag-manipulator-stock-part
+        icon:
+          sprite: "Objects/Misc/stock_parts.rsi"
+          state: micro_mani
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 16
+
+      - tool: Screwing
+        doAfter: 1
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
           data: 17
 
-      - tool: Anchoring
-        doAfter: 1
+      - material: Plasma
+        amount: 30
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
           data: 18
 
-      - tool: Welding
-        doAfter: 1
+      - tag: ADTBluespaceAnomalyCore
+        name: construction-graph-tag-bluespace-anomaly-core
+        icon:
+          sprite: "Structures/Specific/Anomalies/Cores/bluespace_core.rsi"
+          state: core
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
           data: 19
 
-      - material: Plasteel
-        amount: 5
+      - material: Cable
+        amount: 30
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 20
+
+      - tool: Screwing
+        doAfter: 1
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
           data: 21
+
+      - material: Plasteel
+        amount: 30
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 22
 
       - tool: Anchoring
         doAfter: 1
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
-          data: 22
+          data: 23
 
       - tool: Welding
         doAfter: 1
         completed:
         - !type:VisualizerDataInt
           key: "enum.MechAssemblyVisuals.State"
-          data: 22
+          data: 24
 
-  - node: odysseus
+      - tag: ADTPhazonArmor
+        name: construction-graph-tag-phazon-armor-plates
+        icon:
+          sprite: "ADT/Objects/Specific/Mech/phazon_construction.rsi"
+          state: phazon_armor
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 25
+
+      - tool: Anchoring
+        doAfter: 1
+        completed:
+        - !type:VisualizerDataInt
+          key: "enum.MechAssemblyVisuals.State"
+          data: 26
+
+      - tool: Welding
+        doAfter: 1
+
+  - node: phazon
     actions:
     - !type:BuildMech
-      mechPrototype: ADTMechOdysseus
+      mechPrototype: ADTMechPhazon
