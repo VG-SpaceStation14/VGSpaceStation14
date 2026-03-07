@@ -133,7 +133,7 @@
   - type: Tag
     tags:
     - CanPilot
-    - FootstepSound
+    - SiliconFootstepSound
     - DoorBumpOpener
     - ChangelingBlacklist
     - ADTSiliconStealthWhitelist
@@ -172,8 +172,6 @@
         type: StrippableBoundUserInterface
       enum.StoreUiKey.Key:
         type: StoreBoundUserInterface
-      enum.HereticLivingHeartKey.Key:
-        type: LivingHeartMenuBoundUserInterface
   - type: MidroundCustomization
     action: ActionIpcScreen
     selectSlotTime: 0
@@ -187,6 +185,7 @@
     defaultSkinColoring: false
   - type: AnimatedEmotes
   - type: Posing
+  - type: SoftWalk
 
 - type: entity
   save: false
