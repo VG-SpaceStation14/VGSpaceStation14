@@ -32,6 +32,9 @@ public sealed class MiningShopBui : BoundUserInterface
     private string? _selectedCategory;
     private Dictionary<string, Button> _categoryButtons = new();
 
+    // Store last selected category per vending machine
+    private static readonly Dictionary<EntityUid, string?> LastSelectedCategory = new();
+
     public MiningShopBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
         _miningPoints = EntMan.System<MiningPointsSystem>();
@@ -39,7 +42,9 @@ public sealed class MiningShopBui : BoundUserInterface
 
     protected override void Open()
     {
-        _window = new MiningShopWindow();
+        base.Open();
+
+        _window = this.CreateWindow<MiningShopWindow>();
         _window.OnClose += Close;
         _window.Title = EntMan.GetComponentOrNull<MetaDataComponent>(Owner)?.EntityName ?? "MiningShop";
 
@@ -116,6 +121,16 @@ public sealed class MiningShopBui : BoundUserInterface
             _window.Sections.AddChild(uiSection);
         }
 
+        // Restore last selected category
+        if (LastSelectedCategory.TryGetValue(Owner, out var lastCategory))
+        {
+            SetSelectedCategory(lastCategory);
+        }
+        else
+        {
+            // Default to "All" (which is already pressed)
+        }
+
         _window.ClearCart.OnPressed += _ => OnClearCartPressed();
         _window.Express.OnPressed += _ => OnExpressDeliveryButtonPressed();
         _window.Search.OnTextChanged += OnSearchChanged;
@@ -125,49 +140,69 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.OpenCentered();
     }
 
+    // Unified method to set category and update UI
+    private void SetSelectedCategory(string? categoryId)
+    {
+        if (_window == null)
+            return;
+
+        // Update internal state
+        _selectedCategory = categoryId;
+
+        // Update button pressed states
+        foreach (var kvp in _categoryButtons)
+        {
+            if (kvp.Key == "ALL")
+            {
+                kvp.Value.Pressed = (categoryId == null);
+            }
+            else
+            {
+                kvp.Value.Pressed = (categoryId == kvp.Key);
+            }
+        }
+
+        // Save for next time
+        if (categoryId == null)
+            LastSelectedCategory[Owner] = null;
+        else
+            LastSelectedCategory[Owner] = categoryId;
+
+        UpdateSectionsVisibility();
+    }
+
     private void OnAllCategorySelected(bool pressed)
     {
         if (pressed)
         {
-            _selectedCategory = null;
-            foreach (var btn in _categoryButtons.Values)
-            {
-                if (btn != _categoryButtons["ALL"])
-                    btn.Pressed = false;
-            }
+            SetSelectedCategory(null);
         }
         else
         {
+            // If "All" is unpressed, select first category if available
             if (_sections.Count > 0)
             {
-                var firstSection = _sections[0];
-                _selectedCategory = firstSection.ID;
-                _categoryButtons[firstSection.ID].Pressed = true;
+                SetSelectedCategory(_sections[0].ID);
+            }
+            else
+            {
+                // No categories, force "All" back on
+                SetSelectedCategory(null);
             }
         }
-        
-        UpdateSectionsVisibility();
     }
 
     private void OnCategorySelected(SharedMiningShopSectionPrototype section, bool pressed)
     {
         if (pressed)
         {
-            _selectedCategory = section.ID;
-            foreach (var btn in _categoryButtons.Values)
-            {
-                if (btn.Text != section.Name.ToUpperInvariant() && btn != _categoryButtons["ALL"])
-                    btn.Pressed = false;
-            }
-            _categoryButtons["ALL"].Pressed = false;
+            SetSelectedCategory(section.ID);
         }
         else
         {
-            _selectedCategory = null;
-            _categoryButtons["ALL"].Pressed = true;
+            // If a category is unpressed, select "All"
+            SetSelectedCategory(null);
         }
-        
-        UpdateSectionsVisibility();
     }
 
     private void UpdateSectionsVisibility()
@@ -213,7 +248,13 @@ public sealed class MiningShopBui : BoundUserInterface
                 else
                 {
                     var nameMatch = entry.ItemName.Text?.Contains(searchText, OrdinalIgnoreCase) ?? false;
-                    var descMatch = entry.Description.Text?.Contains(searchText, OrdinalIgnoreCase) ?? false;
+                    var descMatch = false;
+                    
+                    if (entry.TooltipButton.ToolTip != null)
+                    {
+                        descMatch = entry.TooltipButton.ToolTip.Contains(searchText, OrdinalIgnoreCase);
+                    }
+                    
                     entry.Visible = nameMatch || descMatch;
                 }
 
@@ -258,10 +299,21 @@ public sealed class MiningShopBui : BoundUserInterface
                 
                 uiEntry.ItemName.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
                 
-                var description = new FormattedMessage();
+                var tooltipMsg = new FormattedMessage();
+                tooltipMsg.AddText(entry.Name?.Replace("\\n", "\n") ?? entity.Name);
                 if (!string.IsNullOrWhiteSpace(entity.Description))
-                    description.AddText(entity.Description);
-                uiEntry.Description.SetMessage(description);
+                {
+                    tooltipMsg.PushNewline();
+                    tooltipMsg.AddText(entity.Description);
+                }
+                
+                var tooltip = new Tooltip();
+                tooltip.SetMessage(tooltipMsg);
+                tooltip.MaxWidth = 250f;
+                
+                uiEntry.TooltipButton.ToolTip = entity.Description ?? "";
+                uiEntry.TooltipButton.TooltipDelay = 0;
+                uiEntry.TooltipButton.TooltipSupplier = _ => tooltip;
 
                 uiEntry.SetBackgroundColor(Color.FromHex("#162031"), Color.FromHex("#4972A1"));
 
@@ -332,7 +384,6 @@ public sealed class MiningShopBui : BoundUserInterface
 
         var userpoints = _miningPoints.TryFindIdCard(user)?.Comp?.Points ?? 0;
 
-        // Calculate total cost and show/hide elements
         bool hasOrders = userOrders.Count > 0;
         uint totalCost = 0;
         foreach (var entry in userOrders)
@@ -343,6 +394,7 @@ public sealed class MiningShopBui : BoundUserInterface
         _window.TotalCostLabel.Text = $"Сумма: {totalCost} P";
         _window.TotalCostLabel.Visible = hasOrders;
         _window.ClearCart.Visible = hasOrders;
+        _window.Express.Visible = hasOrders;
 
         _window.YourPurchases.Text = $"Заказы: {ordersString}";
         _window.PointsLabel.Text = $"Осталось очков: {userpoints}";
@@ -374,6 +426,7 @@ public sealed class MiningShopBui : BoundUserInterface
 
     protected override void Dispose(bool disposing)
     {
+        base.Dispose(disposing);
         if (disposing)
             _window?.Dispose();
     }
