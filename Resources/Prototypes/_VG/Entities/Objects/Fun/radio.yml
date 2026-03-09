@@ -10,6 +10,7 @@
     layers:
     - state: old-radio
   - type: Item
+    size: Normal
     sprite: ADT/Objects/Devices/communication.rsi
     heldPrefix: old-radio
   - type: ActivatableUI
