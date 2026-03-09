@@ -1,0 +1,22 @@
+- type: entity
+  parent: BaseItem
+  id: HandheldJukeboxRadio
+  name: portable jukebox radio
+  description: A handheld radio that can play a variety of tunes. Take the party anywhere!
+  suffix: VG
+  components:
+  - type: Sprite
+    sprite: ADT/Objects/Devices/communication.rsi
+    layers:
+    - state: old-radio
+  - type: Item
+    sprite: ADT/Objects/Devices/communication.rsi
+    heldPrefix: old-radio
+  - type: ActivatableUI
+    key: enum.JukeboxUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.JukeboxUiKey.Key:
+        type: JukeboxBoundUserInterface
+  - type: Jukebox
+  - type: Appearance
