@@ -35,9 +35,92 @@ public sealed class JukeboxSystem : SharedJukeboxSystem
         // VG-Tweak end
         SubscribeLocalEvent<JukeboxComponent, ComponentInit>(OnComponentInit);
         SubscribeLocalEvent<JukeboxComponent, ComponentShutdown>(OnComponentShutdown);
+        // VG-Tweak start - новые подписки
+        SubscribeLocalEvent<JukeboxComponent, JukeboxNextTrackMessage>(OnJukeboxNextTrack);
+        SubscribeLocalEvent<JukeboxComponent, JukeboxPrevTrackMessage>(OnJukeboxPrevTrack);
+        SubscribeLocalEvent<JukeboxComponent, JukeboxPlaySelectedMessage>(OnJukeboxPlaySelected);
+        // VG-Tweak end
 
         SubscribeLocalEvent<JukeboxComponent, PowerChangedEvent>(OnPowerChanged);
     }
+
+    // VG-Tweak start
+    private void OnJukeboxNextTrack(EntityUid uid, JukeboxComponent component, JukeboxNextTrackMessage args)
+    {
+        if (!component.AutoAdvance || component.AudioStream == null)
+            return;
+
+        var nextTrack = GetNextTrack(uid, component);
+        if (nextTrack != null && _protoManager.Resolve(nextTrack.Value, out var nextProto))
+        {
+            component.SelectedSongId = nextTrack.Value;
+            component.AudioStream = Audio.Stop(component.AudioStream);
+            component.AudioStream = Audio.PlayPvs(nextProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(component.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume)))?.Entity;
+            component.AutoAdvance = true;
+            Dirty(uid, component);
+        }
+    }
+
+    private void OnJukeboxPrevTrack(EntityUid uid, JukeboxComponent component, JukeboxPrevTrackMessage args)
+    {
+        if (!component.AutoAdvance || component.AudioStream == null)
+            return;
+
+        if (component.Queue.Count == 0 || component.CurrentQueueIndex < 0)
+            return;
+
+        int prevIndex;
+        if (component.RepeatMode == JukeboxRepeatMode.RepeatAll)
+        {
+            prevIndex = component.CurrentQueueIndex - 1;
+            if (prevIndex < 0)
+                prevIndex = component.Queue.Count - 1;
+        }
+        else
+        {
+            prevIndex = component.CurrentQueueIndex - 1;
+            if (prevIndex < 0)
+                return; 
+        }
+
+        var prevTrack = component.Queue[prevIndex];
+        if (_protoManager.Resolve(prevTrack, out var prevProto))
+        {
+            component.SelectedSongId = prevTrack;
+            component.CurrentQueueIndex = prevIndex;
+            component.AudioStream = Audio.Stop(component.AudioStream);
+            component.AudioStream = Audio.PlayPvs(prevProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(component.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume)))?.Entity;
+            component.AutoAdvance = true;
+            Dirty(uid, component);
+        }
+    }
+
+    private void OnJukeboxPlaySelected(EntityUid uid, JukeboxComponent component, JukeboxPlaySelectedMessage args)
+    {
+        component.SelectedSongId = args.SongId;
+        component.AudioStream = Audio.Stop(component.AudioStream);
+
+        if (_protoManager.Resolve(args.SongId, out var jukeboxProto))
+        {
+            component.AudioStream = Audio.PlayPvs(jukeboxProto.Path, uid, AudioParams.Default.WithMaxDistance(10f).WithVolume(MapToRange(component.Volume, component.MinSlider, component.MaxSlider, component.MinVolume, component.MaxVolume)))?.Entity;
+
+            component.Queue.Clear();
+            component.Queue.AddRange(component.ShuffleEnabled
+                ? component.Playlist.OrderBy(_ => _random.Next()).ToList()
+                : component.Playlist.ToList());
+
+            var index = component.Queue.IndexOf(args.SongId);
+            component.CurrentQueueIndex = index >= 0 ? index : 0;
+            component.AutoAdvance = true;
+
+            DirectSetVisualState(uid, JukeboxVisualState.Select);
+            component.Selecting = true;
+            component.SelectAccumulator = 0f;
+        
+            Dirty(uid, component);
+        }
+    }
+    // VG-Tweak end
 
     private void OnComponentInit(EntityUid uid, JukeboxComponent component, ComponentInit args)
     {

@@ -27,13 +27,15 @@
         <!-- ADT-Tweak start-->
         <BoxContainer Orientation="Vertical">
             <PanelContainer StyleClasses="LowDivider" />
-            <!-- VG-Tweak start -->
+            <!-- VG-Tweak start - реорганизовал кнопки -->
             <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
                           VerticalExpand="False" SizeFlagsStretchRatio="1" HorizontalAlignment="Center">
                 <Button Name="RepeatButton" Text="{Loc 'jukebox-menu-buttonrepeat-off'}" ToggleMode="True" StyleClasses="Button" />
                 <Button Name="ShuffleButton" Text="{Loc 'jukebox-menu-buttonshuffle'}" ToggleMode="True" StyleClasses="Button" />
+                <Button Name="PrevButton" Text="{Loc 'jukebox-menu-buttonprev'}" StyleClasses="Button" />
                 <Button Name="PlayButton" Text="{Loc 'jukebox-menu-buttonplay'}" />
                 <Button Name="StopButton" Text="{Loc 'jukebox-menu-buttonstop'}" />
+                <Button Name="NextButton" Text="{Loc 'jukebox-menu-buttonnext'}" StyleClasses="Button" />
             </BoxContainer>
             <!-- VG-Tweak end -->
         </BoxContainer>

@@ -41,7 +41,11 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
             SendMessage(new JukeboxStopMessage());
         };
 
-        _menu.OnSongSelected += SelectSong;
+        // VG-Tweak start - изменена логика
+        _menu.OnSongSelected += SelectSong; 
+        _menu.OnPlaySelected += PlaySelectedSong; 
+        // VG-Tweak end
+
         _menu.SetTime += SetTime;
         _menu.SetVolume += SetVolume; // ADT-Tweak
 
@@ -55,11 +59,28 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         {
             SendMessage(new JukeboxSetShuffleMessage(enabled));
         };
+
+        _menu.OnNextTrack += () =>
+        {
+            SendMessage(new JukeboxNextTrackMessage());
+        };
+
+        _menu.OnPrevTrack += () =>
+        {
+            SendMessage(new JukeboxPrevTrackMessage());
+        };
         // VG-Tweak end
 
         PopulateMusic();
         Reload();
     }
+
+    // VG-Tweak start
+    private void PlaySelectedSong(ProtoId<JukeboxPrototype> songid)
+    {
+        SendMessage(new JukeboxPlaySelectedMessage(songid));
+    }
+    // VG-Tweak end
 
     /// <summary>
     /// Reloads the attached menu if it exists.

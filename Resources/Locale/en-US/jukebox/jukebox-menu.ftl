@@ -1,5 +1,5 @@
 jukebox-menu-title = Jukebox
-jukebox-menu-selectedsong = Selected Song:
+jukebox-menu-selectedsong = Selected song:
 jukebox-menu-buttonplay = Play
 jukebox-menu-buttonpause = Pause
 jukebox-menu-buttonstop = Stop
@@ -10,4 +10,6 @@ jukebox-menu-buttonrepeat-one = Repeat One
 jukebox-menu-buttonrepeat-all = Repeat All
 jukebox-menu-buttonshuffle = Shuffle
 jukebox-menu-buttonshuffle-on = Shuffle On
+jukebox-menu-buttonprev = ◀◀
+jukebox-menu-buttonnext = ▶▶
 # VG-Tweak end

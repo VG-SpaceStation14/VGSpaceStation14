@@ -156,3 +156,17 @@ public enum JukeboxVisualLayers : byte
 {
     Base
 }
+
+// VG-Tweak start - новые сообщения для управления треками
+[Serializable, NetSerializable]
+public sealed class JukeboxNextTrackMessage : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class JukeboxPrevTrackMessage : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class JukeboxPlaySelectedMessage(ProtoId<JukeboxPrototype> songId) : BoundUserInterfaceMessage
+{
+    public ProtoId<JukeboxPrototype> SongId { get; } = songId;
+}
+// VG-Tweak end

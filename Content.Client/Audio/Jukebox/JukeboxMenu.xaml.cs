@@ -35,6 +35,9 @@ public sealed partial class JukeboxMenu : FancyWindow
     // VG-Tweak start
     public event Action<JukeboxRepeatMode>? OnRepeatModeChanged;
     public event Action<bool>? OnShuffleToggled;
+    public event Action? OnNextTrack;
+    public event Action? OnPrevTrack;
+    public event Action<ProtoId<JukeboxPrototype>>? OnPlaySelected;
     // VG-Tweak end
 
     private EntityUid? _audio;
@@ -47,6 +50,7 @@ public sealed partial class JukeboxMenu : FancyWindow
         IoCManager.InjectDependencies(this);
         _audioSystem = _entManager.System<AudioSystem>();
 
+        // VG-Tweak start - изменена логика выбора трека
         MusicList.OnItemSelected += args =>
         {
             var entry = MusicList[args.ItemIndex];
@@ -54,8 +58,17 @@ public sealed partial class JukeboxMenu : FancyWindow
             if (entry.Metadata is not string juke)
                 return;
 
-            OnSongSelected?.Invoke(juke);
+            // Если трек уже играет, просто выбираем его в списке
+            if (_playState && _audio != null)
+            {
+                OnPlaySelected?.Invoke(juke);
+            }
+            else
+            {
+                OnSongSelected?.Invoke(juke);
+            }
         };
+        // VG-Tweak end
 
         PlayButton.OnPressed += args =>
         {
@@ -66,6 +79,19 @@ public sealed partial class JukeboxMenu : FancyWindow
         {
             OnStopPressed?.Invoke();
         };
+
+        // VG-Tweak start - новые кнопки
+        PrevButton.OnPressed += args =>
+        {
+            OnPrevTrack?.Invoke();
+        };
+
+        NextButton.OnPressed += args =>
+        {
+            OnNextTrack?.Invoke();
+        };
+        // VG-Tweak end
+
         PlaybackSlider.OnReleased += PlaybackSliderKeyUp;
         VolumeSlider.OnReleased += VolumeSliderKeyUp; /// ADT-Tweak
 
