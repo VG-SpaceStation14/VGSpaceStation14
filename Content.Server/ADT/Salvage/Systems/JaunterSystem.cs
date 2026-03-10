@@ -16,6 +16,11 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Content.Shared.Medical;
+// VG-Tweak Start
+using Content.Server.Mech.Components;
+using Content.Shared.Mech.Components;
+using Content.Server.Mech.Systems;
+// VG-Tweak End
 
 namespace Content.Server.ADT.Salvage.Systems;
 
@@ -29,6 +34,9 @@ public sealed class JaunterSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedStaminaSystem _stamina = default!;
     [Dependency] private readonly VomitSystem _vomit = default!;
+    // VG-Tweak Start
+    [Dependency] private readonly MechSystem _mech = default!;
+    // VG-Tweak End
 
     public override void Initialize()
     {
@@ -37,6 +45,9 @@ public sealed class JaunterSystem : EntitySystem
         SubscribeLocalEvent<JaunterComponent, UseInHandEvent>(OnUseInHand);
         SubscribeLocalEvent<JaunterComponent, BeforeChasmFallingEvent>(OnBeforeFall);
         SubscribeLocalEvent<InventoryComponent, BeforeChasmFallingEvent>(Relay);
+        // VG-Tweak Start: обработка падения мехов
+        SubscribeLocalEvent<MechComponent, BeforeChasmFallingEvent>(OnMechBeforeFall);
+        // VG-Tweak End
     }
 
     private void OnUseInHand(EntityUid uid, JaunterComponent comp, UseInHandEvent args)
@@ -124,4 +135,98 @@ public sealed class JaunterSystem : EntitySystem
             }
         }
     }
+
+    // VG-Tweak Start
+    private void OnMechBeforeFall(EntityUid uid, MechComponent mech, ref BeforeChasmFallingEvent args)
+    {
+        if (args.Cancelled)
+            return;
+
+        var pilot = mech.PilotSlot.ContainedEntity;
+        if (pilot == null)
+            return;
+
+        if (!TryFindJaunter(pilot.Value, out var jaunter))
+            return;
+
+        if (!_mech.TryEject(uid, mech))
+            return;
+
+        TeleportPilot(pilot.Value, jaunter);
+
+    }
+
+    private bool TryFindJaunter(EntityUid entity, out EntityUid jaunter)
+    {
+        if (TryComp<JaunterComponent>(entity, out _))
+        {
+            jaunter = entity;
+            return true;
+        }
+
+        if (TryComp<ContainerManagerComponent>(entity, out var containers))
+        {
+            foreach (var container in containers.Containers.Values)
+            {
+                foreach (var contained in container.ContainedEntities)
+                {
+                    if (TryFindJaunter(contained, out jaunter))
+                        return true;
+                }
+            }
+        }
+
+        jaunter = default;
+        return false;
+    }
+
+    private void TeleportPilot(EntityUid pilot, EntityUid jaunter)
+    {
+        if (!TryComp<JaunterComponent>(jaunter, out var comp))
+            return;
+
+        var coordsValid = false;
+        var coords = Transform(pilot).Coordinates;
+        EntityCoordinates newCoords;
+
+        while (!coordsValid)
+        {
+            var randombeacon = _portal.GetRandomBeacon();
+            if (randombeacon != null)
+            {
+                newCoords = Transform(randombeacon.Value).Coordinates;
+                comp.BeaconMode = true;
+            }
+            else
+            {
+                newCoords = new EntityCoordinates(Transform(pilot).ParentUid, coords.X +
+                    _random.NextFloat(-5f, 5f), coords.Y +
+                    _random.NextFloat(-5f, 5f));
+            }
+
+            if (_interaction.InRangeUnobstructed(pilot, newCoords, -1f) && _lookup.GetEntitiesInRange<ChasmComponent>(newCoords, 1f).Count <= 0 || comp.BeaconMode == true)
+            {
+                _transform.SetCoordinates(pilot, newCoords);
+                _transform.AttachToGridOrMap(pilot, Transform(pilot));
+                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/Mining/fultext_launch.ogg"), pilot);
+
+                if (TryComp<StaminaComponent>(pilot, out var stam))
+                {
+                    var need = MathF.Max(0.01f, stam.CritThreshold - stam.StaminaDamage);
+                    _stamina.TakeStaminaDamage(pilot, need, stam);
+                }
+
+                if (HasComp<BodyComponent>(pilot) && HasComp<HungerComponent>(pilot))
+                {
+                    _vomit.Vomit(pilot);
+                }
+
+                if (comp.DeleteOnUse && pilot != jaunter)
+                    QueueDel(jaunter);
+
+                coordsValid = true;
+            }
+        }
+    }
+    // VG-Tweak End
 }
