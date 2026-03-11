@@ -53,12 +53,6 @@
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial
       components:
-        - type: BlueShield
-        - type: CantShoot
-          popup: combo-cantshoot
-          whitelist:
-            tags:
-            - ADTBsoWeapon
         - type: Necksnap
         - type: AntagImmune # VG-MRP: Loyalty implant
         - type: Combo
