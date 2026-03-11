@@ -418,7 +418,7 @@
   parent: BaseStationEvent  # ADT Tweaked
   components:
   - type: StationEvent
-    weight: 5
+    weight: 2.5 #VG-Tweak
     startAnnouncement: station-event-power-grid-check-start-announcement
     endAnnouncement: station-event-power-grid-check-end-announcement
     duration: 60

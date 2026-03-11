@@ -317,7 +317,7 @@
       size: Small
       shape:
       - 0,0,1,0
-      - 0,1,0,1
+      #- 0,1,0,1 VG-Tweak
       storedOffset: 0,-6
     - type: AmmoCounter
     - type: GrapplingGun
