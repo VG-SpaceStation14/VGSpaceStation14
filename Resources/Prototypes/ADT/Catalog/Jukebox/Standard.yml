@@ -226,6 +226,24 @@
   path:
     path: /Audio/ADT/Lobby/Home_-_Were_Finally_Landing.ogg
 
+- type: jukebox
+  id: TheWizard
+  name: The Wizard
+  path:
+    path: /Audio/_VG/Jukebox/the_wizard.ogg
+
+- type: jukebox
+  id: SpaceOddity
+  name: Space Oddity - Chris Hadfield
+  path:
+    path: /Audio/_VG/Jukebox/space_oddity.ogg
+
+- type: jukebox
+  id: SiliconDreams
+  name: Silicon Dreams
+  path:
+    path: /Audio/_VG/Jukebox/silicon-dreams.ogg
+
 # START 9 МАЯ
 # - type: jukebox
 #   id: may_day-pobedy
