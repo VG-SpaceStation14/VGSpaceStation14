@@ -3,31 +3,33 @@
   name: job-name-qm
   description: job-description-qm
   playTimeTracker: JobQuartermaster
-  requireAdminNotify: true # VG Rules Tweak
   requirements:
-    - !type:RoleTimeRequirement
-      role: JobCargoTechnician
-      time: 6h # VG-RoleTime
+#    - !type:RoleTimeRequirement
+#      role: JobCargoTechnician
+#      time: 21600 #6 hrs
     - !type:RoleTimeRequirement
       role: JobSalvageSpecialist
-      time: 6h # VG-RoleTime
+      time: 10h # Corvax-RoleTime 2.5
     - !type:DepartmentTimeRequirement
       department: Cargo
-      time: 20h # VG-RoleTime
+      time: 10h
     - !type:OverallPlaytimeRequirement
-      time: 40h # VG-RoleTime
-      #ADT tweak start
-#    - !type:SpeciesRequirement
-#      inverted: true
-#      species:
-#      - Vox
+      time: 144000 #40 hrs
+     # ADT-Tweak start
+    - !type:TraitsRequirement
+      inverted: true
+      traits:
+      - Muted
+    - !type:SpeciesRequirement
+      inverted: true
+      species:
+      - Vox
       #ADT tweak end
   weight: 10
   startingGear: QuartermasterGear
   icon: "JobIconQuarterMaster"
   supervisors: job-supervisors-captain
-  canBeAntag: true # VG-MRP
-  antagAdvantage: 5 # VG-MRP: Heads can be antags
+  canBeAntag: false
   access:
   - Cargo
   - Salvage
@@ -38,19 +40,18 @@
   - Brig
   - Cryogenics
   special:
-#  - !type:AddImplantSpecial # VG-MRP
-#    implants: [ MindShieldImplant ] # VG-MRP
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial
     components:
       - type: CommandStaff
-#     - type: PhantomTyranyTarget # ADT Phantom
+      # - type: PhantomTyranyTarget # ADT Phantom
 
 - type: startingGear
   id: QuartermasterGear
   equipment:
     # id: QuartermasterPDA # ADT: different PDAs in loadouts
-    # ears: ClothingHeadsetQM # ADT tweak
-    # ears: ClothingHeadsetQM # VG Tweak
+    # ears: ClothingHeadsetQM # ADT tweak - выдаются через loadout ADTQuartermasterEars
     belt: BoxFolderClipboardThreePapers
     pocket1: AppraisalTool
   storage:

@@ -188,6 +188,14 @@
   components:
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Standard/hatch_syndicate.rsi
+  # ADT-Tweak start
+  - type: Airlock
+    openUnlitVisible: false # У текущего шлюза нет Unlit
+    openingSpriteState: opening
+    closingSpriteState: closing
+    openSpriteState: open
+    closedSpriteState: closed
+  # ADT-Tweak end
 
 # Glass
 - type: entity
@@ -345,9 +353,6 @@
   components:
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Standard/xeno.rsi
-  - type: IconSmooth
-    key: chitin
-    mode: NoSprite
   - type: Paintable
     group: null
 
@@ -358,8 +363,5 @@
   components:
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Glass/xeno.rsi
-  - type: IconSmooth
-    key: chitin
-    mode: NoSprite
   - type: Paintable
     group: null
