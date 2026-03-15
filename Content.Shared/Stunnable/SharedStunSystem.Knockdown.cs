@@ -273,10 +273,38 @@ public abstract partial class SharedStunSystem
 
         var stand = !entity.Comp2.DoAfterId.HasValue;
         // SetAutoStand((entity, entity.Comp2), stand);
+        
+        // VG-Tweak-start: Унифицированная логика вставания
+        if (_standingState.IsDown(entity.Owner) && !HasComp<StunnedComponent>(entity))
+        {
+            HandleStandAttempt(entity.Owner);
+            return;
+        }
+        // VG-Tweak-end
+        
+        // var stand = !component.DoAfterId.HasValue;
+        // SetAutoStand(playerEnt, stand); //ADT-tweak
 
         if (!stand || !TryStanding((entity, entity.Comp2)))
             CancelKnockdownDoAfter((entity, entity.Comp2));
     }
+
+    // VG-Tweak-start: Новый метод для обработки попытки вставания
+    private void HandleStandAttempt(EntityUid uid)
+    {
+        // Проверяем, свободна ли хотя бы одна рука
+        if (_hands.TryGetEmptyHand(uid, out _))
+        {
+            // Есть свободная рука - быстрое вставание через ForceStandUp
+            ForceStandUp(uid);
+        }
+        else
+        {
+            // Обе руки заняты - медленное вставание через DoAfter
+            TryStanding(uid);
+        }
+    }
+    // VG-Tweak-end
 
     public bool TryStanding(Entity<KnockedDownComponent?> entity, bool DoDoAfter = true) //ADT-tweak: добавлен бул дудуафтер
     {
@@ -301,7 +329,7 @@ public abstract partial class SharedStunSystem
         if (!TryStand((entity, entity.Comp)))
             return false;
 
-        // ADT-Tweak start
+        // ADT-Tweak-start: Зависимость скорости вставания от стамины
         var baseTime = crawler.StandTime;
         if (TryComp<StaminaComponent>(entity, out var stamina))
         {
@@ -313,8 +341,13 @@ public abstract partial class SharedStunSystem
             baseTime *= timeMultiplier;
         }
 
+        // VG-Tweak-start: Ограничиваем максимальное время до 2 секунд
+        if (baseTime > TimeSpan.FromSeconds(2))
+            baseTime = TimeSpan.FromSeconds(2);
+        // VG-Tweak-end
+
         var ev = new GetStandUpTimeEvent(baseTime);
-        // ADT-Tweak end
+        // ADT-Tweak-end
         RaiseLocalEvent(entity, ref ev);
 
         var doAfterArgs = new DoAfterArgs(EntityManager, entity, ev.DoAfterTime, new TryStandDoAfterEvent(), entity, entity)
@@ -403,7 +436,9 @@ public abstract partial class SharedStunSystem
         if (args.SenderSession.AttachedEntity is not { } user)
             return;
 
-        ForceStandUp(user);
+        // VG-Tweak-start: Используем унифицированную логику
+        HandleStandAttempt(user);
+        // VG-Tweak-end
     }
 
     public void ForceStandUp(Entity<KnockedDownComponent?> entity)
@@ -417,8 +452,10 @@ public abstract partial class SharedStunSystem
         if (StandingBlocked((entity, entity.Comp)))
             return;
 
+        // VG-Tweak-start: Проверка на пустые руки для быстрого вставания
         if (!_hands.TryGetEmptyHand(entity.Owner, out _))
             return;
+        // VG-Tweak-end
 
         if (!TryForceStand(entity.Owner))
             return;
@@ -437,9 +474,9 @@ public abstract partial class SharedStunSystem
         if (args.Handled)
             return;
 
-        // If we're already trying to stand, or we fail to stand try forcing it
-        if (!TryStanding(entity.Owner))
-            ForceStandUp((entity.Owner, entity.Comp));
+        // VG-Tweak-start: Используем унифицированную логику
+        HandleStandAttempt(entity.Owner);
+        // VG-Tweak-end
 
         args.Handled = true;
     }
@@ -450,10 +487,10 @@ public abstract partial class SharedStunSystem
         if (!Resolve(entity, ref entity.Comp, false))
             return false;
 
-        // ADT-Tweak start: Быстрое поднятие отнимает 30% от порога стамины
+        // ADT-Tweak-start: Быстрое поднятие отнимает 30% от порога стамины
         var staminaCost = entity.Comp.CritThreshold * 0.30f;
         var ev = new TryForceStandEvent(staminaCost);
-        // ADT-Tweak end
+        // ADT-Tweak-end
         RaiseLocalEvent(entity, ref ev);
 
         if (!Stamina.TryTakeStamina(entity, ev.Stamina, entity.Comp, visual: true))
