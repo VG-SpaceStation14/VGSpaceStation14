@@ -72,7 +72,8 @@
         ghostProto: ParticleAcceleratorEmitterStarboard
         graph: ParticleAcceleratorEmitterStarboard
         expectedNode: completed
-
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering 
 # Unfinished
 
 - type: entity

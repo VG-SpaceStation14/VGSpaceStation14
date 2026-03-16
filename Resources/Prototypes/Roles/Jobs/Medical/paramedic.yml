@@ -20,6 +20,10 @@
   extendedAccess:
   - Chemistry
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: MedicalSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: ParamedicGear
   equipment:

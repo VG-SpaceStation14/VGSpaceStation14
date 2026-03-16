@@ -13,6 +13,11 @@
   extendedAccess:
   - Kitchen
   - Bar
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BotanistSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:GiveItemOnHolidaySpecial
     holiday: FourTwenty

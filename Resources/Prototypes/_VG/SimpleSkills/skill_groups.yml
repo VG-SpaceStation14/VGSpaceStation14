@@ -1,0 +1,121 @@
+# Группы навыков для профессий
+
+- type: simpleSkillGroup
+  id: BaseSkills
+  name: Базовые навыки
+  skills:
+
+- type: simpleSkillGroup
+  id: BaseSkillsPiloting
+  name: Базовые навыки с пилотированием
+  skills:
+    - Piloting
+
+- type: simpleSkillGroup
+  id: EngineerSkills
+  name: Инженерные навыки
+  skills:
+    - Engineering
+    - Piloting
+
+- type: simpleSkillGroup
+  id: MedicalSkills
+  name: Медицинские навыки
+  skills:
+    - Medicine
+
+- type: simpleSkillGroup
+  id: RoboticistSkills
+  name: Навыки робототехники
+  skills:
+    - Anomalistic
+    - Xenoarchiology
+    - Engineering
+    - Medicin
+
+- type: simpleSkillGroup
+  id: ScienceSkills
+  name: Научные навыки
+  skills:
+    - Anomalistic
+    - Xenoarchiology
+    - Medicin
+
+- type: simpleSkillGroup
+  id: SecuritySkills
+  name: Навыки охраны
+  skills:
+    - Weapons
+
+- type: simpleSkillGroup
+  id: BrigMedicalSkills
+  name: Навыки Бригммедика
+  skills:
+    - Weapons
+    - Medicine
+
+- type: simpleSkillGroup
+  id: CargoSkills
+  name: Навыки карго
+  skills:
+    - Piloting
+    - Engineering
+
+- type: simpleSkillGroup
+  id: SalvageSkills
+  name: Навыки утилизатора
+  skills:
+    - Piloting
+    - Engineering
+    - Medicine
+    - Weapons
+
+- type: simpleSkillGroup
+  id: MinerSkills
+  name: Навыки шахтёра
+  skills:
+    - Piloting
+    - Engineering
+    - Medicine
+    - Weapons
+
+- type: simpleSkillGroup
+  id: CommandSkills
+  name: Командные навыки
+  skills:
+    - Piloting
+    - Engineering
+    - Medicine
+    - Weapons
+    - Anomalistic
+    - Xenoarchiology
+
+- type: simpleSkillGroup
+  id: AtmosphericsSkills
+  name: Навыки атмосферного техника
+  skills:
+    - Engineering
+    - Piloting
+
+- type: simpleSkillGroup
+  id: ChemistSkills
+  name: Навыки химика
+  skills:
+    - Medicine
+
+- type: simpleSkillGroup
+  id: BotanistSkills
+  name: Навыки ботаника
+  skills:
+    - Engineering  # Позже добавлю его собственный скилл, а пока он мамкин инжииииииинееееер
+
+- type: simpleSkillGroup
+  id: AllSkills
+  name: Все скилы
+  skills:
+    - Piloting
+    - Engineering
+    - Medicine
+    - Weapons
+    - Anomalistic
+    - Xenoarchiology

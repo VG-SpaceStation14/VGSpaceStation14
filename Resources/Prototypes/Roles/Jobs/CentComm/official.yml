@@ -17,6 +17,11 @@
   access:
   - CentralCommand
   # Start ADT Tweak
+  
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: CommandSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]

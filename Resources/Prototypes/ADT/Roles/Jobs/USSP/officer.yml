@@ -9,3 +9,7 @@
   - Maintenance
   - External
   canBeAntag: false
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: AllSkills #VG-Tweak SkillsIntegration

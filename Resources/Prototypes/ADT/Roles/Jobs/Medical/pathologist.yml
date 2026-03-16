@@ -15,6 +15,10 @@
     - Medical
     - Maintenance
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: MedicalSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: ADTPathologistGear
   equipment:

@@ -1,0 +1,30 @@
+# Прототипы навыков
+- type: simpleSkill
+  id: Piloting
+  name: Пилотирование
+  description: Позволяет управлять шаттлами
+
+- type: simpleSkill
+  id: Engineering
+  name: Инженерия
+  description: Позволяет строить и чинить
+
+- type: simpleSkill
+  id: Medicine
+  name: Медицина
+  description: Позволяет лечить сложные раны
+
+- type: simpleSkill
+  id: Weapons
+  name: Управление турелями
+  description: Позволяет использовать сложное оружие
+
+- type: simpleSkill
+  id: Anomalistic
+  name: Аномалистика
+  description: Позволяет использовать оборудование отдела аномалистики
+
+- type: simpleSkill
+  id: Xenoarchiology
+  name: Ксеноархиология
+  description: Позволяет использовать оборудование отдела ксеноархиологии

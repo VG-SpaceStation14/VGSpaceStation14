@@ -16,6 +16,11 @@
   - Engineering
   - External
   - Atmospherics
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: AtmosphericsSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:GiveItemOnHolidaySpecial
     holiday: FirefighterDay

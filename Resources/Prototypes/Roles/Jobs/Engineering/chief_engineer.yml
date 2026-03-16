@@ -39,6 +39,11 @@
   - Atmospherics
   - Brig
   - Cryogenics
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: EngineerSkills #VG-Tweak SkillsIntegration
+
   special:
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP

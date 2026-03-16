@@ -108,3 +108,5 @@
     tags:
       - ADTChemistryAmbience
   # ADT-Sound-Update-End
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Medicine

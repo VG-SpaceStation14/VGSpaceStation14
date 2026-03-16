@@ -24,6 +24,10 @@
   - Brig
   - Maintenance
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: LawyerGear
   equipment:

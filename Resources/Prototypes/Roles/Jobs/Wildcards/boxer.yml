@@ -9,6 +9,11 @@
   access:
   - Service
   - Maintenance
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:GiveItemOnHolidaySpecial
     holiday: BoxingDay

@@ -9,6 +9,11 @@
   access:
   - Chapel
   - Maintenance
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:AddComponentSpecial
     components:

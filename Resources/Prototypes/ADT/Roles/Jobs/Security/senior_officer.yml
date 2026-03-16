@@ -38,6 +38,11 @@
   - Cryogenics
   extendedAccess: # VG-Tweak
   - Detective
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: SecuritySkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]

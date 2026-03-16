@@ -27,6 +27,10 @@
   - Engineering
   - External
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: EngineerSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: TechnicalAssistantGear
   equipment:

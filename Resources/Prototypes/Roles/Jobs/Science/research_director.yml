@@ -28,6 +28,11 @@
   - ResearchDirector
   - Brig
   - Cryogenics
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: ScienceSkills #VG-Tweak SkillsIntegration
+
   special:
 #  - !type:AddImplantSpecial # Ganimed-MRP
 #    implants: [ MindShieldImplant ] # Ganimed-MRP

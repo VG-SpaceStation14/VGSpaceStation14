@@ -802,3 +802,5 @@
   - type: MaterialStorage
     whitelist: *StandardMaterialWhitelist
   - type: OreSiloClient
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering 

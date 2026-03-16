@@ -51,6 +51,11 @@
   - External
   - Detective
   - Cryogenics
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: CommandSkills #VG-Tweak SkillsIntegration
+
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]

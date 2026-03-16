@@ -9,6 +9,11 @@
   access:
   - Maintenance
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
+
+
 - type: startingGear
   id: PassengerGear
   equipment:

@@ -13,6 +13,11 @@
   - AllAccess
   access:
   - CentralCommand
+  
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: CommandSkills #VG-Tweak SkillsIntegration
+
 
 # - type: startingGear
 #   id: ERTLeaderGear

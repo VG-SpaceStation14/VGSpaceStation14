@@ -18,6 +18,10 @@
   - Research
   - Maintenance
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: ScienceSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: ResearchAssistantGear
   equipment:

@@ -34,6 +34,11 @@
   - ChiefMedicalOfficer
   - Brig
   - Cryogenics
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: MedicalSkills #VG-Tweak SkillsIntegration
+
   special:
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP

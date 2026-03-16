@@ -20,6 +20,10 @@
   - Maintenance
   - External
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: MinerSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: ADTMinerGear
   equipment:

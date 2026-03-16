@@ -69,6 +69,11 @@
   - Cargo
   - Atmospherics
   - Medical
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkillsPiloting #VG-Tweak SkillsIntegration
+
   special:
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP

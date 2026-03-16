@@ -15,6 +15,10 @@
   - Research
   - Maintenance
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: RoboticistSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: SeniorResearcherGear
   equipment:

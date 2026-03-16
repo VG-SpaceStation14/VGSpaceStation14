@@ -18,6 +18,10 @@
   - Kitchen
   - Hydroponics
 
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: BartenderGear
   equipment:

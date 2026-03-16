@@ -14,3 +14,7 @@
   extendedAccess:
   - External
   - Maintenance # Corvax-MRP
+
+  components:
+  - type: SimpleSkillComponent
+    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
