@@ -76,6 +76,11 @@
     containers:
       storagebase: !type:Container
         ents: []
+  # ADT-Tweak start
+  - type: Tag
+    tags:
+    - Storage
+  # ADT-Tweak end
 
 - type: entity
   id: BaseBagOpenClose
