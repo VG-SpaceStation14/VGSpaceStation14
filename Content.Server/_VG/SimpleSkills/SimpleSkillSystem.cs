@@ -6,6 +6,10 @@ using Content.Shared.Hands.EntitySystems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Audio;
+using Content.Shared.Verbs;
+using Robust.Shared.Utility;
+using Content.Shared.DoAfter;
+using Robust.Shared.Containers;
 
 namespace Content.Server._VG.SimpleSkills;
 
@@ -15,6 +19,7 @@ public sealed class SimpleSkillSystem : EntitySystem
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
     public override void Initialize()
     {
@@ -32,6 +37,25 @@ public sealed class SimpleSkillSystem : EntitySystem
         
         // Автоматическое применение группы при инициализации компонента
         SubscribeLocalEvent<SimpleSkillComponent, ComponentInit>(OnComponentInit);
+        
+        // Обучение через учителя
+        SubscribeLocalEvent<SimpleSkillComponent, GetVerbsEvent<Verb>>(OnGetTeachingVerbs);
+        SubscribeLocalEvent<SkillTeacherComponent, ComponentShutdown>(OnTeacherShutdown);
+        SubscribeLocalEvent<SkillTeacherComponent, SkillTeachDoAfterEvent>(OnTeachDoAfter);
+        SubscribeLocalEvent<SimpleSkillBookComponent, SkillLearnDoAfterEvent>(OnLearnDoAfter);
+    }
+
+    /// <summary>
+    ///     Проверка наличия книги навыка в руках
+    /// </summary>
+    private bool HasSkillBookInHands(EntityUid user, string skillId)
+    {
+        foreach (var hand in _hands.EnumerateHeld(user))
+        {
+            if (TryComp<SimpleSkillBookComponent>(hand, out var book) && book.TeachesSkill == skillId)
+                return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -93,24 +117,35 @@ public sealed class SimpleSkillSystem : EntitySystem
     /// </summary>
     private void TryLearnFromBook(EntityUid book, SimpleSkillBookComponent component, EntityUid user)
     {
-        // Проверяем, есть ли уже навык
         if (HasSkill(user, component.TeachesSkill))
         {
-            _popup.PopupEntity("Вы уже знаете этот навык!", user, user);
+            _popup.PopupEntity(Loc.GetString("skill-already-known"), user, user);
             return;
         }
 
-        // Добавляем навык
-        AddSkill(user, component.TeachesSkill);
-        
-        // Звук и сообщение
-        _popup.PopupEntity($"Вы изучили {GetSkillName(component.TeachesSkill)}!", user, user);
-        
-        if (component.Sound != null)
+        var learnTime = 120f;
+
+        var doAfterArgs = new DoAfterArgs(EntityManager, user, TimeSpan.FromSeconds(learnTime), new SkillLearnDoAfterEvent(component.TeachesSkill), book, target: user)
+        {
+            BreakOnMove = true,
+            BreakOnDamage = true,
+            RequireCanInteract = true,
+            CancelDuplicate = true,
+            BlockDuplicate = true
+        };
+
+        if (!_doAfter.TryStartDoAfter(doAfterArgs))
+        {
+            _popup.PopupEntity(Loc.GetString("skill-learn-interrupted"), user, user);
+            return;
+        }
+
+        _popup.PopupEntity(Loc.GetString("skill-learn-start", ("time", learnTime)), user, user);
+
+        if (component.SoundStart != null)
+            _audio.PlayPvs(component.SoundStart, book);
+        else if (component.Sound != null) 
             _audio.PlayPvs(component.Sound, book);
-        
-        // Удаляем книгу
-        QueueDel(book);
     }
 
     /// <summary>
@@ -131,9 +166,9 @@ public sealed class SimpleSkillSystem : EntitySystem
     {
         var skills = EnsureComp<SimpleSkillComponent>(uid);
         skills.Skills[skillId] = true;
-
+    
         Dirty(uid, skills);
-        
+
         RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
         
         Logger.InfoS("simple.skills", $"Добавлен навык {skillId} для {ToPrettyString(uid)}");
@@ -202,6 +237,212 @@ public sealed class SimpleSkillSystem : EntitySystem
             }
         }
     }
+
+    /// <summary>
+    ///     Рекурсивный поиск предмета в контейнерах (инвентарь, рюкзак и т.д.)
+    /// </summary>
+    private bool TryFindItemInInventory(EntityUid entity, string skillId, out EntityUid foundItem)
+    {
+        if (TryComp<SimpleSkillBookComponent>(entity, out var book) && book.TeachesSkill == skillId)
+        {
+            foundItem = entity;
+            return true;
+        }
+
+        if (TryComp<ContainerManagerComponent>(entity, out var containers))
+        {
+            foreach (var container in containers.Containers.Values)
+            {
+                foreach (var contained in container.ContainedEntities)
+                {
+                    if (TryFindItemInInventory(contained, skillId, out foundItem))
+                        return true;
+                }
+            }
+        }
+
+        foundItem = default;
+        return false;
+    }
+
+    /// <summary>
+    ///     Получение доступных действий обучения
+    /// </summary>
+    private void OnGetTeachingVerbs(Entity<SimpleSkillComponent> entity, ref GetVerbsEvent<Verb> args)
+    {
+        var user = args.User;
+        var target = args.Target;
+
+        if (user == target)
+            return;
+
+        if (!TryComp<SimpleSkillComponent>(user, out var userSkills))
+            return;
+
+        var bookInHands = false;
+        string? availableSkill = null;
+        
+        foreach (var hand in _hands.EnumerateHeld(user))
+        {
+            if (TryComp<SimpleSkillBookComponent>(hand, out var book))
+            {
+                bookInHands = true;
+                availableSkill = book.TeachesSkill;
+                break;
+            }
+        }
+
+        if (!bookInHands || availableSkill == null)
+            return;
+
+        if (!userSkills.Skills.TryGetValue(availableSkill, out var known) || !known)
+            return;
+
+        if (HasSkill(target, availableSkill))
+            return;
+
+        var verb = new Verb
+        {
+            Text = Loc.GetString("skill-teach-verb", ("skill", GetSkillName(availableSkill))),
+            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/fold.svg.192dpi.png")),
+            Act = () => StartTeaching(user, target, availableSkill),
+            Priority = 1
+        };
+
+        args.Verbs.Add(verb);
+    }
+
+    /// <summary>
+    ///     Начать обучение навыку
+    /// </summary>
+    private void StartTeaching(EntityUid teacher, EntityUid student, string skillId)
+    {
+        if (!Transform(teacher).Coordinates.TryDistance(EntityManager, Transform(student).Coordinates, out var distance) || distance > 3f)
+        {
+            _popup.PopupEntity(Loc.GetString("skill-teach-too-far"), teacher, teacher);
+            return;
+        }
+
+        if (!HasSkill(teacher, skillId))
+        {
+            _popup.PopupEntity(Loc.GetString("skill-teach-not-known"), teacher, teacher);
+            return;
+        }
+
+        if (HasSkill(student, skillId))
+        {
+            _popup.PopupEntity(Loc.GetString("skill-teach-already-known"), teacher, teacher);
+            return;
+        }
+
+        if (!HasSkillBookInHands(teacher, skillId))
+        {
+            _popup.PopupEntity(Loc.GetString("skill-teach-no-book"), teacher, teacher);
+            return;
+        }
+
+        var teacherComp = EnsureComp<SkillTeacherComponent>(teacher);
+        teacherComp.SkillId = skillId;
+        teacherComp.Student = student;
+
+        var teachDoAfter = new DoAfterArgs(EntityManager, teacher, TimeSpan.FromSeconds(30), new SkillTeachDoAfterEvent(skillId, GetNetEntity(student)), teacher, target: student)
+        {
+            BreakOnMove = true,
+            BreakOnDamage = true,
+            RequireCanInteract = true,
+            CancelDuplicate = true,
+            DistanceThreshold = 3f
+        };
+
+        if (!_doAfter.TryStartDoAfter(teachDoAfter, out var doAfterId))
+        {
+            RemComp<SkillTeacherComponent>(teacher);
+            return;
+        }
+
+        teacherComp.DoAfterId = doAfterId?.Index;
+
+        _popup.PopupEntity(Loc.GetString("skill-teach-start-teacher", ("student", student), ("skill", GetSkillName(skillId))), teacher, teacher);
+        _popup.PopupEntity(Loc.GetString("skill-teach-start-student", ("teacher", teacher), ("skill", GetSkillName(skillId))), student, student);
+    }
+
+    /// <summary>
+    ///     Завершение обучения
+    /// </summary>
+    private void OnTeachDoAfter(EntityUid uid, SkillTeacherComponent component, SkillTeachDoAfterEvent args)
+    {
+        component.DoAfterId = null;
+
+        if (args.Cancelled || args.Handled)
+        {
+            _popup.PopupEntity(Loc.GetString("skill-teach-cancelled"), uid, uid);
+            RemComp<SkillTeacherComponent>(uid);
+            return;
+        }
+
+        var student = GetEntity(args.Student);
+
+        if (!Exists(student) || TerminatingOrDeleted(student))
+        {
+            RemComp<SkillTeacherComponent>(uid);
+            return;
+        }
+
+        AddSkill(student, component.SkillId);
+
+        _popup.PopupEntity(Loc.GetString("skill-teach-success-teacher", ("student", student), ("skill", GetSkillName(component.SkillId))), uid, uid);
+        _popup.PopupEntity(Loc.GetString("skill-teach-success-student", ("teacher", uid), ("skill", GetSkillName(component.SkillId))), student, student);
+
+        RemComp<SkillTeacherComponent>(uid);
+    }
+
+    /// <summary>
+    ///     Обработчик завершения DoAfter книги
+    /// </summary>
+    private void OnLearnDoAfter(EntityUid uid, SimpleSkillBookComponent component, SkillLearnDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+        {
+            if (component.SoundEnd != null)
+                _audio.PlayPvs(component.SoundEnd, uid);
+            else if (component.Sound != null)
+                _audio.PlayPvs(component.Sound, uid);
+
+            _popup.PopupEntity(Loc.GetString("skill-learn-cancelled"), args.User, args.User);
+            return;
+        }
+
+        var user = args.User;
+
+        if (HasSkill(user, component.TeachesSkill))
+        {
+            _popup.PopupEntity(Loc.GetString("skill-already-known"), user, user);
+            return;
+        }
+
+        AddSkill(user, component.TeachesSkill);
+
+        _popup.PopupEntity(Loc.GetString("skill-learn-success", ("skill", GetSkillName(component.TeachesSkill))), user, user);
+
+        if (component.SoundEnd != null)
+            _audio.PlayPvs(component.SoundEnd, uid);
+        else if (component.Sound != null)
+            _audio.PlayPvs(component.Sound, uid);
+        QueueDel(uid);
+    }
+
+    /// <summary>
+    ///     Обработчик отключения учителя
+    /// </summary>
+    private void OnTeacherShutdown(EntityUid uid, SkillTeacherComponent component, ComponentShutdown args)
+    {
+        if (component.Student != null && component.DoAfterId != null)
+        {
+            // Конвертируем uint в ushort для конструктора DoAfterId
+            var doAfterId = new DoAfterId(uid, (ushort)component.DoAfterId.Value);
+            _doAfter.Cancel(doAfterId);
+        }
+    }
 }
 
 /// <summary>
@@ -224,5 +465,17 @@ public sealed partial class SimpleSkillBookComponent : Component
     public string TeachesSkill = string.Empty;
     
     [DataField]
-    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_VG/SimplSkill/book1.ogg");
+    public SoundSpecifier? Sound; // звук начала изучения (для обратной совместимости)
+
+    [DataField]
+    public SoundSpecifier? SoundStart; // звук начала изучения (приоритетнее)
+
+    [DataField]
+    public SoundSpecifier? SoundEnd; // звук завершения/отмены
+
+    /// <summary>
+    ///     Время изучения из книги (в секундах) - не используется, оставлено для совместимости
+    /// </summary>
+    [DataField]
+    public float LearnTime = 360f;
 }

@@ -14,7 +14,8 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Piloting
-    sound: /Audio/_VG/SimplSkill/book1.ogg
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
 
 - type: entity
   parent: BaseItem
@@ -31,6 +32,8 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Engineering
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
 
 - type: entity
   parent: BaseItem
@@ -47,6 +50,8 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Medicine
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
 
 - type: entity
   parent: BaseItem
@@ -63,7 +68,8 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Weapons
-    sound: /Audio/_VG/SimplSkill/book1.ogg
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
 
 - type: entity
   parent: BaseItem
@@ -80,7 +86,8 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Anomalistic
-    sound: /Audio/_VG/SimplSkill/book1.ogg
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
 
 - type: entity
   parent: BaseItem
@@ -97,4 +104,5 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Xenoarchiology
-    sound: /Audio/_VG/SimplSkill/book1.ogg
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
