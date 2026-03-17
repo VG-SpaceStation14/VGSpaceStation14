@@ -17,9 +17,9 @@
   extendedAccess:
   - Atmospherics
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: EngineerSkills #VG-Tweak SkillsIntegration
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: EngineerSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: StationEngineerGear

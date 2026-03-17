@@ -14,11 +14,9 @@
   - Kitchen
   - Bar
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: BotanistSkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: FourTwenty
     prototype: CannabisSeeds

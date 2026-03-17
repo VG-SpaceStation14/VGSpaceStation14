@@ -10,6 +10,6 @@
   - External
   canBeAntag: false
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: AllSkills #VG-Tweak SkillsIntegration
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: AllSkills #VG-Tweak SkillsIntegration

@@ -19,10 +19,10 @@
   - Salvage
   - Maintenance
   - External
-
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: MinerSkills #VG-Tweak SkillsIntegration
+  
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: MinerSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: ADTMinerGear

@@ -35,11 +35,9 @@
   - Brig
   - Cryogenics
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: MedicalSkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: MedicalSkills #VG-Tweak SkillsIntegration
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial

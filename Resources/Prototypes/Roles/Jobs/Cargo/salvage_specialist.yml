@@ -24,9 +24,9 @@
   - Maintenance
   - External
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: SalvageSkills #VG-Tweak SkillsIntegration
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: SalvageSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: SalvageSpecialistGear

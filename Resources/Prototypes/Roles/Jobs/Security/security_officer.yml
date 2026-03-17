@@ -28,11 +28,9 @@
   - GenpopEnter
   - GenpopLeave
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: SecuritySkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: SecuritySkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   # ADT-Tweak-Start: добавляем выдачу компонента отметки персонала службы безопасности

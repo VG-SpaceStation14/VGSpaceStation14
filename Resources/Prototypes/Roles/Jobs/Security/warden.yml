@@ -34,11 +34,9 @@
   - GenpopEnter
   - GenpopLeave
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: SecuritySkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: SecuritySkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial # goobstation

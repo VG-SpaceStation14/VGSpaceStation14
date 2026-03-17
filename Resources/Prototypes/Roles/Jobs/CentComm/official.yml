@@ -18,11 +18,9 @@
   - CentralCommand
   # Start ADT Tweak
   
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: CommandSkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: CommandSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial # VG-MRP: Loyalty implant

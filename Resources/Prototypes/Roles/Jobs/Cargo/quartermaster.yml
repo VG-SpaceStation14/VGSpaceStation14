@@ -40,11 +40,9 @@
   - Brig
   - Cryogenics
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: BaseSkillsPiloting #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkillsPiloting #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial

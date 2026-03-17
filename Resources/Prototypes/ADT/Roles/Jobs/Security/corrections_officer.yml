@@ -25,11 +25,9 @@
   - External
   - Cryogenics
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: SecuritySkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BrigMedicalSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
 

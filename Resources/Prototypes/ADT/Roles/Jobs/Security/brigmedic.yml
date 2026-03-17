@@ -29,11 +29,9 @@
   extendedAccess: # VG-Tweak
   - Cryogenics
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: BrigMedicalSkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BrigMedicalSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
 

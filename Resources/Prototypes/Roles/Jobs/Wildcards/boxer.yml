@@ -10,11 +10,9 @@
   - Service
   - Maintenance
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: BaseSkills #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: BoxingDay
     prototype: ClothingHandsGlovesBoxingRigged

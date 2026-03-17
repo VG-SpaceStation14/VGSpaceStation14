@@ -15,11 +15,9 @@
   extendedAccess:
   - Salvage
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: BaseSkillsPiloting #VG-Tweak SkillsIntegration
-
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkillsPiloting #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: BoxingDay
     prototype: BoxCardboard

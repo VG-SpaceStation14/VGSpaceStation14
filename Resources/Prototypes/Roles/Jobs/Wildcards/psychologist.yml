@@ -17,9 +17,9 @@
   extendedAccess:
   - Chemistry
 
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: MedicalSkills #VG-Tweak SkillsIntegration
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: PsychologistGear

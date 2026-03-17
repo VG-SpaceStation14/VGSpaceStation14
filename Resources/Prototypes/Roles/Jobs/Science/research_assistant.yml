@@ -17,10 +17,10 @@
   access:
   - Research
   - Maintenance
-
-  components:
-  - type: SimpleSkillComponent
-    skillGroup: ScienceSkills #VG-Tweak SkillsIntegration
+  
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: ScienceSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: ResearchAssistantGear
