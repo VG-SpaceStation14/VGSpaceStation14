@@ -1,16 +1,17 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Utility;
 
 namespace Content.Shared._VG.SimpleSkills;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class SimpleSkillComponent : Component
 {
     /// <summary>
     ///     Словарь навыков: ID навыка -> есть/нет (true/false)
     /// </summary>
-    [DataField]
+    [DataField, AutoNetworkedField]
     public Dictionary<string, bool> Skills = new();
     
     /// <summary>
@@ -31,6 +32,9 @@ public sealed class SimpleSkillPrototype : IPrototype
 
     [DataField]
     public string Description = string.Empty;
+
+    [DataField]
+    public SpriteSpecifier? Icon;
 }
 
 /// <summary>

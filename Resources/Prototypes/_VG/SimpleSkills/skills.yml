@@ -3,28 +3,34 @@
   id: Piloting
   name: Пилотирование
   description: Позволяет управлять шаттлами
+  icon: /Textures/Interface/VerbIcons/anchor.svg.192dpi.png  # Временная иконка
 
 - type: simpleSkill
   id: Engineering
   name: Инженерия
   description: Позволяет строить и чинить
+  icon: /Textures/Interface/VerbIcons/screwdriver.png
 
 - type: simpleSkill
   id: Medicine
   name: Медицина
   description: Позволяет лечить сложные раны
+  icon: /Textures/Interface/VerbIcons/plus.svg.192dpi.png
 
 - type: simpleSkill
   id: Weapons
   name: Управление турелями
   description: Позволяет использовать сложное оружие
+  icon: /Textures/Interface/VerbIcons/vv.svg.192dpi.png
 
 - type: simpleSkill
   id: Anomalistic
   name: Аномалистика
   description: Позволяет использовать оборудование отдела аномалистики
+  icon: /Textures/Interface/VerbIcons/sentient.svg.192dpi.png
 
 - type: simpleSkill
   id: Xenoarchiology
   name: Ксеноархиология
   description: Позволяет использовать оборудование отдела ксеноархиологии
+  icon: /Textures/Interface/VerbIcons/sentient.svg.192dpi.png

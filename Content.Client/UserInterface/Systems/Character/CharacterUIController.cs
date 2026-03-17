@@ -21,6 +21,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static Content.Client.CharacterInfo.CharacterInfoSystem;
 using static Robust.Client.UserInterface.Controls.BaseButton;
+using Content.Client._VG.SimpleSkills; //VG-Tweak - Skills
+using Content.Client.Message; //VG-Tweak - Skills
 
 namespace Content.Client.UserInterface.Systems.Character;
 
@@ -33,6 +35,7 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
 
     [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
     [UISystemDependency] private readonly SpriteSystem _sprite = default!;
+    [UISystemDependency] private readonly SimpleSkillInfoSystem _skillInfo = default!; //VG-Tweak - Skills
 
     public override void Initialize()
     {
@@ -201,6 +204,8 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
         }
         //ADT-Economy-End
 
+        UpdateSkillsSection(data); //VG-Tweak - Skills
+
         if (briefing != null)
         {
             var briefingControl = new ObjectiveBriefingControl();
@@ -276,4 +281,45 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             _window.Open();
         }
     }
+    //VG-Tweak - Skills - Start
+    private void UpdateSkillsSection(CharacterData data)
+    {
+        if (_window == null)
+            return;
+
+        _window.SkillsContainer.RemoveAllChildren();
+
+        var headerLabel = new Label
+        {
+            Text = Loc.GetString("simple-skills-header"),
+            HorizontalAlignment = Control.HAlignment.Center,
+            Margin = new Thickness(0, 10, 0, 5),
+            StyleClasses = { "LabelHeading" }
+        };
+        _window.SkillsContainer.AddChild(headerLabel);
+
+        var knownSkills = _skillInfo.GetKnownSkills();
+
+        if (knownSkills.Count == 0)
+        {
+            var noSkillsLabel = new Label
+            {
+                Text = Loc.GetString("simple-skills-non"),
+                HorizontalAlignment = Control.HAlignment.Center,
+                FontColorOverride = Color.Gray,
+                Margin = new Thickness(0, 5, 0, 5)
+            };
+            _window.SkillsContainer.AddChild(noSkillsLabel);
+        }
+        else
+        {
+            foreach (var (proto, known) in knownSkills)
+            {
+                var entry = new SkillEntryControl();
+                entry.SetSkill(proto, known);
+                _window.SkillsContainer.AddChild(entry);
+            }
+        }
+    }
+    //VG-Tweak - Skills - End
 }

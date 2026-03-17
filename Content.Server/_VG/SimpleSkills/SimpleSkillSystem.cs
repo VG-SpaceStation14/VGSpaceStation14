@@ -158,13 +158,22 @@ public sealed class SimpleSkillSystem : EntitySystem
         }
 
         var skills = EnsureComp<SimpleSkillComponent>(uid);
-        
+    
+        // Если группа пустая - просто создаём компонент без навыков
+        if (group.Skills == null || group.Skills.Count == 0)
+        {
+            Logger.InfoS("simple.skills", $"Применена пустая группа {groupId} для {ToPrettyString(uid)}. Навыков не добавлено.");
+            return;
+        }
+
+        // Добавляем навыки из группы
         foreach (var skillId in group.Skills)
         {
             skills.Skills[skillId] = true;
+            Logger.InfoS("simple.skills", $"  Добавлен навык {skillId} = true");
         }
-        
-        Logger.InfoS("simple.skills", $"Применена группа {groupId} для {ToPrettyString(uid)}");
+    
+        Logger.InfoS("simple.skills", $"Применена группа {groupId} для {ToPrettyString(uid)}. Всего навыков: {skills.Skills.Count}");
     }
 
     /// <summary>
@@ -175,7 +184,15 @@ public sealed class SimpleSkillSystem : EntitySystem
         // Если указана группа, применяем её
         if (!string.IsNullOrEmpty(component.SkillGroup))
         {
-            ApplySkillGroup(uid, component.SkillGroup);
+            // Проверяем, есть ли уже навыки (чтобы не затереть)
+            if (component.Skills == null || component.Skills.Count == 0)
+            {
+                ApplySkillGroup(uid, component.SkillGroup);
+            }
+            else
+            {
+                Logger.InfoS("simple.skills", $"Компонент уже содержит навыки, группа {component.SkillGroup} не применяется");
+            }
         }
     }
 }

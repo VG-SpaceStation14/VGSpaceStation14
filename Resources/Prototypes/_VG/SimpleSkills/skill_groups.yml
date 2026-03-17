@@ -3,8 +3,7 @@
 - type: simpleSkillGroup
   id: BaseSkills
   name: Базовые навыки
-  skills:
-   - Weapons #не может быть пустым, пока что так.
+  skills: []
 
 - type: simpleSkillGroup
   id: BaseSkillsPiloting
