@@ -131,8 +131,11 @@ public sealed class SimpleSkillSystem : EntitySystem
     {
         var skills = EnsureComp<SimpleSkillComponent>(uid);
         skills.Skills[skillId] = true;
+
+        Dirty(uid, skills);
         
-        // Логируем
+        RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
+        
         Logger.InfoS("simple.skills", $"Добавлен навык {skillId} для {ToPrettyString(uid)}");
     }
 
@@ -172,7 +175,11 @@ public sealed class SimpleSkillSystem : EntitySystem
             skills.Skills[skillId] = true;
             Logger.InfoS("simple.skills", $"  Добавлен навык {skillId} = true");
         }
-    
+
+        Dirty(uid, skills);
+
+        RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
+        
         Logger.InfoS("simple.skills", $"Применена группа {groupId} для {ToPrettyString(uid)}. Всего навыков: {skills.Skills.Count}");
     }
 
@@ -217,5 +224,5 @@ public sealed partial class SimpleSkillBookComponent : Component
     public string TeachesSkill = string.Empty;
     
     [DataField]
-    public SoundSpecifier? Sound = new SoundPathSpecifier("Audio/_VG/SimplSkill/book1.ogg");
+    public SoundSpecifier? Sound = new SoundPathSpecifier("/Audio/_VG/SimplSkill/book1.ogg");
 }

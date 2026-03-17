@@ -14,7 +14,7 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Piloting
-    sound: /Audio/Effects/click.ogg
+    sound: /Audio/_VG/SimplSkill/book1.ogg
 
 - type: entity
   parent: BaseItem
@@ -63,7 +63,7 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Weapons
-    sound: /Audio/Effects/click.ogg
+    sound: /Audio/_VG/SimplSkill/book1.ogg
 
 - type: entity
   parent: BaseItem
@@ -80,7 +80,7 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Anomalistic
-    sound: /Audio/Effects/click.ogg
+    sound: /Audio/_VG/SimplSkill/book1.ogg
 
 - type: entity
   parent: BaseItem
@@ -97,4 +97,4 @@
   - type: Item
   - type: SimpleSkillBook
     teachesSkill: Xenoarchiology
-    sound: /Audio/Effects/click.ogg
+    sound: /Audio/_VG/SimplSkill/book1.ogg
