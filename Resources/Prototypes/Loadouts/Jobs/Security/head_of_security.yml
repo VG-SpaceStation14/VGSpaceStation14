@@ -61,7 +61,22 @@
   id: HeadofSecurityCloak
   equipment:
     neck: ClothingNeckCloakHos
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: HeadofSecurityLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakHOS
 
+- type: loadout
+  id: CloakHosOriginal
+  equipment:
+    neck: ClothingNeckCloakHosOriginal
+
+- type: loadout
+  id: CloakHosAlt
+  equipment:
+    neck: ClothingNeckCloakHosAlt
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: HeadofSecurityMantle
   equipment:

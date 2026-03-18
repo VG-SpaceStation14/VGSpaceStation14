@@ -50,7 +50,17 @@
   id: QuartermasterCloak
   equipment:
     neck: ClothingNeckCloakQm
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: QuartermasterLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakQM
 
+- type: loadout
+  id: CloakQmAlt
+  equipment:
+    neck: ClothingNeckCloakQmAlt
+#VG-Tweak - Start - LoadoutsRework
 - type: loadout
   id: QuartermasterMantle
   equipment:

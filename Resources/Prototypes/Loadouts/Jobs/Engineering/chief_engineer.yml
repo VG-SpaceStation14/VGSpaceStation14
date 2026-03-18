@@ -45,7 +45,12 @@
   id: ChiefEngineerCloak
   equipment:
     neck: ClothingNeckCloakCe
-
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: ChiefEngineerLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakCE
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: ChiefEngineerMantle
   equipment:

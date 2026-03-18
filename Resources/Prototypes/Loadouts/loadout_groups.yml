@@ -176,6 +176,8 @@
   loadouts:
   - CaptainCloak
   - CaptainCloakFormal
+  - CaptainLongCloak #VG-Tweak - LoadoutsRework
+  - CloakCapFormalAlt #VG-Tweak - LoadoutsRework
   - ADTClothingCaptainShoulderNeck # ADT Loadout
   - CaptainMantle
   - ADTClothingAdmiralShoulder # ADT Loadout
@@ -237,6 +239,7 @@
   loadouts:
   - HoPCloak
   - HoPMantle
+  - HoPLongCloak #VG-Tweak - Start - LoadoutsRework 
   # ADT-Loadouts-Start
   - ADTHoPAltCloak
   # ADT-Loadouts-End
@@ -935,6 +938,8 @@
   loadouts:
   - QuartermasterCloak
   - QuartermasterMantle
+  - QuartermasterLongCloak #VG-Tweak - LoadoutsRework
+  - CloakQmAlt #VG-Tweak - LoadoutsRework
 
 - type: loadoutGroup
   id: QuartermasterOuterClothing
@@ -1098,6 +1103,7 @@
   loadouts:
   - ChiefEngineerCloak
   - ChiefEngineerMantle
+  - ChiefEngineerLongCloak #VG-Tweak - LoadoutsRework
 
 - type: loadoutGroup
   id: ChiefEngineerOuterClothing
@@ -1293,6 +1299,8 @@
   loadouts:
   - ResearchDirectorMantle
   - ResearchDirectorCloak
+  - ResearchDirectorLongCloak #VG-Tweak - LoadoutsRework
+  - CloakRdAltм #VG-Tweak - LoadoutsRework
 
 - type: loadoutGroup
   id: ResearchDirectorJumpsuit
@@ -1477,6 +1485,9 @@
   loadouts:
   - HeadofSecurityCloak
   - HeadofSecurityMantle
+  - HeadofSecurityLongCloak #VG-Tweak - LoadoutsRework
+  - CloakHosOriginal #VG-Tweak - LoadoutsRework
+  - CloakHosAlt #VG-Tweak - LoadoutsRework
   # ADT-Loadout-Start
   - HeadOfSecurityWhistle
   - HeadofSecurityMantleShoulder
@@ -1745,6 +1756,9 @@
   loadouts:
   - ChiefMedicalOfficerCloak
   - ChiefMedicalOfficerMantle
+  - ChiefMedicalOfficerLongCloak #VG-Tweak - LoadoutsRework
+  - CloakCmoAlt #VG-Tweak - LoadoutsRework
+  - CloakCmoTurquoise #VG-Tweak - LoadoutsRework
 
 - type: loadoutGroup
   id: ChiefMedicalOfficerShoes

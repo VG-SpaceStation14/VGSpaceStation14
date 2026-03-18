@@ -45,7 +45,22 @@
   id: ChiefMedicalOfficerCloak
   equipment:
     neck: ClothingCloakCmo
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: ChiefMedicalOfficerLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakCMO
 
+- type: loadout
+  id: CloakCmoAlt
+  equipment:
+    neck: ClothingNeckCloakCmoAlt
+
+- type: loadout
+  id: CloakCmoTurquoise
+  equipment:
+    neck: ClothingNeckCloakCmoTurquoise
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: ChiefMedicalOfficerMantle
   equipment:

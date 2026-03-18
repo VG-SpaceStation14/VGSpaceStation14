@@ -45,7 +45,17 @@
   id: CaptainCloak
   equipment:
     neck: ClothingNeckCloakCap
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: CaptainLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakCap
 
+- type: loadout
+  id: CloakCapFormalAlt
+  equipment:
+    neck: ClothingNeckCloakCapFormalAlt
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: CaptainCloakFormal
   equipment:

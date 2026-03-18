@@ -40,7 +40,12 @@
   id: HoPCloak
   equipment:
     neck: ClothingNeckCloakHop
-
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: HoPLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakHOP
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: HoPMantle
   equipment:
