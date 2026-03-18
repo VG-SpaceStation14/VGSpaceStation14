@@ -881,13 +881,20 @@
   minLimit: 0
   maxLimit: 1
   loadouts:
-  - ADTNeckSalvageCCape
-  - ADTNeckSalvageSCape
-  - ADTNeckSalvageGCape
-  - ADTNeckSalvagePCape
-  - ADTNeckSalvageECape
   - ADTNeckSalvageDCape
-  - ADTNeckSalvageRCape
+  - GoliathCloak
+
+#VG-Tweak - Start - LoadoutRework
+# Утиль пояса
+- type: loadoutGroup
+  id: VGSalvageBelt 
+  name: loadout-salvage-specialist-belt-vg
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - SalvageWebbing
+  - ToolbeltEmpty
+#VG-Tweak - End - LoadoutRework
 
 - type: loadoutGroup
   id: ADTMinerOuterClothing

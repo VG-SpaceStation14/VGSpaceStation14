@@ -60,6 +60,8 @@
   id: CloakQmAlt
   equipment:
     neck: ClothingNeckCloakQmAlt
+  effects:
+  - !type:SponsorLoadoutEffect
 #VG-Tweak - Start - LoadoutsRework
 - type: loadout
   id: QuartermasterMantle

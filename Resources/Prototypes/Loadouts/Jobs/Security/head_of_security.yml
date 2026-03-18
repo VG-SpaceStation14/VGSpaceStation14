@@ -76,6 +76,8 @@
   id: CloakHosAlt
   equipment:
     neck: ClothingNeckCloakHosAlt
+  effects:
+  - !type:SponsorLoadoutEffect
 #VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: HeadofSecurityMantle

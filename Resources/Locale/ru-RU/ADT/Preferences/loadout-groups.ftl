@@ -48,6 +48,7 @@ loadout-group-quartermaster-id-adt = Квартирмейстер, ID
 loadout-quartermaster-ears-adt = Квартирмейстер, ухо
 loadout-salvage-specialist-jumpsuit-adt = Утилизатор, комбинезон
 loadout-salvage-specialist-neck-adt = Утилизатор, шея
+loadout-salvage-specialist-belt-vg = Утилизатор, пояс
 loadout-salvage-specialist-ears-adt = Утилизатор, ухо
 loadout-group-salvage-id-adt = Утилизатор, ID
 loadout-group-cargo-id-adt = Грузчик, ID

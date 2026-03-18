@@ -43,6 +43,8 @@
   id: CloakRdAltм
   equipment:
     neck: ClothingNeckCloakRdAlt
+  effects:
+  - !type:SponsorLoadoutEffect
 #VG-Tweak - End - LoadoutsRework
 # Jumpsuit
 - type: loadout

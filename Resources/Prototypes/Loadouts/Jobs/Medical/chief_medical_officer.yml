@@ -55,11 +55,15 @@
   id: CloakCmoAlt
   equipment:
     neck: ClothingNeckCloakCmoAlt
+  effects:
+  - !type:SponsorLoadoutEffect
 
 - type: loadout
   id: CloakCmoTurquoise
   equipment:
     neck: ClothingNeckCloakCmoTurquoise
+  effects:
+  - !type:SponsorLoadoutEffect
 #VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: ChiefMedicalOfficerMantle

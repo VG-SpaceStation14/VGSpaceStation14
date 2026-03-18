@@ -55,6 +55,8 @@
   id: CloakCapFormalAlt
   equipment:
     neck: ClothingNeckCloakCapFormalAlt
+  effects:
+  - !type:SponsorLoadoutEffect
 #VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: CaptainCloakFormal
