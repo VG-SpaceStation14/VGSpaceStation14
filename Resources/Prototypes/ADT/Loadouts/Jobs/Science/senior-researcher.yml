@@ -5,6 +5,13 @@
   equipment:
     head: ClothingHeadHatBeretRND
 
+# Neack
+
+- type: loadout
+  id: ClothingNeckCloakRdOriginal
+  equipment:
+    neck: ClothingNeckCloakRdOriginal
+
 # Jumpsuit
 
 - type: loadout

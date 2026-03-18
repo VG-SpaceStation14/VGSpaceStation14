@@ -363,6 +363,13 @@
   - SeniorResearcherBeret
 
 - type: loadoutGroup
+  id: SeniorResearcherNeack
+  name: loadout-group-senior-researcher-neack
+  minLimit: 0
+  loadouts:
+  - ClothingNeckCloakRdOriginal
+
+- type: loadoutGroup
   id: ADTSeniorResearcherJumpsuit
   name: loadout-group-senior-researcher-jumpsuit
   minLimit: 1
