@@ -15,9 +15,9 @@ public sealed partial class SkillTeacherComponent : Component
     public EntityUid? Student;
 
     /// <summary>
-    ///     Книга, используемая для обучения (должна быть в руках)
+    ///     Книга, которую учитель держит в руках
     /// </summary>
-    public EntityUid? Book;
+    public EntityUid Book;
 
     /// <summary>
     ///     ID DoAfter для обучения (индекс)

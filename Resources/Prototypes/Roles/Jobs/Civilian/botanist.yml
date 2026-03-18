@@ -16,7 +16,7 @@
 
   special:
   - !type:AddSkillGroupSpecial 
-    group: BaseSkills #VG-Tweak SkillsIntegration
+    group: BotanistSkills #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: FourTwenty
     prototype: CannabisSeeds

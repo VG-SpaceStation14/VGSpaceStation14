@@ -397,6 +397,8 @@
     tags:
     - ADTRoboticsAmbience
   # ADT-Sound-Update-End
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Robotech
 
 - type: entity
   id: Biofabricator
@@ -670,6 +672,8 @@
     emagStaticPacks:
     - BioGenEmagStatic
     - HostileCubesStatic
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Botanika
 
 - type: entity
   parent: BaseLathe

@@ -34,3 +34,15 @@
   name: Ксеноархиология
   description: Позволяет использовать оборудование отдела ксеноархиологии
   icon: /Textures/Interface/VerbIcons/sentient.svg.192dpi.png
+
+- type: simpleSkill
+  id: Robotech
+  name: Робототехника
+  description: Позволяет использовать оборудование отдела робототехники
+  icon: /Textures/Interface/VerbIcons/settings.svg.192dpi.png
+
+- type: simpleSkill
+  id: Botanika
+  name: Ботаника
+  description: Позволяет использовать ботаничекое оборудование
+  icon: /Textures/Interface/VerbIcons/spill.svg.192dpi.png

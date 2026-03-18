@@ -31,6 +31,7 @@
     - Anomalistic
     - Xenoarchiology
     - Engineering
+    - Robotech
     - Medicin
 
 - type: simpleSkillGroup
@@ -107,7 +108,7 @@
   id: BotanistSkills
   name: Навыки ботаника
   skills:
-    - Engineering  # Позже добавлю его собственный скилл, а пока он мамкин инжииииииинееееер
+    - Botanika 
 
 - type: simpleSkillGroup
   id: AllSkills

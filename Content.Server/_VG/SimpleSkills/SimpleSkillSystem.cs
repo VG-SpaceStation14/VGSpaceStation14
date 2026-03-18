@@ -59,6 +59,19 @@ public sealed class SimpleSkillSystem : EntitySystem
     }
 
     /// <summary>
+    ///     Получение книги навыка из рук
+    /// </summary>
+    private EntityUid? GetSkillBookInHands(EntityUid user, string skillId)
+    {
+        foreach (var hand in _hands.EnumerateHeld(user))
+        {
+            if (TryComp<SimpleSkillBookComponent>(hand, out var book) && book.TeachesSkill == skillId)
+                return hand;
+        }
+        return null;
+    }
+
+    /// <summary>
     ///     Проверка навыков при попытке взаимодействия (срабатывает ДО открытия интерфейса)
     /// </summary>
     private void OnBeforeInteract(EntityUid uid, SimpleSkillRequiredComponent component, BeforeRangedInteractEvent args)
@@ -335,7 +348,8 @@ public sealed class SimpleSkillSystem : EntitySystem
             return;
         }
 
-        if (!HasSkillBookInHands(teacher, skillId))
+        var book = GetSkillBookInHands(teacher, skillId);
+        if (book == null)
         {
             _popup.PopupEntity(Loc.GetString("skill-teach-no-book"), teacher, teacher);
             return;
@@ -344,6 +358,15 @@ public sealed class SimpleSkillSystem : EntitySystem
         var teacherComp = EnsureComp<SkillTeacherComponent>(teacher);
         teacherComp.SkillId = skillId;
         teacherComp.Student = student;
+        teacherComp.Book = book.Value;
+
+        if (TryComp<SimpleSkillBookComponent>(book.Value, out var bookComp))
+        {
+            if (bookComp.SoundStart != null)
+                _audio.PlayPvs(bookComp.SoundStart, book.Value);
+            else if (bookComp.Sound != null)
+                _audio.PlayPvs(bookComp.Sound, book.Value);
+        }
 
         var teachDoAfter = new DoAfterArgs(EntityManager, teacher, TimeSpan.FromSeconds(30), new SkillTeachDoAfterEvent(skillId, GetNetEntity(student)), teacher, target: student)
         {
@@ -372,6 +395,14 @@ public sealed class SimpleSkillSystem : EntitySystem
     private void OnTeachDoAfter(EntityUid uid, SkillTeacherComponent component, SkillTeachDoAfterEvent args)
     {
         component.DoAfterId = null;
+
+        if (TryComp<SimpleSkillBookComponent>(component.Book, out var bookComp))
+        {
+            if (bookComp.SoundEnd != null)
+                _audio.PlayPvs(bookComp.SoundEnd, component.Book);
+            else if (bookComp.Sound != null)
+                _audio.PlayPvs(bookComp.Sound, component.Book);
+        }
 
         if (args.Cancelled || args.Handled)
         {
@@ -428,6 +459,7 @@ public sealed class SimpleSkillSystem : EntitySystem
             _audio.PlayPvs(component.SoundEnd, uid);
         else if (component.Sound != null)
             _audio.PlayPvs(component.Sound, uid);
+            
         QueueDel(uid);
     }
 

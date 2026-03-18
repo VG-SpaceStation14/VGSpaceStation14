@@ -106,3 +106,39 @@
     teachesSkill: Xenoarchiology
     soundStart: /Audio/_VG/SimplSkill/book1.ogg
     soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookRobotech
+  name: книга робототехники
+  description: Обучает работе с оборудованием робототехников
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#c10606"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Robotech
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookBotanika
+  name: книга ботаники
+  description: Обучает работе с ботаническим оборудованием
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#07921e"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Botanika
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg

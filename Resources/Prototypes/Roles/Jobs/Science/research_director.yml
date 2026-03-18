@@ -31,7 +31,7 @@
 
   special:
   - !type:AddSkillGroupSpecial 
-    group: ScienceSkills #VG-Tweak SkillsIntegration
+    group: RoboticistSkills #VG-Tweak SkillsIntegration
 #  - !type:AddImplantSpecial # Ganimed-MRP
 #    implants: [ MindShieldImplant ] # Ganimed-MRP
   - !type:AddComponentSpecial

@@ -375,3 +375,5 @@
       board: !type:Container
       SeedSlotId: !type:ContainerSlot
       DnaDiskSlotId: !type:ContainerSlot
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Botanika
