@@ -17,7 +17,10 @@
   access:
   - CentralCommand
   # Start ADT Tweak
+  
   special:
+  - !type:AddSkillGroupSpecial 
+    group: CommandSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial # VG-MRP: Loyalty implant

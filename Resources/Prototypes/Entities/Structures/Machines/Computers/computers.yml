@@ -90,6 +90,8 @@
     guides:
     - AtmosphericNetworkMonitor
     - DeviceMonitoringAndControl
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 - type: entity
   parent: BaseComputer
@@ -242,6 +244,8 @@
     board: CargoShuttleConsoleCircuitboard
   - type: StealTarget
     stealGroup: CargoShuttleConsoleCircuitboard
+  - type: SimpleSkillRequired
+    requiredSkill: Piloting #VG-Skillsntegration
 
 - type: entity
   parent: BaseComputerAiAccess
@@ -338,6 +342,8 @@
       enum.WiresUiKey.Key:
         type: WiresBoundUserInterface
   - type: StationAiWhitelist #ADT-Tweak
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 - type: entity
   parent: BaseComputerAiAccess
@@ -568,6 +574,8 @@
     guides:
     - AnalysisConsole
   - type: StationAiWhitelist #ADT-Tweak
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Xenoarchiology 
 
 - type: entity
   parent: BaseComputerAiAccess
@@ -828,6 +836,8 @@
     - SolarPanels
     - Power
   - type: StationAiWhitelist #ADT-Tweak
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 - type: entity
   parent: BaseComputerAiAccess
@@ -1567,6 +1577,8 @@
     access: [["ResearchDirector"]]
   - type: Lock
     unlockOnClick: false
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Robotech
 
 - type: entity
   parent: BaseComputer

@@ -79,6 +79,8 @@
     color: "#a8ffd9"
   - type: StaticPrice
     price: 5000
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 - type: entity
   id: GravityGeneratorMini
@@ -139,3 +141,5 @@
     lightRadiusMax: 2.5
   - type: StaticPrice
     price: 2000
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering

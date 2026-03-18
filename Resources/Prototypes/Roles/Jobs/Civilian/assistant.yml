@@ -8,6 +8,9 @@
   supervisors: job-supervisors-everyone
   access:
   - Maintenance
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: PassengerGear

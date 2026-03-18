@@ -14,3 +14,7 @@
   extendedAccess:
   - External
   - Maintenance # Corvax-MRP
+
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration

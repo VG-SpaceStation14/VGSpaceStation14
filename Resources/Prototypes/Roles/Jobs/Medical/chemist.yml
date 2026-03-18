@@ -15,6 +15,10 @@
   - Chemistry
   - Maintenance
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: MedicalSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: ChemistGear
   equipment:

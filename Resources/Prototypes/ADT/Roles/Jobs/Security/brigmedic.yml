@@ -28,7 +28,10 @@
   - External
   extendedAccess: # VG-Tweak
   - Cryogenics
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BrigMedicalSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
 

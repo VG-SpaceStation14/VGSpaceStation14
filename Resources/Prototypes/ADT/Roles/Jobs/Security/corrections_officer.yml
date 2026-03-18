@@ -24,7 +24,10 @@
   - Service
   - External
   - Cryogenics
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BrigMedicalSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
 

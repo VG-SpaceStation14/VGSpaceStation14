@@ -33,7 +33,10 @@
   - Cryogenics
   - GenpopEnter
   - GenpopLeave
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: SecuritySkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial # goobstation

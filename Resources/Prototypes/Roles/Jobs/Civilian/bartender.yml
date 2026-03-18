@@ -17,6 +17,9 @@
   extendedAccess:
   - Kitchen
   - Hydroponics
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: BartenderGear

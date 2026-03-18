@@ -17,6 +17,10 @@
   access:
   - Research
   - Maintenance
+  
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: ScienceSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: ResearchAssistantGear

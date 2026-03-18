@@ -24,6 +24,10 @@
   - Maintenance
   - External
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: SalvageSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: SalvageSpecialistGear
   equipment:

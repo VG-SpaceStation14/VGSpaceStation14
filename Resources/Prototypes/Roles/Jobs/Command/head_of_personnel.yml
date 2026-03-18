@@ -69,7 +69,10 @@
   - Cargo
   - Atmospherics
   - Medical
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkillsPiloting #VG-Tweak SkillsIntegration
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial

@@ -114,6 +114,8 @@
     requirePower: true
     highVoltageNode: input
     mediumVoltageNode: ame
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering 
 
 - type: entity
   categories: [ HideSpawnMenu ]

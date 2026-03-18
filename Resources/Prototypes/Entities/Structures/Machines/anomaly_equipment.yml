@@ -87,6 +87,8 @@
   - type: GuideHelp
     guides:
     - ScannersAndVessels
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Anomalistic
 
 - type: entity
   id: MachineAnomalyVesselExperimental
@@ -113,6 +115,8 @@
     intensitySlope: 7.5
     totalIntensity: 500
     canCreateVacuum: true
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Anomalistic
 
 - type: entity
   id: MachineAPE
@@ -218,6 +222,8 @@
       - SetParticleZeta
       - SetParticleSigma
   - type: StationAiWhitelist # ADT tweak
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Anomalistic 
 
 - type: entity
   id: MachineAnomalyGenerator
@@ -330,3 +336,5 @@
   - type: GuideHelp
     guides:
     - AnomalousResearch
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Anomalistic

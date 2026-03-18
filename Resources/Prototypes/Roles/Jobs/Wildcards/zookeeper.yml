@@ -9,7 +9,10 @@
   access:
   - Service
   - Maintenance
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: MonkeyDay
     prototype: MonkeyCubeBox

@@ -17,6 +17,10 @@
   extendedAccess:
   - Chemistry
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: PsychologistGear
   equipment:

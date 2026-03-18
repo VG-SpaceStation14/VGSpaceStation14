@@ -16,7 +16,10 @@
   - AllAccess
   access:
   - CentralCommand
+  
   special:
+  - !type:AddSkillGroupSpecial 
+    group: CommandSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]
 

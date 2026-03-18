@@ -23,6 +23,10 @@
   - External
   - Atmospherics
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: EngineerSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: SeniorEngineerGear
   equipment:

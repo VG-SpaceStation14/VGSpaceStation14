@@ -140,6 +140,8 @@
     requirePower: true
     highVoltageNode: input
     mediumVoltageNode: output
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 # Compact Wall Substation Base
 - type: entity
@@ -252,6 +254,8 @@
       board: !type:Container
       manipulator: !type:Container
       powercell: !type:Container
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
       # Construction Frame
 - type: entity

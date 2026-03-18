@@ -16,7 +16,10 @@
   - Engineering
   - External
   - Atmospherics
+  
   special:
+  - !type:AddSkillGroupSpecial 
+    group: AtmosphericsSkills #VG-Tweak SkillsIntegration
   - !type:GiveItemOnHolidaySpecial
     holiday: FirefighterDay
     prototype: FireAxe

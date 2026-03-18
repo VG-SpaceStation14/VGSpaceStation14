@@ -22,6 +22,10 @@
   - Maintenance
   - Chemistry
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: MedicalSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: SeniorPhysicianGear
   equipment:

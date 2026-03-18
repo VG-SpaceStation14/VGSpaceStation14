@@ -27,6 +27,10 @@
   - Engineering
   - External
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: EngineerSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: TechnicalAssistantGear
   equipment:

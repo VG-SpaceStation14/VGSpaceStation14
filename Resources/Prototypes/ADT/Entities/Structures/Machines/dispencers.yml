@@ -119,6 +119,8 @@
       Ephedrine: 10
       ADTMorphine: 3
   - type: Appearance
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Medicine
 
 #для базы нюкеров только
 - type: entity

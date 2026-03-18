@@ -27,7 +27,10 @@
   - Cryogenics
   - GenpopEnter
   - GenpopLeave
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: SecuritySkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   # ADT-Tweak-Start: добавляем выдачу компонента отметки персонала службы безопасности

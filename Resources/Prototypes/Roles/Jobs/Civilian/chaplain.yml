@@ -9,7 +9,10 @@
   access:
   - Chapel
   - Maintenance
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BaseSkills #VG-Tweak SkillsIntegration
   - !type:AddComponentSpecial
     components:
     - type: Chaplain  # ADT Chaplain

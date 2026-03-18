@@ -13,6 +13,10 @@
   access:
   - Research
   - Maintenance
+  
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: RoboticistSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: ADTRoboticistGear

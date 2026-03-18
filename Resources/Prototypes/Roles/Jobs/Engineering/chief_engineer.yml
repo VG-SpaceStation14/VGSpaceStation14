@@ -39,7 +39,10 @@
   - Atmospherics
   - Brig
   - Cryogenics
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: EngineerSkills #VG-Tweak SkillsIntegration
 #  - !type:AddImplantSpecial # VG-MRP
 #    implants: [ MindShieldImplant ] # VG-MRP
   - !type:AddComponentSpecial

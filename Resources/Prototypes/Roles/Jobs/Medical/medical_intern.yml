@@ -18,6 +18,10 @@
   - Medical
   - Maintenance
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: MedicalSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: MedicalInternGear
   equipment:

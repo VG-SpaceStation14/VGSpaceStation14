@@ -17,6 +17,10 @@
   extendedAccess:
   - Atmospherics
 
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: EngineerSkills #VG-Tweak SkillsIntegration
+
 - type: startingGear
   id: StationEngineerGear
   equipment:

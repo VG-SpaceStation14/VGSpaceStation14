@@ -10,3 +10,7 @@
   - Maintenance
   - External
   canBeAntag: false
+
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: AllSkills #VG-Tweak SkillsIntegration

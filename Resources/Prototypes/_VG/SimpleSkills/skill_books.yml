@@ -1,0 +1,144 @@
+# Книги навыков
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookPiloting
+  name: книга пилотирования
+  description: Обучает управлению шаттлом
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#2d3a7e"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Piloting
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookEngineering
+  name: книга инженерии
+  description: Обучает инженерному делу
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#bfa14a"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Engineering
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookMedicine
+  name: книга медицины
+  description: Обучает медицине
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#3a6e6e"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Medicine
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookWeapons
+  name: книга управления турелями
+  description: Обучает работе с турелями и оружейными системами
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_strong
+      color: "#8b0000"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Weapons
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookAnomalistic
+  name: книга аномалистики
+  description: Обучает работе с аномалиями и артефактами
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#9400d3"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Anomalistic
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookXenoarchiology
+  name: книга ксеноархиологии
+  description: Обучает работе с древними артефактами и раскопками
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_old
+      color: "#8b4513"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Xenoarchiology
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookRobotech
+  name: книга робототехники
+  description: Обучает работе с оборудованием робототехников
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#c10606"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Robotech
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg
+
+- type: entity
+  parent: BaseItem
+  id: SimpleSkillBookBotanika
+  name: книга ботаники
+  description: Обучает работе с ботаническим оборудованием
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#07921e"
+  - type: Item
+  - type: SimpleSkillBook
+    teachesSkill: Botanika
+    soundStart: /Audio/_VG/SimplSkill/book1.ogg
+    soundEnd: /Audio/_VG/SimplSkill/book2.ogg

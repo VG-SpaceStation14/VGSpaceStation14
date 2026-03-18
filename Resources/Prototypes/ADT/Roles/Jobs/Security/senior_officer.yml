@@ -38,7 +38,10 @@
   - Cryogenics
   extendedAccess: # VG-Tweak
   - Detective
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: BrigMedicalSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
 

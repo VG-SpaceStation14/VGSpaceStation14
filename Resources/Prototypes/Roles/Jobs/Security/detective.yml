@@ -31,7 +31,10 @@
   - External
   - GenpopEnter
   - GenpopLeave
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: SecuritySkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   # ADT-Tweak-Start: добавляем SecurityStaff для детектива

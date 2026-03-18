@@ -48,7 +48,10 @@
     - Engineering
     - Cargo
     - BlueShield
+
   special:
+  - !type:AddSkillGroupSpecial 
+    group: CommandSkills #VG-Tweak SkillsIntegration
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
   - !type:AddComponentSpecial
