@@ -10,7 +10,34 @@
       time: 18000 #5 часов
 
 - type: loadoutEffectGroup
-  id: ADTMinerEmeraldCape60hour
+  id: ADTSalvageSilverCape5hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 18000 #5 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageGoldenCape15hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 54000 #15 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvagePlatinumCape30hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 108000 #30 часов
+
+- type: loadoutEffectGroup
+  id: ADTSalvageEmeraldCape60hour
   effects:
   - !type:JobRequirementLoadoutEffect
     requirement:
@@ -27,6 +54,15 @@
       role: JobSalvageSpecialist
       time: 360000 #100 часов
 
+- type: loadoutEffectGroup
+  id: ADTSalvageRubieCape300hour
+  effects:
+  - !type:JobRequirementLoadoutEffect
+    requirement:
+      !type:RoleTimeRequirement
+      role: JobSalvageSpecialist
+      time: 1080000 #300 часов
+      
 # Наборы плащей для SalvageSpecialist (с эффектами)
 
 - type: loadout
