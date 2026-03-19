@@ -46,8 +46,12 @@
   id: ADTClothingUniformJumpsuitTuxedoRed
   equipment:
     jumpsuit: ADTClothingUniformJumpsuitTuxedoRed
+  effects:
+    - !type:SponsorLoadoutEffect
 
 - type: loadout
   id: ADTClothingUniformJumpsuitTuxedoHell
   equipment:
     jumpsuit: ADTClothingUniformJumpsuitTuxedoHell
+  effects:
+    - !type:SponsorLoadoutEffect

@@ -50,6 +50,8 @@
   id: CaptainLongCloak
   equipment:
     neck: ClothingNeckLongCloakCap
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: CloakCapFormalAlt

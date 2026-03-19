@@ -34,42 +34,58 @@
   id: ADTClothingBackpackBlackLadySatchel
   equipment:
     back: ADTClothingBackpackBlackLadySatchel
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: ADTClothingBackpackLeatherLadySatchel
   equipment:
     back: ADTClothingBackpackLeatherLadySatchel
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 # Jumpsuit
 - type: loadout
   id: ADTClothingUniformJumpsuitTurtleneckPink
   equipment:
     jumpsuit: ADTClothingUniformJumpsuitTurtleneckPink
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: ADTClothingUniformJumpskirtTurtleneckPink
   equipment:
     jumpsuit: ADTClothingUniformJumpskirtTurtleneckPink
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsorss
 
 - type: loadout
   id: ADTClothingUniformJumpsuitHawaiRed
   equipment:
     jumpsuit: ClothingUniformJumpsuitHawaiRed
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
   
 - type: loadout
   id: ADTClothingUniformJumpsuitHawaiBlue
   equipment:
     jumpsuit: ClothingUniformJumpsuitHawaiBlue
+  effects:
+      - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: ADTClothingUniformJumpsuitHawaiYellow
   equipment:
     jumpsuit: ClothingUniformJumpsuitHawaiYellow
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: ADTClothingUniformJumpsuitHawaiBlack
   equipment:
     jumpsuit: ClothingUniformJumpsuitHawaiBlack
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 # Outerclothing
 - type: loadout

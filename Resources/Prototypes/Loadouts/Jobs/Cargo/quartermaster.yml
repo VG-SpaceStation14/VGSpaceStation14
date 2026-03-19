@@ -55,6 +55,8 @@
   id: QuartermasterLongCloak
   equipment:
     neck: ClothingNeckLongCloakQM
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: CloakQmAlt

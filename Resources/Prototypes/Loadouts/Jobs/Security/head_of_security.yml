@@ -66,11 +66,15 @@
   id: HeadofSecurityLongCloak
   equipment:
     neck: ClothingNeckLongCloakHOS
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: CloakHosOriginal
   equipment:
     neck: ClothingNeckCloakHosOriginal
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: CloakHosAlt

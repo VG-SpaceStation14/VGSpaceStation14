@@ -38,6 +38,8 @@
   id: ResearchDirectorLongCloak
   equipment:
     neck: ClothingNeckLongCloakRD
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
 - type: loadout
   id: CloakRdAltм

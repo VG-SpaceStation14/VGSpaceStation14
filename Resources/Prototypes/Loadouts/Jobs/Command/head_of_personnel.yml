@@ -45,6 +45,8 @@
   id: HoPLongCloak
   equipment:
     neck: ClothingNeckLongCloakHOP
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 #VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: HoPMantle

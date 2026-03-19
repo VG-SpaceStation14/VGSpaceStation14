@@ -50,6 +50,8 @@
   id: ChiefEngineerLongCloak
   equipment:
     neck: ClothingNeckLongCloakCE
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 #VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: ChiefEngineerMantle
