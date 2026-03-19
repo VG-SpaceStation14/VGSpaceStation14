@@ -14,7 +14,7 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Content.Shared.Roles;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Robust.Shared.Random;
 
 namespace Content.Client.ADT.Lobby.UI;

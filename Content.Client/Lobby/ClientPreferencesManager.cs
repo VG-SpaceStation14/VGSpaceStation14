@@ -1,6 +1,6 @@
 using System.Linq;
 using Content.Shared.Construction.Prototypes;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Content.Shared.Preferences;
 using Robust.Client;
 using Robust.Client.Player;

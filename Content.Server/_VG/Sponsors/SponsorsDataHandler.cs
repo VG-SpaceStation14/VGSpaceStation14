@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using Robust.Shared.Network;
 
-namespace Content.Server.Corvax.Sponsors;
+namespace Content.Server._VG.Sponsors;
 
 public sealed class SponsorsDataHandler
 {

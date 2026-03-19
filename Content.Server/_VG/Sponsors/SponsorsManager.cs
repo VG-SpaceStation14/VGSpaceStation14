@@ -1,9 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// Based on Corvax Sponsors system
+
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Content.Server.ADT.SponsorLoadout;
 using Content.Server.Database;
-using Content.Shared.Corvax.Sponsors;
+using Content.Shared._VG.Sponsors;
 using Content.Shared.Roles;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -11,7 +13,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Server.Corvax.Sponsors;
+namespace Content.Server._VG.Sponsors;
 
 public sealed class SponsorsManager : ISponsorsManager
 {
@@ -24,12 +26,11 @@ public sealed class SponsorsManager : ISponsorsManager
 
     private readonly Dictionary<NetUserId, SponsorInfo> _cachedSponsors = new();
 
-    // Цвета для разных уровней
     private static readonly Dictionary<int, string> TierColors = new()
     {
-        { 1, "#33ccff" }, // Голубой
-        { 2, "#3366ff" }, // Синий
-        { 3, "#9933ff" }  // Фиолетовый
+        { 1, "#33ccff" },
+        { 2, "#3366ff" }, 
+        { 3, "#9933ff" } 
     };
 
     public void Initialize()
@@ -59,7 +60,6 @@ public sealed class SponsorsManager : ISponsorsManager
         return false;
     }
 
-    // 👈 Исправлено: теперь async Task
     private async Task OnConnecting(NetConnectingArgs e)
     {
         var entry = _dataHandler.GetSponsor(e.UserId);
@@ -70,7 +70,6 @@ public sealed class SponsorsManager : ISponsorsManager
             return;
         }
 
-        // Создаём SponsorInfo из данных
         var info = new SponsorInfo
         {
             Tier = entry.Tier,
@@ -100,7 +99,6 @@ public sealed class SponsorsManager : ISponsorsManager
         _cachedSponsors.Remove(e.Channel.UserId);
     }
 
-    // ADT-Tweak: система лоадаутов (оставляем как есть)
     public bool TryGetSpawnEquipment(NetUserId userId, string? jobPrototype, [NotNullWhen(true)] out string? spawnEquipment)
     {
         spawnEquipment = null;
@@ -148,11 +146,9 @@ public sealed class SponsorsManager : ISponsorsManager
         return false;
     }
 
-    // Админ-команды
     public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null)
     {
         _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes);
-        // Если игрок уже на сервере, обновляем кеш
         if (_cachedSponsors.ContainsKey(userId))
         {
             var info = new SponsorInfo
@@ -166,7 +162,6 @@ public sealed class SponsorsManager : ISponsorsManager
             };
             _cachedSponsors[userId] = info;
 
-            // Отправляем обновление клиенту
             if (_playerManager.TryGetSessionById(userId, out var session))
             {
                 var msg = new MsgSponsorInfo { Info = info };
@@ -180,7 +175,6 @@ public sealed class SponsorsManager : ISponsorsManager
         _dataHandler.RemoveSponsor(userId);
         _cachedSponsors.Remove(userId);
 
-        // Отправляем клиенту, что он больше не спонсор
         if (_playerManager.TryGetSessionById(userId, out var session))
         {
             var msg = new MsgSponsorInfo { Info = null };

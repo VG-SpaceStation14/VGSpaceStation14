@@ -7,7 +7,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.Corvax.Sponsors;
+namespace Content.Shared._VG.Sponsors;
 
 
 [Serializable, NetSerializable]
@@ -28,7 +28,7 @@ public sealed class SponsorInfo
     [JsonPropertyName("extraSlots")]
     public int ExtraSlots { get; set; }
 
-    [JsonPropertyName("allowedMarkings")] // TODO: Rename API field in separate PR as breaking change!
+    [JsonPropertyName("allowedMarkings")]
     public string[] AllowedMarkings { get; set; } = Array.Empty<string>();
 
     [JsonPropertyName("expireDate")]

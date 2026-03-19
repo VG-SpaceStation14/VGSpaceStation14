@@ -4,7 +4,7 @@ using Content.Client.Chat.Managers;
 using Content.Client.DebugMon;
 using Content.Client.Corvax.DiscordAuth;
 using Content.Client.Corvax.JoinQueue;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Content.Client.Corvax.TTS;
 using Content.Client.Options;
 using Content.Client.Eui;

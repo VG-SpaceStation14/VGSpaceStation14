@@ -5,7 +5,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Serialization;
 using Robust.Shared.GameObjects;
 
-namespace Content.Shared.Corvax.Sponsors
+namespace Content.Shared._VG.Sponsors
 {
     [Serializable, NetSerializable]
     public sealed class CheckUserSponsor : EntityEventArgs

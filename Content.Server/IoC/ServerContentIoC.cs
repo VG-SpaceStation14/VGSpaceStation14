@@ -9,7 +9,7 @@ using Content.Server.Chat.Managers;
 using Content.Server.Connection;
 using Content.Server.Corvax.DiscordAuth;
 using Content.Server.Corvax.JoinQueue;
-using Content.Server.Corvax.Sponsors;
+using Content.Server._VG.Sponsors;
 using Content.Server.Corvax.TTS;
 using Content.Server.Database;
 using Content.Server.Discord;

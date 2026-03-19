@@ -4,7 +4,7 @@ using Content.Client.Chat.Managers;
 using Content.Client.Clickable;
 using Content.Client.Corvax.DiscordAuth;
 using Content.Client.Corvax.JoinQueue;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Content.Client.Corvax.TTS;
 using Content.Client.DebugMon;
 using Content.Client.Eui;
@@ -25,7 +25,7 @@ using Content.Client.Voting;
 using Content.Shared.Administration.Logs;
 using Content.Client.Lobby;
 using Content.Client.Players.RateLimiting;
-using Content.Shared.Corvax.Sponsors; // VG-Sponsors
+using Content.Shared._VG.Sponsors; // VG-Sponsors
 using Content.Shared.Administration.Managers;
 using Content.Shared.Chat;
 using Content.Shared.IoC;

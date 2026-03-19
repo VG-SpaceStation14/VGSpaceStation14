@@ -6,7 +6,7 @@ using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Corvax.Sponsors;
+namespace Content.Server._VG.Sponsors;
 
 [AdminCommand(AdminFlags.Admin)]
 public sealed class SponsorAddCommand : IConsoleCommand

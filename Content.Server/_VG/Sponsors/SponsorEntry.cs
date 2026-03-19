@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Robust.Shared.Network;
 
-namespace Content.Server.Corvax.Sponsors;
+namespace Content.Server._VG.Sponsors;
 
 public sealed class SponsorEntry
 {

@@ -1,6 +1,6 @@
 using System.Linq;
 using Content.Client.ADT.UserInterface.Controls;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Markings;
 using Content.Shared.Humanoid.Prototypes;
