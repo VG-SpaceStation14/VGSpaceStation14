@@ -24,23 +24,20 @@ public sealed partial class SponsorLoadoutEffect : LoadoutEffect
     {
         reason = null;
 
+        var net = collection.Resolve<INetManager>();
+        //VG-Tweak - Start
+        if (net.IsServer)
+            return true;
+        //VG-Tweak - End
+
         if (session == null)
             return true;
 
-        var net = collection.Resolve<INetManager>();
-        var isSponsor = false;
         SponsorInfo? info = null;
+        var isSponsor = false; //VG-Tweak
 
-        if (net.IsClient)
-        {
-            if (collection.TryResolveType<ISponsorsManager>(out var sponsorsClient))
-                isSponsor = sponsorsClient.TryGetInfo(out info) && info != null;
-        }
-        else
-        {
-            if (collection.TryResolveType<ISponsorsManager>(out var sponsorsServer))
-                isSponsor = sponsorsServer.TryGetInfo(session.UserId, out info) && info != null;
-        }
+        if (collection.TryResolveType<ISponsorsManager>(out var sponsorsClient))
+            isSponsor = sponsorsClient.TryGetInfo(out info) && info != null;
 
         if (!isSponsor || info == null)
         {
