@@ -44,7 +44,14 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtHosFormal
   groupBy: "jumpskirt"
-
+# VG-Tweak Start
+- type: loadout
+  id: HeadofSecurityMaleParadeUniform
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitHoSParadeMale
+  effects:
+  - !type:SponsorLoadoutEffect
+# VG-Tweak End
 # Head
 - type: loadout
   id: HeadofSecurityHead

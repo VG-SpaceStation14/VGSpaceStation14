@@ -377,6 +377,7 @@
   loadouts:
   - SeniorResearcherJumpsuit
   - SeniorResearcherJumpskirt
+  - JumpsuitScientistFormal #VG-Tweak
 
 - type: loadoutGroup
   id: ADTSeniorResearcherGloves
@@ -673,6 +674,13 @@
   - ADTUniformJumpskirtBrigmedic
   - ADTUniformBrigmedicJumpsuitTurtleneck
   - ADTUniformSkirtBrigmedicJumpskirtTurtleneck
+  # VG-Tweak - Start
+  - OriginalBrigmedicJumpsuit
+  - OriginalBrigmedicJumpskirt
+  - BlackBrigmedicJumpsuit
+  - BlackBrigmedicJumpskirt
+  - JumpskirtOfLife
+  # VG-Tweak - End
 
   #head
 - type: loadoutGroup
@@ -832,6 +840,8 @@
   loadouts:
   - ADTClothingUniformJumpsuitSalvageSpecialist
   - ADTUniformJumpsuitExplorer # VG-Loadouts-Add
+  - ExplorersJumpsuit # VG-Loadouts-Add
+  - GrimySalvageJumpsuit # VG-Loadouts-Add
 
 # ШАХТЁР
 - type: loadoutGroup

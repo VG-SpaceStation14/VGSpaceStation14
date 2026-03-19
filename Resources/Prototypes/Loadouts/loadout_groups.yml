@@ -168,6 +168,11 @@
   - CaptainJumpsuitTurtleneck
   - CaptainJumpskirtTurtleneck
   # Corvax-Loadouts-End
+  # VG-Tweak - Start
+  - CaptainWhiteJumpsuit
+  - CaptainWhiteJumpskirt
+  - CaptainCommandSuit
+  # VG-Tweak - End
 
 - type: loadoutGroup
   id: CaptainNeck
@@ -990,6 +995,10 @@
   - ADTClothingUniformJumpsuitTurtleneckGrey
   - ADTClothingUniformJumpskirtTurtleneckGrey
   # ADT tweak end
+  # VG-Tweak - Start
+  - CargoTechnicianJumpsuitPostal
+  - CargoTechnicianJumpskirtPostal
+  # VG-Tweak  End
 
 - type: loadoutGroup
   id: CargoTechnicianBackpack
@@ -1473,6 +1482,7 @@
   - HeadofSecurityTurtleneckSkirt
   - HeadofSecurityFormalSuit
   - HeadofSecurityFormalSkirt
+  - HeadofSecurityMaleParadeUniform # VG-Tweak
   # Corvax-Loadouts-Start
   - HeadofSecurityJumpsuitBlack
   - HeadofSecurityJumpskirtBlack
@@ -1660,6 +1670,7 @@
   - ADTDetectiveOldSuit
   - ADTDetectiveOldJumpskirt
   - DetectiveInvestigatorSuit
+  - SuperstarCopJumpsuit # VG-Tweak 
   - ADTSecurityOfficerMogesBrown
   - ADTSecurityOfficerMogesBlue
   - ADTSecurityOfficerMogesGray
@@ -1804,6 +1815,12 @@
   - ADTClothingUniformJumpsuitTurtleneckWhite
   - ADTClothingUniformJumpskirtTurtleneckWhite
   # ADT tweak end
+  # VG-Tweak - Start
+  - MedicalDoctorJumpskirt
+  - MedicalDoctorJumpskirt
+  - BlackCoronerJumpsuit
+  - BlackCoronerJumpskirt
+  # VG-Tweak - End
 
 - type: loadoutGroup
   id: MedicalDoctorOuterClothing

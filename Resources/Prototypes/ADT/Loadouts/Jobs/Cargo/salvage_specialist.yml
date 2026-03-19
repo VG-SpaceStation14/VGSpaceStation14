@@ -90,7 +90,21 @@
   id: ADTUniformJumpsuitExplorer
   equipment:
     jumpsuit: ADTClothingUniformJumpsuitExplorer
+# VG-Tweak Start
+- type: loadout
+  id: ExplorersJumpsuit
+  equipment:
+    jumpsuit: ADTClothingUniformJumpsuitKringeClothing
+  effects:
+  - !type:SponsorLoadoutEffect
 
+- type: loadout
+  id: GrimySalvageJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+# VG-Tweak End
 # Belt
 - type: loadout
   id: SalvageWebbing

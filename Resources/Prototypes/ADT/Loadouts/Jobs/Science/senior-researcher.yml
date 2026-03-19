@@ -23,7 +23,14 @@
   id: SeniorResearcherJumpskirt
   equipment:
     jumpsuit: ClothingUniformJumpskirtSeniorResearcher
-
+#VG-Tweak Start
+- type: loadout
+  id: JumpsuitScientistFormal
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitScientistFormal
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Twea End
 # OuterClothing
 
 - type: loadout

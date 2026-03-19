@@ -35,7 +35,14 @@
   id: ADTDetectiveOldSuit
   equipment:
     jumpsuit: ADTClothingUniformJumpsuitDetectiveOld
-
+# VG-Tweak Start
+- type: loadout
+  id: SuperstarCopJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSuperstarCop
+  effects:
+  - !type:SponsorLoadoutEffect
+# VG-Tweak End
 # Jumpskirts
 - type: loadout
   id: ADTDetectiveOldJumpskirt
