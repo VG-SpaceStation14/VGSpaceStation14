@@ -405,7 +405,8 @@ public sealed class SimpleSkillSystem : EntitySystem
             RequireCanInteract = true,
             CancelDuplicate = true,
             DistanceThreshold = 3f,
-            NeedHand = true
+            NeedHand = true,
+            EventTarget = teacher 
         };
 
         if (!_doAfter.TryStartDoAfter(teachDoAfter, out var doAfterId))
@@ -491,7 +492,6 @@ public sealed class SimpleSkillSystem : EntitySystem
         else if (component.Sound != null)
             _audio.PlayPvs(component.Sound, uid);
             
-        QueueDel(uid);
     }
 
     /// <summary>
