@@ -5171,8 +5171,7 @@ entities:
     - type: RadiationGridResistance
     - type: BecomesStation
       id: ADT_Cluster
-    - type: SpreaderGrid
-    - type: GridPathfinding
+    - type: SupermatterSpreaderGrid
     - type: ImplicitRoof
     - type: SupermatterSpreaderGrid
 - proto: AcousticGuitarInstrument
