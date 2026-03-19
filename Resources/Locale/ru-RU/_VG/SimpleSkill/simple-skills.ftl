@@ -17,6 +17,7 @@ skill-teach-success-teacher = Вы успешно обучили { $student } н
 skill-teach-success-student = { $teacher } успешно обучил вас навыку { $skill }!
 
 ### Skill Learning
+skill-learn-verb = Изучить { $skill }
 skill-learn-start = Вы начали изучение навыка. Это займёт { $time } секунд.
 skill-learn-cancelled = Изучение прервано
 skill-learn-success = Вы изучили навык { $skill }!
