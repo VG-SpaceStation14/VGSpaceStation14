@@ -149,24 +149,24 @@ public sealed class SponsorsManager : ISponsorsManager
     public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null)
     {
         _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes);
-        if (_cachedSponsors.ContainsKey(userId))
+    
+        var info = new SponsorInfo
         {
-            var info = new SponsorInfo
-            {
-                Tier = tier,
-                OOCColor = TierColors.GetValueOrDefault(tier, "#ffffff"),
-                AllowJob = tier >= 2,
-                ExtraSlots = tier >= 3 ? 2 : (tier >= 2 ? 1 : 0),
-                ExpireDate = expireDate ?? DateTime.MaxValue,
-                CharacterName = username
-            };
-            _cachedSponsors[userId] = info;
+            Tier = tier,
+            OOCColor = TierColors.GetValueOrDefault(tier, "#ffffff"),
+            AllowJob = tier >= 2,
+            ExtraSlots = tier >= 3 ? 2 : (tier >= 2 ? 1 : 0),
+            ExpireDate = expireDate ?? DateTime.MaxValue,
+            CharacterName = username
+        };
 
-            if (_playerManager.TryGetSessionById(userId, out var session))
-            {
-                var msg = new MsgSponsorInfo { Info = info };
-                _netMgr.ServerSendMessage(msg, session.Channel);
-            }
+        _cachedSponsors[userId] = info;
+    
+        if (_playerManager.TryGetSessionById(userId, out var session))
+        {
+            var msg = new MsgSponsorInfo { Info = info };
+            _netMgr.ServerSendMessage(msg, session.Channel);
+            _sawmill.Info($"Sent updated sponsor info to {username} (Tier {tier})");
         }
     }
 
@@ -174,11 +174,12 @@ public sealed class SponsorsManager : ISponsorsManager
     {
         _dataHandler.RemoveSponsor(userId);
         _cachedSponsors.Remove(userId);
-
+    
         if (_playerManager.TryGetSessionById(userId, out var session))
         {
             var msg = new MsgSponsorInfo { Info = null };
             _netMgr.ServerSendMessage(msg, session.Channel);
+            _sawmill.Info($"Sent removed sponsor info to {session.Name}");
         }
     }
 
