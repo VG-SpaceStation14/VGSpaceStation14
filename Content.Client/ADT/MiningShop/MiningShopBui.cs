@@ -52,7 +52,8 @@ public sealed class MiningShopBui : BoundUserInterface
             return;
         
         var sections = _prototype.EnumeratePrototypes<SharedMiningShopSectionPrototype>().ToList();
-        sections.Sort((x, y) => x.Name[0].CompareTo(x.Name[0]));
+        // VG-Tweak: сортируем по ID для стабильного порядка
+        sections.Sort((x, y) => string.Compare(x.ID, y.ID, StringComparison.Ordinal));
         _sections = sections;
 
         // Add "All" category button at the beginning
