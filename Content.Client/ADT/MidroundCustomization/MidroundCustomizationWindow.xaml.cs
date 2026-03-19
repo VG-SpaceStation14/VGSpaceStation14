@@ -1,6 +1,6 @@
 using Content.Client.ADT.Bark;
 using Content.Client.ADT.SpeechBarks;
-using Content.Client.Corvax.Sponsors;
+using Content.Client._VG.Sponsors;
 using Content.Client.Corvax.TTS;
 using Content.Client.Humanoid;
 using Content.Client.UserInterface.Controls;

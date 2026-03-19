@@ -44,7 +44,14 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtHosFormal
   groupBy: "jumpskirt"
-
+# VG-Tweak Start
+- type: loadout
+  id: HeadofSecurityMaleParadeUniform
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitHoSParadeMale
+  effects:
+  - !type:SponsorLoadoutEffect
+# VG-Tweak End
 # Head
 - type: loadout
   id: HeadofSecurityHead
@@ -61,7 +68,28 @@
   id: HeadofSecurityCloak
   equipment:
     neck: ClothingNeckCloakHos
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: HeadofSecurityLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakHOS
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
+- type: loadout
+  id: CloakHosOriginal
+  equipment:
+    neck: ClothingNeckCloakHosOriginal
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
+
+- type: loadout
+  id: CloakHosAlt
+  equipment:
+    neck: ClothingNeckCloakHosAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: HeadofSecurityMantle
   equipment:

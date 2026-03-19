@@ -45,7 +45,28 @@
   id: ChiefMedicalOfficerCloak
   equipment:
     neck: ClothingCloakCmo
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: ChiefMedicalOfficerLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakCMO
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
+- type: loadout
+  id: CloakCmoAlt
+  equipment:
+    neck: ClothingNeckCloakCmoAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+
+- type: loadout
+  id: CloakCmoTurquoise
+  equipment:
+    neck: ClothingNeckCloakCmoTurquoise
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: ChiefMedicalOfficerMantle
   equipment:

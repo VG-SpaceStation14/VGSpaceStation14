@@ -28,7 +28,28 @@
   id: CaptainFormalSkirt
   equipment:
     jumpsuit: ClothingUniformJumpskirtCapFormalDress
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout 
+  id: CaptainWhiteJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitCaptainWhite
+  effects:
+  - !type:SponsorLoadoutEffect
 
+- type: loadout
+  id: CaptainWhiteJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtCaptainWhite
+  effects:
+  - !type:SponsorLoadoutEffect
+
+- type: loadout
+  id: CaptainCommandSuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitCommandCaptain
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - End - LoadoutsRework
 # Head
 - type: loadout
   id: CaptainHead
@@ -45,7 +66,21 @@
   id: CaptainCloak
   equipment:
     neck: ClothingNeckCloakCap
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: CaptainLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakCap
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
+- type: loadout
+  id: CloakCapFormalAlt
+  equipment:
+    neck: ClothingNeckCloakCapFormalAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - End - LoadoutsRework
 - type: loadout
   id: CaptainCloakFormal
   equipment:

@@ -29,7 +29,36 @@
   id: ADTUniformSkirtBrigmedicJumpskirtTurtleneck
   equipment:
     jumpsuit: ADTClothingUniformJumpskirtBrigmedicTurtleneck
+# VG-Tweak - Start - LoadoutsRewor
+- type: loadout
+  id: OriginalBrigmedicJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitBrigmedicOriginal
 
+- type: loadout
+  id: OriginalBrigmedicJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtBrigmedicOriginal
+
+- type: loadout
+  id: BlackBrigmedicJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitBrigmedicBlack
+  effects:
+  - !type:SponsorLoadoutEffect
+
+- type: loadout
+  id: BlackBrigmedicJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtBrigmedicBlack
+  effects:
+  - !type:SponsorLoadoutEffect
+
+- type: loadout
+  id: JumpskirtOfLife
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtOfLife
+# VG-Tweak - End - LoadoutsRewor
 # Neck
 # - type: loadout
 #   id: ADTNeckSecBadge

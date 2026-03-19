@@ -1,10 +1,10 @@
 using System.Linq;
-using Content.Shared.Corvax.Sponsors;
+using Content.Shared._VG.Sponsors;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 
-namespace Content.Client.Corvax.Sponsors
+namespace Content.Client._VG.Sponsors
 {
     public sealed class CheckSponsorClientSystem : EntitySystem
     {

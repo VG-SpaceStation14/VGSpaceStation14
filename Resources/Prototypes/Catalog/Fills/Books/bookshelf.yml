@@ -64,6 +64,27 @@
         - id: BookImplants
     # Corvax-Lore-End
         - id: ADTBookAboutJail # ADT-Tweak
+    # VG-Tweak 
+    - !type:NestedSelector
+      rolls: !type:RangeNumberSelector
+        range: 1, 3 
+      tableId: SkillBooksTable
+    # VG-Tweak End
+
+# VG-Tweak Start
+- type: entityTable
+  id: SkillBooksTable
+  table: !type:GroupSelector
+    children:
+    - id: SimpleSkillBookPiloting
+    - id: SimpleSkillBookEngineering
+    - id: SimpleSkillBookMedicine
+    - id: SimpleSkillBookWeapons
+    - id: SimpleSkillBookAnomalistic
+    - id: SimpleSkillBookXenoarchiology
+    - id: SimpleSkillBookRobotech
+    - id: SimpleSkillBookBotanika
+# VG-Tweak End
 
 - type: entityTable
   id: RandomHandwrittenBookTable

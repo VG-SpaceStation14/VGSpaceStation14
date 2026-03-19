@@ -49,7 +49,21 @@
                                     </BoxContainer>
                                 </controls:StripeBack>
                                 <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" />
-                                <!--Нахуй спонсорки VG-Tweak-->
+                                <!-- VG-Tweak Start - Панель спонсоров (широкая кнопка) -->
+                                <controls:StripeBack Name="LobbyPanelLeftTop" Margin="1 -10 0 0" Visible="True">
+                                    <BoxContainer Orientation="Vertical" Margin="1" Visible="True">
+                                        <cc:UICommandButton Name="SponsorInfoButton"
+                                                            Command="ui-lobby-sponsor-info"
+                                                            Text="{Loc 'ui-lobby-sponsor-button-main-level'}"
+                                                            StyleClasses="Caution"
+                                                            Visible="True"
+                                                            WindowType="{x:Type lobbyUi:SponsorInfoWindow}"
+                                                            HorizontalExpand="True"
+                                                            MinHeight="20"
+                                                            Margin="3" />
+                                    </BoxContainer>
+                                </controls:StripeBack>
+                                <!-- VG-Tweak End -->
                             </BoxContainer>
                         </PanelContainer>
                         <!-- Voting Popups -->

@@ -17,6 +17,7 @@ skill-teach-success-teacher = You successfully taught { $student } the skill { $
 skill-teach-success-student = { $teacher } successfully taught you the skill { $skill }!
 
 ### Skill Learning
+skill-learn-verb = Learn { $skill }
 skill-learn-start = You started learning a skill. This will take { $time } seconds.
 skill-learn-cancelled = Learning interrupted
 skill-learn-success = You learned the skill { $skill }!

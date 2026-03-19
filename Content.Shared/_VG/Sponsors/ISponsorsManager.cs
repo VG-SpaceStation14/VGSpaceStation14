@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Robust.Shared.Network;
 
-namespace Content.Shared.Corvax.Sponsors
+namespace Content.Shared._VG.Sponsors
 {
     public interface ISponsorsManager
     {

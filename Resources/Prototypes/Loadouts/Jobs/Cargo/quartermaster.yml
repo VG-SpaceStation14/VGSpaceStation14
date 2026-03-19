@@ -50,7 +50,21 @@
   id: QuartermasterCloak
   equipment:
     neck: ClothingNeckCloakQm
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: QuartermasterLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakQM
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
+- type: loadout
+  id: CloakQmAlt
+  equipment:
+    neck: ClothingNeckCloakQmAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - Start - LoadoutsRework
 - type: loadout
   id: QuartermasterMantle
   equipment:

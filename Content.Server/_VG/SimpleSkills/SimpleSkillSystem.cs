@@ -43,6 +43,9 @@ public sealed class SimpleSkillSystem : EntitySystem
         SubscribeLocalEvent<SkillTeacherComponent, ComponentShutdown>(OnTeacherShutdown);
         SubscribeLocalEvent<SkillTeacherComponent, SkillTeachDoAfterEvent>(OnTeachDoAfter);
         SubscribeLocalEvent<SimpleSkillBookComponent, SkillLearnDoAfterEvent>(OnLearnDoAfter);
+        
+        // Добавляем верб для изучения книги
+        SubscribeLocalEvent<SimpleSkillBookComponent, GetVerbsEvent<Verb>>(OnGetSkillBookVerbs);
     }
 
     /// <summary>
@@ -144,7 +147,8 @@ public sealed class SimpleSkillSystem : EntitySystem
             BreakOnDamage = true,
             RequireCanInteract = true,
             CancelDuplicate = true,
-            BlockDuplicate = true
+            BlockDuplicate = true,
+            NeedHand = true
         };
 
         if (!_doAfter.TryStartDoAfter(doAfterArgs))
@@ -326,6 +330,32 @@ public sealed class SimpleSkillSystem : EntitySystem
     }
 
     /// <summary>
+    ///     Получение вербов для книг навыков
+    /// </summary>
+    private void OnGetSkillBookVerbs(EntityUid uid, SimpleSkillBookComponent component, GetVerbsEvent<Verb> args)
+    {
+        var user = args.User;
+
+        if (!args.CanAccess || !args.CanInteract)
+            return;
+
+        if (HasSkill(user, component.TeachesSkill))
+        {
+            return;
+        }
+
+        var verb = new Verb
+        {
+            Text = Loc.GetString("skill-learn-verb", ("skill", GetSkillName(component.TeachesSkill))),
+            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/sentient.svg.192dpi.png")),
+            Act = () => TryLearnFromBook(uid, component, user),
+            Priority = 2 
+        };
+
+        args.Verbs.Add(verb);
+    }
+
+    /// <summary>
     ///     Начать обучение навыку
     /// </summary>
     private void StartTeaching(EntityUid teacher, EntityUid student, string skillId)
@@ -368,13 +398,15 @@ public sealed class SimpleSkillSystem : EntitySystem
                 _audio.PlayPvs(bookComp.Sound, book.Value);
         }
 
-        var teachDoAfter = new DoAfterArgs(EntityManager, teacher, TimeSpan.FromSeconds(30), new SkillTeachDoAfterEvent(skillId, GetNetEntity(student)), teacher, target: student)
+        var teachDoAfter = new DoAfterArgs(EntityManager, teacher, TimeSpan.FromSeconds(30), new SkillTeachDoAfterEvent(skillId, GetNetEntity(student)), book.Value, target: student)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
             RequireCanInteract = true,
             CancelDuplicate = true,
-            DistanceThreshold = 3f
+            DistanceThreshold = 3f,
+            NeedHand = true,
+            EventTarget = teacher 
         };
 
         if (!_doAfter.TryStartDoAfter(teachDoAfter, out var doAfterId))
@@ -460,7 +492,6 @@ public sealed class SimpleSkillSystem : EntitySystem
         else if (component.Sound != null)
             _audio.PlayPvs(component.Sound, uid);
             
-        QueueDel(uid);
     }
 
     /// <summary>

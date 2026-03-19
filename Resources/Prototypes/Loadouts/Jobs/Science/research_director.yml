@@ -33,7 +33,21 @@
   id: ResearchDirectorCloak
   equipment:
     neck: ClothingNeckCloakRd
+#VG-Tweak - Start - LoadoutsRework
+- type: loadout
+  id: ResearchDirectorLongCloak
+  equipment:
+    neck: ClothingNeckLongCloakRD
+  effects:
+    - !type:SponsorLoadoutEffect #VG-Tweak - Sponsors
 
+- type: loadout
+  id: CloakRdAltм
+  equipment:
+    neck: ClothingNeckCloakRdAlt
+  effects:
+  - !type:SponsorLoadoutEffect
+#VG-Tweak - End - LoadoutsRework
 # Jumpsuit
 - type: loadout
   id: ResearchDirectorJumpsuit

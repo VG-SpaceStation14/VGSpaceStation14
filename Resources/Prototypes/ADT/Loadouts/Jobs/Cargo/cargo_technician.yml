@@ -16,6 +16,22 @@
   equipment:
     head: ADTClothingHeadHatsBeretSupply
 
+
+# Jumpsuit 
+- type: loadout
+  id: CargoTechnicianJumpsuitPostal
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitCargoPostal
+  effects:
+  - !type:SponsorLoadoutEffect
+
+- type: loadout
+  id: CargoTechnicianJumpskirtPostal
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtCargoPostal
+  effects:
+  - !type:SponsorLoadoutEffect
+
 # PDA
 - type: loadout
   id: CargoPDA

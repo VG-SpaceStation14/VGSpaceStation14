@@ -363,6 +363,13 @@
   - SeniorResearcherBeret
 
 - type: loadoutGroup
+  id: SeniorResearcherNeack
+  name: loadout-group-senior-researcher-neack
+  minLimit: 0
+  loadouts:
+  - ClothingNeckCloakRdOriginal
+
+- type: loadoutGroup
   id: ADTSeniorResearcherJumpsuit
   name: loadout-group-senior-researcher-jumpsuit
   minLimit: 1
@@ -370,6 +377,7 @@
   loadouts:
   - SeniorResearcherJumpsuit
   - SeniorResearcherJumpskirt
+  - JumpsuitScientistFormal #VG-Tweak
 
 - type: loadoutGroup
   id: ADTSeniorResearcherGloves
@@ -666,6 +674,13 @@
   - ADTUniformJumpskirtBrigmedic
   - ADTUniformBrigmedicJumpsuitTurtleneck
   - ADTUniformSkirtBrigmedicJumpskirtTurtleneck
+  # VG-Tweak - Start
+  - OriginalBrigmedicJumpsuit
+  - OriginalBrigmedicJumpskirt
+  - BlackBrigmedicJumpsuit
+  - BlackBrigmedicJumpskirt
+  - JumpskirtOfLife
+  # VG-Tweak - End
 
   #head
 - type: loadoutGroup
@@ -825,6 +840,8 @@
   loadouts:
   - ADTClothingUniformJumpsuitSalvageSpecialist
   - ADTUniformJumpsuitExplorer # VG-Loadouts-Add
+  - ExplorersJumpsuit # VG-Loadouts-Add
+  - GrimySalvageJumpsuit # VG-Loadouts-Add
 
 # ШАХТЁР
 - type: loadoutGroup
@@ -874,13 +891,20 @@
   minLimit: 0
   maxLimit: 1
   loadouts:
-  - ADTNeckSalvageCCape
-  - ADTNeckSalvageSCape
-  - ADTNeckSalvageGCape
-  - ADTNeckSalvagePCape
-  - ADTNeckSalvageECape
   - ADTNeckSalvageDCape
-  - ADTNeckSalvageRCape
+  - GoliathCloak
+
+#VG-Tweak - Start - LoadoutRework
+# Утиль пояса
+- type: loadoutGroup
+  id: VGSalvageBelt 
+  name: loadout-salvage-specialist-belt-vg
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - SalvageWebbing
+  - ToolbeltEmpty
+#VG-Tweak - End - LoadoutRework
 
 - type: loadoutGroup
   id: ADTMinerOuterClothing

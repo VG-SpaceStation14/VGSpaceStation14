@@ -21,7 +21,7 @@ using Robust.Shared.Utility;
 using Content.Shared.ADT.CCVar;
 using Content.Server.Discord;
 using Content.Server.ADT.Chat;
-using Content.Server.Corvax.Sponsors;
+using Content.Server._VG.Sponsors;
 
 namespace Content.Server.Chat.Managers;
 

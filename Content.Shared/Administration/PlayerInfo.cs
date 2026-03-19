@@ -1,4 +1,4 @@
-using Content.Shared.Corvax.Sponsors;
+using Content.Shared._VG.Sponsors;
 using Content.Shared.Mind;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;

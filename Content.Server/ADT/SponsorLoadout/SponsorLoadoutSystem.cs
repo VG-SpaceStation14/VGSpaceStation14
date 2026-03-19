@@ -1,4 +1,4 @@
-using Content.Server.Corvax.Sponsors;
+using Content.Server._VG.Sponsors;
 using Content.Server.Station.Systems;
 using Content.Shared.GameTicking;
 using Robust.Shared.Prototypes;

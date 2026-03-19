@@ -1,5 +1,5 @@
-using Content.Server.Corvax.Sponsors;
-using Content.Shared.Corvax.Sponsors;
+using Content.Server._VG.Sponsors;
+using Content.Shared._VG.Sponsors;
 using Robust.Server.Player;
 
 public sealed class CheckSponsorSystem : EntitySystem
