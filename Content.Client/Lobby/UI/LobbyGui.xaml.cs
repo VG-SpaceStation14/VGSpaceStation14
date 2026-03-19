@@ -17,8 +17,7 @@ namespace Content.Client.Lobby.UI
         // VG-Tweak Start
         [Dependency] private readonly SponsorsManager _sponsorsManager = default!;
         private float _updateTimer;
-        private static readonly Color ColorBlue = Color.FromHex("#1966ff");
-        private static readonly Color ColorRed = Color.FromHex("#272727");
+        private static readonly Color ColorNonSponsor = Color.FromHex("#272727");
         // VG-Tweak End
 
         public LobbyGui()
@@ -74,11 +73,26 @@ namespace Content.Client.Lobby.UI
 
             var hasSponsor = _sponsorsManager.TryGetInfo(out var sponsorInfo);
             
-            SponsorInfoButton.ModulateSelfOverride = hasSponsor ? ColorBlue : ColorRed;
-            
-            SponsorInfoButton.Text = hasSponsor && sponsorInfo?.Tier != null
-                ? Loc.GetString("ui-lobby-sponsor-button-level", ("sponsorTier", sponsorInfo.Tier))
-                : Loc.GetString("ui-lobby-sponsor-button-main-level");
+            if (hasSponsor && sponsorInfo != null)
+            {
+                if (!string.IsNullOrEmpty(sponsorInfo.OOCColor))
+                {
+                    SponsorInfoButton.ModulateSelfOverride = Color.FromHex(sponsorInfo.OOCColor);
+                }
+                else
+                {
+                    SponsorInfoButton.ModulateSelfOverride = Color.White;
+                }
+                
+                var tierValue = sponsorInfo.Tier ?? 0;
+                SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-level", 
+                    ("sponsorTier", tierValue));
+            }
+            else
+            {
+                SponsorInfoButton.ModulateSelfOverride = ColorNonSponsor;
+                SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-main-level");
+            }
         }
         // VG-Tweak End
 
