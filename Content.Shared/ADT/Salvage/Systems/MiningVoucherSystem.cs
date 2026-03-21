@@ -20,7 +20,6 @@ public sealed class MiningVoucherSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPowerReceiverSystem _power = default!;
     [Dependency] private readonly DroppodSystem _droppod = default!;
     [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
 
@@ -70,11 +69,7 @@ public sealed class MiningVoucherSystem : EntitySystem
             return;
         }
 
-        if (!_power.IsPowered(target))
-        {
-            _popup.PopupClient(Loc.GetString("mining-voucher-vendor-unpowered", ("vendor", target)), target, user);
-            return;
-        }
+        // VG-Tweak: removed power requirement check for vouchers
 
         if (!_timing.IsFirstTimePredicted)
             return;
