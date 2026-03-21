@@ -25,7 +25,7 @@
 
   special:
   - !type:AddSkillGroupSpecial 
-    group: EngineerSkills #VG-Tweak SkillsIntegration
+    group: AtmosphericsSkills #VG-Tweak SkillsIntegration
 
 - type: startingGear
   id: SeniorEngineerGear

@@ -31,6 +31,7 @@
     - Anomalistic
     - Xenoarchiology
     - Engineering
+    - Atmos
     - Robotech
     - Medicin
 
@@ -40,6 +41,7 @@
   skills:
     - Anomalistic
     - Xenoarchiology
+    - Atmos
     - Medicin
 
 - type: simpleSkillGroup
@@ -68,6 +70,7 @@
   skills:
     - Piloting
     - Engineering
+    - Atmos
     - Medicine
     - Weapons
 
@@ -77,6 +80,7 @@
   skills:
     - Piloting
     - Engineering
+    - Atmos
     - Medicine
     - Weapons
 
@@ -86,6 +90,7 @@
   skills:
     - Piloting
     - Engineering
+    - Atmos
     - Medicine
     - Weapons
     - Anomalistic
@@ -96,6 +101,7 @@
   name: Навыки атмосферного техника
   skills:
     - Engineering
+    - Atmos
     - Piloting
 
 - type: simpleSkillGroup
@@ -116,6 +122,7 @@
   skills:
     - Piloting
     - Engineering
+    - Atmos
     - Medicine
     - Weapons
     - Anomalistic

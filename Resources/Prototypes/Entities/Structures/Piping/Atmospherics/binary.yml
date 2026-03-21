@@ -34,6 +34,8 @@
     fx: EffectRCDDeconstruct2
   # ADT-RPD-End
   - type: StationAiWhitelist #ADT-Tweak
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Atmos
 
 - type: entity
   parent: GasBinaryBase

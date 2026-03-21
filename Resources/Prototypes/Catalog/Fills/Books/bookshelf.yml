@@ -84,6 +84,7 @@
     - id: SimpleSkillBookXenoarchiology
     - id: SimpleSkillBookRobotech
     - id: SimpleSkillBookBotanika
+    - id: SimpleSkillBookAtmos
 # VG-Tweak End
 
 - type: entityTable

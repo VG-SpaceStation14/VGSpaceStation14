@@ -302,6 +302,8 @@
     - type: GuideHelp
       guides:
       - Thermomachines
+    - type: SimpleSkillRequired #VG-Skillsntegration
+      requiredSkill: Atmos
 
 - type: entity
   parent: BaseGasThermoMachine
@@ -419,6 +421,8 @@
       energy: 1.5
       color: "#ffc747"
     # ADT-New-Sprite-Update-End
+    - type: SimpleSkillRequired #VG-Skillsntegration
+      requiredSkill: Atmos
 
 - type: entity
   parent: GasThermoMachineHeater
@@ -602,4 +606,6 @@
   - type: GuideHelp
     guides:
     - GasCondensing
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Atmos
 

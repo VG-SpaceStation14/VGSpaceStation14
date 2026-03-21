@@ -22,4 +22,6 @@
       whitelist:
         tags:
           - ADTSteelSheet
+    - type: SimpleSkillRequired #VG-Skillsntegration
+      requiredSkill: Atmos
 

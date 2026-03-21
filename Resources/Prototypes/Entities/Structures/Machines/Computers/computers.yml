@@ -53,6 +53,8 @@
     guides:
     - AtmosphericAlertsComputer
     - DeviceMonitoringAndControl
+  - type: SimpleSkillRequired #VG-Skillsntegration
+    requiredSkill: Engineering
 
 - type: entity
   parent: BaseComputerAiAccess

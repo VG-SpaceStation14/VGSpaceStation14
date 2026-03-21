@@ -176,3 +176,23 @@
   - type: SimpleSkillBook
     teachesSkill: Botanika
 
+- type: entity
+  parent: BaseSimpleSkillBook
+  id: SimpleSkillBookAtmos
+  name: книга атмосферной инженерии
+  description: Обучает работе с атмосферным оборудованием
+  components:
+  - type: Sprite
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#20b2aa" 
+    - state: decor_wingette
+      color: "#ffd700"  
+    - state: icon_atmos   
+      color: "#ffffff"    
+    - state: overlay_null
+  - type: SimpleSkillBook
+    teachesSkill: Atmos
+
+
