@@ -44,7 +44,7 @@ public sealed class JaunterSystem : EntitySystem
 
         SubscribeLocalEvent<JaunterComponent, UseInHandEvent>(OnUseInHand);
         SubscribeLocalEvent<JaunterComponent, BeforeChasmFallingEvent>(OnBeforeFall);
-        SubscribeLocalEvent<InventoryComponent, BeforeChasmFallingEvent>(Relay);
+        SubscribeLocalEvent<InventoryComponent, BeforeChasmFallingEvent>(OnInventoryBeforeFall);
         // VG-Tweak Start: обработка падения мехов
         SubscribeLocalEvent<MechComponent, BeforeChasmFallingEvent>(OnMechBeforeFall);
         // VG-Tweak End
@@ -60,78 +60,109 @@ public sealed class JaunterSystem : EntitySystem
         args.Handled = true;
     }
 
+    // Обработка падения самого джаунтера (например, если он выброшен на пол и падает в яму)
     private void OnBeforeFall(EntityUid uid, JaunterComponent comp, ref BeforeChasmFallingEvent args)
     {
         args.Cancelled = true;
-        var coordsValid = false;
-        var coords = Transform(args.Entity).Coordinates;
-        EntityCoordinates newCoords;
+        TeleportEntity(uid, comp, uid); // Сам джаунтер телепортируется
+    }
 
-        while (!coordsValid)
+    // Новый обработчик для сущности с инвентарём (игрок, животное и т.п.)
+    private void OnInventoryBeforeFall(EntityUid uid, InventoryComponent comp, ref BeforeChasmFallingEvent args)
+    {
+        if (args.Cancelled)
+            return;
+
+        // Ищем джаунтер в инвентаре и вложенных контейнерах
+        if (TryFindJaunterInInventory(uid, out var jaunter))
         {
-            var randombeacon = _portal.GetRandomBeacon();
-            if (randombeacon != null)
+            args.Cancelled = true;
+            if (TryComp<JaunterComponent>(jaunter, out var jaunterComp))
             {
-                newCoords = Transform(randombeacon.Value).Coordinates;
-                comp.BeaconMode = true;
-            }
-            else
-            {
-                newCoords = new EntityCoordinates(Transform(args.Entity).ParentUid, coords.X +
-                    _random.NextFloat(-5f, 5f), coords.Y +
-                    _random.NextFloat(-5f, 5f));
-            }
-
-            if (_interaction.InRangeUnobstructed(args.Entity, newCoords, -1f) && _lookup.GetEntitiesInRange<ChasmComponent>(newCoords, 1f).Count <= 0 || comp.BeaconMode == true)
-            {
-                _transform.SetCoordinates(args.Entity, newCoords);
-                _transform.AttachToGridOrMap(args.Entity, Transform(args.Entity));
-                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/Mining/fultext_launch.ogg"), args.Entity);
-
-                if (TryComp<StaminaComponent>(args.Entity, out var stam))
-                {
-                    var need = MathF.Max(0.01f, stam.CritThreshold - stam.StaminaDamage);
-                    _stamina.TakeStaminaDamage(args.Entity, need, stam);
-                }
-
-                if (HasComp<BodyComponent>(args.Entity) && HasComp<HungerComponent>(args.Entity))
-                {
-                    _vomit.Vomit(args.Entity);
-                }
-
-                if (args.Entity != uid && comp.DeleteOnUse)
-                    QueueDel(uid);
-
-                coordsValid = true;
+                TeleportEntity(uid, jaunterComp, jaunter);
             }
         }
     }
 
-    private void Relay(EntityUid uid, InventoryComponent comp, ref BeforeChasmFallingEvent args)
+    // Вспомогательный метод для поиска джаунтера во всех контейнерах сущности
+    private bool TryFindJaunterInInventory(EntityUid entity, out EntityUid jaunter)
     {
-        if (!HasComp<ContainerManagerComponent>(uid))
-            return;
+        jaunter = default;
 
-        RelayEvent(uid, ref args);
-    }
+        // Проверяем сам объект
+        if (TryComp<JaunterComponent>(entity, out _))
+        {
+            jaunter = entity;
+            return true;
+        }
 
-    private void RelayEvent(EntityUid uid, ref BeforeChasmFallingEvent ev)
-    {
-        if (!TryComp<ContainerManagerComponent>(uid, out var containerManager))
-            return;
+        // Проверяем все контейнеры (рюкзак, ящики, карманы и т.д.)
+        if (!TryComp<ContainerManagerComponent>(entity, out var containerManager))
+            return false;
 
         foreach (var container in containerManager.Containers.Values)
         {
-            if (ev.Cancelled)
-                break;
-
-            foreach (var entity in container.ContainedEntities)
+            foreach (var contained in container.ContainedEntities)
             {
-                RaiseLocalEvent(entity, ref ev);
-                if (ev.Cancelled)
-                    break;
+                if (TryFindJaunterInInventory(contained, out jaunter))
+                    return true;
+            }
+        }
 
-                RelayEvent(entity, ref ev);
+        return false;
+    }
+
+    // Основная логика телепортации сущности с использованием джаунтера
+    private void TeleportEntity(EntityUid target, JaunterComponent comp, EntityUid jaunterUsed)
+    {
+        var coordsValid = false;
+        var currentCoords = Transform(target).Coordinates;
+        EntityCoordinates newCoords;
+
+        while (!coordsValid)
+        {
+            var randomBeacon = _portal.GetRandomBeacon();
+            if (randomBeacon != null)
+            {
+                newCoords = Transform(randomBeacon.Value).Coordinates;
+                comp.BeaconMode = true;
+            }
+            else
+            {
+                newCoords = new EntityCoordinates(Transform(target).ParentUid,
+                    currentCoords.X + _random.NextFloat(-5f, 5f),
+                    currentCoords.Y + _random.NextFloat(-5f, 5f));
+            }
+
+            // Проверка на отсутствие препятствий и ям
+            if (_interaction.InRangeUnobstructed(target, newCoords, -1f) &&
+                _lookup.GetEntitiesInRange<ChasmComponent>(newCoords, 1f).Count <= 0 ||
+                comp.BeaconMode)
+            {
+                _transform.SetCoordinates(target, newCoords);
+                _transform.AttachToGridOrMap(target, Transform(target));
+                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/Mining/fultext_launch.ogg"), target);
+
+                // Эффекты стамины
+                if (TryComp<StaminaComponent>(target, out var stam))
+                {
+                    var need = MathF.Max(0.01f, stam.CritThreshold - stam.StaminaDamage);
+                    _stamina.TakeStaminaDamage(target, need, stam);
+                }
+
+                // Рвота для живых существ
+                if (HasComp<BodyComponent>(target) && HasComp<HungerComponent>(target))
+                {
+                    _vomit.Vomit(target);
+                }
+
+                // Удаление использованного джаунтера, если нужно
+                if (comp.DeleteOnUse && target != jaunterUsed)
+                {
+                    QueueDel(jaunterUsed);
+                }
+
+                coordsValid = true;
             }
         }
     }
@@ -146,86 +177,18 @@ public sealed class JaunterSystem : EntitySystem
         if (pilot == null)
             return;
 
-        if (!TryFindJaunter(pilot.Value, out var jaunter))
+        // Ищем джаунтер у пилота
+        if (!TryFindJaunterInInventory(pilot.Value, out var jaunter))
             return;
 
+        // Выбрасываем пилота из меха
         if (!_mech.TryEject(uid, mech))
             return;
 
-        TeleportPilot(pilot.Value, jaunter);
-
-    }
-
-    private bool TryFindJaunter(EntityUid entity, out EntityUid jaunter)
-    {
-        if (TryComp<JaunterComponent>(entity, out _))
+        // Телепортируем пилота
+        if (TryComp<JaunterComponent>(jaunter, out var jaunterComp))
         {
-            jaunter = entity;
-            return true;
-        }
-
-        if (TryComp<ContainerManagerComponent>(entity, out var containers))
-        {
-            foreach (var container in containers.Containers.Values)
-            {
-                foreach (var contained in container.ContainedEntities)
-                {
-                    if (TryFindJaunter(contained, out jaunter))
-                        return true;
-                }
-            }
-        }
-
-        jaunter = default;
-        return false;
-    }
-
-    private void TeleportPilot(EntityUid pilot, EntityUid jaunter)
-    {
-        if (!TryComp<JaunterComponent>(jaunter, out var comp))
-            return;
-
-        var coordsValid = false;
-        var coords = Transform(pilot).Coordinates;
-        EntityCoordinates newCoords;
-
-        while (!coordsValid)
-        {
-            var randombeacon = _portal.GetRandomBeacon();
-            if (randombeacon != null)
-            {
-                newCoords = Transform(randombeacon.Value).Coordinates;
-                comp.BeaconMode = true;
-            }
-            else
-            {
-                newCoords = new EntityCoordinates(Transform(pilot).ParentUid, coords.X +
-                    _random.NextFloat(-5f, 5f), coords.Y +
-                    _random.NextFloat(-5f, 5f));
-            }
-
-            if (_interaction.InRangeUnobstructed(pilot, newCoords, -1f) && _lookup.GetEntitiesInRange<ChasmComponent>(newCoords, 1f).Count <= 0 || comp.BeaconMode == true)
-            {
-                _transform.SetCoordinates(pilot, newCoords);
-                _transform.AttachToGridOrMap(pilot, Transform(pilot));
-                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/Mining/fultext_launch.ogg"), pilot);
-
-                if (TryComp<StaminaComponent>(pilot, out var stam))
-                {
-                    var need = MathF.Max(0.01f, stam.CritThreshold - stam.StaminaDamage);
-                    _stamina.TakeStaminaDamage(pilot, need, stam);
-                }
-
-                if (HasComp<BodyComponent>(pilot) && HasComp<HungerComponent>(pilot))
-                {
-                    _vomit.Vomit(pilot);
-                }
-
-                if (comp.DeleteOnUse && pilot != jaunter)
-                    QueueDel(jaunter);
-
-                coordsValid = true;
-            }
+            TeleportEntity(pilot.Value, jaunterComp, jaunter);
         }
     }
     // VG-Tweak End
