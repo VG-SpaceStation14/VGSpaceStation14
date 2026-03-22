@@ -39,11 +39,11 @@
     - tatorlight
   name: traitorlight-title
   description: traitorlight-description
-  showInVote: false
+  showInVote: true
   rules:
     - TraitorLightGameRule
-    - SubGamemodesRuleNoXenoborg
-    - BasicStationEventScheduler
+    - SubGamemodesRule
+    - TraitorLightStationEventScheduler
     - MeteorSwarmScheduler
 #    - SpaceTrafficControlEventScheduler #VG-Tweak
     - BasicRoundstartVariation
