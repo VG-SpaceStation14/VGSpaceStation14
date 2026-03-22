@@ -13,11 +13,13 @@ namespace Content.Client.Lobby.UI
     public sealed partial class LobbyGui : UIScreen
     {
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
+        [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
         
         // VG-Tweak Start
         [Dependency] private readonly SponsorsManager _sponsorsManager = default!;
         private float _updateTimer;
         private static readonly Color ColorNonSponsor = Color.FromHex("#272727");
+        private SponsorInfoWindow? _sponsorWindow;
         // VG-Tweak End
 
         public LobbyGui()
@@ -49,11 +51,36 @@ namespace Content.Client.Lobby.UI
             ExpandButton.OnPressed += _ => TogglePanel(true);
             
             // VG-Tweak Start
-            UpdateSponsorButton();
+            // Убеждаемся, что кнопка существует
+            if (SponsorInfoButton != null)
+            {
+                SponsorInfoButton.OnPressed += _ => OnSponsorButtonPressed();
+                UpdateSponsorButton();
+            }
+            else
+            {
+                Logger.Error("SponsorInfoButton is null! Check XAML");
+            }
             // VG-Tweak End
         }
 
         // VG-Tweak Start
+        private void OnSponsorButtonPressed()
+        {
+            // Закрываем окно, если оно уже открыто
+            if (_sponsorWindow != null)
+            {
+                _sponsorWindow.Close();
+                _sponsorWindow = null;
+                return;
+            }
+            
+            // Создаём и открываем окно спонсора
+            _sponsorWindow = _uiManager.CreateWindow<SponsorInfoWindow>();
+            _sponsorWindow.OnClose += () => _sponsorWindow = null;
+            _sponsorWindow.OpenCentered();
+        }
+
         protected override void FrameUpdate(FrameEventArgs args)
         {
             base.FrameUpdate(args);
@@ -69,7 +96,10 @@ namespace Content.Client.Lobby.UI
         private void UpdateSponsorButton()
         {
             if (SponsorInfoButton == null)
+            {
+                Logger.Warning("SponsorInfoButton is null in UpdateSponsorButton");
                 return;
+            }
 
             var hasSponsor = _sponsorsManager.TryGetInfo(out var sponsorInfo);
             
@@ -93,6 +123,9 @@ namespace Content.Client.Lobby.UI
                 SponsorInfoButton.ModulateSelfOverride = ColorNonSponsor;
                 SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-main-level");
             }
+            
+            // Гарантируем, что кнопка видима
+            SponsorInfoButton.Visible = true;
         }
         // VG-Tweak End
 
