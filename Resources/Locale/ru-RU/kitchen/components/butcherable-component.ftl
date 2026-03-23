@@ -4,3 +4,6 @@ butcherable-need-knife = Используйте острый предмет чт
 butcherable-not-in-container = Сперва достаньте { $target } из контейнера.
 butcherable-mob-isnt-dead = Цель должна быть мертва.
 butcherable-verb-name = Разделать
+
+butcherable-need-knife-or-claws = Вам нужен нож или острые когти для разделки { $target }
+butcherable-claws-butchered-success = Вы разделываете { $target } с помощью своих когтей.

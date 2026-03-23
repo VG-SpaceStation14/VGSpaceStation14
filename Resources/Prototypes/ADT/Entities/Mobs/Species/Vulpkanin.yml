@@ -54,6 +54,8 @@
       damage:
         types:
           Piercing: 5
+    - type: Sharp
+      butcherDelayModifier: 2.0
     - type: Temperature
       heatDamageThreshold: 325
       coldDamageThreshold: 230

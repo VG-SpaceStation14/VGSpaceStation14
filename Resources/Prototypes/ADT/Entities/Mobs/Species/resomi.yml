@@ -102,6 +102,8 @@
     damage:
       types:
         Slash: 5
+  - type: Sharp
+    butcherDelayModifier: 2.0
   - type: Puller
     needsHands: false
 
