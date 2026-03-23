@@ -72,3 +72,11 @@
   storage:
     back:
     - HandheldStationMapUnpowered
+
+- type: loadout
+  id: VGHandheldJukeboxRadio
+  storage:
+    back:
+    - HandheldJukeboxRadio
+  effects:
+  - !type:SponsorLoadoutEffect
