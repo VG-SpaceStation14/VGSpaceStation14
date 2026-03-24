@@ -195,4 +195,22 @@
   - type: SimpleSkillBook
     teachesSkill: Atmos
 
+- type: entity
+  parent: BaseSimpleSkillBook
+  id: SimpleSkillBookBreaking
+  name: книга взлома
+  description: Обучает взлому электронных замков
+  components:
+  - type: Sprite
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#4a4a4a"
+    - state: decor_diagonal
+      color: "#ff6b6b"
+    - state: icon_hacking
+      color: "#ff6b6b"
+  - type: SimpleSkillBook
+    teachesSkill: Breaking
+
 

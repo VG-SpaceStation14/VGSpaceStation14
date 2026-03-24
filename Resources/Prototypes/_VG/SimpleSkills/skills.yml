@@ -52,3 +52,9 @@
   name: Атмосферика
   description: Позволяет использовать атмосферное оборудование
   icon: /Textures/Interface/VerbIcons/bubbles.svg.192dpi.png
+
+- type: simpleSkill
+  id: Breaking
+  name: Взлом
+  description: Позволяет взламывать двери и электронные замки
+  icon: /Textures/Interface/VerbIcons/settings.svg.192dpi.png

@@ -18,6 +18,7 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Content.Server._VG.SimpleSkills; // VG-Tweak
 
 namespace Content.Server.Wires;
 
@@ -31,6 +32,7 @@ public sealed class WiresSystem : SharedWiresSystem
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ConstructionSystem _construction = default!;
+    [Dependency] private readonly SimpleSkillSystem _skillSystem = default!; // VG-Tweak
 
     private static readonly ProtoId<ToolQualityPrototype> CuttingQuality = "Cutting";
     private static readonly ProtoId<ToolQualityPrototype> PulsingQuality = "Pulsing";
@@ -432,6 +434,7 @@ public sealed class WiresSystem : SharedWiresSystem
         args.Handled = true;
     }
 
+    // VG-Tweak 
     private void OnInteractUsing(EntityUid uid, WiresComponent component, InteractUsingEvent args)
     {
         if (args.Handled)
@@ -442,6 +445,18 @@ public sealed class WiresSystem : SharedWiresSystem
 
         if (!IsPanelOpen(uid))
             return;
+
+        // VG-Tweak Start 
+        if (TryComp<WiresPanelSkillRequiredComponent>(uid, out var skillReq))
+        {
+            if (!_skillSystem.HasSkill(args.User, skillReq.RequiredSkill))
+            {
+                _popupSystem.PopupEntity($"Вам нужен навык: {_skillSystem.GetSkillName(skillReq.RequiredSkill)}", args.User, args.User);
+                args.Handled = true;
+                return;
+            }
+        }
+        // VG-Tweak End
 
         if (Tool.HasQuality(args.Used, CuttingQuality, tool) ||
             Tool.HasQuality(args.Used, PulsingQuality, tool))
@@ -523,7 +538,7 @@ public sealed class WiresSystem : SharedWiresSystem
 
     private void UpdateUserInterface(EntityUid uid, WiresComponent? wires = null, UserInterfaceComponent? ui = null)
     {
-        if (!Resolve(uid, ref wires, ref ui, false)) // logging this means that we get a bunch of errors
+        if (!Resolve(uid, ref wires, ref ui, false))
             return;
 
         var clientList = new List<ClientWire>();
@@ -556,8 +571,20 @@ public sealed class WiresSystem : SharedWiresSystem
             wires.WireSeed));
     }
 
+    // VG-Tweak
     public void OpenUserInterface(EntityUid uid, ICommonSession player)
     {
+        // VG-Tweak Start
+        if (TryComp<WiresPanelSkillRequiredComponent>(uid, out var skillReq))
+        {
+            if (player.AttachedEntity != null && !_skillSystem.HasSkill(player.AttachedEntity.Value, skillReq.RequiredSkill))
+            {
+                _popupSystem.PopupEntity($"Вам нужен навык: {_skillSystem.GetSkillName(skillReq.RequiredSkill)}", player.AttachedEntity.Value, player.AttachedEntity.Value);
+                return;
+            }
+        }
+        // VG-Tweak End
+        
         _uiSystem.OpenUi(uid, WiresUiKey.Key, player);
     }
 

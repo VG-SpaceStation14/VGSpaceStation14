@@ -194,7 +194,7 @@ public sealed class SimpleSkillSystem : EntitySystem
     /// <summary>
     ///     Получение названия навыка из прототипа
     /// </summary>
-    private string GetSkillName(string skillId)
+    public string GetSkillName(string skillId)
     {
         return _prototype.TryIndex<SimpleSkillPrototype>(skillId, out var proto) 
             ? proto.Name 

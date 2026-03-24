@@ -16,6 +16,7 @@
   name: Инженерные навыки
   skills:
     - Engineering
+    - Breaking
     - Piloting
 
 - type: simpleSkillGroup
@@ -31,6 +32,7 @@
     - Anomalistic
     - Xenoarchiology
     - Engineering
+    - Breaking
     - Atmos
     - Robotech
     - Medicin
@@ -49,6 +51,7 @@
   name: Навыки охраны
   skills:
     - Weapons
+    - Breaking
 
 - type: simpleSkillGroup
   id: BrigMedicalSkills
@@ -56,6 +59,7 @@
   skills:
     - Weapons
     - Medicine
+    - Breaking
 
 - type: simpleSkillGroup
   id: CargoSkills
@@ -70,6 +74,7 @@
   skills:
     - Piloting
     - Engineering
+    - Breaking
     - Atmos
     - Medicine
     - Weapons
@@ -80,6 +85,7 @@
   skills:
     - Piloting
     - Engineering
+    - Breaking
     - Atmos
     - Medicine
     - Weapons
@@ -90,6 +96,7 @@
   skills:
     - Piloting
     - Engineering
+    - Breaking
     - Atmos
     - Medicine
     - Weapons
@@ -101,6 +108,7 @@
   name: Навыки атмосферного техника
   skills:
     - Engineering
+    - Breaking
     - Atmos
     - Piloting
 
@@ -122,6 +130,7 @@
   skills:
     - Piloting
     - Engineering
+    - Breaking
     - Atmos
     - Medicine
     - Weapons
