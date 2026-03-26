@@ -34,7 +34,8 @@
   - ADT_Aspid
   - ADT_Cluster
 # Micropop 0 - 20
-  - ADT_Reach
+  - ADT_Cluster_Legacy #VG_Tweak
+ # - ADT_Reach #VG-Tweak
   - ADT_Silly
 
 # ADT Maps Выведенные на переработку
