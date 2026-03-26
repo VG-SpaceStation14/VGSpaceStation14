@@ -84,7 +84,7 @@
       task: SimpleRangedHostileCompound
     blackboard:
       VisionRadius: !type:Single
-        2
+        8 #VG-Tweak (2 > 8)
       AggroVisionRadius: !type:Single
         10
   # ADT-Tweak end
