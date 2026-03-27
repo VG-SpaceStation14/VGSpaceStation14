@@ -2,7 +2,7 @@
   id: ADT_Cluster_Legacy
   mapName: 'Cluster Legacy'
   mapPath: /Maps/ADTMaps/ADTStations/adt_cluster_legacy.yml
-  minPlayers: 1
+  minPlayers: 0 # VG-Tweak (1 -> 0)
   maxPlayers: 20 # VG-Tweak (35 -> 20)
   stations:
     ADT_Cluster_Legacy:
