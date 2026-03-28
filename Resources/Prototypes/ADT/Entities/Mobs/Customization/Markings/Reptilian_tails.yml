@@ -3,6 +3,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: axolotl
@@ -12,6 +13,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: datashark_ears_inner
@@ -29,6 +31,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: easternd_primary
@@ -40,6 +43,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: fish_primary
@@ -51,6 +55,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: gecko_primary
@@ -64,6 +69,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: maw
@@ -73,6 +79,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: shark_fin
@@ -84,6 +91,7 @@
   bodyPart: Tail
   markingCategory: Tail
   speciesRestriction: [Reptilian, KoboltSpecies]
+  sponsorOnly: true
   sprites:
     - sprite: ADT/Mobs/Customization/Reptilian/reptilian_tails.rsi
       state: snake
