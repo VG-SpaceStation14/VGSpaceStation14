@@ -1,0 +1,14 @@
+<BoxContainer xmlns="https://spacestation14.io"
+              Orientation="Vertical"
+              HorizontalExpand="True"
+              VerticalExpand="True">
+    <ScrollContainer HorizontalExpand="True" 
+                     VerticalExpand="True"
+                     HScrollEnabled="False"
+                     VScrollEnabled="True">
+        <BoxContainer Name="SkillsContainer"
+                      Orientation="Vertical"
+                      HorizontalExpand="True"
+                      SeparationOverride="4" />
+    </ScrollContainer>
+</BoxContainer>

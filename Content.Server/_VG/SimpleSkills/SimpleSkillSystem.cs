@@ -21,9 +21,21 @@ public sealed class SimpleSkillSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
 
+    private ISawmill _sawmill = default!;
+    
+    // VG-Tweak: Кэш прототипов навыков для быстрого доступа
+    private Dictionary<string, SimpleSkillPrototype> _skillCache = new();
+    private Dictionary<string, SimpleSkillGroupPrototype> _skillGroupCache = new();
+    private bool _cacheInitialized = false;
+    
+    private AsyncSkillCheck? _asyncChecker;
+
     public override void Initialize()
     {
         base.Initialize();
+
+        _sawmill = Logger.GetSawmill("simple.skills");
+        _asyncChecker = new AsyncSkillCheck(this, _sawmill);
 
         // Проверка навыков ДО открытия интерфейса
         SubscribeLocalEvent<SimpleSkillRequiredComponent, BeforeRangedInteractEvent>(OnBeforeInteract);
@@ -46,6 +58,54 @@ public sealed class SimpleSkillSystem : EntitySystem
         
         // Добавляем верб для изучения книги
         SubscribeLocalEvent<SimpleSkillBookComponent, GetVerbsEvent<Verb>>(OnGetSkillBookVerbs);
+        
+        InitializeCache();
+    }
+
+    private void InitializeCache()
+    {
+        if (_cacheInitialized)
+            return;
+
+        _skillCache.Clear();
+        foreach (var proto in _prototype.EnumeratePrototypes<SimpleSkillPrototype>())
+        {
+            _skillCache[proto.ID] = proto;
+        }
+
+        _skillGroupCache.Clear();
+        foreach (var proto in _prototype.EnumeratePrototypes<SimpleSkillGroupPrototype>())
+        {
+            _skillGroupCache[proto.ID] = proto;
+        }
+
+        _cacheInitialized = true;
+        _sawmill.Info($"Skill cache initialized: {_skillCache.Count} skills, {_skillGroupCache.Count} groups");
+    }
+
+    public SimpleSkillPrototype? GetSkillPrototype(string skillId)
+    {
+        InitializeCache();
+        return _skillCache.GetValueOrDefault(skillId);
+    }
+
+    public SimpleSkillGroupPrototype? GetSkillGroupPrototype(string groupId)
+    {
+        InitializeCache();
+        return _skillGroupCache.GetValueOrDefault(groupId);
+    }
+
+    public string GetSkillName(string skillId)
+    {
+        return GetSkillPrototype(skillId)?.Name ?? skillId;
+    }
+
+    /// <summary>
+    ///     Асинхронная проверка навыка
+    /// </summary>
+    public void CheckSkillAsync(EntityUid user, string skillId, Action<bool> callback)
+    {
+        _asyncChecker?.CheckSkillAsync(user, skillId, callback);
     }
 
     /// <summary>
@@ -85,7 +145,7 @@ public sealed class SimpleSkillSystem : EntitySystem
         if (!HasSkill(args.User, component.RequiredSkill))
         {
             _popup.PopupEntity($"Вам нужен навык: {GetSkillName(component.RequiredSkill)}", args.User, args.User);
-            args.Handled = true;  // Блокируем всё взаимодействие
+            args.Handled = true;
         }
     }
 
@@ -192,21 +252,12 @@ public sealed class SimpleSkillSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Получение названия навыка из прототипа
-    /// </summary>
-    public string GetSkillName(string skillId)
-    {
-        return _prototype.TryIndex<SimpleSkillPrototype>(skillId, out var proto) 
-            ? proto.Name 
-            : skillId;
-    }
-
-    /// <summary>
     ///     Применить группу навыков к игроку
     /// </summary>
     public void ApplySkillGroup(EntityUid uid, string groupId)
     {
-        if (!_prototype.TryIndex<SimpleSkillGroupPrototype>(groupId, out var group))
+        var group = GetSkillGroupPrototype(groupId);
+        if (group == null)
         {
             Logger.ErrorS("simple.skills", $"Группа навыков {groupId} не найдена");
             return;
@@ -253,33 +304,6 @@ public sealed class SimpleSkillSystem : EntitySystem
                 Logger.InfoS("simple.skills", $"Компонент уже содержит навыки, группа {component.SkillGroup} не применяется");
             }
         }
-    }
-
-    /// <summary>
-    ///     Рекурсивный поиск предмета в контейнерах (инвентарь, рюкзак и т.д.)
-    /// </summary>
-    private bool TryFindItemInInventory(EntityUid entity, string skillId, out EntityUid foundItem)
-    {
-        if (TryComp<SimpleSkillBookComponent>(entity, out var book) && book.TeachesSkill == skillId)
-        {
-            foundItem = entity;
-            return true;
-        }
-
-        if (TryComp<ContainerManagerComponent>(entity, out var containers))
-        {
-            foreach (var container in containers.Containers.Values)
-            {
-                foreach (var contained in container.ContainedEntities)
-                {
-                    if (TryFindItemInInventory(contained, skillId, out foundItem))
-                        return true;
-                }
-            }
-        }
-
-        foundItem = default;
-        return false;
     }
 
     /// <summary>
@@ -406,7 +430,7 @@ public sealed class SimpleSkillSystem : EntitySystem
             CancelDuplicate = true,
             DistanceThreshold = 3f,
             NeedHand = true,
-            EventTarget = teacher 
+            EventTarget = teacher
         };
 
         if (!_doAfter.TryStartDoAfter(teachDoAfter, out var doAfterId))
@@ -491,7 +515,6 @@ public sealed class SimpleSkillSystem : EntitySystem
             _audio.PlayPvs(component.SoundEnd, uid);
         else if (component.Sound != null)
             _audio.PlayPvs(component.Sound, uid);
-            
     }
 
     /// <summary>
@@ -501,7 +524,6 @@ public sealed class SimpleSkillSystem : EntitySystem
     {
         if (component.Student != null && component.DoAfterId != null)
         {
-            // Конвертируем uint в ushort для конструктора DoAfterId
             var doAfterId = new DoAfterId(uid, (ushort)component.DoAfterId.Value);
             _doAfter.Cancel(doAfterId);
         }
@@ -528,17 +550,14 @@ public sealed partial class SimpleSkillBookComponent : Component
     public string TeachesSkill = string.Empty;
     
     [DataField]
-    public SoundSpecifier? Sound; // звук начала изучения (для обратной совместимости)
+    public SoundSpecifier? Sound;
 
     [DataField]
-    public SoundSpecifier? SoundStart; // звук начала изучения (приоритетнее)
+    public SoundSpecifier? SoundStart;
 
     [DataField]
-    public SoundSpecifier? SoundEnd; // звук завершения/отмены
+    public SoundSpecifier? SoundEnd;
 
-    /// <summary>
-    ///     Время изучения из книги (в секундах) - не используется, оставлено для совместимости
-    /// </summary>
     [DataField]
     public float LearnTime = 360f;
 }

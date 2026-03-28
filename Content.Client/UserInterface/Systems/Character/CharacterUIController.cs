@@ -327,12 +327,9 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
         }
         else
         {
-            foreach (var (proto, known) in knownSkills)
-            {
-                var entry = new SkillEntryControl();
-                entry.SetSkill(proto, known);
-                _window.SkillsContainer.AddChild(entry);
-            }
+            var lazyList = new LazySkillList();
+            lazyList.SetSkills(knownSkills);
+            _window.SkillsContainer.AddChild(lazyList);
         }
     }
     //VG-Tweak - Skills - End
