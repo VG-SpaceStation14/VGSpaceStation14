@@ -9,10 +9,11 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 using Robust.Shared.Serialization;
+using Content.Shared.Humanoid;
 
 namespace Content.Shared.ADT.Morph;
 
-[RegisterComponent, AutoGenerateComponentState, NetworkedComponent] //, AutoGenerateComponentState]
+[RegisterComponent, AutoGenerateComponentState, NetworkedComponent]
 public sealed partial class MorphComponent : Component
 {
     /// <summary>
@@ -34,6 +35,7 @@ public sealed partial class MorphComponent : Component
     /// </summary>
     [DataField]
     public DamageSpecifier DamageOnTouch = default!;
+    
     /// <summary>
     ///     нужно исключительно для размножения
     /// </summary>
@@ -45,11 +47,13 @@ public sealed partial class MorphComponent : Component
     /// </summary>
     [DataField]
     public float EatWeaponChanceOnHit = 0.2f;
+    
     /// <summary>
     ///     шанс скушать оружие ударом по морфу
     /// </summary>
     [DataField]
     public float EatWeaponChanceOnHited = 0.5f;
+    
     /// <summary>
     ///     количество еды, нужное чтобы скушать оруже
     /// </summary>
@@ -73,6 +77,7 @@ public sealed partial class MorphComponent : Component
     /// </summary>
     [DataField]
     public int ReplicationFoodReq = 200;
+    
     /// <summary>
     /// Звук обеда
     /// </summary>
@@ -81,14 +86,16 @@ public sealed partial class MorphComponent : Component
     {
         Params = AudioParams.Default.WithVolume(-3f),
     };
+    
     /// <summary>
     /// объява цк после массового размножения
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite), DataField("soundReplication")]
-    public SoundSpecifier? SoundReplication = new SoundPathSpecifier("/Audio/Announcements/announce.ogg") // VG edit
+    public SoundSpecifier? SoundReplication = new SoundPathSpecifier("/Audio/Announcements/announce.ogg")
     {
         Params = AudioParams.Default.WithVolume(-3f),
     };
+    
     /// <summary>
     /// время нужное для обеда
     /// </summary>
@@ -97,39 +104,75 @@ public sealed partial class MorphComponent : Component
 
     [AutoNetworkedField, ViewVariables(VVAccess.ReadWrite)]
     public List<EntityUid> ContainedCreatures = new();
+    
     /// <summary>
     /// вайтлист на обед
     /// </summary>
     [AutoNetworkedField]
     public List<EntityUid> MemoryObjects = new();
+    
     [DataField]
     public EntityWhitelist? DevourWhitelist = new();
+
+    // VG-Tweak Start
+    /// <summary>
+    /// Сохранённые гуманоиды для мимикрии (только сервер)
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public List<StoredHumanoidProfile> StoredHumanoids = new();
+    // VG-Tweak End
 
     //дальше идёт хлам, который вам не надо использовать
     [DataField("devourAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? DevourAction = "ActionMorphDevour";
     public EntityUid? DevourActionEntity;
+    
     [DataField("memoryAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? MemoryAction = "ActionMorphRemember";
     public EntityUid? MemoryActionEntity;
+    
     [DataField("replicationAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? ReplicationAction = "ActionMorphReplication";
     public EntityUid? ReplicationActionEntity;
+    
     [DataField("mimicryAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? MimicryAction = "ActionMorphMimicry";
     public EntityUid? MimicryActionEntity;
+    
     [DataField("ambushAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? AmbushAction = "ActionMorphAmbush";
     public EntityUid? AmbushActionEntity;
+    
     [DataField("openVentAction", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     public string? VentOpenAction = "ActionMorphVentOpen";
     public EntityUid? VentOpenActionEntity;
-    // public List<HumanoidAppearanceComponent> ApperanceList = new();
-    //нужен для работы мимикрии под гуманойдов, больше ничего
-    //бла-бла-бла, это надо если хотите делать морф под гуманоидов не костылями
-    // public (EntityUid, HumanoidAppearanceComponent) NullspacedHumanoid = default;
-
 }
+
+[Serializable, NetSerializable]
+public sealed class MimicryMenuState : BoundUserInterfaceState
+{
+    public NetEntity[] Targets { get; }
+    
+    public MimicryMenuState(NetEntity[] targets)
+    {
+        Targets = targets;
+    }
+}
+
+// VG-Tweak Start
+/// <summary>
+/// Сохранённый профиль гуманоида для мимикрии (только сервер)
+/// </summary>
+[Serializable, DataDefinition]
+public sealed partial class StoredHumanoidProfile
+{
+    [DataField]
+    public HumanoidAppearanceComponent? Appearance { get; set; }
+    
+    [DataField]
+    public string Name { get; set; } = string.Empty;
+}
+// VG-Tweak End
 
 /// <summary>
 /// копирование данных предметов для мимикрии. Работает ТОЛЬКО на простых предметах, гуманоидов или существ с телом отдельный метод
@@ -137,29 +180,35 @@ public sealed partial class MorphComponent : Component
 public sealed partial class MorphDevourActionEvent : EntityTargetActionEvent
 {
 }
+
 public sealed partial class MorphMimicryRememberActionEvent : EntityTargetActionEvent
 {
 }
+
 public sealed partial class MorphReproduceActionEvent : InstantActionEvent
 {
 }
+
 public sealed partial class MorphOpenRadialMenuEvent : InstantActionEvent
 {
 }
-public sealed partial class MorphDevourActionEvent : EntityTargetActionEvent
-{
-}
+
 public sealed partial class MorphAmbushActionEvent : InstantActionEvent
 {
 }
+
 public sealed partial class MorphVentOpenActionEvent : EntityTargetActionEvent
 {
 }
-[Serializable, NetSerializable] public sealed partial class EventMimicryActivate : BoundUserInterfaceMessage
+
+[Serializable, NetSerializable] 
+public sealed partial class EventMimicryActivate : BoundUserInterfaceMessage
 {
     public NetEntity? Target { get; set; }
 }
-[Serializable, NetSerializable] public enum MimicryKey : byte
+
+[Serializable, NetSerializable] 
+public enum MimicryKey : byte
 {
     Key
 }

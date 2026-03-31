@@ -3,6 +3,7 @@ using System.Numerics;
 using Content.Server.Body.Components;
 using Content.Server.Chat.Systems;
 using Content.Server.Humanoid;
+using Content.Server.Mind;
 using Content.Server.Stunnable;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
@@ -17,6 +18,7 @@ using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
+using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -65,8 +67,16 @@ public sealed class MorphSystem : SharedMorphSystem
     [Dependency] private readonly WeldableSystem _weldable = default!;
     [Dependency] private readonly StandingStateSystem _standing = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly MetaDataSystem _metaSystem = default!;
+    [Dependency] private readonly MindSystem _mindSystem = default!;
+    
     public ProtoId<DamageGroupPrototype> BruteDamageGroup = "Brute";
     public ProtoId<DamageGroupPrototype> BurnDamageGroup = "Burn";
+    
+    #region VG-Tweak Start
+    private EntProtoId _morphHumanoidProto = "MorphHumanoidDummy";
+    #endregion VG-Tweak End
+
     public override void Initialize()
     {
         SubscribeLocalEvent<MorphComponent, AttackedEvent>(OnAttacked);
@@ -99,9 +109,22 @@ public sealed class MorphSystem : SharedMorphSystem
             var transform = Transform(uid);
             _transform.SetCoordinates(entity, transform.Coordinates);
         }
+        
+        // VG-Tweak: Удаляем все заглушки гуманоидов
+        foreach (var dummy in component.MemoryObjects)
+        {
+            if (TryComp<HumanoidAppearanceComponent>(dummy, out _))
+            {
+                QueueDel(dummy);
+            }
+        }
     }
+    
     private void OnInit(EntityUid uid, MorphComponent component, MapInitEvent args)
     {
+        component.Container = container.EnsureContainer<Container>(uid, component.ContainerId);
+        component.MimicryContainer = container.EnsureContainer<Container>(uid, component.MimicryContainerId);
+        
         _actions.AddAction(uid, ref component.DevourActionEntity, component.DevourAction);
         _actions.AddAction(uid, ref component.MemoryActionEntity, component.MemoryAction);
         _actions.AddAction(uid, ref component.ReplicationActionEntity, component.ReplicationAction);
@@ -109,6 +132,7 @@ public sealed class MorphSystem : SharedMorphSystem
         _actions.AddAction(uid, ref component.AmbushActionEntity, component.AmbushAction);
         _actions.AddAction(uid, ref component.VentOpenActionEntity, component.VentOpenAction);
     }
+    
     private void OnAttacked(Entity<MorphComponent> ent, ref AttackedEvent args)
     {
         if (!TryComp<HungerComponent>(ent, out var hunger))
@@ -125,6 +149,7 @@ public sealed class MorphSystem : SharedMorphSystem
             _hunger.ModifyHunger(ent, -ent.Comp.EatWeaponHungerReq, hunger);
         }
     }
+    
     private void OnAttack(Entity<MorphComponent> ent, ref MeleeHitEvent args)
     {
         _chameleon.TryReveal(ent.Owner);
@@ -168,14 +193,97 @@ public sealed class MorphSystem : SharedMorphSystem
         var hungerCount = _hunger.GetHunger(hunger);
         args.PushMarkup($"[color=yellow]{Loc.GetString("comp-morph-examined-hunger", ("hunger", hungerCount))}[/color]");
     }
+    
+    private void OnMimicryRadialMenu(EntityUid uid, MorphComponent component, MorphOpenRadialMenuEvent args)
+    {
+        if (!TryComp<UserInterfaceComponent>(uid, out var uic))
+            return;
+        
+        var availableTargets = new List<NetEntity>();
+        foreach (var obj in component.MemoryObjects)
+        {
+            if (Exists(obj) && !Deleted(obj))
+                availableTargets.Add(GetNetEntity(obj));
+        }
+        
+        _ui.SetUiState((uid, uic), MimicryKey.Key, new MimicryMenuState(availableTargets.ToArray()));
+        _ui.OpenUi((uid, uic), MimicryKey.Key, uid);
+        _chameleon.TryReveal(uid);
+    }
+    
+    // VG-Tweak Start
+    private void OnMimicryRememberAction(EntityUid uid, MorphComponent component, MorphMimicryRememberActionEvent args)
+    {
+        if (!TryComp<ChameleonProjectorComponent>(uid, out var chamel))
+            return;
+
+        if (TryComp<HumanoidAppearanceComponent>(args.Target, out var humanoid))
+        {
+            var humanoidProfile = new StoredHumanoidProfile
+            {
+                Appearance = humanoid,
+                Name = MetaData(args.Target).EntityName
+            };
+            
+            if (component.StoredHumanoids.Count > 5) 
+                component.StoredHumanoids.RemoveAt(0);
+            
+            component.StoredHumanoids.Add(humanoidProfile);
+            
+            var dummy = Spawn(_morphHumanoidProto, Transform(uid).Coordinates);
+            if (dummy != null && TryComp<HumanoidAppearanceComponent>(dummy, out var dummyAppearance))
+            {
+                _humanoid.SetAppearance(humanoid, dummyAppearance);
+                _metaSystem.SetEntityName(dummy, MetaData(args.Target).EntityName);
+                
+                if (component.MemoryObjects.Count > 5) 
+                    component.MemoryObjects.RemoveAt(0);
+                
+                component.MemoryObjects.Add(dummy);
+            }
+            
+            _popupSystem.PopupCursor(Loc.GetString("morph-remembered-humanoid"), uid);
+            Dirty(uid, component);
+            return;
+        }
+
+        if (_chameleon.IsInvalid(chamel, args.Target))
+        {
+            _popupSystem.PopupCursor(Loc.GetString("morph-unable-to-remember"), uid);
+            return;
+        }
+        
+        if (component.MemoryObjects.Count > 5) 
+            component.MemoryObjects.RemoveAt(0);
+        
+        component.MemoryObjects.Add(args.Target);
+        Dirty(uid, component);
+    }
+    // VG-Tweak End
+    
     private void OnMimicryActivate(EntityUid uid, MorphComponent component, EventMimicryActivate args)
     {
         if (!TryComp<ChameleonProjectorComponent>(uid, out var chamel))
             return;
-        var targ = GetEntity(args.Target);
-        if (targ != null)
-            MimicryNonHumanoid((uid, chamel), targ.Value);
+
+        var target = GetEntity(args.Target);
+        if (target == null)
+            return;
+
+        // VG-Tweak: проверяем, является ли цель заглушкой гуманоида
+        var humanoidProfile = component.StoredHumanoids.FirstOrDefault(h => h.Name == MetaData(target.Value).EntityName);
+        if (humanoidProfile?.Appearance != null)
+        {
+            MimicryHumanoid(uid, humanoidProfile.Appearance, humanoidProfile.Name);
+            component.MemoryObjects.Remove(target.Value);
+            QueueDel(target.Value);
+            return;
+        }
+
+        // Обычная мимикрия (животные, предметы)
+        MimicryNonHumanoid((uid, chamel), target.Value);
     }
+    
     private void OnAmbushAction(EntityUid uid, MorphComponent component, MorphAmbushActionEvent args)
     {
         if (!TryComp<ChameleonProjectorComponent>(uid, out var chamel))
@@ -194,15 +302,18 @@ public sealed class MorphSystem : SharedMorphSystem
             _actionBlocker.UpdateCanMove(uid);
         }
     }
+    
     private void OnCanMoveEvent(EntityUid uid, MorphAmbushComponent component, UpdateCanMoveEvent args)
     {
         args.Cancel();
     }
+    
     private void OnAmbushAttack(Entity<MorphAmbushComponent> ent, ref MeleeHitEvent args)
     {
         _stun.TryKnockdown(args.HitEntities[0], TimeSpan.FromSeconds(ent.Comp.StunTimeInteract), false);
         AmbushBreak(ent);
     }
+    
     public void AmbushBreak(EntityUid uid)
     {
         _popupSystem.PopupCursor(Loc.GetString("morphs-out-of-ambush"), uid);
@@ -220,70 +331,18 @@ public sealed class MorphSystem : SharedMorphSystem
             Dirty(uid, input);
         }
     }
+    
     private void OnAmbusInteract(EntityUid uid, MorphAmbushComponent component, UndisguisedEvent args)
     {
         if (args.User == null)
             return;
-        _stun.TryUpdateStunDuration(args.User.Value, TimeSpan.FromSeconds(component.StunTimeInteract)); //при интеракции станим, при ударе морфом клокдауним
+        _stun.TryUpdateStunDuration(args.User.Value, TimeSpan.FromSeconds(component.StunTimeInteract));
         _damageable.TryChangeDamage(args.User.Value, component.DamageOnTouch);
         AmbushBreak(uid);
     }
-    private void OnMimicryRadialMenu(EntityUid uid, MorphComponent component, MorphOpenRadialMenuEvent args)
-    {
-        // Инциализируем контейнер мимикрии
-        component.MimicryContainer = container.EnsureContainer<Container>(uid, component.MimicryContainerId);
-
-        if (!TryComp<UserInterfaceComponent>(uid, out var uic))
-            return;
-        _ui.OpenUi((uid, uic), MimicryKey.Key, uid);
-        _chameleon.TryReveal(uid);
-    }
-    private void OnMimicryRememberAction(EntityUid uid, MorphComponent component, MorphMimicryRememberActionEvent args)
-    {
-        if (!TryComp<ChameleonProjectorComponent>(uid, out var chamel))
-            return;
-        //отвечает за запоминание энтити для мимикрии.
-        //гуманоидов запоминает отдельно т.к. их невозможно показать путём хамелеона
-        //короче мне лень эту хреноетнь выписывать. Кто будет её чинить - мои соболезнования вам
-        if (TryComp<HumanoidAppearanceComponent>(args.Target, out var humanoid))
-        {
-            //короче мне лень эту хреноетнь выписывать. Кто будет её чинить - мои соболезнования вам
-            //TODO: сделать морфабильность гуманоидов. Этот метод работает, но на 50%. Он спавнит зуманоида и устанавливает ему вид, но не может прицепить его
-            //вероятно, беды в прототипах
-            // var transform = Transform(uid);
-            // var target = SpawnAttachedTo("MorphHumanoidDummy", transform.Coordinates);
-            // if (!TryComp<HumanoidAppearanceComponent>(target, out var targethumanoid))
-            //     return;
-            // component.ApperanceList.Add(humanoid);
-            // if (component.ApperanceList.Count() > 5) component.ApperanceList.RemoveAt(0);
-            // _humanoid.SetAppearance(component.ApperanceList[0], targethumanoid);
-        }
-        else
-        {
-            if (_chameleon.IsInvalid(chamel, args.Target))
-            {
-                _popupSystem.PopupCursor(Loc.GetString("morph-unable-to-remember"), uid);
-                return;
-            }
-            if (component.MemoryObjects.Count() > 5) { component.MemoryObjects.RemoveAt(0); }
-            component.MemoryObjects.Add(args.Target);
-        }
-        Dirty(uid, component);
-    }
-    //сюда надо перенести части из метода выше, а пока этот метод в комментах
-    // public void MimicryHumanoid(EntityUid morph, EntityUid humanoid, HumanoidAppearanceComponent apperance)
-    // {
-
-    // }
-    public void MimicryNonHumanoid(Entity<ChameleonProjectorComponent> morph, EntityUid toChameleon)
-    {
-        if (!Exists(toChameleon) || Deleted(toChameleon))
-            return;
-        _chameleon.Disguise(morph, morph, toChameleon);
-    }
+    
     private void OnDevourAction(EntityUid uid, MorphComponent component, MorphDevourActionEvent args)
     {
-        //делаю отдельный код т.к. уже готовая система дракона совсем не подходити
         if (_whitelistSystem.IsWhitelistFailOrNull(component.DevourWhitelist, args.Target))
             return;
         if (args.Handled)
@@ -299,7 +358,6 @@ public sealed class MorphSystem : SharedMorphSystem
                     _popupSystem.PopupClient(Loc.GetString("devour-action-popup-message-fail-target-alive"), uid, uid);
                     break;
                 case MobState.Dead:
-
                     _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, uid, component.DevourTime, new MorphDevourDoAfterEvent(), uid, target: target, used: uid)
                     {
                         BreakOnMove = true,
@@ -309,7 +367,6 @@ public sealed class MorphSystem : SharedMorphSystem
                     _popupSystem.PopupClient(Loc.GetString("devour-action-popup-message-fail-target-alive"), uid, uid);
                     break;
             }
-
             return;
         }
 
@@ -320,6 +377,7 @@ public sealed class MorphSystem : SharedMorphSystem
             BreakOnMove = true,
         });
     }
+    
     private void OnReproduceAction(EntityUid uid, MorphComponent component, MorphReproduceActionEvent args)
     {
         if (!TryComp<HungerComponent>(uid, out var hunger))
@@ -334,7 +392,7 @@ public sealed class MorphSystem : SharedMorphSystem
             while (morphs.MoveNext(out var ent, out _, out _))
                 morphList.Add(ent);
 
-            if (morphList.Count() == component.DetectableCount) //чтобы не спамило на всякий
+            if (morphList.Count == component.DetectableCount)
             {
                 ChatSystem.DispatchFilteredAnnouncement(Filter.Broadcast(), Loc.GetString("morphs-announcement"), playSound: false, colorOverride: Color.Gold);
                 _audioSystem.PlayGlobal(component.SoundReplication, Filter.Broadcast(), true);
@@ -342,6 +400,7 @@ public sealed class MorphSystem : SharedMorphSystem
             _actions.StartUseDelay(component.ReplicationActionEntity);
         }
     }
+    
     private void OnDoDevourAfter(EntityUid uid, MorphComponent component, MorphDevourDoAfterEvent args)
     {
         if (args.Handled || args.Cancelled || args.Target == null)
@@ -350,11 +409,9 @@ public sealed class MorphSystem : SharedMorphSystem
             return;
         if (!TryComp<MobThresholdsComponent>(args.Target, out var state) || !_threshold.TryGetDeadThreshold(args.Target.Value, out var health))
         {
-            //ЭТО ОТВЕЧАЕТ ЗА КУШАНИЕ ПРЕДМЕТОВ. НЕ ПЕРЕПУТАТЬ.
             health = -component.EatWeaponHungerReq;
             _hunger.ModifyHunger(uid, (float)health.Value, hunger);
             _audioSystem.PlayPvs(component.SoundDevour, uid);
-            component.ContainedCreatures.Add(args.Target.Value);
             component.ContainedCreatures.Add(args.Target.Value);
             _transform.SetCoordinates(args.Target.Value, new EntityCoordinates(EntityUid.Invalid, Vector2.Zero));
             return;
@@ -374,4 +431,87 @@ public sealed class MorphSystem : SharedMorphSystem
         component.ContainedCreatures.Add(args.Target.Value);
         _transform.SetCoordinates(args.Target.Value, new EntityCoordinates(EntityUid.Invalid, Vector2.Zero));
     }
+    
+    #region VG-Tweak Start
+    /// <summary>
+    /// Мимикрия под гуманоида
+    /// </summary>
+    public void MimicryHumanoid(EntityUid morph, HumanoidAppearanceComponent appearance, string name)
+    {
+        if (!TryComp<MorphComponent>(morph, out var oldMorphComp))
+            return;
+        
+        var oldMemoryObjects = new List<EntityUid>(oldMorphComp.MemoryObjects);
+        var oldStoredHumanoids = new List<StoredHumanoidProfile>(oldMorphComp.StoredHumanoids);
+        var oldContainedCreatures = new List<EntityUid>(oldMorphComp.ContainedCreatures);
+
+        var oldDevourActionEntity = oldMorphComp.DevourActionEntity;
+        var oldMemoryActionEntity = oldMorphComp.MemoryActionEntity;
+        var oldReplicationActionEntity = oldMorphComp.ReplicationActionEntity;
+        var oldMimicryActionEntity = oldMorphComp.MimicryActionEntity;
+        var oldAmbushActionEntity = oldMorphComp.AmbushActionEntity;
+        var oldVentOpenActionEntity = oldMorphComp.VentOpenActionEntity;
+        
+        var dummy = Spawn(_morphHumanoidProto, Transform(morph).Coordinates);
+        
+        if (dummy == null || !Exists(dummy))
+            return;
+
+        if (!TryComp<HumanoidAppearanceComponent>(dummy, out var dummyAppearance))
+        {
+            QueueDel(dummy);
+            return;
+        }
+
+        _humanoid.SetAppearance(appearance, dummyAppearance);
+        _metaSystem.SetEntityName(dummy, name);
+        
+        dummyAppearance.SkinColor = appearance.SkinColor;
+        dummyAppearance.EyeColor = appearance.EyeColor;
+        dummyAppearance.CustomBaseLayers = appearance.CustomBaseLayers;
+
+        var newMorphComp = EnsureComp<MorphComponent>(dummy);
+        newMorphComp.MemoryObjects = oldMemoryObjects;
+        newMorphComp.StoredHumanoids = oldStoredHumanoids;
+        newMorphComp.ContainedCreatures = oldContainedCreatures;
+        newMorphComp.Container = oldMorphComp.Container;
+        newMorphComp.MimicryContainer = oldMorphComp.MimicryContainer;
+        newMorphComp.DevourActionEntity = oldDevourActionEntity;
+        newMorphComp.MemoryActionEntity = oldMemoryActionEntity;
+        newMorphComp.ReplicationActionEntity = oldReplicationActionEntity;
+        newMorphComp.MimicryActionEntity = oldMimicryActionEntity;
+        newMorphComp.AmbushActionEntity = oldAmbushActionEntity;
+        newMorphComp.VentOpenActionEntity = oldVentOpenActionEntity;
+        
+        EnsureComp<ChameleonProjectorComponent>(dummy);
+        
+        if (_mindSystem.TryGetMind(morph, out var mindId, out var mind))
+        {
+            _mindSystem.TransferTo(mindId, dummy, mind: mind);
+        }
+
+        QueueDel(morph);
+        
+        _popupSystem.PopupCursor(Loc.GetString("morph-mimicry-humanoid-success"), dummy);
+    }
+
+    /// <summary>
+    /// Мимикрия под не-гуманоида
+    /// </summary>
+    public void MimicryNonHumanoid(Entity<ChameleonProjectorComponent> morph, EntityUid toChameleon)
+    {
+        if (!Exists(toChameleon) || Deleted(toChameleon))
+            return;
+        _chameleon.Disguise(morph, morph, toChameleon);
+    }
+    #endregion VG-Tweak End
+
+    //Короче я заеблася, как я понял изначально система подразумивала под собой прикрепление гуманойдов так же как и предметов с животными
+    //Понял я это позновато, так что теперь у нас переселение ума жижки в гуманойда, в целом тоже рабочий варик
+    //TODO: Превращение обратно в жижку если ты гуманойд и корректный перенос компонентов с исходника на копию. 
+    // При запоминании жижкой гуманойда его клон создается на жижке, это нужно для отображения его в радиальном меню, 
+    // но все же нужно как то сделать так, что бы дамми не появлялся на жижке, может сразу переселять мозг жижки в дамми при копировании?
+    //Может быть теперь жижка умный и я оставлю ему руки если он гуманойд
+    //хотя цель у него плодится представте армию мимиком жижек с ящиками для инструментов, по моему пиздато
+    //К этой дроче я точно не скоро вернусь
 }

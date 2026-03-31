@@ -1,0 +1,86 @@
+- type: entity
+  id: MorphHumanoidDummy
+  parent: BaseMobHuman
+  name: morphling
+  description: A shifting mass of flesh and bone, capable of mimicking any form it has consumed.
+  components:
+  - type: Sprite
+    drawdepth: Mobs
+    layers:
+    - state: generic
+      map: ["enum.DamageStateVisualLayers.Base"]
+  - type: MobState
+    allowedStates:
+    - Alive
+    - Dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      100: Dead
+  - type: Damageable
+    damageContainer: Biological
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MeatSlap
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: Hunger
+    baseDecayRate: 0
+  - type: Thirst
+    baseDecayRate: 0
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 3
+    baseSprintSpeed: 4.5
+  - type: InputMover
+  - type: MobMover
+  - type: Physics
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 100
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: Appearance
+  - type: HumanoidAppearance
+    species: Human
+  - type: Body
+    prototype: Human
+  - type: Inventory
+    templateId: human
+  - type: Hands
+  - type: StationAiWhitelist
+  - type: GhostTakeoverAvailable
+    makeSentient: true
+    name: morphling-husk-name
+    description: morphling-husk-description
+    requirements:
+    - !type:OverallPlaytimeRequirement
+      time: 14400
+    - !type:DepartmentTimeRequirement
+      department: Silicon
+      time: 7200
+  - type: GhostRole
+    name: morphling-husk-name
+    description: morphling-husk-description
+    makeSentient: true
+    rules: ghost-role-information-nonantagonist-rules
+  - type: GhostRoleMobSpawner
+    deleteOnSpawn: true
+    prototype: ADTMorphGhostRole
+  - type: MindContainer
+    showExamineInfo: true
+  - type: CanHostGuardian
+  - type: Grammar
+    attributes:
+      proper: true
