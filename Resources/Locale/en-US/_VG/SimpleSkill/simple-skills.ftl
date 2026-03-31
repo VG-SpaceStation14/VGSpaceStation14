@@ -24,3 +24,7 @@ skill-teach-start-student = { $teacher } started teaching you the skill { $skill
 skill-teach-cancelled = Teaching interrupted
 skill-teach-success-teacher = You successfully taught { $student } the skill { $skill }!
 skill-teach-success-student = { $teacher } successfully taught you the skill { $skill }!
+
+admin-verbs-grant-all-skills = Grant all skills
+admin-verbs-grant-all-skills-description = Grants all available skills to the selected character
+admin-verbs-grant-all-skills-success = Granted { $count } skills!

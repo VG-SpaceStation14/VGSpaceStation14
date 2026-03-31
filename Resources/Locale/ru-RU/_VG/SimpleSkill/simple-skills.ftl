@@ -24,3 +24,7 @@ skill-teach-start-student = { $teacher } начал обучать вас нав
 skill-teach-cancelled = Обучение прервано
 skill-teach-success-teacher = Вы успешно обучили { $student } навыку { $skill }!
 skill-teach-success-student = { $teacher } успешно обучил вас навыку { $skill }!
+
+admin-verbs-grant-all-skills = Выдать все навыки
+admin-verbs-grant-all-skills-description = Выдает все доступные навыки выбранному персонажу
+admin-verbs-grant-all-skills-success = Выдано { $count } навыков!

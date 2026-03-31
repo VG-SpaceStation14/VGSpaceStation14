@@ -25,6 +25,7 @@ using Content.Shared.Hands.Components;
 using Content.Shared.Inventory;
 using Content.Shared.PDA;
 using Content.Shared.Power.Components;
+using Content.Shared.Popups; // VG-Tweak
 using Content.Shared.Stacks;
 using Content.Shared.Station.Components;
 using Content.Shared.Verbs;
@@ -37,6 +38,10 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using Content.Server._VG.SimpleSkills; // VG-Tweak
+using Content.Shared._VG.SimpleSkills; // VG-Tweak
+using Content.Shared.Mech.Components; // VG-Tweak
+using Content.Shared.Doors.Components; // VG-Tweak
 
 namespace Content.Server.Administration.Systems;
 
@@ -730,7 +735,65 @@ public sealed partial class AdminVerbSystem
             };
             args.Verbs.Add(setCapacity);
         }
+
+        // VG-Tweak: Добавляем верб для выдачи всех навыков
+        AddAllSkillsVerb(args);
     }
+
+    // VG-Tweak Start - Выдача всех навыков
+    private void AddAllSkillsVerb(GetVerbsEvent<Verb> args)
+    {
+        if (!TryComp(args.User, out ActorComponent? actor))
+            return;
+
+        var player = actor.PlayerSession;
+
+        if (!_adminManager.HasAdminFlag(player, AdminFlags.Admin))
+            return;
+
+        if (!CanHaveSkills(args.Target))
+            return;
+
+        var allSkillsVerb = new Verb
+        {
+            Text = Loc.GetString("admin-verbs-grant-all-skills"),
+            Category = VerbCategory.Tricks,
+            Icon = new SpriteSpecifier.Rsi(new("/Textures/Objects/Misc/books.rsi"), "book_icon"),
+            Act = () =>
+            {
+                var skillSystem = EntityManager.System<SimpleSkillSystem>();
+                var allSkills = _prototypeManager.EnumeratePrototypes<SimpleSkillPrototype>().ToList();
+
+                foreach (var skill in allSkills)
+                {
+                    skillSystem.AddSkill(args.Target, skill.ID);
+                }
+
+                _popupSystem.PopupEntity(
+                    Loc.GetString("admin-verbs-grant-all-skills-success", ("count", allSkills.Count)),
+                    args.Target,
+                    args.Target,
+                    PopupType.Medium);
+            },
+            Impact = LogImpact.Medium,
+            Message = Loc.GetString("admin-verbs-grant-all-skills-description"),
+            Priority = (int)TricksVerbPriorities.GrantAllSkills,
+        };
+
+        args.Verbs.Add(allSkillsVerb);
+    }
+
+    private bool CanHaveSkills(EntityUid uid)
+    {
+        if (HasComp<MechComponent>(uid) ||
+            HasComp<DoorComponent>(uid) ||
+            HasComp<MapGridComponent>(uid) ||
+            HasComp<MapComponent>(uid))
+            return false;
+
+        return true;
+    }
+    // VG-Tweak End
 
     private void RefillEquippedTanks(EntityUid target, Gas gasType)
     {
@@ -875,5 +938,6 @@ public sealed partial class AdminVerbSystem
         SnapJoints = -27,
         MakeMinigun = -28,
         SetBulletAmount = -29,
+        GrantAllSkills = -30, // VG-Tweak
     }
 }
