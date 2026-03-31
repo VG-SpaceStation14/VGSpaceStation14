@@ -36,14 +36,23 @@ public sealed partial class PlayerListEntry : BoxContainer
             OnPinStatusChanged?.Invoke(info);
         };
     }
-
+    // VG-Tweak - Start
     private void Update(PlayerInfo info, Func<PlayerInfo, string, string>? overrideText)
     {
-        PlayerEntryLabel.Text = overrideText?.Invoke(info, $"{info.CharacterName} ({info.Username})") ??
-                                $"{info.CharacterName} ({info.Username})";
+        var displayText = $"{info.CharacterName} ({info.Username})";
+        
+        var sponsorsManager = IoCManager.Resolve<Content.Client._VG.Sponsors.SponsorsManager>();
+        if (sponsorsManager.TryGetInfo(out var sponsorInfo) && sponsorInfo != null && sponsorInfo.Tier.HasValue)
+        {
+            var tier = sponsorInfo.Tier.Value;
+            displayText = $"{displayText} cпонсор {tier} ур.";
+        }
+        
+        PlayerEntryLabel.Text = overrideText?.Invoke(info, displayText) ?? displayText;
 
         UpdatePinButtonTexture(info.IsPinned);
     }
+    // VG-Tweak - End
 
     private void UpdatePinButtonTexture(bool isPinned)
     {

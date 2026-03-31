@@ -98,9 +98,7 @@ public sealed partial class PlayerListControl : BoxContainer
         _sortedPlayerList.Clear();
         foreach (var info in _playerList)
         {
-            var displayName = $"{info.CharacterName} ({info.Username})";
-            if (info.IdentityName != info.CharacterName)
-                displayName += $" [{info.IdentityName}]";
+            var displayName = GetText(info);
             if (!string.IsNullOrEmpty(FilterLineEdit.Text)
                 && !displayName.ToLowerInvariant().Contains(FilterLineEdit.Text.Trim().ToLowerInvariant()))
                 continue;
@@ -114,8 +112,23 @@ public sealed partial class PlayerListControl : BoxContainer
         if (_selectedPlayer != null)
             PlayerListContainer.Select(new PlayerListData(_selectedPlayer));
     }
-
-
+    // VG-Tweak - Start: информация о спонсоре
+    private string GetText(PlayerInfo info)
+    {
+        var displayText = $"{info.CharacterName} ({info.Username})";
+    
+        var sponsorsManager = IoCManager.Resolve<Content.Client._VG.Sponsors.SponsorsManager>();
+        if (sponsorsManager.TryGetInfo(out var sponsorInfo) && sponsorInfo != null && sponsorInfo.Tier.HasValue)
+        {
+            var tier = sponsorInfo.Tier.Value;
+            displayText = $"{displayText} Спонсор {tier} ур.";
+        }
+    
+        if (OverrideText != null)
+            displayText = OverrideText.Invoke(info, displayText);
+        return displayText;
+    }
+    // VG-Tweak - End
     public void PopulateList(IReadOnlyList<PlayerInfo>? players = null)
     {
         // Maintain existing pin statuses
@@ -138,15 +151,6 @@ public sealed partial class PlayerListControl : BoxContainer
             _selectedPlayer = null;
 
         FilterList();
-    }
-
-
-    private string GetText(PlayerInfo info)
-    {
-        var text = $"{info.CharacterName} ({info.Username})";
-        if (OverrideText != null)
-            text = OverrideText.Invoke(info, text);
-        return text;
     }
 
     private void GenerateButton(ListData data, ListContainerButton button)
