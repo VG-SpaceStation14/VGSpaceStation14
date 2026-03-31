@@ -1,0 +1,45 @@
+<DefaultWindow
+    x:Class="Content.Client.Administration.UI.Tabs.AdminTab.SponsorEditorWindow"
+    xmlns="https://spacestation14.io"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
+    Title="{Loc admin-sponsor-panel-window-title}" MinSize="400 450">
+
+    <BoxContainer Orientation="Vertical" SeparationOverride="6" Margin="10">
+
+        <GridContainer Columns="2" VerticalExpand="false" Margin="0 0 0 10">
+            <Label Text="{Loc admin-sponsor-panel-window-player}" VerticalAlignment="Center" />
+            <LineEdit Name="PlayerNameLine" MinWidth="150" HorizontalExpand="True" />
+
+            <Label Text="{Loc admin-sponsor-panel-window-tier}" VerticalAlignment="Center" />
+            <LineEdit Name="TierInput" MinWidth="100" HorizontalExpand="True" PlaceHolder="1-3" />
+
+            <Label Text="{Loc admin-sponsor-panel-window-days}" VerticalAlignment="Center" />
+            <LineEdit Name="DaysInput" MinWidth="100" HorizontalExpand="True" PlaceHolder="0 = без срока" />
+
+            <Label Text="{Loc admin-sponsor-panel-window-notes}" VerticalAlignment="Center" />
+            <LineEdit Name="NotesInput" MinWidth="150" HorizontalExpand="True" PlaceHolder="Опционально" />
+        </GridContainer>
+
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="8" Margin="0 5 0 5">
+            <Button Name="AddDayButton" Text="+1d" HorizontalExpand="True" />
+            <Button Name="AddWeekButton" Text="+1w" HorizontalExpand="True" />
+            <Button Name="AddMonthButton" Text="+1M" HorizontalExpand="True" />
+            <Button Name="AddYearButton" Text="+1Y" HorizontalExpand="True" />
+            <Button Name="ClearExpireButton" Text="{Loc admin-sponsor-panel-clear-expire}" HorizontalExpand="True" />
+        </BoxContainer>
+
+        <cc:PlayerListControl Name="PlayerList" VerticalExpand="True" Margin="0 10 0 10" />
+
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="10" Margin="0 5 0 5">
+            <Button Name="AddSponsorButton" Text="{Loc admin-sponsor-panel-add-sponsor}" HorizontalExpand="True" />
+            <Button Name="RemoveSponsorButton" Text="{Loc admin-sponsor-panel-remove-sponsor}" HorizontalExpand="True" />
+        </BoxContainer>
+
+        <BoxContainer Orientation="Horizontal" SetHeight="20" Margin="0 5 0 0" SeparationOverride="10" HorizontalExpand="True">
+            <Label Text="{Loc admin-panel-footer-powered-albuka}" FontColorOverride="#e7ff10ff" 
+                   HorizontalAlignment="Center" HorizontalExpand="True" StyleClasses="LabelSmall"/>
+        </BoxContainer>
+
+    </BoxContainer>
+</DefaultWindow>
