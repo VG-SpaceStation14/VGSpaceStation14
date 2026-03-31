@@ -27,9 +27,9 @@ public sealed partial class SkillEntryControl : BoxContainer
         
         if (known)
         {
-            SkillStatusLabel.Text = Loc.GetString("simple-skills-known");
-            SkillStatusLabel.FontColorOverride = Color.FromHex("#4caf50");
-            SkillStatusLabel.Visible = true;
+            //SkillStatusLabel.Text = Loc.GetString("simple-skills-known");
+            //SkillStatusLabel.FontColorOverride = Color.FromHex("#4caf50");
+            //SkillStatusLabel.Visible = true;
         }
         else
         {
