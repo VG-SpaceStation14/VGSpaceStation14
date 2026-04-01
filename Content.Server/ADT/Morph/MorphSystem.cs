@@ -50,7 +50,7 @@ public sealed class MorphSystem : SharedMorphSystem
     [Dependency] protected readonly ChatSystem ChatSystem = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedChameleonProjectorSystem _chameleon = default!;
-    [Dependency] protected readonly SharedContainerSystem container = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -144,7 +144,7 @@ public sealed class MorphSystem : SharedMorphSystem
         }
         else if (_random.Prob(ent.Comp.EatWeaponChanceOnHited) && _hunger.GetHunger(hunger) >= ent.Comp.EatWeaponHungerReq)
         {
-            container.Insert(args.Used, ent.Comp.Container);
+            _container.Insert(args.Used, ent.Comp.Container);
             _audioSystem.PlayPvs(ent.Comp.SoundDevour, ent);
             _hunger.ModifyHunger(ent, -ent.Comp.EatWeaponHungerReq, hunger);
         }
@@ -159,7 +159,7 @@ public sealed class MorphSystem : SharedMorphSystem
             return;
         if (_hands.TryGetActiveItem((args.HitEntities[0], hands), out var item) && _random.Prob(ent.Comp.EatWeaponChanceOnHit))
         {
-            container.Insert(item.Value, ent.Comp.Container);
+            _container.Insert(item.Value, ent.Comp.Container);
             _audioSystem.PlayPvs(ent.Comp.SoundDevour, ent);
             _hunger.ModifyHunger(ent, -ent.Comp.EatWeaponHungerReq, hunger);
         }
@@ -174,7 +174,7 @@ public sealed class MorphSystem : SharedMorphSystem
     {
         if (!TryComp<HungerComponent>(uid, out var hunger))
             return;
-        if (container.IsEntityInContainer(uid))
+        if (_container.IsEntityInContainer(uid))
             return;
         if (comp.OpenVentFoodReq > _hunger.GetHunger(hunger))
             return;
