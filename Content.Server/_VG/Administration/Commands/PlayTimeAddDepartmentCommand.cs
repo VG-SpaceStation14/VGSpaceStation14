@@ -1,5 +1,3 @@
-// Content.Server/ADT/Administration/Commands/PlayTimeAddDepartmentCommand.cs
-
 using System.Linq;
 using Content.Server.Administration;
 using Content.Server.Players.PlayTimeTracking;
@@ -10,7 +8,7 @@ using Robust.Shared.Console;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.ADT.Administration.Commands;
+namespace Content.Server._VG.Administration.Commands;
 
 [AdminCommand(AdminFlags.Moderator)]
 public sealed class PlayTimeAddDepartmentCommand : IConsoleCommand
