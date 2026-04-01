@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading;
 using Content.Client.ADT.Lobby.UI;
 using Content.Client._VG.Sponsors;
+using Content.Client.ADT.Traits.UI;
 using Content.Client.Guidebook;
 using System.Reflection;
 using Content.Client.Humanoid;
@@ -511,6 +512,7 @@ namespace Content.Client.Lobby.UI
             Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
 
             RefreshTraits();
+            Traits.OnTraitsChanged += OnTraitsSelectionChanged; // ADT-Tweak new Traits
 
             /*TabContainer.SetTabTitle(5, Loc.GetString("humanoid-profile-editor-traits-tab")); // Corvax-TTS-Edit
             Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
@@ -676,121 +678,49 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public void RefreshTraits()
         {
-            TraitsList.RemoveAllChildren();
-
-            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().Where(t => !t.Quirk).OrderBy(t => Loc.GetString(t.Name)).ToList();
-            /*TabContainer.SetTabTitle(4, Loc.GetString("humanoid-profile-editor-traits-tab"));   // ADT Languages tweak
-            Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
-
-            if (traits.Count < 1)
+            if (Profile != null)
+            // ADT-Tweak start new Traits
             {
-                TraitsList.AddChild(new Label
+                var selectedTraits = new HashSet<ProtoId<TraitPrototype>>(Profile.TraitPreferences.Count);
+                foreach (var traitId in Profile.TraitPreferences)
                 {
-                    Text = Loc.GetString("humanoid-profile-editor-no-traits"),
-                    FontColorOverride = Color.Gray,
-                });
-                return;
-            }
+                    if (_prototypeManager.HasIndex(traitId))
+                    {
+                        selectedTraits.Add(new ProtoId<TraitPrototype>(traitId));
+                    }
+                }
 
-            // Setup model
-            Dictionary<string, List<string>> traitGroups = new();
-            List<string> defaultTraits = new();
-            traitGroups.Add(TraitCategoryPrototype.Default, defaultTraits);
+                Traits.SetSelectedTraits(selectedTraits, Profile);
+                Traits.UpdateRequirements(Profile);
+            }
+            else
+            {
+                Traits.SetSelectedTraits(new HashSet<ProtoId<TraitPrototype>>(), Profile);
+            }
+        }
+
+        /// <summary>
+        /// Called when trait selection changes in the TraitsTab.
+        /// Updates the profile with the new trait selection.
+        /// </summary>
+        private void OnTraitsSelectionChanged(HashSet<ProtoId<TraitPrototype>> traits)
+        {
+            if (Profile is null)
+                return;
+
+            // Remove all existing traits - iterate directly over readonly collection
+            foreach (var existingTrait in Profile.TraitPreferences)
+            {
+                Profile = Profile.WithoutTraitPreference(existingTrait, _prototypeManager);
+            }
 
             foreach (var trait in traits)
+            // ADT-Tweak end new Traits
             {
-                if (trait.Category == null)
-                {
-                    defaultTraits.Add(trait.ID);
-                    continue;
-                }
-
-                if (!_prototypeManager.HasIndex(trait.Category))
-                    continue;
-
-                if (trait.SponsorOnly && !IoCManager.Resolve<SponsorsManager>().TryGetInfo(out var sponsor))
-                    continue;
-                var group = traitGroups.GetOrNew(trait.Category);
-                group.Add(trait.ID);
+                Profile = Profile.WithTraitPreference(trait.Id, _prototypeManager);
             }
 
-            // Create UI view from model
-            foreach (var (categoryId, categoryTraits) in traitGroups)
-            {
-                TraitCategoryPrototype? category = null;
-
-                if (categoryId != TraitCategoryPrototype.Default)
-                {
-                    category = _prototypeManager.Index<TraitCategoryPrototype>(categoryId);
-                    // Label
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString(category.Name),
-                        Margin = new Thickness(0, 10, 0, 0),
-                        StyleClasses = { StyleClass.LabelHeading },
-                    });
-                }
-
-                List<TraitPreferenceSelector?> selectors = new();
-                var selectionCount = 0;
-
-                foreach (var traitProto in categoryTraits)
-                {
-                    var trait = _prototypeManager.Index<TraitPrototype>(traitProto);
-                    // ADT Trait species blacklist start
-                    if (Profile != null && trait.SpeciesBlacklist.Contains(Profile.Species))
-                    {
-                        Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        continue;
-                    }
-                    // ADT Trait species blacklist end
-                    var selector = new TraitPreferenceSelector(trait);
-
-                    selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
-                    if (selector.Preference)
-                        selectionCount += trait.Cost;
-
-                    selector.PreferenceChanged += preference =>
-                    {
-                        if (preference)
-                        {
-                            Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
-                        }
-                        else
-                        {
-                            Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        }
-
-                        SetDirty();
-                        RefreshTraits(); // If too many traits are selected, they will be reset to the real value.
-                    };
-                    selectors.Add(selector);
-                }
-
-                // Selection counter
-                if (category is { MaxTraitPoints: >= 0 })
-                {
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString("humanoid-profile-editor-trait-count-hint", ("current", selectionCount), ("max", category.MaxTraitPoints)),
-                        FontColorOverride = Color.Gray
-                    });
-                }
-
-                foreach (var selector in selectors)
-                {
-                    if (selector == null)
-                        continue;
-
-                    if (category is { MaxTraitPoints: >= 0 } &&
-                        selector.Cost + selectionCount > category.MaxTraitPoints)
-                    {
-                        selector.Checkbox.Label.FontColorOverride = Color.Red;
-                    }
-
-                    TraitsList.AddChild(selector);
-                }
-            }
+            SetDirty();
         }
 
         /// <summary>
