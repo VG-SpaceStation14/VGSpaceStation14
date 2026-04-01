@@ -117,10 +117,9 @@ public sealed partial class PlayerListControl : BoxContainer
     {
         var displayText = $"{info.CharacterName} ({info.Username})";
     
-        var sponsorsManager = IoCManager.Resolve<Content.Client._VG.Sponsors.SponsorsManager>();
-        if (sponsorsManager.TryGetInfo(out var sponsorInfo) && sponsorInfo != null && sponsorInfo.Tier.HasValue)
+        if (info.Sponsor != null && info.Sponsor.Tier.HasValue)
         {
-            var tier = sponsorInfo.Tier.Value;
+            var tier = info.Sponsor.Tier.Value;
             displayText = $"{displayText} Спонсор {tier} ур.";
         }
     
