@@ -54,8 +54,15 @@ public sealed partial class SpeciesWindow : FancyWindow
         var protoList = _proto.EnumeratePrototypes<SpeciesPrototype>().Where(x => x.RoundStart).ToList();
         protoList.Sort((x, y) => Loc.GetString(x.Name)[0].CompareTo(Loc.GetString(y.Name)[0]));
 
-        AddLabel("Классические");
-        foreach (var item in protoList.Where(x => x.Category == SpeciesCategory.Classic))
+        // VG-Tweak Start
+        // Убраны категории, создаём общий список всех видов
+        // Спонсорские виды фильтруются отдельно
+        var sponsorManager = IoCManager.Resolve<SponsorsManager>();
+        var isSponsor = sponsorManager.TryGetInfo(out var _);
+        
+        var allSpecies = protoList.Where(x => !x.SponsorOnly || isSponsor).ToList();
+        
+        foreach (var item in allSpecies)
         {
             var button = new SpeciesButton(item)
             {
@@ -68,80 +75,15 @@ public sealed partial class SpeciesWindow : FancyWindow
             button.OnToggled += args => SelectSpecies(item.ID);
             SpeciesContainer.AddChild(button);
         }
-
-        AddLabel("Нестандартные");
-        foreach (var item in protoList.Where(x => x.Category == SpeciesCategory.Unusual))
-        {
-            var button = new SpeciesButton(item)
-            {
-                HorizontalExpand = true,
-                ToggleMode = true,
-                Pressed = Profile.Species == item.ID,
-                Text = Loc.GetString(item.Name),
-                Margin = new Thickness(5f, 5f),
-            };
-            button.OnToggled += args => SelectSpecies(item.ID);
-            SpeciesContainer.AddChild(button);
-        }
-
-        AddLabel("Особые");
-        foreach (var item in protoList.Where(x => x.Category == SpeciesCategory.Special))
-        {
-            var button = new SpeciesButton(item)
-            {
-                HorizontalExpand = true,
-                ToggleMode = true,
-                Pressed = Profile.Species == item.ID,
-                Text = Loc.GetString(item.Name),
-                Margin = new Thickness(5f, 5f),
-            };
-            button.OnToggled += args => SelectSpecies(item.ID);
-            SpeciesContainer.AddChild(button);
-        }
-
-        if (IoCManager.Resolve<SponsorsManager>().TryGetInfo(out var sponsor))
-        {
-            AddLabel("Спонсорские");
-            foreach (var item in protoList.Where(x => x.Category == SpeciesCategory.Sponsor))
-            {
-                var button = new SpeciesButton(item)
-                {
-                    HorizontalExpand = true,
-                    ToggleMode = true,
-                    Pressed = Profile.Species == item.ID,
-                    Text = Loc.GetString(item.Name),
-                    Margin = new Thickness(5f, 5f),
-                };
-                button.OnToggled += args => SelectSpecies(item.ID);
-                SpeciesContainer.AddChild(button);
-            }
-        }
+        // VG-Tweak End
 
         CurrentSpecies = Profile.Species;
         SelectSpecies(Profile.Species);
     }
-    private void AddLabel(string text)
-    {
-        var container = new BoxContainer()
-        {
-            Orientation = BoxContainer.LayoutOrientation.Vertical,
-            Margin = new Thickness(5f, 5f),
-        };
-        var label = new Label()
-        {
-            Text = text,
-            StyleClasses = { "LowDivider" },
-            Margin = new(2f, 2f),
-        };
-        var separator = new HSeparator()
-        {
-            Margin = new(2f, 2f, 2f, 4f),
-        };
-        container.AddChild(label);
-        container.AddChild(separator);
-
-        SpeciesContainer.AddChild(container);
-    }
+    
+    // VG-Tweak Start
+    // Метод AddLabel удалён, так как категории больше не используются
+    // VG-Tweak End
 
     public void SelectSpecies(ProtoId<SpeciesPrototype> protoId)
     {
