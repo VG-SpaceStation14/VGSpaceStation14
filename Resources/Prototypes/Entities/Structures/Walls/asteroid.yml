@@ -118,7 +118,52 @@
         acts: ["Destruction"]
       - !type:TriggerBehavior
         keyOut: timer # explode immediately
-
+# VG-Twaak Start
+- type: entity
+  abstract: true
+  id: VGBaseRockGibtonite
+  suffix: Gibtonite
+  components:
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.Trigger.TriggerVisuals.VisualState:
+        "gib":
+          Primed:
+            state: gibtonite_active
+            shader: unshaded
+            visible: true
+          Unprimed:
+            state: gibtonite_inactive
+            visible: false
+  - type: TimerTrigger
+    examinable: false
+    beepInterval: 0.4
+    beepSound:
+      collection: GlassCrack
+  - type: RandomTimerTrigger
+    min: 8
+    max: 10
+  - type: ExplodeOnTrigger
+    keysIn:
+    - timer
+  - type: Explosive
+    explosionType: DemolitionCharge
+    totalIntensity: 450
+    intensitySlope: 2.5
+    maxIntensity: 10
+    canCreateVacuum: false
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 3 
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:TriggerBehavior
+        keyOut: timer
+# VG-Twaak End
 # Ore veins
 - type: entity
   id: AsteroidRockCoal
@@ -772,7 +817,7 @@
     #   map: [ "enum.MiningScannerVisualLayers.Overlay" ] #ADT tweak
 
 - type: entity
-  parent: [ BaseRockGibtonite, IronRock ]
+  parent: [ VGBaseRockGibtonite, IronRock ] # VG-Tweak
   id: IronRockGibtonite
   components:
   - type: Sprite
