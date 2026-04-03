@@ -3,12 +3,11 @@ using Content.Shared.Storage.Components;
 using Content.Shared.Whitelist;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Timing;
+using Robust.Shared.Prototypes; // VG-Tweak
+using Content.Shared._VG.Storage.Components; // VG-Tweak
 
 namespace Content.Shared.Storage.EntitySystems;
 
-/// <summary>
-/// <see cref="MagnetPickupComponent"/>
-/// </summary>
 public sealed class MagnetPickupSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -17,10 +16,9 @@ public sealed class MagnetPickupSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedStorageSystem _storage = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
-
+    [Dependency] private readonly IPrototypeManager _prototype = default!; // VG-Tweak
 
     private static readonly TimeSpan ScanDelay = TimeSpan.FromSeconds(1);
-
     private EntityQuery<PhysicsComponent> _physicsQuery;
 
     public override void Initialize()
@@ -55,7 +53,6 @@ public sealed class MagnetPickupSystem : EntitySystem
             if ((slotDef.SlotFlags & comp.SlotFlags) == 0x0)
                 continue;
 
-            // No space
             if (!_storage.HasSpace((uid, storage)))
                 continue;
 
@@ -75,10 +72,15 @@ public sealed class MagnetPickupSystem : EntitySystem
                 if (near == parentUid)
                     continue;
 
-                // TODO: Probably move this to storage somewhere when it gets cleaned up
-                // TODO: This sucks but you need to fix a lot of stuff to make it better
-                // the problem is that stack pickups delete the original entity, which is fine, but due to
-                // game state handling we can't show a lerp animation for it.
+                // VG-Tweak Start: фильтрация для умной сумки
+                if (TryComp<SmartOreBagComponent>(uid, out var smartBag))
+                {
+                    var nearMeta = MetaData(near);
+                    if (nearMeta.EntityPrototype != null && smartBag.IgnoredOres.Contains(nearMeta.EntityPrototype.ID))
+                        continue;
+                }
+                // VG-Tweak End
+
                 var nearXform = Transform(near);
                 var nearMap = _transform.GetMapCoordinates(near, xform: nearXform);
                 var nearCoords = _transform.ToCoordinates(moverCoords.EntityId, nearMap);
@@ -86,7 +88,6 @@ public sealed class MagnetPickupSystem : EntitySystem
                 if (!_storage.Insert(uid, near, out var stacked, storageComp: storage, playSound: !playedSound))
                     continue;
 
-                // Play pickup animation for either the stack entity or the original entity.
                 if (stacked != null)
                     _storage.PlayPickupAnimation(stacked.Value, nearCoords, finalCoords, nearXform.LocalRotation);
                 else

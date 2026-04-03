@@ -1,0 +1,35 @@
+- type: entity
+  name: advanced ore bag
+  parent: OreBag
+  id: VGAdvancedOreBag
+  suffix: VG
+  components:
+  - type: MagnetPickup
+    slotFlags: POCKET # Работает в кармане/поясе
+    range: 2.5
+  - type: SmartOreBag
+  - type: Sprite
+    sprite: _VG/Objects/Specific/Salvage/smart_ore_bag.rsi
+    state: icon
+  - type: Clothing
+    sprite: _VG/Objects/Specific/Salvage/smart_ore_bag.rsi
+    quickEquip: false
+    slots:
+    - belt
+  - type: Item
+    size: Small
+  - type: Storage
+    maxItemSize: Normal
+    grid:
+    - 0,0,11,5
+    quickInsert: true
+    areaInsert: true
+    whitelist:
+      tags:
+        - ArtifactFragment
+        - Ore
+  - type: Dumpable
+  - type: Tag
+    tags:
+    - ADTOreBag
+    - ADTStorageBlacklist
