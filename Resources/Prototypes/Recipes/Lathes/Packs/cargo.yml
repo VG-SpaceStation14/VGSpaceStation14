@@ -24,6 +24,7 @@
   - MineralScannerEmpty
   - AdvancedMineralScannerEmpty
   - OreBagOfHolding
+  - ClothingSmartBag
 
 - type: latheRecipePack
   id: CargoBoards

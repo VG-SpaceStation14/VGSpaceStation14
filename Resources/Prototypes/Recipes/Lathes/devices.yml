@@ -153,6 +153,17 @@
     Uranium: 150
     Copper: 400  #ADT-BFUU-Tweak
     ADTBScrystal: 500 # ADT Tweak
+# VG-Tweak Start
+- type: latheRecipe
+  id: ClothingSmartBag
+  result: VGAdvancedOreBag
+  completetime: 5
+  materials:
+    Steel: 1000
+    Copper: 200
+    Glass: 200
+    Plastic: 200
+# VG-Tweak End
 
 - type: latheRecipe
   parent: ClothingBackpackHolding
