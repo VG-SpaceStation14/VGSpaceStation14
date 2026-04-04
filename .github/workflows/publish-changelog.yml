@@ -1,0 +1,58 @@
+name: Publish Changelog
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'Commit SHA (short or full)'
+        required: true
+        type: string
+        default: 'master'
+
+jobs:
+  publish:
+    name: Publish Changelog to Discord
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit information
+        id: commit
+        run: |
+          # Get commit details
+          FULL_HASH=$(git rev-parse ${{ github.event.inputs.commit_sha }})
+          SHORT_HASH=$(git rev-parse --short $FULL_HASH)
+          TITLE=$(git log -1 --format=%s $FULL_HASH)
+          BODY=$(git log -1 --format=%b $FULL_HASH)
+          AUTHOR=$(git log -1 --format=%an $FULL_HASH)
+          DATE=$(git log -1 --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' $FULL_HASH)
+          
+          # Escape for JSON
+          BODY_ESCAPED=$(echo "$BODY" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          echo "full_hash=$FULL_HASH" >> $GITHUB_OUTPUT
+          echo "short_hash=$SHORT_HASH" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "body=$BODY_ESCAPED" >> $GITHUB_OUTPUT
+          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "url=https://github.com/${{ github.repository }}/commit/$FULL_HASH" >> $GITHUB_OUTPUT
+
+      - name: Send to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "embeds": [{
+              "title": "📝 New Changelog",
+              "color": 5814783,
+              "description": "**${{ steps.commit.outputs.title }}**\n\n${{ steps.commit.outputs.body }}\n\n🔗 [View Commit](${{ steps.commit.outputs.url }})",
+              "footer": {
+                "text": "${{ steps.commit.outputs.author }} | Commit: ${{ steps.commit.outputs.short_hash }} • ${{ steps.commit.outputs.date }}"
+              }
+            }]
+          }' "$DISCORD_WEBHOOK"
