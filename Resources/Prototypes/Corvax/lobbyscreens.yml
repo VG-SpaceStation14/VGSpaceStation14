@@ -13,11 +13,11 @@
 - type: lobbyBackground
   id: Detective
   background: /Textures/Corvax/LobbyScreens/detective.webp
-
-- type: lobbyBackground
-  id: EngineersChill
-  background: /Textures/Corvax/LobbyScreens/engineers-chill.webp
-
+# VG-Tweak Start
+#- type: lobbyBackground
+#  id: EngineersChill
+# background: /Textures/Corvax/LobbyScreens/engineers-chill.webp
+# VG-Tweak End
 - type: lobbyBackground
   id: Greytide
   background: /Textures/Corvax/LobbyScreens/greytide.webp
