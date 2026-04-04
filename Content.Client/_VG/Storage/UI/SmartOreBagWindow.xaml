@@ -1,12 +1,42 @@
 <controls:FancyWindow xmlns="https://spacestation14.io"
                       xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
                       Title="Умная сумка для руды"
-                      MinSize="350, 450">
-    <BoxContainer Orientation="Vertical" Margin="5">
-        <Label Text="Выберите руду, которую нужно СОБИРАТЬ:" Margin="0,0,0,5" />
+                      MinSize="650, 550">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <Label Text="Умная сумка для руды" StyleClasses="LabelHeading" HorizontalAlignment="Center" Margin="0,0,0,5" />
+        <Label Name="SelectedCountLabel" Text="Выбрано: 0 руд" Margin="0,0,0,5" HorizontalAlignment="Center" />
+        
+        <LineEdit Name="SearchBox" PlaceHolder="Поиск руды..." Margin="0,0,0,10" />
+        
+        <BoxContainer Orientation="Horizontal" Margin="0,0,0,5">
+            <Button Name="SelectAllButton" Text="Выбрать всё" HorizontalExpand="True" />
+            <Button Name="SelectNoneButton" Text="Сбросить всё" HorizontalExpand="True" />
+        </BoxContainer>
+        
         <ScrollContainer VerticalExpand="True">
-            <BoxContainer Name="OreListContainer" Orientation="Vertical" />
+            <GridContainer Columns="2" HorizontalExpand="True">
+                
+                <!-- Левая колонка - Основные руды -->
+                <BoxContainer Orientation="Vertical" Margin="0,0,20,0">
+                    <Label Text="Основные руды" StyleClasses="LabelHeading" Margin="0,0,0,8" />
+                    <BoxContainer Name="BasicOresContainer" Orientation="Vertical" />
+                </BoxContainer>
+                
+                <!-- Правая колонка - Специальные руды + Артефакты -->
+                <BoxContainer Orientation="Vertical" Margin="20,0,0,0">
+                    <Label Text="Специальные руды" StyleClasses="LabelHeading" Margin="0,0,0,8" />
+                    <BoxContainer Name="SpecialOresContainer" Orientation="Vertical" />
+                    
+                    <!-- Разделитель -->
+                    <Control MinSize="0, 15" />
+                    
+                    <Label Text="Артефакты" StyleClasses="LabelHeading" Margin="0,10,0,8" />
+                    <BoxContainer Name="ArtifactsContainer" Orientation="Vertical" />
+                </BoxContainer>
+                
+            </GridContainer>
         </ScrollContainer>
+        
         <BoxContainer Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Name="CancelButton" Text="Отмена" />
             <Button Name="SaveButton" Text="Сохранить" StyleClasses="ButtonColorGreen" />
