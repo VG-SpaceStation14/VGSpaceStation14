@@ -4,8 +4,6 @@ using Content.Shared.Interaction;
 using Content.Shared.Verbs;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
-using Robust.Shared.Input; // ← Добавлено для InputModifiers
-using System.Linq;
 
 namespace Content.Server._VG.Storage;
 
@@ -17,7 +15,6 @@ public sealed class SmartOreBagSystem : EntitySystem
         
         SubscribeLocalEvent<SmartOreBagComponent, GetVerbsEvent<Verb>>(OnGetVerbs);
         SubscribeLocalEvent<SmartOreBagComponent, InteractUsingEvent>(OnInteractUsing);
-        SubscribeLocalEvent<SmartOreBagComponent, InteractHandEvent>(OnInteractHand); // ← NEW: ALT+ЛКМ
         SubscribeNetworkEvent<SmartOreBagUpdateMessage>(OnUpdateIgnored);
     }
 
@@ -31,7 +28,7 @@ public sealed class SmartOreBagSystem : EntitySystem
             Text = "Настройка руд",
             Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/settings.svg.192dpi.png")),
             Act = () => OpenConfigWindow(uid, args.User, component),
-            Priority = 4
+            Priority = 2
         };
         args.Verbs.Add(verb);
     }
@@ -40,16 +37,6 @@ public sealed class SmartOreBagSystem : EntitySystem
     {
         OpenConfigWindow(uid, args.User, component);
         args.Handled = true;
-    }
-
-    // ← NEW: Обработчик ALT+ЛКМ
-    private void OnInteractHand(EntityUid uid, SmartOreBagComponent component, InteractHandEvent args)
-    {
-        if (args.Modifiers.HasFlag(InputModifiers.Alt))
-        {
-            OpenConfigWindow(uid, args.User, component);
-            args.Handled = true;
-        }
     }
 
     private void OpenConfigWindow(EntityUid uid, EntityUid user, SmartOreBagComponent component)
