@@ -6,6 +6,7 @@
   components:
   - type: MagnetPickup
     range: 2.5 # ADT tweak: 2 -> 2.5
+  - type: SmartOreBag # VG-Tweak
   - type: Sprite
     sprite: Objects/Specific/Mining/ore_bag_holding.rsi
     state: icon
