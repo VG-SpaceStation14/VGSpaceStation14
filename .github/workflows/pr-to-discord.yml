@@ -18,8 +18,40 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Notify Discord about merged PR
-        run: python3 Tools/vg/pr_to_discord.py
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get PR info
+        id: pr_info
+        run: |
+          # Ограничиваем описание 2000 символами и экранируем
+          BODY="${{ github.event.pull_request.body }}"
+          if [ ${#BODY} -gt 2000 ]; then
+            BODY="${BODY:0:1997}..."
+          fi
+          BODY="${BODY//$'\n'/'\\n'}"
+          BODY="${BODY//'"'/'\"'}"
+          echo "title=${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+          echo "url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+          echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+          echo "author_url=${{ github.event.pull_request.user.html_url }}" >> $GITHUB_OUTPUT
+          echo "merged_by=${{ github.event.pull_request.merged_by.login }}" >> $GITHUB_OUTPUT
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+          echo "additions=${{ github.event.pull_request.additions }}" >> $GITHUB_OUTPUT
+          echo "deletions=${{ github.event.pull_request.deletions }}" >> $GITHUB_OUTPUT
+          echo "changed_files=${{ github.event.pull_request.changed_files }}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord embed
+        uses: tsickert/discord-webhook@v6.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-title: 📦 PR Merged!
+          embed-description: |
+            **${{ steps.pr_info.outputs.title }}**
+            
+            ${{ steps.pr_info.outputs.body }}
+            
+            📊 **Stats:** +${{ steps.pr_info.outputs.additions }} / -${{ steps.pr_info.outputs.deletions }} lines • ${{ steps.pr_info.outputs.changed_files }} files changed
+          embed-url: ${{ steps.pr_info.outputs.url }}
+          embed-color: 0x00ff00
+          embed-author-name: ${{ steps.pr_info.outputs.author }}
+          embed-author-url: ${{ steps.pr_info.outputs.author_url }}
+          embed-footer: Merged by ${{ steps.pr_info.outputs.merged_by }}
+          embed-timestamp: ${{ github.event.pull_request.merged_at }}
