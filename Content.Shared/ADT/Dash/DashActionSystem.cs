@@ -3,6 +3,7 @@ using Content.Shared.Actions;
 using Content.Shared.Gravity;
 using Content.Shared.Movement.Components;
 using Content.Shared.Throwing;
+using Content.Shared.Vehicle.Components;
 
 namespace Content.Shared.ADT.Dash;
 
@@ -26,6 +27,10 @@ public sealed class DashActionSystem : EntitySystem
     private void OnDashAction(DashActionEvent args)
     {
         if (args.Handled)
+            return;
+
+        // VG-Fix: Запрещаем дэш на транспорте
+        if (HasComp<RiderComponent>(args.Performer)) 
             return;
 
         if (args.NeedsGravity && _gravity.IsWeightless(args.Performer))
