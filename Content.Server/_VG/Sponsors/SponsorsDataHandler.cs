@@ -61,14 +61,20 @@ public sealed class SponsorsDataHandler
         if (entry == null)
             return null;
 
-        // Проверяем срок действия
+        // Check expiration
         if (entry.ExpireDate != null && entry.ExpireDate < DateTime.UtcNow)
             return null;
 
         return entry;
     }
 
-    public void AddOrUpdateSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null)
+    public SponsorEntry? GetRawSponsor(NetUserId userId)
+    {
+        var userIdStr = userId.ToString();
+        return _sponsors.FirstOrDefault(s => s.UserId == userIdStr);
+    }
+
+    public void AddOrUpdateSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
     {
         var userIdStr = userId.ToString();
         var existing = _sponsors.FirstOrDefault(s => s.UserId == userIdStr);
@@ -78,6 +84,8 @@ public sealed class SponsorsDataHandler
             existing.ExpireDate = expireDate;
             existing.Notes = notes;
             existing.Username = username;
+            if (customLoadouts != null)
+                existing.CustomLoadouts = customLoadouts;
         }
         else
         {
@@ -87,7 +95,8 @@ public sealed class SponsorsDataHandler
                 Username = username,
                 Tier = tier,
                 ExpireDate = expireDate,
-                Notes = notes
+                Notes = notes,
+                CustomLoadouts = customLoadouts ?? new()
             });
         }
         Save();

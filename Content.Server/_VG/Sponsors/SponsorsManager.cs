@@ -60,6 +60,66 @@ public sealed class SponsorsManager : ISponsorsManager
         return false;
     }
 
+    public bool TryGetCustomLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? customLoadouts)
+    {
+        customLoadouts = null;
+        var entry = _dataHandler.GetSponsor(userId);
+        
+        if (entry == null || entry.CustomLoadouts == null || entry.CustomLoadouts.Count == 0)
+            return false;
+            
+        customLoadouts = entry.CustomLoadouts;
+        return true;
+    }
+
+    public void AddCustomLoadout(NetUserId userId, string loadoutId)
+    {
+        var entry = _dataHandler.GetRawSponsor(userId);
+        if (entry == null)
+        {
+            _sawmill.Warning($"Cannot add custom loadout {loadoutId} to non-sponsor {userId}");
+            return;
+        }
+        
+        if (!entry.CustomLoadouts.Contains(loadoutId))
+        {
+            entry.CustomLoadouts.Add(loadoutId);
+            _dataHandler.Save();
+            _sawmill.Info($"Added custom loadout {loadoutId} to {entry.Username}");
+            
+            // Update cache and send to client
+            if (_cachedSponsors.TryGetValue(userId, out var info))
+            {
+                info.CustomLoadouts = entry.CustomLoadouts.ToArray();
+                if (_playerManager.TryGetSessionById(userId, out var session))
+                {
+                    var msg = new MsgSponsorInfo { Info = info };
+                    _netMgr.ServerSendMessage(msg, session.Channel);
+                }
+            }
+        }
+    }
+
+    public void RemoveCustomLoadout(NetUserId userId, string loadoutId)
+    {
+        var entry = _dataHandler.GetRawSponsor(userId);
+        if (entry != null && entry.CustomLoadouts.Remove(loadoutId))
+        {
+            _dataHandler.Save();
+            _sawmill.Info($"Removed custom loadout {loadoutId} from {entry.Username}");
+            
+            if (_cachedSponsors.TryGetValue(userId, out var info))
+            {
+                info.CustomLoadouts = entry.CustomLoadouts.ToArray();
+                if (_playerManager.TryGetSessionById(userId, out var session))
+                {
+                    var msg = new MsgSponsorInfo { Info = info };
+                    _netMgr.ServerSendMessage(msg, session.Channel);
+                }
+            }
+        }
+    }
+
     private async Task OnConnecting(NetConnectingArgs e)
     {
         var entry = _dataHandler.GetSponsor(e.UserId);
@@ -77,14 +137,15 @@ public sealed class SponsorsManager : ISponsorsManager
             AllowJob = entry.Tier >= 2,
             ExtraSlots = entry.Tier >= 3 ? 2 : (entry.Tier >= 2 ? 1 : 0),
             ExpireDate = entry.ExpireDate ?? DateTime.MaxValue,
-            CharacterName = entry.Username 
+            CharacterName = entry.Username,
+            CustomLoadouts = entry.CustomLoadouts.ToArray()
         };
 
         DebugTools.Assert(!_cachedSponsors.ContainsKey(e.UserId), "Cached data was found on client connect");
         _cachedSponsors[e.UserId] = info;
-        _sawmill.Info($"Sponsor {e.UserId} (Tier {entry.Tier}) connected");
+        _sawmill.Info($"Sponsor {e.UserId} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts");
 
-        await Task.CompletedTask; 
+        await Task.CompletedTask;
     }
 
     private void OnConnected(object? sender, NetChannelArgs e) 
@@ -146,9 +207,9 @@ public sealed class SponsorsManager : ISponsorsManager
         return false;
     }
 
-    public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null)
+    public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
     {
-        _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes);
+        _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes, customLoadouts);
     
         var info = new SponsorInfo
         {
@@ -157,7 +218,8 @@ public sealed class SponsorsManager : ISponsorsManager
             AllowJob = tier >= 2,
             ExtraSlots = tier >= 3 ? 2 : (tier >= 2 ? 1 : 0),
             ExpireDate = expireDate ?? DateTime.MaxValue,
-            CharacterName = username
+            CharacterName = username,
+            CustomLoadouts = customLoadouts?.ToArray() ?? Array.Empty<string>()
         };
 
         _cachedSponsors[userId] = info;

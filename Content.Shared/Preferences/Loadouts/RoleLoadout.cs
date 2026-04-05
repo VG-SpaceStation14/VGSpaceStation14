@@ -77,7 +77,7 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         var groupRemove = new ValueList<string>();
         var protoManager = collection.Resolve<IPrototypeManager>();
         var configManager = collection.Resolve<IConfigurationManager>();
-        var netManager = collection.Resolve<INetManager>(); // Corvax-Loadouts
+        var netManager = collection.Resolve<INetManager>();
 
         if (!protoManager.TryIndex(Role, out var roleProto))
         {
@@ -93,7 +93,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         }
 
         // Validate name length
-        // TODO: Probably allow regex to be supplied?
         if (EntityName != null)
         {
             var name = EntityName.Trim();
@@ -113,16 +112,56 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         // In some instances we might not have picked up a new group for existing data.
         foreach (var groupProto in roleProto.Groups)
         {
-            // VG sponsor start
             if (!SelectedLoadouts.ContainsKey(groupProto))
-                SelectedLoadouts[groupProto] = new List<Loadout>(); 
-            // VG sponsor end
+                SelectedLoadouts[groupProto] = new List<Loadout>();
         }
 
         // Reset points to recalculate.
         Points = roleProto.Points;
 
-        foreach (var (group, groupLoadouts) in SelectedLoadouts)
+        // VG-Tweak Start
+        foreach (var (group, groupLoadouts) in SelectedLoadouts.ToList())
+        {
+            if (!protoManager.TryIndex(group, out var groupProto))
+                continue;
+
+            for (var i = groupLoadouts.Count - 1; i >= 0; i--)
+            {
+                var loadout = groupLoadouts[i];
+                if (!protoManager.TryIndex(loadout.Prototype, out var loadoutProto))
+                    continue;
+
+                var isSponsorLoadout = loadoutProto.SponsorOnly ||
+                                    loadoutProto.Effects.Any(e => e is SponsorLoadoutEffect);
+
+                if (!isSponsorLoadout)
+                {
+                    foreach (var (otherGroup, otherLoadouts) in SelectedLoadouts)
+                    {
+                        foreach (var otherLoad in otherLoadouts)
+                        {
+                            if (!protoManager.TryIndex(otherLoad.Prototype, out var otherProto))
+                                continue;
+
+                            var isOtherSponsor = otherProto.SponsorOnly ||
+                                                otherProto.Effects.Any(e => e is SponsorLoadoutEffect);
+
+                            if (isOtherSponsor && Conflicts(loadoutProto, otherProto))
+                            {
+                                Logger.InfoS("sponsor.debug", $"Removing non-sponsor loadout {loadout.Prototype} because it conflicts with sponsor loadout {otherLoad.Prototype}");
+                                groupLoadouts.RemoveAt(i);
+                                break;
+                            }
+                        }
+                        if (i < 0 || i >= groupLoadouts.Count || groupLoadouts[i].Prototype != loadout.Prototype)
+                            break;
+                    }   
+                }
+            }
+            SelectedLoadouts[group] = groupLoadouts;
+        }
+        // VG-Tweak End
+        foreach (var (group, groupLoadouts) in SelectedLoadouts.ToList())
         {
             // Check the group is even valid for this role.
             if (!roleProto.Groups.Contains(group))
@@ -145,35 +184,59 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
             {
                 var loadout = loadouts[i];
 
-                // Old prototype or otherwise invalid.
                 if (!protoManager.TryIndex(loadout.Prototype, out var loadoutProto))
                 {
+                    Logger.WarningS("sponsor.debug", $"Loadout prototype missing: {loadout.Prototype}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
+                
+                var isSponsorLoadout = loadoutProto.SponsorOnly ||
+                                    loadoutProto.Effects.Any(e => e is SponsorLoadoutEffect);
 
-                // Malicious client maybe, check the group even has it.
+                if (isSponsorLoadout)
+                {
+                    Logger.InfoS("sponsor.debug", $"Sponsor loadout {loadout.Prototype} is valid, keeping (bypassing checks)");
+                    Apply(loadoutProto);
+                    continue;
+                }
+
                 if (!groupProto.Loadouts.Contains(loadout.Prototype))
                 {
+                    Logger.WarningS("sponsor.debug", $"Loadout {loadout.Prototype} not in group {groupProto.ID}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
 
-                // Validate the loadout can be applied (e.g. points).
-                if (!IsValid(profile, session, loadout.Prototype, collection, out _))
+                if (!IsValid(profile, session, loadout.Prototype, collection, out var reason))
                 {
+                    Logger.WarningS("sponsor.debug", $"Loadout {loadout.Prototype} invalid: {reason?.ToMarkup()}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
 
+                Logger.InfoS("sponsor.debug", $"Loadout {loadout.Prototype} is valid, keeping");
                 Apply(loadoutProto);
             }
 
             // Apply defaults if required
-            // Technically it's possible for someone to game themselves into loadouts they shouldn't have
-            // If you put invalid ones first but that's your fault for not using sensible defaults
             if (loadouts.Count < groupProto.MinLimit)
             {
+                var occupiedSlots = new HashSet<string>();
+                foreach (var (otherGroup, otherLoadouts) in SelectedLoadouts)
+                {
+                    foreach (var otherLoad in otherLoadouts)
+                    {
+                        if (protoManager.TryIndex(otherLoad.Prototype, out var otherProto))
+                        {
+                            foreach (var slot in otherProto.Equipment.Keys)
+                            {
+                                occupiedSlots.Add(slot);
+                            }
+                        }
+                    }
+                }
+
                 foreach (var protoId in groupProto.Loadouts)
                 {
                     if (loadouts.Count >= groupProto.MinLimit)
@@ -182,20 +245,34 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
                     if (!protoManager.TryIndex(protoId, out var loadoutProto))
                         continue;
 
-                    var defaultLoadout = new Loadout()
-                    {
-                        Prototype = loadoutProto.ID,
-                    };
-
+                    var defaultLoadout = new Loadout() { Prototype = loadoutProto.ID };
                     if (loadouts.Contains(defaultLoadout))
                         continue;
 
-                    // Not valid so don't default to it anyway.
+                    bool conflicts = false;
+                    foreach (var slot in loadoutProto.Equipment.Keys)
+                    {
+                        if (occupiedSlots.Contains(slot))
+                        {
+                            conflicts = true;
+                            Logger.InfoS("sponsor.debug", $"Default loadout {protoId} conflicts with already occupied slot '{slot}', skipping");
+                            break;
+                        }
+                    }
+                    if (conflicts)
+                        continue;
+
                     if (!IsValid(profile, session, defaultLoadout.Prototype, collection, out _))
                         continue;
 
+                    Logger.InfoS("sponsor.debug", $"Adding default loadout: {defaultLoadout.Prototype} to group {groupProto.ID}");
                     loadouts.Add(defaultLoadout);
                     Apply(loadoutProto);
+
+                    foreach (var slot in loadoutProto.Equipment.Keys)
+                    {
+                        occupiedSlots.Add(slot);
+                    }
                 }
             }
 
@@ -207,8 +284,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
             SelectedLoadouts.Remove(value);
         }
 
-        // ADT SAI Custom start
-        // Extras validation (we don't want assists to have SAI data, right?)
         if (!protoManager.TryIndex(Role, out var role) || role.AllowedExtras == null)
         {
             ExtraData.Clear();
@@ -226,7 +301,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
         {
             ExtraData.Remove(key);
         }
-        // ADT SAI Custom end
     }
 
     private void Apply(LoadoutPrototype loadoutProto)
@@ -301,27 +375,39 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
     public bool IsValid(HumanoidCharacterProfile profile, ICommonSession? session, ProtoId<LoadoutPrototype> loadout, IDependencyCollection collection, [NotNullWhen(false)] out FormattedMessage? reason)
     {
         reason = null;
-
         var protoManager = collection.Resolve<IPrototypeManager>();
-
+    
         if (!protoManager.TryIndex(loadout, out var loadoutProto))
         {
-            // Uhh
             reason = FormattedMessage.FromMarkupOrThrow("");
             return false;
+        }
+
+        var netManager = collection.Resolve<INetManager>();
+    
+        if (netManager.IsServer)
+        {
+            foreach (var effect in loadoutProto.Effects)
+            {
+                if (effect is SponsorLoadoutEffect)
+                {
+                    Logger.InfoS("sponsor.debug", $"Server skipping validation for sponsor loadout: {loadout}");
+                    return true;
+                }
+            }
         }
 
         if (!protoManager.HasIndex(Role))
         {
             reason = FormattedMessage.FromUnformatted("loadouts-prototype-missing");
             return false;
-        }
+        }   
 
         var valid = true;
-
         foreach (var effect in loadoutProto.Effects)
         {
             valid = valid && effect.Validate(profile, this, session, collection, out reason);
+            if (!valid) break;
         }
 
         return valid;

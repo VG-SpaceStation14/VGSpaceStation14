@@ -10,6 +10,9 @@ public sealed class SponsorEntry
     public int Tier { get; set; }
     public DateTime? ExpireDate { get; set; }
     public string? Notes { get; set; }
+    
+    // Custom loadouts available to this specific player
+    public List<string> CustomLoadouts { get; set; } = new();
 
     [JsonIgnore]
     public NetUserId? NetUserId => Guid.TryParse(UserId, out var guid) ? new NetUserId(guid) : null;

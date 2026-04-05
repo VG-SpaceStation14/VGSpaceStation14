@@ -4,7 +4,7 @@ using Robust.Shared.Network;
 
 namespace Content.Client._VG.Sponsors;
 
-public sealed class SponsorsManager : ISponsorsManager // VG-Sponsors
+public sealed class SponsorsManager : ISponsorsManager
 {
     [Dependency] private readonly IClientNetManager _netMgr = default!;
 
@@ -21,11 +21,9 @@ public sealed class SponsorsManager : ISponsorsManager // VG-Sponsors
         return _info != null;
     }
 
-    // VG-Sponsors start
-    bool ISponsorsManager.TryGetInfo(Robust.Shared.Network.NetUserId userId, [NotNullWhen(true)] out SponsorInfo? sponsor)
+    bool ISponsorsManager.TryGetInfo(NetUserId userId, [NotNullWhen(true)] out SponsorInfo? sponsor)
     {
         sponsor = null;
         return false;
     }
-    // VG-Sponsors end
 }

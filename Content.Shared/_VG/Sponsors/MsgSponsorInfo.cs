@@ -9,7 +9,6 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._VG.Sponsors;
 
-
 [Serializable, NetSerializable]
 public sealed class SponsorInfo
 {
@@ -30,6 +29,9 @@ public sealed class SponsorInfo
 
     [JsonPropertyName("allowedMarkings")]
     public string[] AllowedMarkings { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("customLoadouts")]
+    public string[] CustomLoadouts { get; set; } = Array.Empty<string>();
 
     [JsonPropertyName("expireDate")]
     public DateTime ExpireDate {get; set;}
@@ -81,7 +83,6 @@ public sealed class MsgSponsorListInfo : NetMessage
         }
     }
 }
-
 
 /// <summary>
 /// Server sends sponsoring info to client on connect only if user is sponsor

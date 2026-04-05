@@ -24,14 +24,11 @@ public sealed class CheckSponsorSystem : EntitySystem
         if (!_sponsorsManager.TryGetInfo(session.UserId, out var sponsorData))
             return false;
 
-        // ADT-SPONSORS
         return sponsorData.Tier > 0 || sponsorData.AllowJob;
-        // ADT-SPONSORS
     }
 
     private void SetSponsorStatus(CheckUserSponsor ev)
     {
-
         var isSponsor = CheckUser(ev.Player);
         var eve = new CheckedUserSponsor(isSponsor);
         RaiseNetworkEvent(eve);
