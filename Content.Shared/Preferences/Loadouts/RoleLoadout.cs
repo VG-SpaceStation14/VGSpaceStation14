@@ -148,7 +148,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
                             if (isOtherSponsor && Conflicts(loadoutProto, otherProto))
                             {
-                                Logger.InfoS("sponsor.debug", $"Removing non-sponsor loadout {loadout.Prototype} because it conflicts with sponsor loadout {otherLoad.Prototype}");
                                 groupLoadouts.RemoveAt(i);
                                 break;
                             }
@@ -186,7 +185,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
                 if (!protoManager.TryIndex(loadout.Prototype, out var loadoutProto))
                 {
-                    Logger.WarningS("sponsor.debug", $"Loadout prototype missing: {loadout.Prototype}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
@@ -196,26 +194,22 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
 
                 if (isSponsorLoadout)
                 {
-                    Logger.InfoS("sponsor.debug", $"Sponsor loadout {loadout.Prototype} is valid, keeping (bypassing checks)");
                     Apply(loadoutProto);
                     continue;
                 }
 
                 if (!groupProto.Loadouts.Contains(loadout.Prototype))
                 {
-                    Logger.WarningS("sponsor.debug", $"Loadout {loadout.Prototype} not in group {groupProto.ID}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
 
                 if (!IsValid(profile, session, loadout.Prototype, collection, out var reason))
                 {
-                    Logger.WarningS("sponsor.debug", $"Loadout {loadout.Prototype} invalid: {reason?.ToMarkup()}, removing");
                     loadouts.RemoveAt(i);
                     continue;
                 }
 
-                Logger.InfoS("sponsor.debug", $"Loadout {loadout.Prototype} is valid, keeping");
                 Apply(loadoutProto);
             }
 
@@ -255,7 +249,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
                         if (occupiedSlots.Contains(slot))
                         {
                             conflicts = true;
-                            Logger.InfoS("sponsor.debug", $"Default loadout {protoId} conflicts with already occupied slot '{slot}', skipping");
                             break;
                         }
                     }
@@ -265,7 +258,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
                     if (!IsValid(profile, session, defaultLoadout.Prototype, collection, out _))
                         continue;
 
-                    Logger.InfoS("sponsor.debug", $"Adding default loadout: {defaultLoadout.Prototype} to group {groupProto.ID}");
                     loadouts.Add(defaultLoadout);
                     Apply(loadoutProto);
 
@@ -391,7 +383,6 @@ public sealed partial class RoleLoadout : IEquatable<RoleLoadout>
             {
                 if (effect is SponsorLoadoutEffect)
                 {
-                    Logger.InfoS("sponsor.debug", $"Server skipping validation for sponsor loadout: {loadout}");
                     return true;
                 }
             }
