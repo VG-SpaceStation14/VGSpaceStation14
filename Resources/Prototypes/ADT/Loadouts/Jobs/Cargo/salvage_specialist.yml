@@ -74,6 +74,14 @@
     neck: ClothingNeckCloakSalvagerSupreme
 
 - type: loadout
+  id: VGNeckSalvageGloomyCape
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageRubieCape300hour
+  equipment:
+    neck: ClothingNeckGloomyCloakSalvager
+
+- type: loadout
   id: GoliathCloak
   equipment:
     neck: ClothingNeckCloakGoliathCloak
@@ -98,12 +106,13 @@
   effects:
   - !type:SponsorLoadoutEffect
 
-#- type: loadout
-#  id: GrimySalvageJumpsuit
-#  equipment:
-#    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
-#  effects:
-#  - !type:SponsorLoadoutEffect
+- type: loadout
+  id: GrimySalvageJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
+  effects:
+  - !type:GroupLoadoutEffect
+    proto: ADTSalvageRubieCape300hour
 # VG-Tweak End
 # Belt
 - type: loadout

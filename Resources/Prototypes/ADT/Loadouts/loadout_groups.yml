@@ -840,8 +840,8 @@
   loadouts:
   - ADTClothingUniformJumpsuitSalvageSpecialist
   - ADTUniformJumpsuitExplorer # VG-Loadouts-Add
+  - GrimySalvageJumpsuit # VG-Loadouts-Add
   - ExplorersJumpsuit # VG-Loadouts-Add
-#  - GrimySalvageJumpsuit # VG-Loadouts-Add
 
 # ШАХТЁР
 - type: loadoutGroup
@@ -892,6 +892,7 @@
   maxLimit: 1
   loadouts:
   - ADTNeckSalvageDCape
+  - VGNeckSalvageGloomyCape # VG-Tweak
   - GoliathCloak
 
 #VG-Tweak - Start - LoadoutRework

@@ -52,14 +52,14 @@
 
 # Albuka
 - type: loadout
-  id: SponsorLoadoutAlbukaGloomyCloack
-  dummyEntity: ClothingNeckGloomyCloakSalvager
+  id: SponsorLoadoutAlbukaDarkGreyCloack
+  dummyEntity: ADTClothingNeckDarkGreyCloak
   equipment:
-    neck: ClothingNeckGloomyCloakSalvager
-    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
+    neck: ADTClothingNeckDarkGreyCloak
+    jumpsuit: ADTClothingUniformJumpsuitKringeClothing
     back: ClothingBigBackpackSalvage
   effects:
     - !type:SponsorLoadoutEffect
       tier: 3
     - !type:JobRestrictedLoadoutEffect
-      whitelistJobs: [ SalvageSpecialist ]
+      whitelistJobs: [ SalvageSpecialist ] 
