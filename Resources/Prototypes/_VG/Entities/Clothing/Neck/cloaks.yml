@@ -291,3 +291,12 @@
     sprite: _VG/Clothing/Neck/Cloaks/Long/hos.rsi
   - type: StealTarget
     stealGroup: HeadCloak
+
+- type: entity
+  parent: ClothingNeckBase
+  id: ClothingNeckGloomyCloakSalvager
+  name: gloomy salvager's cloak
+  description: Worn by the most skilled salvagers, for one who has mastered space and made the mining asteroid his domain. They don't just hand these things out, y'know?
+  components:
+  - type: Sprite
+    sprite: _VG/Clothing/Neck/Cloaks/alt_miner.rsi

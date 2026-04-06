@@ -49,3 +49,17 @@
 #      tier: 3
 #    - !type:JobRestrictedLoadoutEffect
 #      whitelistJobs: [ Quartermaster, SalvageSpecialist ]
+
+# Albuka
+- type: loadout
+  id: SponsorLoadoutAlbukaGloomyCloack
+  dummyEntity: ClothingNeckGloomyCloakSalvager
+  equipment:
+    neck: ClothingNeckGloomyCloakSalvager
+    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
+    back: ClothingBigBackpackSalvage
+  effects:
+    - !type:SponsorLoadoutEffect
+      tier: 3
+    - !type:JobRestrictedLoadoutEffect
+      whitelistJobs: [ Quartermaster, SalvageSpecialist ]

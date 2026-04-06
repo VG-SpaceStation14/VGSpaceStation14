@@ -98,12 +98,12 @@
   effects:
   - !type:SponsorLoadoutEffect
 
-- type: loadout
-  id: GrimySalvageJumpsuit
-  equipment:
-    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
-  effects:
-  - !type:SponsorLoadoutEffect
+#- type: loadout
+#  id: GrimySalvageJumpsuit
+#  equipment:
+#    jumpsuit: ClothingUniformJumpsuitSalvageSpecialistAlt
+#  effects:
+#  - !type:SponsorLoadoutEffect
 # VG-Tweak End
 # Belt
 - type: loadout
