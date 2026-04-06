@@ -62,4 +62,4 @@
     - !type:SponsorLoadoutEffect
       tier: 3
     - !type:JobRestrictedLoadoutEffect
-      whitelistJobs: [ Quartermaster, SalvageSpecialist ]
+      whitelistJobs: [ SalvageSpecialist ]
