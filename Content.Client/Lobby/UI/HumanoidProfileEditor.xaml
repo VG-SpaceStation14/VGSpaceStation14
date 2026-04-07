@@ -151,7 +151,6 @@
                 </BoxContainer>
                 <BoxContainer Orientation="Vertical" Margin="10">
                     <!-- Traits -->
-                    <Button Name="QuirksMenuButton" Text="{Loc 'quirks-window-title'}" ToggleMode="True" Margin="5"/>
                     <ScrollContainer VerticalExpand="True">
                         <BoxContainer Name="TraitsList" Orientation="Vertical" />
                     </ScrollContainer>

@@ -130,7 +130,6 @@ namespace Content.Client.Lobby.UI
         private ISawmill _sawmill;
 
         private SpeciesWindow? _speciesWindow;  // ADT Species window
-        private QuirksWindow? _quirksWindow;  // ADT Quirks window
 
 
         public HumanoidProfileEditor(
@@ -673,47 +672,9 @@ namespace Content.Client.Lobby.UI
         {
             TraitsList.RemoveAllChildren();
 
-            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().Where(t => !t.Quirk).OrderBy(t => Loc.GetString(t.Name)).ToList(); // ADT Quirks tweaked
+            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().Where(t => !t.Quirk).OrderBy(t => Loc.GetString(t.Name)).ToList();
             /*TabContainer.SetTabTitle(4, Loc.GetString("humanoid-profile-editor-traits-tab"));   // ADT Languages tweak
             Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
-
-            // ADT Quirks Window start
-            if (Profile != null)
-                _quirksWindow?.Populate(Profile);
-            QuirksMenuButton.OnToggled += args =>
-            {
-                if (Profile == null)
-                    return;
-
-                _quirksWindow?.Dispose();
-
-                if (!args.Pressed)
-                {
-                    _quirksWindow = null;
-                }
-                else
-                {
-                    _quirksWindow = new(_prototypeManager);
-                    _quirksWindow.Populate(Profile);
-                    _quirksWindow.OpenCenteredRight();
-                    _quirksWindow.QuirkSelected += args =>
-                    {
-                        if (Profile.TraitPreferences.Contains(args.ID))
-                            Profile = Profile.WithoutTraitPreference(args.ID, _prototypeManager);
-                        else
-                            Profile = Profile.WithTraitPreference(args.ID, _prototypeManager);
-
-                        SetDirty();
-                        _quirksWindow?.Populate(Profile);
-                    };
-                    _quirksWindow.OnClose += () =>
-                    {
-                        QuirksMenuButton.Pressed = false;
-                        _quirksWindow = null;
-                    };
-                }
-            };
-            // ADT Quirks Window end
 
             if (traits.Count < 1)
             {
