@@ -129,7 +129,7 @@ public sealed partial class ShuttleSystem
             jungleDiff *= dotProduct;
 
             // this is cursed but makes it so that collisions of small grid with large grid count the inertia as being approximately the small grid's
-            var effectiveInertiaMult = (ourBody.FixturesMass * otherBody.FixturesMass) / (ourBody.FixturesMass + otherBody.FixturesMass);
+            var effectiveInertiaMult = (ourBody.FixturesMass * otherBody.FixturesMass) * 1.5f; // VG-Tweak
             var effectiveInertia = jungleDiff * effectiveInertiaMult;
 
             // TODO: squish damage so that a tiny splinter grid can't stop 2 big grids by being in the way
