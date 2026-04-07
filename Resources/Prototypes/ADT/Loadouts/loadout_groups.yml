@@ -335,6 +335,16 @@
   - ADTPurpleGloves
   - RobohandsGloves
 
+- type: loadoutGroup
+  id: RobohandsBackpacck
+  name: loadout-group-roboticist-backpack
+  minLimit: 1
+  loadouts:
+  - RoboticistBackpack
+  - RoboticistSatchel
+  - RoboticistDuffel
+
+
 # SENIOR ENGINEER
 
 - type: loadoutGroup

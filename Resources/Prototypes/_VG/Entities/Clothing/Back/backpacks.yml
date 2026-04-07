@@ -25,3 +25,12 @@
   components:
   - type: Sprite
     sprite: _VG/Clothing/Back/Backpacks/security-engineer.rsi
+
+- type: entity
+  parent: ClothingBackpack
+  id: ClothingBackpackRoboticist
+  name: roboticist backpack
+  description: A backpack specially designed to repel stains and hazardous liquids.
+  components:
+  - type: Sprite
+    sprite: _VG/Clothing/Back/Backpacks/roboticist.rsi

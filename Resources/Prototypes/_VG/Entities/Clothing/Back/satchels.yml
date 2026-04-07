@@ -19,3 +19,12 @@
   components:
   - type: Sprite
     sprite: _VG/Clothing/Back/Satchels/white_captain_satchel.rsi
+
+- type: entity
+  parent: [ClothingBackpackSatchel , ClothingBackpackSatchelFoldableBase] #VG-Tweak (two-sided satchels)
+  id: ClothingBackpackSatchelRoboticist
+  name: roboticist satchel
+  description: Useful for holding research materials.
+  components:
+  - type: Sprite
+    sprite: _VG/Clothing/Back/Satchels/roboticist.rsi
