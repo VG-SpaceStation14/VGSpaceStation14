@@ -353,6 +353,14 @@
   loadouts:
   - BlackShoes
   - WinterBoots
+  # VG tweak start
+  - ADTFootWrapsW
+  - ADTFootWrapsHighW
+  - ADTFootWrapsBr
+  - ADTFootWrapsHighBr
+  - ADTFootWrapsBl
+  - ADTFootWrapsHighBl
+  # VG tweak end
 
 - type: loadoutGroup
   id: PassengerJobTrinkets
