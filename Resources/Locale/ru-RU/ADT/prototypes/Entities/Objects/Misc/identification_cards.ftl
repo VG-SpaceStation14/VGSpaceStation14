@@ -182,8 +182,8 @@ ent-ADTMechAssemblerIDCard = ID карта механосборщика
 ent-ADTSheriffIDCard = ID карта шерифа
     .desc = ID карта шерифа.
 
-ent-ADTLawyerIDCard = ID карта адвоката
-    .desc = ID карта адвоката.
+ent-ADTLawyerIDCard = ID карта юриста
+    .desc = ID карта юриста.
 
 ent-ADTGardenerIDCard = ID карта садовода
     .desc = ID карта садовода.
@@ -238,3 +238,6 @@ ent-ADTTraumatologistIDCard = ID карта травматолога
 
 ent-ADTIntendantIDCard = ID карта интенданта
     .desc = ID карта интенданта.
+
+ent-ADTPassagerRDIDCard = ID карта научного руководителя
+        .desc = ID карта научного руководителя.
