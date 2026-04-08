@@ -10,6 +10,8 @@ using Content.Shared.Verbs;
 using Robust.Shared.Utility;
 using Content.Shared.DoAfter;
 using Robust.Shared.Containers;
+using Content.Shared.Mind;
+using Content.Shared.Mind.Components;
 
 namespace Content.Server._VG.SimpleSkills;
 
@@ -58,6 +60,9 @@ public sealed class SimpleSkillSystem : EntitySystem
         
         // Добавляем верб для изучения книги
         SubscribeLocalEvent<SimpleSkillBookComponent, GetVerbsEvent<Verb>>(OnGetSkillBookVerbs);
+
+        // Фоллбек для выдачи навыков яо, обр, гостролям и обсерверу
+        SubscribeLocalEvent<MindContainerComponent, MindAddedMessage>(OnMindAdded);
         
         InitializeCache();
     }
@@ -98,6 +103,100 @@ public sealed class SimpleSkillSystem : EntitySystem
     public string GetSkillName(string skillId)
     {
         return GetSkillPrototype(skillId)?.Name ?? skillId;
+    }
+
+    private void OnMindAdded(EntityUid uid, MindContainerComponent component, MindAddedMessage args)
+    {
+        var skills = EnsureComp<SimpleSkillComponent>(uid);
+
+        if (skills.Skills.Count > 0)
+            return;
+
+        // Если указана группа — применяем её логику (даже если она пустая)
+        // Это предотвращает фоллбэк на все навыки
+        if (!string.IsNullOrEmpty(skills.SkillGroup))
+        {
+            var group = GetSkillGroupPrototype(skills.SkillGroup);
+            ApplySkillGroupIfNeeded(uid, skills, group);
+            return;
+        }
+
+        // Fallback: выдаём все навыки только если НЕТ флага предотвращения и это игрок
+        if (!skills.FallbackPrevented && IsPlayer(uid))
+        {
+            GiveAllSkills(uid);
+        }
+    }   
+
+    /// <summary>
+    /// Проверка что сущность — игрок
+    /// </summary>
+    private bool IsPlayer(EntityUid uid)
+    {
+        return TryComp<MindContainerComponent>(uid, out var mind)
+            && mind.HasMind;
+    }
+
+    /// <summary>
+    /// Выдать все навыки (только для фоллбэка)
+    /// </summary>
+    private void GiveAllSkills(EntityUid uid)
+    {
+        var skills = EnsureComp<SimpleSkillComponent>(uid);
+
+        // Дополнительная проверка: если фоллбэк запрещён — не выдаём
+        if (skills.FallbackPrevented)
+        {
+            _sawmill.Debug($"Fallback prevented for {ToPrettyString(uid)}");
+            return;
+        }
+
+        foreach (var proto in _prototype.EnumeratePrototypes<SimpleSkillPrototype>())
+        {
+            skills.Skills[proto.ID] = true;
+        }
+
+        Dirty(uid, skills);
+        RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
+
+        _sawmill.Info($"Fallback: выданы ВСЕ навыки для {ToPrettyString(uid)}");
+    }
+
+    /// <summary>
+    ///     Применяет группу навыков, если это необходимо.
+    ///     Если группа пустая или имеет PreventFallback — навыки не выдаются.
+    /// </summary>
+    private void ApplySkillGroupIfNeeded(EntityUid uid, SimpleSkillComponent skills, SimpleSkillGroupPrototype? group)
+    {
+        var groupId = group?.ID ?? "null";
+        
+        // Если группа запрещает fallback (или просто задана как "пустая") — не выдаём ничего
+        if (group?.PreventFallback == true)
+        {
+            skills.FallbackPrevented = true;
+            Dirty(uid, skills);
+            _sawmill.Debug($"Группа {groupId} с preventFallback=true — навыки не выданы для {ToPrettyString(uid)}");
+            return;
+        }
+
+        // Если группа пустая (и не запрещает fallback явно) — просто создаём компонент без навыков
+        // Это тоже предотвращает фоллбэк, так как группа "заняла место"
+        if (group?.Skills == null || group.Skills.Count == 0)
+        {
+            _sawmill.Info($"Применена пустая группа {groupId} для {ToPrettyString(uid)}. Навыков не добавлено.");
+            return;
+        }
+
+        // Добавляем навыки из группы
+        foreach (var skillId in group.Skills)
+        {
+            skills.Skills[skillId] = true;
+        }
+
+        Dirty(uid, skills);
+        RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
+        
+        _sawmill.Info($"Применена группа {groupId} для {ToPrettyString(uid)}. Навыков: {skills.Skills.Count}");
     }
 
     /// <summary>
@@ -245,14 +344,13 @@ public sealed class SimpleSkillSystem : EntitySystem
         skills.Skills[skillId] = true;
     
         Dirty(uid, skills);
-
         RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
         
         Logger.InfoS("simple.skills", $"Добавлен навык {skillId} для {ToPrettyString(uid)}");
     }
 
     /// <summary>
-    ///     Применить группу навыков к игроку
+    ///     Применить группу навыков к игроку (публичный метод для внешнего использования)
     /// </summary>
     public void ApplySkillGroup(EntityUid uid, string groupId)
     {
@@ -264,26 +362,7 @@ public sealed class SimpleSkillSystem : EntitySystem
         }
 
         var skills = EnsureComp<SimpleSkillComponent>(uid);
-    
-        // Если группа пустая - просто создаём компонент без навыков
-        if (group.Skills == null || group.Skills.Count == 0)
-        {
-            Logger.InfoS("simple.skills", $"Применена пустая группа {groupId} для {ToPrettyString(uid)}. Навыков не добавлено.");
-            return;
-        }
-
-        // Добавляем навыки из группы
-        foreach (var skillId in group.Skills)
-        {
-            skills.Skills[skillId] = true;
-            Logger.InfoS("simple.skills", $"  Добавлен навык {skillId} = true");
-        }
-
-        Dirty(uid, skills);
-
-        RaiseNetworkEvent(new SkillsChangedEvent(GetNetEntity(uid)));
-        
-        Logger.InfoS("simple.skills", $"Применена группа {groupId} для {ToPrettyString(uid)}. Всего навыков: {skills.Skills.Count}");
+        ApplySkillGroupIfNeeded(uid, skills, group);
     }
 
     /// <summary>
@@ -291,18 +370,16 @@ public sealed class SimpleSkillSystem : EntitySystem
     /// </summary>
     private void OnComponentInit(EntityUid uid, SimpleSkillComponent component, ComponentInit args)
     {
-        // Если указана группа, применяем её
         if (!string.IsNullOrEmpty(component.SkillGroup))
         {
-            // Проверяем, есть ли уже навыки (чтобы не затереть)
-            if (component.Skills == null || component.Skills.Count == 0)
-            {
-                ApplySkillGroup(uid, component.SkillGroup);
-            }
-            else
-            {
-                Logger.InfoS("simple.skills", $"Компонент уже содержит навыки, группа {component.SkillGroup} не применяется");
-            }
+            var group = GetSkillGroupPrototype(component.SkillGroup);
+            ApplySkillGroupIfNeeded(uid, component, group);
+            return;
+        }
+
+        if (!component.FallbackPrevented && (component.Skills == null || component.Skills.Count == 0) && IsPlayer(uid))
+        {
+            GiveAllSkills(uid);
         }
     }
 

@@ -4,6 +4,7 @@
   id: BaseSkills
   name: Базовые навыки
   skills: []
+  preventFallback: true
 
 - type: simpleSkillGroup
   id: BaseSkillsPiloting

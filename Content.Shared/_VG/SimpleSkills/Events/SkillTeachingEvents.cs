@@ -13,16 +13,3 @@ public sealed partial class SkillLearnDoAfterEvent : SimpleDoAfterEvent
         SkillId = skillId;
     }
 }
-
-[Serializable, NetSerializable]
-public sealed partial class SkillTeachDoAfterEvent : SimpleDoAfterEvent
-{
-    public string SkillId { get; }
-    public NetEntity Student { get; }
-
-    public SkillTeachDoAfterEvent(string skillId, NetEntity student)
-    {
-        SkillId = skillId;
-        Student = student;
-    }
-}
