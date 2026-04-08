@@ -28,12 +28,16 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             RobustXamlLoader.Load(this);
             IoCManager.InjectDependencies(this);
 
+            MainTabContainer.SetTabTitle(0, Loc.GetString("admin-sponsor-panel-tab-sponsor"));
+            MainTabContainer.SetTabTitle(1, Loc.GetString("admin-sponsor-panel-tab-loadout"));
+
             WireEvents();
             RefreshButtons();
         }
 
         private void WireEvents()
         {
+            // События для вкладки спонсоров
             PlayerNameLine.OnTextChanged += _ => RefreshButtons();
             TierInput.OnTextChanged += _ => RefreshButtons();
             DaysInput.OnTextChanged += _ => RefreshButtons();
@@ -47,12 +51,25 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
 
             AddSponsorButton.OnPressed += OnAddSponsor;
             RemoveSponsorButton.OnPressed += OnRemoveSponsor;
+
+            LoadoutPlayerNameLine.OnTextChanged += _ => RefreshLoadoutButtons();
+            LoadoutIdInput.OnTextChanged += _ => RefreshLoadoutButtons();
+            LoadoutPlayerList.OnSelectionChanged += OnLoadoutPlayerSelected;
+
+            AddLoadoutButton.OnPressed += OnAddLoadout;
+            RemoveLoadoutButton.OnPressed += OnRemoveLoadout;
         }
 
         private void OnPlayerSelected(PlayerInfo? player)
         {
             PlayerNameLine.Text = player?.Username ?? string.Empty;
             RefreshButtons();
+        }
+
+        private void OnLoadoutPlayerSelected(PlayerInfo? player)
+        {
+            LoadoutPlayerNameLine.Text = player?.Username ?? string.Empty;
+            RefreshLoadoutButtons();
         }
 
         private void OnAddSponsor(BaseButton.ButtonEventArgs args)
@@ -102,11 +119,47 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             PlayerNameLine.Text = "";
         }
 
+        private void OnAddLoadout(BaseButton.ButtonEventArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(LoadoutPlayerNameLine.Text))
+                return;
+
+            if (string.IsNullOrWhiteSpace(LoadoutIdInput.Text))
+                return;
+
+            var cmd = $"sponsoraddloadout \"{CommandParsing.Escape(LoadoutPlayerNameLine.Text)}\" {LoadoutIdInput.Text}";
+            _consoleHost.ExecuteCommand(cmd);
+
+            LoadoutIdInput.Text = "";
+        }
+
+        private void OnRemoveLoadout(BaseButton.ButtonEventArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(LoadoutPlayerNameLine.Text))
+                return;
+
+            if (string.IsNullOrWhiteSpace(LoadoutIdInput.Text))
+                return;
+
+            var cmd = $"sponsorremoveloadout \"{CommandParsing.Escape(LoadoutPlayerNameLine.Text)}\" {LoadoutIdInput.Text}";
+            _consoleHost.ExecuteCommand(cmd);
+
+            LoadoutIdInput.Text = "";
+        }
+
         private void RefreshButtons()
         {
             var inputValid = !string.IsNullOrWhiteSpace(PlayerNameLine.Text);
             AddSponsorButton.Disabled = !inputValid || string.IsNullOrWhiteSpace(TierInput.Text);
             RemoveSponsorButton.Disabled = !inputValid;
+        }
+
+        private void RefreshLoadoutButtons()
+        {
+            var inputValid = !string.IsNullOrWhiteSpace(LoadoutPlayerNameLine.Text) && 
+                           !string.IsNullOrWhiteSpace(LoadoutIdInput.Text);
+            AddLoadoutButton.Disabled = !inputValid;
+            RemoveLoadoutButton.Disabled = !inputValid;
         }
 
         private void AdjustDays(int delta)
