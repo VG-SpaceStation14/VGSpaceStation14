@@ -1,5 +1,3 @@
-// Content.Client/Administration/UI/Tabs/AdminTab/PlayTimeEditorWindow.xaml.cs
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +41,10 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             IoCManager.InjectDependencies(this);
             _consoleHost = IoCManager.Resolve<IClientConsoleHost>();
 
+            // Устанавливаем заголовки вкладок
+            MainTabContainer.SetTabTitle(0, Loc.GetString("admin-time-panel-tab-edit"));
+            MainTabContainer.SetTabTitle(1, Loc.GetString("admin-time-panel-tab-reset"));
+
             InitializeData();
             WireEvents();
             SetButtonsState(true);
@@ -73,62 +75,6 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             // Заполняем выпадающие списки
             RefreshFilteredRoles("");
             RefreshFilteredDepartments("");
-            
-            // Настраиваем радио-кнопки для выбора типа
-            SetupTargetTypeSelector();
-        }
-
-        private void SetupTargetTypeSelector()
-        {
-            // Создаем контейнер для выбора типа цели
-            var typeSelector = new BoxContainer
-            {
-                Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                HorizontalExpand = true,
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-
-            var roleRadio = new Button
-            {
-                Text = Loc.GetString("admin-time-panel-target-role"),
-                ToggleMode = true,
-                Pressed = true,
-                HorizontalExpand = true
-            };
-            
-            var departmentRadio = new Button
-            {
-                Text = Loc.GetString("admin-time-panel-target-department"),
-                ToggleMode = true,
-                HorizontalExpand = true
-            };
-
-            // Группируем радио-кнопки
-            roleRadio.OnToggled += args => 
-            {
-                if (args.Pressed)
-                {
-                    departmentRadio.Pressed = false;
-                    _currentTargetType = TargetType.Role;
-                    UpdateTargetSelector();
-                }
-            };
-            
-            departmentRadio.OnToggled += args => 
-            {
-                if (args.Pressed)
-                {
-                    roleRadio.Pressed = false;
-                    _currentTargetType = TargetType.Department;
-                    UpdateTargetSelector();
-                }
-            };
-
-            typeSelector.AddChild(roleRadio);
-            typeSelector.AddChild(departmentRadio);
-
-            // Вставляем в начало контейнера с опциями
-            OptionsContainer.AddChild(typeSelector);
         }
 
         private void UpdateTargetSelector()
@@ -185,6 +131,7 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
 
         private void WireEvents()
         {
+            // События для вкладки редактирования
             PlayerNameLine.OnTextChanged += _ => RefreshButtons();
             MinutesInput.OnTextChanged += _ => RefreshButtons();
             MinutesInput.OnTextChanged += UpdateTimeButtonsLabels;
@@ -195,6 +142,27 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
                     RefreshFilteredRoles(RoleFilterInput.Text);
                 else
                     RefreshFilteredDepartments(RoleFilterInput.Text);
+            };
+
+            // Радио-кнопки
+            RoleRadioButton.OnToggled += args =>
+            {
+                if (args.Pressed)
+                {
+                    DepartmentRadioButton.Pressed = false;
+                    _currentTargetType = TargetType.Role;
+                    UpdateTargetSelector();
+                }
+            };
+            
+            DepartmentRadioButton.OnToggled += args =>
+            {
+                if (args.Pressed)
+                {
+                    RoleRadioButton.Pressed = false;
+                    _currentTargetType = TargetType.Department;
+                    UpdateTargetSelector();
+                }
             };
 
             // Кнопки добавления времени
@@ -210,6 +178,26 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             // Выбор в выпадающих списках
             RoleOption.OnItemSelected += args => RoleOption.SelectId(args.Id);
             DepartmentOption.OnItemSelected += args => DepartmentOption.SelectId(args.Id);
+
+            // События для вкладки сброса
+            ResetPlayerNameLine.OnTextChanged += _ => RefreshResetButtons();
+            ResetPlayerList.OnSelectionChanged += OnResetPlayerSelected;
+
+            ResetAllButton.OnPressed += OnResetAll;
+            ResetRolesButton.OnPressed += OnResetRoles;
+            ResetOverallButton.OnPressed += OnResetOverall;
+        }
+
+        private void OnPlayerSelected(PlayerInfo? player)
+        {
+            PlayerNameLine.Text = player?.Username ?? string.Empty;
+            RefreshButtons();
+        }
+
+        private void OnResetPlayerSelected(PlayerInfo? player)
+        {
+            ResetPlayerNameLine.Text = player?.Username ?? string.Empty;
+            RefreshResetButtons();
         }
 
         private void OnApply(BaseButton.ButtonEventArgs _)
@@ -245,6 +233,30 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             _consoleHost.ExecuteCommand($"playtime_addoverall_as \"{PlayerNameLine.Text}\" {MinutesInput.Text}");
         }
 
+        private void OnResetAll(BaseButton.ButtonEventArgs _)
+        {
+            if (string.IsNullOrWhiteSpace(ResetPlayerNameLine.Text))
+                return;
+
+            _consoleHost.ExecuteCommand($"playtime_resetall_as \"{ResetPlayerNameLine.Text}\"");
+        }
+
+        private void OnResetRoles(BaseButton.ButtonEventArgs _)
+        {
+            if (string.IsNullOrWhiteSpace(ResetPlayerNameLine.Text))
+                return;
+
+            _consoleHost.ExecuteCommand($"playtime_resetroles_as \"{ResetPlayerNameLine.Text}\"");
+        }
+
+        private void OnResetOverall(BaseButton.ButtonEventArgs _)
+        {
+            if (string.IsNullOrWhiteSpace(ResetPlayerNameLine.Text))
+                return;
+
+            _consoleHost.ExecuteCommand($"playtime_resetoverall_as \"{ResetPlayerNameLine.Text}\"");
+        }
+
         private void RefreshButtons()
         {
             var inputValid = !string.IsNullOrWhiteSpace(PlayerNameLine.Text) && 
@@ -254,16 +266,19 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             SetButtonsState(!inputValid);
         }
 
+        private void RefreshResetButtons()
+        {
+            var inputValid = !string.IsNullOrWhiteSpace(ResetPlayerNameLine.Text);
+            
+            ResetAllButton.Disabled = !inputValid;
+            ResetRolesButton.Disabled = !inputValid;
+            ResetOverallButton.Disabled = !inputValid;
+        }
+
         private void SetButtonsState(bool disabled)
         {
             ApplyRoleButton.Disabled = disabled;
             ApplyTotalButton.Disabled = disabled;
-        }
-
-        private void OnPlayerSelected(PlayerInfo? player)
-        {
-            PlayerNameLine.Text = player?.Username ?? string.Empty;
-            RefreshButtons();
         }
 
         private void UpdateTimeButtonsLabels(LineEditEventArgs _)

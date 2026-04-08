@@ -1,5 +1,3 @@
-<!-- Content.Client/Administration/UI/Tabs/AdminTab/PlayTimeEditorWindow.xaml -->
-
 <DefaultWindow
     x:Class="Content.Client.Administration.UI.Tabs.AdminTab.PlayTimeEditorWindow"
     xmlns="https://spacestation14.io"
@@ -7,49 +5,82 @@
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
     Title="{Loc admin-player-actions-window-playtime-panel}" MinSize="550 600">
 
-    <BoxContainer Orientation="Vertical" SeparationOverride="6" Margin="10" Name="OptionsContainer">
+    <BoxContainer Orientation="Vertical" VerticalExpand="True">
+        <TabContainer Name="MainTabContainer" VerticalExpand="True" Margin="0">
+            
+            <!-- Вкладка редактирования времени роли/отдела -->
+            <BoxContainer Name="RoleDepartmentTab" Orientation="Vertical" SeparationOverride="6" Margin="10">
+                <GridContainer Columns="2" VerticalExpand="false" Margin="0 0 0 10">
+                    <!-- Поле ввода ника игрока -->
+                    <Label Text="{Loc admin-time-panel-window-player}" VerticalAlignment="Center" />
+                    <LineEdit Name="PlayerNameLine" MinWidth="150" HorizontalExpand="True" />
 
-        <GridContainer Columns="2" VerticalExpand="false" Margin="0 0 0 10">
-            <!-- Поле ввода ника игрока -->
-            <Label Text="{Loc admin-time-panel-window-player}" VerticalAlignment="Center" />
-            <LineEdit Name="PlayerNameLine" MinWidth="150" HorizontalExpand="True" />
+                    <!-- Фильтр поиска роли/отдела -->
+                    <Label Text="{Loc admin-time-panel-window-target}" VerticalAlignment="Center" />
+                    <LineEdit Name="RoleFilterInput" MinWidth="150" HorizontalExpand="True" 
+                             PlaceHolder="{Loc admin-time-panel-window-role-filtre}" />
 
-            <!-- Фильтр поиска роли/отдела -->
-            <Label Text="{Loc admin-time-panel-window-target}" VerticalAlignment="Center" />
-            <LineEdit Name="RoleFilterInput" MinWidth="150" HorizontalExpand="True" 
-                     PlaceHolder="{Loc admin-time-panel-window-role-filtre}" />
+                    <!-- Поле ввода минут -->
+                    <Label Text="{Loc admin-time-panel-window-minutes}" VerticalAlignment="Center" />
+                    <LineEdit Name="MinutesInput" MinWidth="100" HorizontalExpand="True" />
+                </GridContainer>
 
-            <!-- Поле ввода минут -->
-            <Label Text="{Loc admin-time-panel-window-minutes}" VerticalAlignment="Center" />
-            <LineEdit Name="MinutesInput" MinWidth="100" HorizontalExpand="True" />
-        </GridContainer>
+                <!-- Радио-кнопки выбора цели -->
+                <BoxContainer Name="TargetTypeContainer" Orientation="Horizontal" HorizontalExpand="True" Margin="0 0 0 5">
+                    <Button Name="RoleRadioButton" Text="{Loc admin-time-panel-target-role}" ToggleMode="True" Pressed="True" HorizontalExpand="True" />
+                    <Button Name="DepartmentRadioButton" Text="{Loc admin-time-panel-target-department}" ToggleMode="True" HorizontalExpand="True" />
+                </BoxContainer>
 
-        <!-- Выпадающие списки для ролей и отделов -->
-        <OptionButton Name="RoleOption" MinWidth="150" Margin="0 0 0 5" Visible="True" />
-        <OptionButton Name="DepartmentOption" MinWidth="150" Margin="0 0 0 5" Visible="False" />
+                <!-- Выпадающие списки для ролей и отделов -->
+                <OptionButton Name="RoleOption" MinWidth="150" Margin="0 0 0 5" Visible="True" />
+                <OptionButton Name="DepartmentOption" MinWidth="150" Margin="0 0 0 5" Visible="False" />
 
-        <!-- Кнопки для добавления времени -->
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="8" Margin="0 5 0 5">
-            <Button Name="AddHourButton" Text="+1h (0)" HorizontalExpand="True" />
-            <Button Name="AddDayButton" Text="+1d (0)" HorizontalExpand="True" />
-            <Button Name="AddWeekButton" Text="+1w (0)" HorizontalExpand="True" />
-            <Button Name="AddMonthButton" Text="+1M (0)" HorizontalExpand="True" />
-        </BoxContainer>
+                <!-- Кнопки для добавления времени -->
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="8" Margin="0 5 0 5">
+                    <Button Name="AddHourButton" Text="+1h (0)" HorizontalExpand="True" />
+                    <Button Name="AddDayButton" Text="+1d (0)" HorizontalExpand="True" />
+                    <Button Name="AddWeekButton" Text="+1w (0)" HorizontalExpand="True" />
+                    <Button Name="AddMonthButton" Text="+1M (0)" HorizontalExpand="True" />
+                </BoxContainer>
 
-        <!-- Фильтр игроков -->
-        <cc:PlayerListControl Name="PlayerList" VerticalExpand="True" Margin="0 10 0 10" />
+                <!-- Фильтр игроков -->
+                <cc:PlayerListControl Name="PlayerList" VerticalExpand="True" Margin="0 10 0 10" />
 
-        <!-- Кнопки применения -->
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="10" Margin="0 5 0 5">
-            <Button Name="ApplyRoleButton" Text="{Loc admin-time-panel-window-add-to-target}" HorizontalExpand="True" />
-            <Button Name="ApplyTotalButton" Text="{Loc admin-time-panel-window-add-to-overall}" HorizontalExpand="True" />
-        </BoxContainer>
+                <!-- Кнопки применения -->
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="10" Margin="0 5 0 5">
+                    <Button Name="ApplyRoleButton" Text="{Loc admin-time-panel-window-add-to-target}" HorizontalExpand="True" />
+                    <Button Name="ApplyTotalButton" Text="{Loc admin-time-panel-window-add-to-overall}" HorizontalExpand="True" />
+                </BoxContainer>
+            </BoxContainer>
+
+            <!-- Вкладка сброса времени -->
+            <BoxContainer Name="ResetTab" Orientation="Vertical" SeparationOverride="6" Margin="10">
+                <GridContainer Columns="2" VerticalExpand="false" Margin="0 0 0 10">
+                    <!-- Поле ввода ника игрока -->
+                    <Label Text="{Loc admin-time-panel-window-player}" VerticalAlignment="Center" />
+                    <LineEdit Name="ResetPlayerNameLine" MinWidth="150" HorizontalExpand="True" />
+                </GridContainer>
+
+                <!-- Фильтр игроков -->
+                <cc:PlayerListControl Name="ResetPlayerList" VerticalExpand="True" Margin="0 10 0 10" />
+
+                <!-- Кнопки сброса -->
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="10" Margin="0 5 0 5">
+                    <Button Name="ResetAllButton" Text="{Loc admin-time-panel-reset-all}" HorizontalExpand="True" StyleClasses="Caution" />
+                    <Button Name="ResetRolesButton" Text="{Loc admin-time-panel-reset-roles}" HorizontalExpand="True" />
+                </BoxContainer>
+
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="10" Margin="0 5 0 5">
+                    <Button Name="ResetOverallButton" Text="{Loc admin-time-panel-reset-overall}" HorizontalExpand="True" />
+                </BoxContainer>
+            </BoxContainer>
+
+        </TabContainer>
 
         <!-- Футер -->
-        <BoxContainer Orientation="Horizontal" SetHeight="20" Margin="0 5 0 0" SeparationOverride="10" HorizontalExpand="True">
+        <BoxContainer Orientation="Horizontal" SetHeight="20" Margin="10 5 10 0" SeparationOverride="10" HorizontalExpand="True">
             <Label Text="{Loc admin-panel-footer-powered-albuka}" FontColorOverride="#e7ff10ff" 
                    HorizontalAlignment="Center" HorizontalExpand="True" StyleClasses="LabelSmall"/>
         </BoxContainer>
-
     </BoxContainer>
 </DefaultWindow>

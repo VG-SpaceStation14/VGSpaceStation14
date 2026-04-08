@@ -576,4 +576,56 @@ public sealed class PlayTimeTrackingManager : ISharedPlaytimeManager, IPostInjec
         return TimeSpan.Zero;
     }
     // ADT-Tweak-end
+
+    // VG-Tweak-start: Reset methods
+    public void ResetOverallPlaytime(ICommonSession id)
+    {
+        if (!_playTimeData.TryGetValue(id, out var data) || !data.Initialized)
+            throw new InvalidOperationException("Play time info is not yet loaded for this player!");
+
+        data.TrackerTimes[PlayTimeTrackingShared.TrackerOverall] = TimeSpan.Zero;
+        data.DbTrackersDirty.Add(PlayTimeTrackingShared.TrackerOverall);
+    }
+
+    public async Task ResetOverallPlaytimeById(NetUserId userId)
+    {
+        await _db.UpdatePlayTimes(new List<PlayTimeUpdate> 
+        { 
+            new PlayTimeUpdate(userId, PlayTimeTrackingShared.TrackerOverall, TimeSpan.Zero) 
+        });
+    }
+
+    public void ResetPlaytimeForTracker(ICommonSession id, string tracker)
+    {
+        if (!_playTimeData.TryGetValue(id, out var data) || !data.Initialized)
+            throw new InvalidOperationException("Play time info is not yet loaded for this player!");
+
+        data.TrackerTimes[tracker] = TimeSpan.Zero;
+        data.DbTrackersDirty.Add(tracker);
+    }
+
+    public async Task ResetPlaytimeForTrackerById(NetUserId userId, string tracker)
+    {
+        await _db.UpdatePlayTimes(new List<PlayTimeUpdate> 
+        { 
+            new PlayTimeUpdate(userId, tracker, TimeSpan.Zero) 
+        });
+    }
+
+    public async Task ResetAllPlaytimeById(NetUserId userId)
+    {
+        var playTimes = await _db.GetPlayTimes(userId, CancellationToken.None);
+        var updates = new List<PlayTimeUpdate>();
+
+        foreach (var timer in playTimes)
+        {
+            updates.Add(new PlayTimeUpdate(userId, timer.Tracker, TimeSpan.Zero));
+        }
+
+        if (updates.Count > 0)
+        {
+            await _db.UpdatePlayTimes(updates);
+        }
+    }
+    // VG-Tweak-end
 }
