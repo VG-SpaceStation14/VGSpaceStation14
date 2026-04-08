@@ -1,44 +1,52 @@
-<!-- Resized a window to add UI for the Jukebox volume slider-->
-<ui:FancyWindow xmlns="https://spacestation14.io" xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
-                SetSize="600 500" Title="{Loc 'jukebox-menu-title'}"> <!-- ADT-Tweak -->
-    <BoxContainer Margin="4 0" Orientation="Vertical">
-        <ItemList Name="MusicList" SelectMode="Button" Margin="3 3 3 3"
-        HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="8"/>
-        <BoxContainer Orientation="Vertical">
-            <Label Name="SongSelected" Text="{Loc 'jukebox-menu-selectedsong'}" />
-            <BoxContainer Orientation="Horizontal" HorizontalExpand="True" 
-                          VerticalExpand="False" SizeFlagsStretchRatio="1"> <!-- ADT-Tweak -->
-                <Label Name="SongName" Text="---" />
-                <Label Name="DurationLabel" Text="00:00 / 00:00" HorizontalAlignment="Right" HorizontalExpand="True"/>
+<ui:FancyWindow xmlns="https://spacestation14.io" 
+                xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
+                xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
+                MinSize="480 420"
+                SetSize="480 420"
+                Title="{Loc 'jukebox-menu-title'}">
+    <BoxContainer Margin="6" Orientation="Vertical" SeparationOverride="4">
+        
+        <!-- Поиск -->
+        <LineEdit Name="SearchBar" PlaceHolder="{Loc 'jukebox-menu-search'}" HorizontalExpand="True" />
+        
+        <!-- Плейлист -->
+        <ItemList Name="MusicList" SelectMode="Button" 
+                  HorizontalExpand="True" VerticalExpand="True" 
+                  SizeFlagsStretchRatio="8" Margin="0 2 0 2" />
+        
+        <!-- Инфо о треке -->
+        <BoxContainer Orientation="Vertical" Margin="0 2 0 2">
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+                <Label Name="SongName" Text="---" ClipText="True" HorizontalExpand="True" />
+                <Label Name="DurationLabel" Text="00:00 / 00:00" HorizontalAlignment="Right" MinWidth="90" />
             </BoxContainer>
-            <!-- Here I added Interface to change the music volume in Jukebox.
-                Added volume slider and Volume label to show the volume-->
-            <!-- ADT-Tweak start -->
             <Slider Name="PlaybackSlider" HorizontalExpand="True" />
-            <Label Name="VolumeNumberLabel" Text="0" HorizontalAlignment="Right" HorizontalExpand="True"/>
-            <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
-                          VerticalExpand="False" SizeFlagsStretchRatio="1">
-                <Label Name="VolumeLabel" Text="{Loc 'jukebox-menu-volume'} " />
-                <Slider Name="VolumeSlider" HorizontalExpand="True" />
-            <!-- End of changes. In summary I added from another pr: volume slider and volume label -->
-            <!-- ADT-Tweak end -->
-            </BoxContainer>
         </BoxContainer>
-        <!-- ADT-Tweak start-->
-        <BoxContainer Orientation="Vertical">
-            <PanelContainer StyleClasses="LowDivider" />
-            <!-- VG-Tweak start - реорганизовал кнопки -->
-            <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
-                          VerticalExpand="False" SizeFlagsStretchRatio="1" HorizontalAlignment="Center">
-                <Button Name="RepeatButton" Text="{Loc 'jukebox-menu-buttonrepeat-off'}" ToggleMode="True" StyleClasses="Button" />
-                <Button Name="ShuffleButton" Text="{Loc 'jukebox-menu-buttonshuffle'}" ToggleMode="True" StyleClasses="Button" />
-                <Button Name="PrevButton" Text="{Loc 'jukebox-menu-buttonprev'}" StyleClasses="Button" />
-                <Button Name="PlayButton" Text="{Loc 'jukebox-menu-buttonplay'}" />
-                <Button Name="StopButton" Text="{Loc 'jukebox-menu-buttonstop'}" />
-                <Button Name="NextButton" Text="{Loc 'jukebox-menu-buttonnext'}" StyleClasses="Button" />
-            </BoxContainer>
-            <!-- VG-Tweak end -->
+        
+        <cc:HSeparator Color="#4972A1" Margin="0 2 0 2" />
+        
+        <!-- Плеер -->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" HorizontalAlignment="Center">
+            <Button Name="PrevButton" Text="⏮" StyleClasses="ButtonSquare" ToolTip="{Loc 'jukebox-menu-buttonprev'}" />
+            <Button Name="PlayButton" Text="▶" StyleClasses="ButtonSquare" MinWidth="50" />
+            <Button Name="StopButton" Text="⏹" StyleClasses="ButtonSquare" ToolTip="{Loc 'jukebox-menu-buttonstop'}" />
+            <Button Name="NextButton" Text="⏭" StyleClasses="ButtonSquare" ToolTip="{Loc 'jukebox-menu-buttonnext'}" />
         </BoxContainer>
-        <!-- ADT-Tweak end-->
+        
+        <!-- Режимы -->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" HorizontalAlignment="Center">
+            <Button Name="RepeatButton" Text="{Loc 'jukebox-menu-buttonrepeat-off'}" 
+                    ToggleMode="True" StyleClasses="ButtonSquare" MinWidth="80" />
+            <Button Name="ShuffleButton" Text="{Loc 'jukebox-menu-buttonshuffle'}" 
+                    ToggleMode="True" StyleClasses="ButtonSquare" MinWidth="80" />
+        </BoxContainer>
+        
+        <!-- Громкость -->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="6">
+            <Label Name="VolumeLabel" Text="{Loc 'jukebox-menu-volume'}" MinWidth="60" />
+            <Slider Name="VolumeSlider" HorizontalExpand="True" />
+            <Label Name="VolumeNumberLabel" Text="0%" MinWidth="45" HorizontalAlignment="Right" />
+        </BoxContainer>
+        
     </BoxContainer>
 </ui:FancyWindow>
