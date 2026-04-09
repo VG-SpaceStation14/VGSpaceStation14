@@ -18,24 +18,15 @@ public sealed class ServerRadioJobIconSystem : SharedRadioJobIconSystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<IdCardComponent, EntInsertedIntoContainerMessage>(OnIdCardInserted);
-        SubscribeLocalEvent<IdCardComponent, EntRemovedFromContainerMessage>(OnIdCardRemoved);
+        SubscribeLocalEvent<IdCardComponent, IdCardJobChangedEvent>(OnIdCardJobChanged);
     }
 
-    private void OnIdCardInserted(EntityUid uid, IdCardComponent component, EntInsertedIntoContainerMessage args)
+    private void OnIdCardJobChanged(EntityUid uid, IdCardComponent component, ref IdCardJobChangedEvent args)
     {
-        UpdateOwnerRadioCache(args.Container.Owner);
-    }
-
-    private void OnIdCardRemoved(EntityUid uid, IdCardComponent component, EntRemovedFromContainerMessage args)
-    {
-        UpdateOwnerRadioCache(args.Container.Owner);
-    }
-
-    private void UpdateOwnerRadioCache(EntityUid entity)
-    {
-        if (TryComp<InventoryComponent>(entity, out var _))
-            UpdateRadioJobIcon(entity);
+        if (args.PlayerUid.HasValue && Exists(args.PlayerUid.Value) && !Deleted(args.PlayerUid.Value) && !Terminating(args.PlayerUid.Value))
+        {
+            UpdateRadioJobIcon(args.PlayerUid.Value);
+        }
     }
 
     protected override (string iconId, string jobName) GetJobIcon(EntityUid entity)
