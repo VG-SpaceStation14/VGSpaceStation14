@@ -114,7 +114,7 @@
       - !type:NestedSelector
         tableId: BasicAntagEventsTable
       - id: ParadoxCloneSpawn
-      - id: SleeperAgents
+      - id: SleeperAgentsLight
       - id: LoneOpsSpawn
       - id: VoxRaidersEvent
       - !type:NestedSelector
@@ -341,3 +341,12 @@
       mindRoles:
       - MindRoleTraitor
   - type: TraitorRule
+
+- type: entity
+  parent: SleeperAgents
+  id: SleeperAgentsLight
+  components:
+  - type: AntagRandomObjectives
+    sets:
+    - groups: TraitorLightObjectiveGroups
+    maxDifficulty: 8
