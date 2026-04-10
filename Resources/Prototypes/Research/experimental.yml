@@ -23,6 +23,7 @@
   tier: 1
   cost: 5000
   recipeUnlocks:
+  - HoloprojectorRND # VG-Tweak
   - AnomalyScanner
   - AnomalyLocator
   - AnomalyLocatorWide

@@ -1,0 +1,69 @@
+- type: entity
+  parent: Holoprojector
+  id: HoloprojectorRND
+  name: R&D holobarrier projector
+  description: Creates a barrier that prevents anomalous entities from passing through.
+  components:
+    - type: HolosignProjector
+      signProto: HolosignRND
+      chargeUse: 90
+    - type: Sprite
+      sprite: _VG/Objects/Devices/Holoprojectors/rnd.rsi
+      state: icon
+    - type: Tag
+      tags:
+        - HolofanProjector
+    - type: StaticPrice
+      price: 50
+
+- type: entity
+  parent: HoloprojectorRND
+  id: HoloprojectorRNDEmpty
+  suffix: Пустой
+  components:
+    - type: ItemSlots
+      slots:
+        cell_slot:
+          name: power-cell-slot-component-slot-name-default
+
+- type: entity
+  id: HolosignRND
+  parent: HolosignWetFloor
+  name: R&D holobarrier
+  description: A hard-light barrier that prevents anomalous entities from passing through, but is quite fragile.
+  components:
+    - type: Sprite
+      sprite: _VG/Structures/Holo/rnd.rsi
+      state: icon
+    - type: Physics
+      bodyType: Static
+      canCollide: true
+    - type: Fixtures
+      fixtures:
+        fix1:
+          shape:
+            !type:PhysShapeAabb
+            bounds: "-0.5,-0.5,0.5,0.5"
+          hard: true 
+          mask:
+            - TableLayer
+          layer:
+            - TableLayer
+    - type: EntityFilterBarrier
+    - type: TimedDespawn
+      lifetime: 300
+    - type: PointLight
+      enabled: true
+      radius: 3
+      color: violet
+    - type: Clickable
+    - type: Damageable
+      damageContainer: Inorganic
+    - type: Destructible
+      thresholds:
+        - trigger:
+            !type:DamageTrigger
+            damage: 30
+          behaviors:
+            - !type:DoActsBehavior
+              acts: [ "Destruction" ]

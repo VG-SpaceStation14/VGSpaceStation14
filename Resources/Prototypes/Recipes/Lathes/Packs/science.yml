@@ -20,6 +20,7 @@
   - AnomalyLocator
   - AnomalyLocatorWide
   - HoloprojectorField
+  - HoloprojectorRND # VG-Tweak
   - SignallerAdvanced
   # - DeviceQuantumSpinInverter #ADT_Tweak - временно удалено до решения всех багов предмета
   - DeviceDesynchronizer
