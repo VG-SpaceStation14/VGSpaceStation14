@@ -124,6 +124,7 @@
       1000: Critical
   - type: MobState
   - type: GrabProtection # ADT-tweak-end
+  - type: ZombieImmune # ADT-Tweak
 
 - type: entity
   id: MechRipley
