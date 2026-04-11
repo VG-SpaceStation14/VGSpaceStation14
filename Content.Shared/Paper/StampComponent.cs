@@ -22,7 +22,20 @@ public partial struct StampDisplayInfo
 
     [DataField("stampedColor")]
     public Color StampedColor;
+
+    [DataField("type")]
+    public StampType Type = StampType.RubberStamp;
+
+    // Новый шрифт
+    [DataField("font")]
+    public string? Font = "/Fonts/NotoSans/NotoSans-Regular.ttf";
 };
+
+public enum StampType
+{
+    RubberStamp,
+    Signature
+}
 
 [RegisterComponent]
 public sealed partial class StampComponent : Component

@@ -8,7 +8,7 @@ using Content.Shared.Verbs;
 using Robust.Server.Audio;
 using Robust.Shared.Player;
 
-namespace Content.Server._Ganimed.Paper;
+namespace Content.Server._VG.Paper;
 
 public sealed class SignatureSystem : EntitySystem
 {
@@ -19,7 +19,11 @@ public sealed class SignatureSystem : EntitySystem
     [Dependency] private readonly TagSystem _tags = default!;
 
     // The sprite used to visualize "signatures" on paper entities.
-    private const string SignatureStampState = "paper_stamp-signature";
+    private const string SignatureStampState = "sign"; // VG: Изменено на "sign" для использования кастомного спрайта
+
+    // VG: Красивый шрифт для подписей
+    private const string SignatureFont = "/Fonts/_VG/GoodVibesCyr.ttf"; // VG: Путь к шрифту
+    private static readonly Color SignatureColor = Color.FromHex("#004391"); // VG: Цвет подписи (синий как в ADT)
 
     public override void Initialize()
     {
@@ -62,10 +66,13 @@ public sealed class SignatureSystem : EntitySystem
 
         var signatureName = DetermineEntitySignature(signer);
 
+        // VG: Создаем информацию о подписи с красивым шрифтом и цветом
         var stampInfo = new StampDisplayInfo()
         {
             StampedName = signatureName,
-            StampedColor = Color.DarkSlateGray, //TODO Make this configurable depending on the pen.
+            StampedColor = Color.DarkSlateGray,
+            Type = StampType.Signature,
+            Font = "/Fonts/VG/goodvibescyr.ttf"
         };
 
         if (!comp.StampedBy.Contains(stampInfo) && _paper.TryStamp(paper, stampInfo, SignatureStampState))

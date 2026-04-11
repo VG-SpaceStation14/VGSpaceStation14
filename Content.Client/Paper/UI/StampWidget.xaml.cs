@@ -25,9 +25,29 @@ public sealed partial class StampWidget : PanelContainer
 
     public StampDisplayInfo StampInfo {
         set {
-            StampedByLabel.Text = Loc.GetString(value.StampedName);
+            StampedByLabel.Text =
+                value.Type == StampType.Signature
+                ? value.StampedName
+                : Loc.GetString(value.StampedName);
+
             StampedByLabel.FontColorOverride = value.StampedColor;
             ModulateSelfOverride = value.StampedColor;
+
+            if (value.Type == StampType.Signature && value.Font != null)
+            {
+                var resCache = IoCManager.Resolve<IResourceCache>();
+                var fontResource = resCache.GetResource<FontResource>(value.Font);
+                StampedByLabel.FontOverride = new VectorFont(fontResource, 45);
+            }
+            else
+            {
+                StampedByLabel.FontOverride = null;
+            }
+
+            PanelOverride =
+                value.Type == StampType.Signature
+                ? null
+                : _borderTexture;
         }
     }
 
