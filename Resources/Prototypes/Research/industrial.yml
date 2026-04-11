@@ -8,13 +8,14 @@
     state: handdrill
   discipline: Industrial
   tier: 1
-  cost: 7500
+  cost: 12500
   recipeUnlocks:
   - MiningDrill
   - MineralScannerEmpty
   - OreProcessorIndustrialMachineCircuitboard
   - ClothingMaskWeldingGas
   - ClothingSmartBag # VG-Tweak
+  - HoloprojectorCargo # VG-Tweak
   # - ClothingShoesBootsJump ADT tweak
 # ADT Research Console Rework start
   position: 3,0

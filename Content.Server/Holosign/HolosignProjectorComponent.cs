@@ -7,7 +7,7 @@ namespace Content.Server.Holosign
     public sealed partial class HolosignProjectorComponent : Component
     {
         [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("signProto", customTypeSerializer:typeof(PrototypeIdSerializer<EntityPrototype>))]
+        [DataField("signProto", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
         public string SignProto = "HolosignWetFloor";
 
         /// <summary>
@@ -15,5 +15,9 @@ namespace Content.Server.Holosign
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite), DataField("chargeUse")]
         public float ChargeUse = 50f;
+
+        // VG-Tweak: Флаг для определения, нужно ли анкорить спавнимый объект
+        [DataField("anchorOnSpawn")]
+        public bool AnchorOnSpawn = true;
     }
 }

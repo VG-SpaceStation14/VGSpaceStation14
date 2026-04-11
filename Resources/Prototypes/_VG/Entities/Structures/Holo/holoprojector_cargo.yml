@@ -1,0 +1,109 @@
+
+- type: entity
+  parent: Holoprojector
+  id: HoloprojectorCrateVG
+  name: holocrate holoprojector
+  description: A projector that creates a temporary hard light crate.
+  components:
+  - type: HolosignProjector
+    signProto: CrateholographicVG
+    chargeUse: 300
+    anchorOnSpawn: false
+  - type: Sprite
+    sprite: _VG/Objects/Devices/Holoprojectors/cargo.rsi
+    state: icon
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        name: power-cell-slot-component-slot-name-default
+        startingItem: PowerCellMedium    
+  - type: Tag
+    tags:
+    - HolofanProjector
+
+- type: entity
+  parent: HoloprojectorCrateVG
+  id: HoloprojectorCrateEmptyVG
+  suffix: Пустой
+  components:
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        name: power-cell-slot-component-slot-name-default
+
+- type: entity
+  parent: CrateGeneric
+  id: CrateholographicVG
+  name: holographic crate
+  description: A temporary hard light crate that will disappear after 5 minutes.
+  components:
+  - type: HologramVisuals
+  - type: TriggerOnSpawn
+  - type: TimerTrigger
+    delay: 300
+  - type: Icon
+    sprite: _VG/Structures/Storage/Crates/cargoholo.rsi
+    state: icon
+  - type: Sprite
+    noRot: true
+    sprite:  _VG/Structures/Storage/Crates/cargoholo.rsi
+    layers:
+    - state: base
+      map: ["enum.StorageVisualLayers.Base"]
+    - state: closed
+      map: ["enum.StorageVisualLayers.Door"]
+    - state: welded
+      visible: false
+      map: ["enum.WeldableLayers.BaseWelded"]
+    - state: paper
+      sprite: Structures/Storage/Crates/labels.rsi
+      map: ["enum.PaperLabelVisuals.Layer"]
+  - type: EntityStorage
+    capacity: 60
+  - type: DamageOnTrigger
+    damage:
+      types:
+        Blunt: 5000
+    keysIn:
+    - timer
+  - type: StaticPrice
+    price: 0
+  - type: Construction
+    graph: CrateholographicVG
+    node: crateholographic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        mask:
+        - ItemMask
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+      - !type:PlaySoundBehavior
+        sound:
+          path: /Audio/Effects/stealthoff.ogg
+  - type: Holosign
+
+- type: constructionGraph
+  id: CrateholographicVG
+  start: start
+  graph:
+    - node: start
+      edges:
+        - to: crateholographic
+
+    - node: crateholographic
+      entity: CrateholographicVG
+      edges:
+        - to: start
+          steps:
+            - tool: Screwing
+              doAfter: 2
+          completed:
+            - !type:EmptyAllContainers
+            - !type:DeleteEntity

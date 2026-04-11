@@ -24,7 +24,8 @@
   - MineralScannerEmpty
   - AdvancedMineralScannerEmpty
   - OreBagOfHolding
-  - ClothingSmartBag
+  - ClothingSmartBag # VG-Tweak
+  - HoloprojectorCargo # VG-Tweak
 
 - type: latheRecipePack
   id: CargoBoards

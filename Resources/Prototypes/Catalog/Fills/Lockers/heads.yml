@@ -30,6 +30,7 @@
     # ADT-Tweak Start - частичный откат нерфа утилей
     - id: ADTSalvageShuttleConsoleCircuitboard
     # ADT-Tweak End - частичный откат нерфа утилей
+    - id: HoloprojectorCrateVG # VG-Tweak - голопроетор ящиков
 
 - type: entity
   id: LockerQuarterMasterFilled

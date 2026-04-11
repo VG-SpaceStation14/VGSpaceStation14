@@ -234,6 +234,16 @@
     Steel: 500
     Plasma: 300
     Glass: 100
+
+- type: latheRecipe
+  parent: BaseToolRecipe
+  id: HoloprojectorCargo
+  result: HoloprojectorCrateEmptyVG
+  completetime: 3
+  materials:
+    Steel: 500
+    Plasma: 300
+    Glass: 100
 # VG-Tweak End
 - type: latheRecipe
   parent: BaseToolRecipe
