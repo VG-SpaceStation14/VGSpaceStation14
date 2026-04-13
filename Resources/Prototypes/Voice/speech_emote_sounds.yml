@@ -579,9 +579,9 @@
     variation: 0.125
   sounds:
     Laugh:
-      collection: MaleLaugh
+      collection: VulpkaninLaugh # VG-Tweak
     Sneeze:
-      collection: MaleSneezes
+      collection: VulpkaninSneezes # VG-Tweak
     Cough:
       collection: MaleCoughs
     Whistle:
@@ -589,9 +589,9 @@
     Sigh:
       collection: MaleSigh
     Scream:
-      collection: VulpkaninScreams
+      collection: VulpkaninMaleScreams # VG-Tweak
     Growl:
-      collection: VulpkaninGrowls
+      collection: VulpkaninMaleGrowl # VG-Tweak
     Snarl:
       collection: VulpkaninSnarls
     Bark:
@@ -599,9 +599,9 @@
     Whine:
       collection: VulpkaninWhines
     Crying:
-      collection: VulpkaninWhines
+      collection: VulpkaninCry # VG-Tweak
     Howl:
-      collection: VulpkaninHowls
+      collection: VulpkaninMaleHowl # VG-Tweak
     Heckaet:
       collection: VulpHeckaetSound
     Gasp:
@@ -615,9 +615,9 @@
     variation: 0.125
   sounds:
     Laugh:
-      collection: FemaleLaugh
+      collection: VulpkaninLaugh # VG-Tweak
     Sneeze:
-      collection: FemaleSneezes
+      collection: VulpkaninSneezes # VG-Tweak
     Cough:
       collection: FemaleCoughs
     Whistle:
@@ -625,9 +625,9 @@
     Sigh:
       collection: FemaleSigh
     Scream:
-      collection: VulpkaninScreams
+      collection: VulpkaninFemaleScreams # VG-Tweak
     Growl:
-      collection: VulpkaninGrowls
+      collection: VulpkaninFemaleGrowl # VG-Tweak
     Snarl:
       collection: VulpkaninSnarls
     Bark:
@@ -635,9 +635,9 @@
     Whine:
       collection: VulpkaninWhines
     Crying:
-      collection: VulpkaninWhines
+      collection: VulpkaninCry # VG-Tweak
     Howl:
-      collection: VulpkaninHowls
+      collection: VulpkaninFemaleHowl # VG-Tweak
     Heckaet:
       collection: VulpHeckaetSound
     Gasp:
