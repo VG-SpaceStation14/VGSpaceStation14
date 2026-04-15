@@ -395,6 +395,7 @@
     graph: Seat
     node: chairFolding
   - type: DamageExaminable
+  - type: GravityAffected #ADT-Tweak
 
 - type: entity
   parent: ChairFolding
