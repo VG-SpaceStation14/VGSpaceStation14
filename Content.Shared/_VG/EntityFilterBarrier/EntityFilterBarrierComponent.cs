@@ -18,6 +18,8 @@ public sealed partial class EntityFilterBarrierComponent : Component
         "ReagentSlime", "ReagentSlimeBeer", "ReagentSlimePax", "ReagentSlimeNocturine",
         "ReagentSlimeTHC", "ReagentSlimeBicaridine", "ReagentSlimeToxin", "ReagentSlimeNapalm",
         "ReagentSlimeOmnizine", "ReagentSlimeMuteToxin", "ReagentSlimeNorepinephricAcid",
-        "ReagentSlimeEphedrine", "ReagentSlimeRobustHarvest",
+        "ReagentSlimeEphedrine", "ReagentSlimeRobustHarvest", "MobCarpHolo", "MobShark",
+        "MobCarp", "ADTChurchMobCarp", "MobCarpDragon", "MobCarpDungeon", "MobCarpSalvage",
+        "MobCarpMagic", "MobCarpRainbow", "MobSharkSalvage", "BaseMobCarp", 
     };
 }
