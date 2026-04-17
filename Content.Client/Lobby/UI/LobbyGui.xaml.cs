@@ -26,40 +26,33 @@ namespace Content.Client.Lobby.UI
         {
             RobustXamlLoader.Load(this);
             IoCManager.InjectDependencies(this);
+
             SetAnchorPreset(MainContainer, LayoutPreset.Wide);
             SetAnchorPreset(Background, LayoutPreset.Wide);
             SetAnchorPreset(ShowInterfaceContainer, LayoutPreset.Wide); // ADT-Tweak
             SetAnchorPreset(ShowInterface, LayoutPreset.BottomLeft); // ADT-Tweak
+            SetAnchorPreset(CharacterSetupState, LayoutPreset.Wide);
 
             LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
 
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
             
-            // ADT-Tweak-Start
-            HideInterface.OnPressed += _ =>
-            {
-                SwitchState(LobbyGuiState.ScreenSaver);
-            };
-            ShowInterface.OnPressed += _ =>
-            {
-                SwitchState(LobbyGuiState.Default);
-            };
-            // ADT-Tweak-End
+            // ADT-Tweak Start
+            HideInterface.OnPressed += _ => SwitchState(LobbyGuiState.ScreenSaver);
+            ShowInterface.OnPressed += _ => SwitchState(LobbyGuiState.Default);
+            // ADT-Tweak End
 
             CollapseButton.OnPressed += _ => TogglePanel(false);
             ExpandButton.OnPressed += _ => TogglePanel(true);
             
+            CharacterSetup.OnPressed += _ => SwitchState(LobbyGuiState.CharacterSetup);
+
             // VG-Tweak Start
-            // Убеждаемся, что кнопка существует
             if (SponsorInfoButton != null)
             {
                 SponsorInfoButton.OnPressed += _ => OnSponsorButtonPressed();
                 UpdateSponsorButton();
-            }
-            else
-            {
-                Logger.Error("SponsorInfoButton is null! Check XAML");
             }
             // VG-Tweak End
         }
@@ -67,7 +60,6 @@ namespace Content.Client.Lobby.UI
         // VG-Tweak Start
         private void OnSponsorButtonPressed()
         {
-            // Закрываем окно, если оно уже открыто
             if (_sponsorWindow != null)
             {
                 _sponsorWindow.Close();
@@ -75,7 +67,6 @@ namespace Content.Client.Lobby.UI
                 return;
             }
             
-            // Создаём и открываем окно спонсора
             _sponsorWindow = _uiManager.CreateWindow<SponsorInfoWindow>();
             _sponsorWindow.OnClose += () => _sponsorWindow = null;
             _sponsorWindow.OpenCentered();
@@ -84,6 +75,14 @@ namespace Content.Client.Lobby.UI
         protected override void FrameUpdate(FrameEventArgs args)
         {
             base.FrameUpdate(args);
+
+            // VG-Tweak Start
+            if (!StartTime.Visible)
+                StartTime.Visible = true;
+
+            if (string.IsNullOrEmpty(StartTime.Text))
+                StartTime.Text = "Раунд уже в процессе";
+            // VG-Tweak End
 
             _updateTimer += args.DeltaSeconds;
             if (_updateTimer > 5.0f)
@@ -95,36 +94,25 @@ namespace Content.Client.Lobby.UI
 
         private void UpdateSponsorButton()
         {
-            if (SponsorInfoButton == null)
-            {
-                Logger.Warning("SponsorInfoButton is null in UpdateSponsorButton");
-                return;
-            }
+            if (SponsorInfoButton == null) return;
 
             var hasSponsor = _sponsorsManager.TryGetInfo(out var sponsorInfo);
             
             if (hasSponsor && sponsorInfo != null)
             {
                 if (!string.IsNullOrEmpty(sponsorInfo.OOCColor))
-                {
                     SponsorInfoButton.ModulateSelfOverride = Color.FromHex(sponsorInfo.OOCColor);
-                }
                 else
-                {
                     SponsorInfoButton.ModulateSelfOverride = Color.White;
-                }
                 
                 var tierValue = sponsorInfo.Tier ?? 0;
-                SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-level", 
-                    ("sponsorTier", tierValue));
+                SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-level", ("sponsorTier", tierValue));
             }
             else
             {
                 SponsorInfoButton.ModulateSelfOverride = ColorNonSponsor;
                 SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-main-level");
             }
-            
-            // Гарантируем, что кнопка видима
             SponsorInfoButton.Visible = true;
         }
         // VG-Tweak End
@@ -133,11 +121,8 @@ namespace Content.Client.Lobby.UI
         {
             DefaultState.Visible = false;
             CharacterSetupState.Visible = false;
-            
-            // ADT-Tweak-Start
-            ShowInterfaceContainer.Visible = false;
+            ShowInterfaceContainer.Visible = false; // ADT-Tweak
             MainContainer.Visible = true;
-            // ADT-Tweak-End
 
             switch (state)
             {
@@ -148,24 +133,14 @@ namespace Content.Client.Lobby.UI
                     
                 case LobbyGuiState.CharacterSetup:
                     CharacterSetupState.Visible = true;
-
-                    var actualWidth = (float) UserInterfaceManager.RootControl.PixelWidth;
-                    var setupWidth = (float) LeftSide.PixelWidth;
-
-                    if (1 - (setupWidth / actualWidth) > 0.30)
-                    {
-                        RightSide.Visible = false;
-                    }
-
+                    MainContainer.Visible = false; // VG-Tweak
                     UserInterfaceManager.GetUIController<LobbyUIController>().ReloadCharacterSetup();
                     break;
 
-                // ADT-Tweak-Start
-                case LobbyGuiState.ScreenSaver:
+                case LobbyGuiState.ScreenSaver: // ADT-Tweak
                     ShowInterfaceContainer.Visible = true;
                     MainContainer.Visible = false;
                     break;
-                // ADT-Tweak-End
             }
         }
 
@@ -177,16 +152,8 @@ namespace Content.Client.Lobby.UI
 
         public enum LobbyGuiState : byte
         {
-            /// <summary>
-            ///  The default state, i.e., what's seen on launch.
-            /// </summary>
             Default,
-            
-            /// <summary>
-            ///  The character setup state.
-            /// </summary>
             CharacterSetup,
-            
             ScreenSaver, // ADT-Tweak
         }
     }
