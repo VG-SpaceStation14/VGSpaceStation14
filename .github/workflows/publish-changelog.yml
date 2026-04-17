@@ -20,39 +20,106 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install jq (just in case)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Get commit information
         id: commit
         run: |
-          # Get commit details
           FULL_HASH=$(git rev-parse ${{ github.event.inputs.commit_sha }})
           SHORT_HASH=$(git rev-parse --short $FULL_HASH)
+
           TITLE=$(git log -1 --format=%s $FULL_HASH)
           BODY=$(git log -1 --format=%b $FULL_HASH)
+
           AUTHOR=$(git log -1 --format=%an $FULL_HASH)
           DATE=$(git log -1 --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' $FULL_HASH)
-          
-          # Escape for JSON
-          BODY_ESCAPED=$(echo "$BODY" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-          
+
+          # limit discord size
+          BODY=$(echo "$BODY" | head -c 3500)
+
+          # try get github avatar (fallback safe)
+          GITHUB_USER=$(curl -s "https://api.github.com/search/users?q=$AUTHOR" | jq -r '.items[0].login // empty')
+          AVATAR=$(curl -s "https://api.github.com/users/$GITHUB_USER" | jq -r '.avatar_url // ""')
+
           echo "full_hash=$FULL_HASH" >> $GITHUB_OUTPUT
           echo "short_hash=$SHORT_HASH" >> $GITHUB_OUTPUT
-          echo "title=$TITLE" >> $GITHUB_OUTPUT
-          echo "body=$BODY_ESCAPED" >> $GITHUB_OUTPUT
+
+          echo "title<<EOF" >> $GITHUB_OUTPUT
+          echo "$TITLE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
           echo "author=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "avatar=$AVATAR" >> $GITHUB_OUTPUT
           echo "date=$DATE" >> $GITHUB_OUTPUT
           echo "url=https://github.com/${{ github.repository }}/commit/$FULL_HASH" >> $GITHUB_OUTPUT
+
+      - name: Detect emoji
+        id: emoji
+        run: |
+          TITLE="${{ steps.commit.outputs.title }}"
+
+          if [[ "$TITLE" == *"[FIX]"* ]]; then
+            echo "emoji=🐛" >> $GITHUB_OUTPUT
+          elif [[ "$TITLE" == *"[ADD]"* ]]; then
+            echo "emoji=✨" >> $GITHUB_OUTPUT
+          elif [[ "$TITLE" == *"[TWEAK]"* ]]; then
+            echo "emoji=⚙️" >> $GITHUB_OUTPUT
+          elif [[ "$TITLE" == *"[REMOVE]"* ]]; then
+            echo "emoji=🗑️" >> $GITHUB_OUTPUT
+          elif [[ "$TITLE" == *"[REFACTOR]"* ]]; then
+            echo "emoji=♻️" >> $GITHUB_OUTPUT
+          else
+            echo "emoji=📝" >> $GITHUB_OUTPUT
+          fi
 
       - name: Send to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{
-            "embeds": [{
-              "title": "📝 New Changelog",
-              "color": 5814783,
-              "description": "**${{ steps.commit.outputs.title }}**\n\n${{ steps.commit.outputs.body }}\n\n🔗 [View Commit](${{ steps.commit.outputs.url }})",
-              "footer": {
-                "text": "${{ steps.commit.outputs.author }} | Commit: ${{ steps.commit.outputs.short_hash }} • ${{ steps.commit.outputs.date }}"
-              }
-            }]
-          }' "$DISCORD_WEBHOOK"
+          jq -n \
+            --arg emoji "${{ steps.emoji.outputs.emoji }}" \
+            --arg title "${{ steps.commit.outputs.title }}" \
+            --arg body "${{ steps.commit.outputs.body }}" \
+            --arg url "${{ steps.commit.outputs.url }}" \
+            --arg author "${{ steps.commit.outputs.author }}" \
+            --arg avatar "${{ steps.commit.outputs.avatar }}" \
+            --arg hash "${{ steps.commit.outputs.short_hash }}" \
+            --arg date "${{ steps.commit.outputs.date }}" \
+            '{
+              embeds: [{
+                title: ($emoji + " New Changelog"),
+
+                color: 5814783,
+
+                author: {
+                  name: $author,
+                  icon_url: $avatar
+                },
+
+                description: ("**" + $title + "**\n\n" + $body + "\n\n🔗 [View Commit](" + $url + ")"),
+
+                footer: {
+                  text: ($hash + " • " + $date)
+                }
+              }]
+            }' > payload.json
+
+          echo "📦 Payload:"
+          cat payload.json
+
+          echo ""
+          echo "🚀 Sending to Discord..."
+
+          HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "$DISCORD_WEBHOOK")
+
+          echo "HTTP status: $HTTP_CODE"
+          echo "Discord response:"
+          cat response.txt
