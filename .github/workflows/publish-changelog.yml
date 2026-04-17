@@ -20,9 +20,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install jq (just in case)
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Get commit information
         id: commit
         run: |
@@ -35,16 +32,11 @@ jobs:
           AUTHOR=$(git log -1 --format=%an $FULL_HASH)
           DATE=$(git log -1 --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' $FULL_HASH)
 
-          # limit discord size
+          # Limit Discord description
           BODY=$(echo "$BODY" | head -c 3500)
-
-          # try get github avatar (fallback safe)
-          GITHUB_USER=$(curl -s "https://api.github.com/search/users?q=$AUTHOR" | jq -r '.items[0].login // empty')
-          AVATAR=$(curl -s "https://api.github.com/users/$GITHUB_USER" | jq -r '.avatar_url // ""')
 
           echo "full_hash=$FULL_HASH" >> $GITHUB_OUTPUT
           echo "short_hash=$SHORT_HASH" >> $GITHUB_OUTPUT
-
           echo "title<<EOF" >> $GITHUB_OUTPUT
           echo "$TITLE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -54,11 +46,10 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
           echo "author=$AUTHOR" >> $GITHUB_OUTPUT
-          echo "avatar=$AVATAR" >> $GITHUB_OUTPUT
           echo "date=$DATE" >> $GITHUB_OUTPUT
           echo "url=https://github.com/${{ github.repository }}/commit/$FULL_HASH" >> $GITHUB_OUTPUT
 
-      - name: Detect emoji
+      - name: Detect commit type emoji
         id: emoji
         run: |
           TITLE="${{ steps.commit.outputs.title }}"
@@ -87,39 +78,27 @@ jobs:
             --arg body "${{ steps.commit.outputs.body }}" \
             --arg url "${{ steps.commit.outputs.url }}" \
             --arg author "${{ steps.commit.outputs.author }}" \
-            --arg avatar "${{ steps.commit.outputs.avatar }}" \
             --arg hash "${{ steps.commit.outputs.short_hash }}" \
             --arg date "${{ steps.commit.outputs.date }}" \
             '{
               embeds: [{
                 title: ($emoji + " New Changelog"),
-
                 color: 5814783,
-
-                author: {
-                  name: $author,
-                  icon_url: $avatar
-                },
-
                 description: ("**" + $title + "**\n\n" + $body + "\n\n🔗 [View Commit](" + $url + ")"),
-
                 footer: {
-                  text: ($hash + " • " + $date)
+                  text: ($author + " | " + $hash + " • " + $date)
                 }
               }]
             }' > payload.json
 
-          echo "📦 Payload:"
+          echo "Payload:"
           cat payload.json
 
-          echo ""
-          echo "🚀 Sending to Discord..."
-
-          HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
+          curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
-            "$DISCORD_WEBHOOK")
+            "$DISCORD_WEBHOOK"
 
-          echo "HTTP status: $HTTP_CODE"
+          echo ""
           echo "Discord response:"
           cat response.txt
