@@ -3,7 +3,6 @@ using Content.Server.Administration;
 using Content.Shared.Administration;
 using Robust.Server.Player;
 using Robust.Shared.Console;
-using Robust.Shared.Network;
 
 namespace Content.Server._VG.Sponsors;
 
@@ -27,13 +26,17 @@ public sealed class SponsorRemoveCommand : LocalizedEntityCommands
         var sponsorsManager = IoCManager.Resolve<SponsorsManager>();
 
         var session = playerManager.Sessions.FirstOrDefault(s => s.Name == username);
-        if (session == null)
+        
+        if (session != null)
         {
-            shell.WriteLine(Loc.GetString("cmd-sponsorremove-user-not-found", ("username", username)));
-            return;
+            sponsorsManager.RemoveSponsor(session.UserId);
+            shell.WriteLine(Loc.GetString("cmd-sponsorremove-success", ("username", username)));
         }
-
-        sponsorsManager.RemoveSponsor(session.UserId);
-        shell.WriteLine(Loc.GetString("cmd-sponsorremove-success", ("username", username)));
+        else
+        {
+            var action = new RemoveSponsorAction { Username = username };
+            sponsorsManager.QueuePendingAction(action);
+            shell.WriteLine(Loc.GetString("cmd-sponsorremove-queued", ("username", username)));
+        }
     }
 }

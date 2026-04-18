@@ -12,14 +12,14 @@ namespace Content.Server._VG.Sponsors.Commands;
 public sealed class SponsorAddLoadoutCommand : LocalizedEntityCommands
 {
     public override string Command => "sponsoraddloadout";
-    public override string Description => "Adds a custom loadout to a sponsor";
-    public override string Help => "sponsoraddloadout <username> <loadoutId>";
+    public override string Description => Loc.GetString("cmd-sponsoraddloadout-desc");
+    public override string Help => Loc.GetString("cmd-sponsoraddloadout-help");
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 2)
         {
-            shell.WriteLine("Usage: sponsoraddloadout <username> <loadoutId>");
+            shell.WriteLine(Loc.GetString("shell-wrong-arguments-number"));
             return;
         }
 
@@ -30,21 +30,30 @@ public sealed class SponsorAddLoadoutCommand : LocalizedEntityCommands
         var sponsorsManager = IoCManager.Resolve<SponsorsManager>();
         var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
         
-        // Check if loadout prototype exists
         if (!prototypeManager.HasIndex<LoadoutPrototype>(loadoutId))
         {
-            shell.WriteLine($"Loadout prototype '{loadoutId}' not found!");
+            shell.WriteLine(Loc.GetString("cmd-sponsoraddloadout-loadout-not-found", ("loadoutId", loadoutId)));
             return;
         }
 
         var session = playerManager.Sessions.FirstOrDefault(s => s.Name == username);
-        if (session == null)
+        
+        if (session != null)
         {
-            shell.WriteLine($"User '{username}' not found!");
-            return;
+            sponsorsManager.AddCustomLoadout(session.UserId, loadoutId);
+            shell.WriteLine(Loc.GetString("cmd-sponsoraddloadout-success", 
+                ("loadoutId", loadoutId), 
+                ("username", username)));
         }
-
-        sponsorsManager.AddCustomLoadout(session.UserId, loadoutId);
-        shell.WriteLine($"Added loadout '{loadoutId}' to {username}");
+        else
+        {
+            var action = new AddLoadoutAction
+            {
+                Username = username,
+                LoadoutId = loadoutId
+            };
+            sponsorsManager.QueuePendingAction(action);
+            shell.WriteLine(Loc.GetString("cmd-sponsoraddloadout-queued", ("username", username)));
+        }
     }
 }

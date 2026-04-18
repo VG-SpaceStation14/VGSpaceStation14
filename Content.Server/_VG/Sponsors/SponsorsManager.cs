@@ -1,7 +1,9 @@
 ﻿// Based on Corvax Sponsors system
 
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Content.Server.ADT.SponsorLoadout;
 using Content.Server.Database;
@@ -26,6 +28,10 @@ public sealed class SponsorsManager : ISponsorsManager
 
     private readonly Dictionary<NetUserId, SponsorInfo> _cachedSponsors = new();
 
+    // Pending actions for offline users (username -> list of actions)
+    private Dictionary<string, List<PendingSponsorAction>> _pendingActions = new();
+    private readonly string _pendingActionsPath = "data/pending_sponsor_actions.json";
+
     private static readonly Dictionary<int, string> TierColors = new()
     {
         { 1, "#33ccff" },
@@ -38,6 +44,8 @@ public sealed class SponsorsManager : ISponsorsManager
         _sawmill = Logger.GetSawmill("sponsors");
         _dataHandler = new SponsorsDataHandler(_sawmill);
 
+        LoadPendingActions();
+
         _netMgr.RegisterNetMessage<MsgSponsorInfo>();
 
         _netMgr.Connecting += OnConnecting;
@@ -46,8 +54,101 @@ public sealed class SponsorsManager : ISponsorsManager
 
         IoCManager.Register<ISponsorsManager, SponsorsManager>(true);
 
-        _sawmill.Info("SponsorsManager initialized with local JSON storage");
+        _sawmill.Info("SponsorsManager initialized with local JSON storage and pending actions");
     }
+
+    #region Pending Actions
+
+    private void LoadPendingActions()
+    {
+        try
+        {
+            if (!File.Exists(_pendingActionsPath))
+            {
+                _pendingActions = new Dictionary<string, List<PendingSponsorAction>>();
+                return;
+            }
+
+            var json = File.ReadAllText(_pendingActionsPath);
+            _pendingActions = JsonSerializer.Deserialize<Dictionary<string, List<PendingSponsorAction>>>(json)
+                              ?? new Dictionary<string, List<PendingSponsorAction>>();
+            _sawmill.Info($"Loaded {_pendingActions.Count} pending action entries from {_pendingActionsPath}");
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Failed to load pending actions: {e.Message}");
+            _pendingActions = new Dictionary<string, List<PendingSponsorAction>>();
+        }
+    }
+
+    private void SavePendingActions()
+    {
+        try
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var json = JsonSerializer.Serialize(_pendingActions, options);
+            File.WriteAllText(_pendingActionsPath, json);
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Failed to save pending actions: {e.Message}");
+        }
+    }
+
+    public void QueuePendingAction(PendingSponsorAction action)
+    {
+        var username = action.Username;
+        if (!_pendingActions.ContainsKey(username))
+            _pendingActions[username] = new List<PendingSponsorAction>();
+
+        _pendingActions[username].Add(action);
+        SavePendingActions();
+        _sawmill.Info($"Queued {action.GetType().Name} for offline user '{username}'");
+    }
+
+    private void ProcessPendingActionsForUser(string username, NetUserId userId)
+    {
+        if (!_pendingActions.TryGetValue(username, out var actions))
+            return;
+
+        _sawmill.Info($"Processing {actions.Count} pending action(s) for user '{username}' (UID: {userId})");
+
+        foreach (var action in actions)
+        {
+            try
+            {
+                switch (action)
+                {
+                    case AddSponsorAction add:
+                        AddSponsor(userId, username, add.Tier, add.ExpireDate, add.Notes, null);
+                        break;
+                    case RemoveSponsorAction:
+                        RemoveSponsor(userId);
+                        break;
+                    case AddLoadoutAction addLoadout:
+                        AddCustomLoadout(userId, addLoadout.LoadoutId);
+                        break;
+                    case RemoveLoadoutAction removeLoadout:
+                        RemoveCustomLoadout(userId, removeLoadout.LoadoutId);
+                        break;
+                    default:
+                        _sawmill.Warning($"Unknown pending action type: {action.GetType()}");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                _sawmill.Error($"Failed to process pending action {action.GetType().Name} for {username}: {e.Message}");
+            }
+        }
+
+        _pendingActions.Remove(username);
+        SavePendingActions();
+    }
+
+    #endregion
+
+    #region Sponsor Info
 
     public bool TryGetInfo(NetUserId userId, [NotNullWhen(true)] out SponsorInfo? sponsor)
     {
@@ -59,6 +160,10 @@ public sealed class SponsorsManager : ISponsorsManager
         info = null;
         return false;
     }
+
+    #endregion
+
+    #region Custom Loadouts
 
     public bool TryGetCustomLoadouts(NetUserId userId, [NotNullWhen(true)] out List<string>? customLoadouts)
     {
@@ -120,13 +225,39 @@ public sealed class SponsorsManager : ISponsorsManager
         }
     }
 
+    #endregion
+
+    #region Connection Handling
+
     private async Task OnConnecting(NetConnectingArgs e)
     {
-        var entry = _dataHandler.GetSponsor(e.UserId);
+        // No longer set cache here; we will do it in OnConnected after processing pending actions
+        await Task.CompletedTask;
+    }
+
+    private void OnConnected(object? sender, NetChannelArgs e)
+    {
+        var userId = e.Channel.UserId;
+        if (!_playerManager.TryGetSessionById(userId, out var session))
+        {
+            _sawmill.Warning($"OnConnected: No session found for userId {userId}");
+            return;
+        }
+
+        var username = session.Name;
+
+        // Process any pending actions for this username
+        ProcessPendingActionsForUser(username, userId);
+
+        // Now load sponsor entry (which may have been added/updated by pending actions)
+        var entry = _dataHandler.GetSponsor(userId);
 
         if (entry == null)
         {
-            _cachedSponsors.Remove(e.UserId);
+            _cachedSponsors.Remove(userId);
+            // Send null info to client (not a sponsor)
+            var msg = new MsgSponsorInfo { Info = null };
+            _netMgr.ServerSendMessage(msg, e.Channel);
             return;
         }
 
@@ -141,24 +272,21 @@ public sealed class SponsorsManager : ISponsorsManager
             CustomLoadouts = entry.CustomLoadouts.ToArray()
         };
 
-        DebugTools.Assert(!_cachedSponsors.ContainsKey(e.UserId), "Cached data was found on client connect");
-        _cachedSponsors[e.UserId] = info;
-        _sawmill.Info($"Sponsor {e.UserId} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts");
+        _cachedSponsors[userId] = info;
+        _sawmill.Info($"Sponsor {username} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts");
 
-        await Task.CompletedTask;
-    }
-
-    private void OnConnected(object? sender, NetChannelArgs e) 
-    {
-        var info = _cachedSponsors.TryGetValue(e.Channel.UserId, out var sponsor) ? sponsor : null;
-        var msg = new MsgSponsorInfo { Info = info };
-        _netMgr.ServerSendMessage(msg, e.Channel);
+        var msgSponsor = new MsgSponsorInfo { Info = info };
+        _netMgr.ServerSendMessage(msgSponsor, e.Channel);
     }
 
     private void OnDisconnect(object? sender, NetDisconnectedArgs e)
     {
         _cachedSponsors.Remove(e.Channel.UserId);
     }
+
+    #endregion
+
+    #region Spawn Equipment
 
     public bool TryGetSpawnEquipment(NetUserId userId, string? jobPrototype, [NotNullWhen(true)] out string? spawnEquipment)
     {
@@ -207,6 +335,10 @@ public sealed class SponsorsManager : ISponsorsManager
         return false;
     }
 
+    #endregion
+
+    #region Admin Commands (Direct)
+
     public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
     {
         _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes, customLoadouts);
@@ -249,4 +381,6 @@ public sealed class SponsorsManager : ISponsorsManager
     {
         return _dataHandler.GetAllSponsors();
     }
+
+    #endregion
 }

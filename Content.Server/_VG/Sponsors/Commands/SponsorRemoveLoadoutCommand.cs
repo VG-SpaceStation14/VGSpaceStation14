@@ -1,10 +1,8 @@
 using System.Linq;
 using Content.Server.Administration;
 using Content.Shared.Administration;
-using Content.Shared.Preferences.Loadouts;
 using Robust.Server.Player;
 using Robust.Shared.Console;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server._VG.Sponsors.Commands;
 
@@ -12,14 +10,14 @@ namespace Content.Server._VG.Sponsors.Commands;
 public sealed class SponsorRemoveLoadoutCommand : LocalizedEntityCommands
 {
     public override string Command => "sponsorremoveloadout";
-    public override string Description => "Removes a custom loadout from a sponsor";
-    public override string Help => "sponsorremoveloadout <username> <loadoutId>";
+    public override string Description => Loc.GetString("cmd-sponsorremoveloadout-desc");
+    public override string Help => Loc.GetString("cmd-sponsorremoveloadout-help");
 
     public override void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length < 2)
         {
-            shell.WriteLine("Usage: sponsorremoveloadout <username> <loadoutId>");
+            shell.WriteLine(Loc.GetString("shell-wrong-arguments-number"));
             return;
         }
 
@@ -30,13 +28,23 @@ public sealed class SponsorRemoveLoadoutCommand : LocalizedEntityCommands
         var sponsorsManager = IoCManager.Resolve<SponsorsManager>();
 
         var session = playerManager.Sessions.FirstOrDefault(s => s.Name == username);
-        if (session == null)
+        
+        if (session != null)
         {
-            shell.WriteLine($"User '{username}' not found!");
-            return;
+            sponsorsManager.RemoveCustomLoadout(session.UserId, loadoutId);
+            shell.WriteLine(Loc.GetString("cmd-sponsorremoveloadout-success",
+                ("loadoutId", loadoutId),
+                ("username", username)));
         }
-
-        sponsorsManager.RemoveCustomLoadout(session.UserId, loadoutId);
-        shell.WriteLine($"Removed loadout '{loadoutId}' from {username}");
+        else
+        {
+            var action = new RemoveLoadoutAction
+            {
+                Username = username,
+                LoadoutId = loadoutId
+            };
+            sponsorsManager.QueuePendingAction(action);
+            shell.WriteLine(Loc.GetString("cmd-sponsorremoveloadout-queued", ("username", username)));
+        }
     }
 }

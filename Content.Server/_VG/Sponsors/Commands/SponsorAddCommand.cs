@@ -42,15 +42,25 @@ public sealed class SponsorAddCommand : LocalizedEntityCommands
         var sponsorsManager = IoCManager.Resolve<SponsorsManager>();
 
         var session = playerManager.Sessions.FirstOrDefault(s => s.Name == username);
-        if (session == null)
+        
+        if (session != null)
         {
-            shell.WriteLine(Loc.GetString("cmd-sponsoradd-user-not-found", ("username", username)));
-            return;
+            sponsorsManager.AddSponsor(session.UserId, username, tier, expireDate, notes);
+            shell.WriteLine(Loc.GetString("cmd-sponsoradd-success",
+                ("username", username),
+                ("tier", tier)));
         }
-
-        sponsorsManager.AddSponsor(session.UserId, username, tier, expireDate, notes);
-        shell.WriteLine(Loc.GetString("cmd-sponsoradd-success",
-            ("username", username),
-            ("tier", tier)));
+        else
+        {
+            var action = new AddSponsorAction
+            {
+                Username = username,
+                Tier = tier,
+                ExpireDate = expireDate,
+                Notes = notes
+            };
+            sponsorsManager.QueuePendingAction(action);
+            shell.WriteLine(Loc.GetString("cmd-sponsoradd-queued", ("username", username)));
+        }
     }
 }
