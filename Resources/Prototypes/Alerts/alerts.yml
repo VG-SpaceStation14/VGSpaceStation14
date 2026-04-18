@@ -104,7 +104,7 @@
   id: Offer
   clickEvent: !type:AcceptOfferAlertEvent
   icons:
-  - sprite: /Textures/ADT/Alerts/offer_item.rsi
+  - sprite: /Textures/_VG/Alerts/offer_item.rsi # VG-Tweak
     state: offer_item
   name: alerts-offer-name
   description: alerts-offer-desc
