@@ -1432,6 +1432,25 @@
   - ADTFootWrapsHighBl
   # ADT tweak end
 
+# VG-Tweak Start
+- type: loadoutGroup
+  id: RoboticistShoes
+  name: loadout-group-roboticist-shoes
+  loadouts:
+  - RoboticistShoes 
+  - WhiteShoes
+  - BlackShoes
+  - RoboticistBoots
+  # ADT tweak start
+  - ADTFootWrapsW
+  - ADTFootWrapsHighW
+  - ADTFootWrapsBr
+  - ADTFootWrapsHighBr
+  - ADTFootWrapsBl
+  - ADTFootWrapsHighBl
+  # ADT tweak end
+# VG-Tweak End
+
 - type: loadoutGroup
   id: ScientistGloves
   name: loadout-group-scientist-gloves

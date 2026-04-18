@@ -60,6 +60,35 @@
         color: "#EAE8E8"
       - state: contrastedsoles-equipped-FEET
 
+# VG-Tweak Start
+# Black Shoes
+- type: entity
+  parent: ClothingShoesBaseButcherable
+  id: ClothingShoesColorBlackRoboticist
+  name: black shoes
+  description: Don't take them off at your office Christmas party.
+  components:
+  - type: Sprite
+    sprite: Clothing/Shoes/color.rsi
+    layers:
+    - state: icon
+      color: "#3D3B49"
+  - type: Item
+    inhandVisuals:
+      left:
+      - state: inhand-left
+        color: "#3D3B49"
+      right:
+      - state: inhand-right
+        color: "#3D3B49"
+  - type: Clothing
+    sprite: Clothing/Shoes/color.rsi
+    clothingVisuals:
+      shoes:
+      - state: equipped-FEET
+        color: "#3D3B49"
+# VG-Tweak End
+
 # Blue Shoes
 - type: entity
   parent: ClothingShoesBaseButcherable

@@ -54,6 +54,21 @@
   equipment:
     gloves: ClothingHandsGlovesRobohands
 
+# VG-Tweak Start
+# Shoes
+
+- type: loadout
+  id: RoboticistShoes
+  equipment:
+    shoes: ClothingShoesColorBlackRoboticist
+
+- type: loadout
+  id: RoboticistBoots
+  equipment:
+    shoes: ClothingShoesBootsWinterRbt
+
+# VG-Tweak End
+
 # ID
 
 - type: loadout

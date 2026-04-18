@@ -14,5 +14,7 @@ ent-ClothingShoesColorRed = красные туфли
     .desc = Стильные красные туфли.
 ent-ClothingShoesColorWhite = белые туфли
     .desc = Не снимайте их на рождественской вечеринке в офисе.
+ent-ClothingShoesColorBlackRoboticist = туфли робототехника
+    .desc = чёрные туфли робототехников.
 ent-ClothingShoesColorYellow = жёлтые туфли
     .desc = Стильные жёлтые туфли.

@@ -1,0 +1,9 @@
+- type: entity
+  parent: ClothingShoesBaseWinterBoots
+  id: ClothingShoesBootsWinterRbt
+  name: roboticist winter boots
+  components:
+  - type: Sprite
+    sprite: _VG/Clothing/Shoes/Boots/winterbootsrbt.rsi
+  - type: Clothing
+    sprite: _VG/Clothing/Shoes/Boots/winterbootsrbt.rsi
