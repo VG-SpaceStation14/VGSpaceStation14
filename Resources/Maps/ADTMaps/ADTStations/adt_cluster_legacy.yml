@@ -4,8 +4,8 @@ meta:
   engineVersion: 268.0.0
   forkId: ""
   forkVersion: ""
-  time: 04/04/2026 16:14:12
-  entityCount: 9525
+  time: 04/19/2026 11:04:34
+  entityCount: 9527
 maps:
 - 1
 grids:
@@ -5970,7 +5970,7 @@ entities:
       pos: 0.5,18.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -31954.572
+      secondsUntilStateChange: -33479.63
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6082,7 +6082,7 @@ entities:
       pos: 13.5,4.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -78492.086
+      secondsUntilStateChange: -80017.14
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6136,7 +6136,7 @@ entities:
       pos: 8.5,-12.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -121397.195
+      secondsUntilStateChange: -122922.25
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6346,7 +6346,7 @@ entities:
       pos: 31.5,-9.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -118090.91
+      secondsUntilStateChange: -119615.96
       state: Opening
     - type: DeviceLinkSink
       invokeCounter: 2
@@ -6423,7 +6423,7 @@ entities:
       pos: -27.5,-13.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -93211.266
+      secondsUntilStateChange: -94736.32
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6548,7 +6548,7 @@ entities:
       pos: -10.5,-15.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -88073.67
+      secondsUntilStateChange: -89598.73
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -6782,7 +6782,7 @@ entities:
       pos: -8.5,-26.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -109977.375
+      secondsUntilStateChange: -111502.43
       state: Opening
     - type: DeviceLinkSource
       lastSignals:
@@ -21327,6 +21327,13 @@ entities:
     - type: Transform
       pos: -15.353028,13.538885
       parent: 2
+- proto: ChemDispenser
+  entities:
+  - uid: 7672
+    components:
+    - type: Transform
+      pos: -6.5,8.5
+      parent: 2
 - proto: ChemistryHotplate
   entities:
   - uid: 58
@@ -25900,13 +25907,6 @@ entities:
     - type: Transform
       pos: -19.5,13.5
       parent: 2
-- proto: EnergyChemDispenser
-  entities:
-  - uid: 7672
-    components:
-    - type: Transform
-      pos: -6.5,8.5
-      parent: 2
 - proto: ExosuitFabricator
   entities:
   - uid: 3687
@@ -26475,7 +26475,7 @@ entities:
       pos: -8.5,21.5
       parent: 2
     - type: Door
-      secondsUntilStateChange: -2821.5725
+      secondsUntilStateChange: -4346.6304
       state: Closing
   - uid: 3750
     components:
@@ -43733,7 +43733,9 @@ entities:
     - type: Paper
       stampState: paper_stamp-cap
       stampedBy:
-      - stampedColor: '#FF0000FF'
+      - font: /Fonts/NotoSans/NotoSans-Regular.ttf
+        type: RubberStamp
+        stampedColor: '#FF0000FF'
         stampedName: Максим Соко
       content: Я прокладываю эти трубы уже 1000 лет, помогите
       editingDisabled: True
@@ -43796,7 +43798,9 @@ entities:
     - type: Paper
       stampState: paper_stamp-syndicate
       stampedBy:
-      - stampedColor: '#850000FF'
+      - font: /Fonts/NotoSans/NotoSans-Regular.ttf
+        type: RubberStamp
+        stampedColor: '#850000FF'
         stampedName: stamp-component-stamped-name-syndicate
       content: >
         Ты что, серьёзно надеялся сбежать подобным образом?
@@ -43838,7 +43842,9 @@ entities:
     - type: Paper
       stampState: paper_stamp-centcom
       stampedBy:
-      - stampedColor: '#006600FF'
+      - font: /Fonts/NotoSans/NotoSans-Regular.ttf
+        type: RubberStamp
+        stampedColor: '#006600FF'
         stampedName: Банк приколов "Гамлет Криминал"
       content: >+
         [color=#008000]░░░██░████░██░░░[/color]
@@ -49469,6 +49475,31 @@ entities:
           - Toggle
     - type: Fixtures
       fixtures: {}
+  - uid: 9526
+    components:
+    - type: Transform
+      pos: -26.5,5.5
+      parent: 2
+    - type: DeviceLinkSource
+      linkedPorts:
+        459:
+        - - Pressed
+          - Toggle
+    - type: Fixtures
+      fixtures: {}
+  - uid: 9527
+    components:
+    - type: Transform
+      rot: 3.141592653589793 rad
+      pos: -24.5,10.5
+      parent: 2
+    - type: DeviceLinkSource
+      linkedPorts:
+        460:
+        - - Pressed
+          - Toggle
+    - type: Fixtures
+      fixtures: {}
 - proto: SignalButtonDirectional
   entities:
   - uid: 6843
@@ -52240,7 +52271,6 @@ entities:
   - uid: 7228
     components:
     - type: Transform
-      rot: 1.5707963267948966 rad
       pos: 7.5,22.5
       parent: 2
 - proto: Syringe
@@ -62498,7 +62528,7 @@ entities:
       lastSignals:
         DoorStatus: True
     - type: Door
-      secondsUntilStateChange: -162643.1
+      secondsUntilStateChange: -164168.16
       state: Opening
     - type: Airlock
       autoClose: False
@@ -62517,7 +62547,7 @@ entities:
       lastSignals:
         DoorStatus: True
     - type: Door
-      secondsUntilStateChange: -74431.46
+      secondsUntilStateChange: -75956.516
       state: Opening
     - type: Airlock
       autoClose: False
@@ -62566,7 +62596,7 @@ entities:
       lastSignals:
         DoorStatus: True
     - type: Door
-      secondsUntilStateChange: -162641.1
+      secondsUntilStateChange: -164166.16
       state: Opening
     - type: Airlock
       autoClose: False
