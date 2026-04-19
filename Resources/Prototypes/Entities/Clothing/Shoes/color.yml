@@ -72,6 +72,8 @@
     sprite: Clothing/Shoes/color.rsi
     layers:
     - state: icon
+      color: "#8F2828"
+    - state: soles-icon
       color: "#3D3B49"
   - type: Item
     inhandVisuals:
@@ -86,6 +88,8 @@
     clothingVisuals:
       shoes:
       - state: equipped-FEET
+        color: "#8F2828"
+      - state: contrastedsoles-equipped-FEET
         color: "#3D3B49"
 # VG-Tweak End
 
