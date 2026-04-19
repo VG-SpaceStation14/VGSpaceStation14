@@ -106,7 +106,7 @@
       rolls: 2
       children:
       - id: ClothingOuterCoatRobo
-      - id: ClothingShoesColorBlack
+      - id: ClothingShoesColorBlackRoboticist # VG-Tweak
       - id: ClothingHandsGlovesFingerless
 
 - type: entity
