@@ -12,95 +12,106 @@
 
     <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" HorizontalExpand="True" />
 
-    <!-- ADT-Tweak Start -->
     <BoxContainer Name="ShowInterfaceContainer" Access="Public" VerticalExpand="True" HorizontalExpand="True" Visible="False">
         <Control VerticalExpand="True" HorizontalExpand="True" />
         <Button Name="ShowInterface" Access="Public" Text="{Loc 'ui-lobby-show-interface'}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="20"/>
     </BoxContainer>
-    <!-- ADT-Tweak End -->
 
-    <BoxContainer Name="MainContainer" Access="Public" VerticalExpand="True" HorizontalExpand="True" Orientation="Vertical" Margin="10">
+    <Control Name="MainContainer" Access="Public" VerticalExpand="True" HorizontalExpand="True">
         
-        <controls:StripeBack Name="TopPanel" Access="Public" Modulate="#FFFFFFD0">
-            <PanelContainer StyleClasses="BackgroundPanel" HorizontalExpand="True" MinHeight="45">
-                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="10 0">
-                    <BoxContainer Orientation="Horizontal" SeparationOverride="10" VerticalAlignment="Center">
-                        <BoxContainer Orientation="Horizontal" SeparationOverride="5">
-                            <Button Name="HideInterface" Text="Ø" MinSize="35 30" /> <!-- ADT-Tweak -->
-                            <vote:VoteCallMenuButton Name="CallVoteButton" Access="Public" MinSize="100 30" />
-                            <Button Name="AHelpButton" Access="Public" Text="АХелп" MinSize="80 30" />
-                        </BoxContainer>
-                        <controls:VSpacer Spacing="10"/>
-                        <Label Name="ServerName" Access="Public" StyleClasses="LabelHeadingBigger" VerticalAlignment="Center" />
-                    </BoxContainer>
-                    <Control HorizontalExpand="True" /> 
-                    <BoxContainer VerticalAlignment="Center">
-                        <info:LinkBanner Name="LinkBanner" Access="Public" />
-                    </BoxContainer>
-                </BoxContainer>
-            </PanelContainer>
-        </controls:StripeBack>
-
-        <BoxContainer Name="VoteContainer" Access="Public" HorizontalAlignment="Left" Margin="0 5" Orientation="Vertical" />
-
-        <Control Name="MiddleSpacer" VerticalExpand="True" />
-
-        <PanelContainer Modulate="#FFFFFFD0" StyleClasses="WindowPanel" HorizontalExpand="True">
-            <BoxContainer Name="BottomColumnsContainer" Access="Public" Orientation="Horizontal" 
-                          HorizontalExpand="True" SeparationOverride="15" Margin="15">
-                
-                <BoxContainer Orientation="Vertical" HorizontalExpand="True" SizeFlagsStretchRatio="1">
-                    <PanelContainer Name="LeftSide" Access="Public" StyleClasses="BackgroundPanel" MinHeight="380" VerticalExpand="True">
-                        <BoxContainer Name="DefaultState" Access="Public" Orientation="Vertical" Margin="12">
-                            <info:ServerInfo Name="ServerInfo" Access="Public" VerticalExpand="True" HorizontalAlignment="Right" VerticalAlignment="Top" />
-                            <controls:HLine Thickness="1" Margin="0 8" />
-                            <info:DevInfoBanner Name="DevInfoBanner" Access="Public" Margin="0 4" />
-                        </BoxContainer>
-                    </PanelContainer>
-                </BoxContainer>
-
-                <BoxContainer Orientation="Vertical" HorizontalExpand="True" SizeFlagsStretchRatio="1">
-                    <PanelContainer Name="CenterPanel" Access="Public" StyleClasses="BackgroundPanel" MinHeight="380" VerticalExpand="True">
-                        <BoxContainer Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalExpand="True" SeparationOverride="6" Margin="12 10">
-                            <controls:StripeBack HorizontalExpand="True">
-                                <Label Name="StartTime" Access="Public" StyleClasses="LabelBig" Align="Center" HorizontalExpand="True" />
-                            </controls:StripeBack>
-                            <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" />
-                            <Button Name="CharacterSetup" Access="Public" Text="Персонализация" HorizontalExpand="True" MinHeight="30" />
-                            <!-- VG-Tweak Start -->
-                            <controls:StripeBack Name="LobbyPanelLeftTop" Access="Public" HorizontalExpand="True">
-                                <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" MinHeight="28" />
-                            </controls:StripeBack>
-                            <!-- VG-Tweak End -->
-                            <Button Name="ReadyButton" Access="Public" ToggleMode="True" Text="ПРИСОЕДИНИТЬСЯ" HorizontalExpand="True" MinHeight="45" StyleClasses="ButtonBig" />
-                            <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" MinHeight="30" WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
-                            
-                            <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" Margin="0 4 0 0">
-                                <Button Name="OptionsButton" Access="Public" Text="Настройки" HorizontalExpand="True" MinHeight="32" />
-                                <Button Name="LeaveButton" Access="Public" Text="Выйти" HorizontalExpand="True" MinHeight="32" StyleClasses="Caution" />
+        <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True" Margin="10">
+            
+            <controls:StripeBack Name="TopPanel" Access="Public" Modulate="#FFFFFFD0">
+                <PanelContainer StyleClasses="BackgroundPanel" HorizontalExpand="True" MinHeight="45">
+                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="10 0">
+                        <BoxContainer Orientation="Horizontal" SeparationOverride="10" VerticalAlignment="Center">
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="5">
+                                <Button Name="HideInterface" Text="Ø" MinSize="35 30" /> 
+                                <vote:VoteCallMenuButton Name="CallVoteButton" Access="Public" MinSize="100 30" />
+                                <Button Name="AHelpButton" Access="Public" Text="АХелп" MinSize="80 30" />
                             </BoxContainer>
+                            <controls:VSpacer Spacing="10"/>
+                            <Label Name="ServerName" Access="Public" StyleClasses="LabelHeadingBigger" VerticalAlignment="Center" />
                         </BoxContainer>
-                    </PanelContainer>
-                </BoxContainer>
-
-                <BoxContainer Orientation="Vertical" HorizontalExpand="True" SizeFlagsStretchRatio="1">
-                    <PanelContainer Name="RightSide" Access="Public" StyleClasses="BackgroundPanel" MinHeight="380" VerticalExpand="True">
-                        <BoxContainer Orientation="Vertical" Margin="8" HorizontalExpand="True">
-                            <Label Text="ЧАТ:" FontColorOverride="Cyan" StyleClasses="LabelSubtext" Margin="2"/>
-                            <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" HorizontalExpand="True" MinWidth="100" />
+                        <Control HorizontalExpand="True" /> 
+                        <BoxContainer VerticalAlignment="Center">
+                            <info:LinkBanner Name="LinkBanner" Access="Public" />
                         </BoxContainer>
-                    </PanelContainer>
-                </BoxContainer>
-            </BoxContainer>
-        </PanelContainer>
+                    </BoxContainer>
+                </PanelContainer>
+            </controls:StripeBack>
 
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 8 0 0">
-            <PanelContainer Modulate="#FFFFFFD0" StyleClasses="WindowPanel" HorizontalAlignment="Left">
-                 <BoxContainer Orientation="Horizontal" Margin="10 5" VerticalAlignment="Center" MinWidth="300">
-                    <RichTextLabel Name="LobbySong" Access="Public" VerticalAlignment="Center" HorizontalExpand="True" />
-                </BoxContainer>
+            <Control Name="MiddleSpacer" VerticalExpand="True" />
+
+            <PanelContainer Modulate="#FFFFFFD0" StyleClasses="WindowPanel" HorizontalExpand="True" VerticalExpand="True">
+                <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
+                    <BoxContainer Name="BottomColumnsContainer" Access="Public" Orientation="Horizontal" 
+                                  HorizontalExpand="True" VerticalExpand="True" SeparationOverride="15" Margin="15">
+                        
+                        <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="1">
+                            <PanelContainer Name="LeftSide" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True">
+                                <BoxContainer Name="DefaultState" Access="Public" Orientation="Vertical" Margin="12" VerticalExpand="True">
+                                    <info:ServerInfo Name="ServerInfo" Access="Public" VerticalExpand="True" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                    <controls:HLine Thickness="1" Margin="0 8" />
+                                    <info:DevInfoBanner Name="DevInfoBanner" Access="Public" Margin="0 4" />
+                                </BoxContainer>
+                            </PanelContainer>
+                        </BoxContainer>
+
+                        <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="1">
+                            <PanelContainer Name="CenterPanel" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True">
+                                <BoxContainer Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalExpand="True" VerticalExpand="True" SeparationOverride="6" Margin="12 10">
+                                    <controls:StripeBack HorizontalExpand="True">
+                                        <Label Name="StartTime" Access="Public" StyleClasses="LabelBig" Align="Center" HorizontalExpand="True" />
+                                    </controls:StripeBack>
+                                    
+                                    <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="1" />
+                                    
+                                    <Button Name="CharacterSetup" Access="Public" Text="Персонализация" HorizontalExpand="True" />
+                                    <controls:StripeBack Name="LobbyPanelLeftTop" Access="Public" HorizontalExpand="True">
+                                        <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" />
+                                    </controls:StripeBack>
+                                    <Button Name="ReadyButton" Access="Public" ToggleMode="True" Text="ПРИСОЕДИНИТЬСЯ" HorizontalExpand="True" StyleClasses="ButtonBig" />
+                                    <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
+                                    
+                                    <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" Margin="0 4 0 0">
+                                        <Button Name="OptionsButton" Access="Public" Text="Настройки" HorizontalExpand="True" />
+                                        <Button Name="LeaveButton" Access="Public" Text="Выйти" HorizontalExpand="True" StyleClasses="Caution" />
+                                    </BoxContainer>
+                                </BoxContainer>
+                            </PanelContainer>
+                        </BoxContainer>
+
+                        <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" SizeFlagsStretchRatio="1">
+                            <PanelContainer Name="RightSide" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True">
+                                <BoxContainer Orientation="Vertical" Margin="8" HorizontalExpand="True" VerticalExpand="True">
+                                    <Label Text="ЧАТ:" FontColorOverride="Cyan" StyleClasses="LabelSubtext" Margin="2"/>
+                                    <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" HorizontalExpand="True" />
+                                </BoxContainer>
+                            </PanelContainer>
+                        </BoxContainer>
+
+                    </BoxContainer>
+                </ScrollContainer>
             </PanelContainer>
+
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True" Margin="0 8 0 0">
+                <PanelContainer Modulate="#FFFFFFD0" StyleClasses="WindowPanel" HorizontalAlignment="Left">
+                     <BoxContainer Orientation="Horizontal" Margin="10 5" VerticalAlignment="Center" MinWidth="300">
+                        <RichTextLabel Name="LobbySong" Access="Public" VerticalAlignment="Center" HorizontalExpand="True" />
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
+
         </BoxContainer>
+
+        <BoxContainer Name="VoteContainer" 
+                      Access="Public" 
+                      HorizontalAlignment="Left" 
+                      VerticalAlignment="Top" 
+                      Margin="20 65" 
+                      Orientation="Vertical" 
+                      MouseFilter="Ignore" />
 
         <Control Visible="False">
             <Button Name="CollapseButton" Access="Public" />
@@ -110,5 +121,5 @@
             <RichTextLabel Name="PlaytimeComment" Access="Public" />
             <Label Name="StatusLabel" Access="Public" />
         </Control>
-    </BoxContainer>
+    </Control>
 </lobbyUi:LobbyGui>
