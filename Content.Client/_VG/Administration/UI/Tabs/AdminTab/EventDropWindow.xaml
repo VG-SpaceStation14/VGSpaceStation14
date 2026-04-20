@@ -1,0 +1,70 @@
+<DefaultWindow
+    x:Class="Content.Client.Administration.UI.Tabs.AdminTab.EventDropWindow"
+    xmlns="https://spacestation14.io"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Loc admin-event-drop-window-title}"
+    MinSize="380 400">
+
+    <BoxContainer Orientation="Vertical" VerticalExpand="True" Margin="8 4">
+        
+        <TabContainer Name="MainTabContainer" VerticalExpand="True">
+            
+            <BoxContainer Name="QueueTab" Orientation="Vertical" SeparationOverride="4">
+                <GridContainer Columns="2" VerticalExpand="False" Margin="0 0 0 2">
+                    <Label Text="{Loc admin-event-drop-prototype-label}" VerticalAlignment="Center" StyleClasses="LabelSmall" />
+                    <LineEdit Name="ItemInput" MinWidth="150" HorizontalExpand="True" 
+                             PlaceHolder="{Loc admin-event-drop-prototype-placeholder}" />
+
+                    <Label Text="{Loc admin-event-drop-amount-label}" VerticalAlignment="Center" StyleClasses="LabelSmall" />
+                    <LineEdit Name="AmountInput" MinWidth="50" HorizontalExpand="True" Text="1" />
+                </GridContainer>
+
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" Margin="0 2">
+                    <Button Name="AddItemButton" Text="{Loc admin-event-drop-add-button}" HorizontalExpand="True" />
+                    <Button Name="ClearQueueButton" Text="{Loc admin-event-drop-clear-button}" HorizontalExpand="True" StyleClasses="Caution" />
+                    <Button Name="SendDropButton" Text="{Loc admin-event-drop-send-button}" HorizontalExpand="True" StyleClasses="Action" />
+                </BoxContainer>
+
+                <Label Text="{Loc admin-event-drop-queue-label}" Margin="0 2 0 0" StyleClasses="LabelSmall" />
+
+                <ScrollContainer VerticalExpand="True" MinHeight="100">
+                    <Label Name="QueueLabel" Text="{Loc admin-event-drop-queue-empty}" />
+                </ScrollContainer>
+
+                <Button Name="RemoveLastButton" Text="{Loc admin-event-drop-remove-last-button}" HorizontalExpand="True" Margin="0 2" />
+            </BoxContainer>
+
+            <BoxContainer Name="PresetTab" Orientation="Vertical" SeparationOverride="4">
+                <GridContainer Columns="2" VerticalExpand="False" Margin="0 0 0 2">
+                    <Label Text="{Loc admin-event-drop-preset-name-label}" VerticalAlignment="Center" StyleClasses="LabelSmall" />
+                    <LineEdit Name="PresetNameInput" MinWidth="150" HorizontalExpand="True" 
+                             PlaceHolder="{Loc admin-event-drop-preset-name-placeholder}" />
+
+                    <Label Text="{Loc admin-event-drop-preset-desc-label}" VerticalAlignment="Center" StyleClasses="LabelSmall" />
+                    <LineEdit Name="PresetDescriptionInput" MinWidth="150" HorizontalExpand="True" 
+                             PlaceHolder="{Loc admin-event-drop-preset-desc-placeholder}" />
+                </GridContainer>
+
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" Margin="0 2">
+                    <Button Name="SavePresetButton" Text="{Loc admin-event-drop-preset-save-button}" HorizontalExpand="True" />
+                    <Button Name="LoadPresetButton" Text="{Loc admin-event-drop-preset-load-button}" HorizontalExpand="True" />
+                    <Button Name="DeletePresetButton" Text="{Loc admin-event-drop-preset-delete-button}" HorizontalExpand="True" StyleClasses="Caution" />
+                    <Button Name="RefreshPresetsButton" Text="↻" HorizontalExpand="False" MinWidth="30" 
+                            ToolTip="{Loc admin-event-drop-preset-refresh-tooltip}" />
+                </BoxContainer>
+
+                <Label Text="{Loc admin-event-drop-presets-available-label}" Margin="0 2 0 0" StyleClasses="LabelSmall" />
+
+                <ScrollContainer VerticalExpand="True" MinHeight="140">
+                    <BoxContainer Name="PresetsContainer" Orientation="Vertical" SeparationOverride="2" />
+                </ScrollContainer>
+            </BoxContainer>
+
+        </TabContainer>
+
+        <BoxContainer Orientation="Horizontal" SetHeight="18" Margin="0 4 0 0" SeparationOverride="6">
+            <Label Name="StatusLabel" Text="{Loc admin-event-drop-status-ready}" HorizontalExpand="True" StyleClasses="LabelSmall" />
+            <Label Text="{Loc admin-panel-footer-powered-albuka}" FontColorOverride="#e7ff10ff" StyleClasses="LabelSmall" />
+        </BoxContainer>
+    </BoxContainer>
+</DefaultWindow>

@@ -11,6 +11,7 @@ admin-sponsor-panel-select = Выбрать
 admin-sponsor-panel-no-sponsors = Нет активных спонсоров
 admin-sponsor-panel-error-loading = Ошибка загрузки списка спонсоров
 admin-player-actions-window-sponsor-panel = Спонсоры
+admin-player-actions-window-eventdrop-panel = Управление ивент-капсулами
 admin-sponsor-panel-tab-sponsor = Спонсоры
 admin-sponsor-panel-tab-loadout = Лодауты
 admin-sponsor-panel-loadout-id = ID лодаута

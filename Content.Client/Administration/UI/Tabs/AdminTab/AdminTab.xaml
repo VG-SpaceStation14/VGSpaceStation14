@@ -21,6 +21,7 @@
             <!-- ADT-Tweak-End -->
             <!-- VG-Tweak-Start -->
             <cc:UICommandButton Command="sponsor-panel" Text="{Loc admin-player-actions-window-sponsor-panel}" WindowType="{x:Type at:SponsorEditorWindow}" />
+            <cc:UICommandButton Command="eventdrop-panel" Text="{Loc admin-player-actions-window-eventdrop-panel}" WindowType="{x:Type at:EventDropWindow}" />
             <!-- VG-Tweak-End -->
         </GridContainer>
     </BoxContainer>

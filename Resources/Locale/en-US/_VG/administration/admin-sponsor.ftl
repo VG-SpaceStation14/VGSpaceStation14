@@ -11,3 +11,4 @@ admin-sponsor-panel-select = Select
 admin-sponsor-panel-no-sponsors = No active sponsors
 admin-sponsor-panel-error-loading = Error loading sponsors list
 admin-player-actions-window-sponsor-panel = Sponsors
+admin-player-actions-window-eventdrop-panel = Event Drop Manager
