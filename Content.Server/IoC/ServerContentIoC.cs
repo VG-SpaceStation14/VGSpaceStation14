@@ -10,6 +10,7 @@ using Content.Server.Connection;
 using Content.Server.Corvax.DiscordAuth;
 using Content.Server.Corvax.JoinQueue;
 using Content.Server._VG.Sponsors;
+using Content.Server._VG.EventDrop;
 using Content.Server.Corvax.TTS;
 using Content.Server.Database;
 using Content.Server.Discord;
@@ -93,6 +94,7 @@ internal static class ServerContentIoC
         IoCManager.Register<ExportManager>(); // ADT Export
         IoCManager.Register<ServerDiscordIdManager>(); // ADT Discord
         IoCManager.Register<SponsorsManager>(); // Corvax-Sponsors
+        IoCManager.Register<IEventDropPresetManager, EventDropPresetManager>(); // VG-Tweak
         IoCManager.Register<JoinQueueManager>(); // Corvax-Queue
     }
 }

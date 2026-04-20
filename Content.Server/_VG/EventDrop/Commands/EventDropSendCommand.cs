@@ -3,7 +3,6 @@ using Content.Shared.Administration;
 using Content.Shared._VG.EventDrop;
 using Content.Shared.ADT.Droppods.EntitySystems;
 using Robust.Shared.Console;
-using Robust.Shared.Prototypes;
 
 namespace Content.Server._VG.EventDrop;
 
@@ -12,7 +11,7 @@ public sealed class EventDropSendCommand : IConsoleCommand
 {
     public string Command => "drop_send";
     public string Description => Loc.GetString("cmd-eventdropsend-desc");
-    public string Help => "drop_send";
+    public string Help => Loc.GetString("cmd-eventdropsend-help");
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
@@ -24,7 +23,7 @@ public sealed class EventDropSendCommand : IConsoleCommand
 
         if (!entMan.TryGetComponent<EventDropComponent>(actor, out var comp) || comp.PreparedItems.Count == 0)
         {
-            shell.WriteError("Очередь пуста! Сначала используйте drop_add.");
+            shell.WriteError(Loc.GetString("cmd-eventdropsend-error-empty"));
             return;
         }
 
@@ -35,7 +34,9 @@ public sealed class EventDropSendCommand : IConsoleCommand
         
         droppodSys.CreateDroppod(xform.Coordinates, comp.PreparedItems);
 
-        shell.WriteLine($"Капсула отправлена на координаты: {xform.Coordinates}. Предметов: {comp.PreparedItems.Count}");
+        shell.WriteLine(Loc.GetString("cmd-eventdropsend-success",
+            ("coordinates", xform.Coordinates.ToString()),
+            ("count", comp.PreparedItems.Count)));
         
         comp.PreparedItems.Clear();
     }
