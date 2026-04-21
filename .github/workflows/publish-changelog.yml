@@ -23,6 +23,8 @@ jobs:
       - name: Get commit information
         id: commit
         run: |
+          set -e
+
           FULL_HASH=$(git rev-parse ${{ github.event.inputs.commit_sha }})
           SHORT_HASH=$(git rev-parse --short $FULL_HASH)
 
@@ -32,54 +34,62 @@ jobs:
           AUTHOR=$(git log -1 --format=%an $FULL_HASH)
           DATE=$(git log -1 --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' $FULL_HASH)
 
-          # Limit Discord description
+          # безопасная обрезка
           BODY=$(echo "$BODY" | head -c 3500)
 
-          echo "full_hash=$FULL_HASH" >> $GITHUB_OUTPUT
-          echo "short_hash=$SHORT_HASH" >> $GITHUB_OUTPUT
-          echo "title<<EOF" >> $GITHUB_OUTPUT
-          echo "$TITLE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "full_hash=$FULL_HASH"
+            echo "short_hash=$SHORT_HASH"
+            echo "title<<EOF"
+            echo "$TITLE"
+            echo "EOF"
 
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+            echo "body<<EOF"
+            echo "$BODY"
+            echo "EOF"
 
-          echo "author=$AUTHOR" >> $GITHUB_OUTPUT
-          echo "date=$DATE" >> $GITHUB_OUTPUT
-          echo "url=https://github.com/${{ github.repository }}/commit/$FULL_HASH" >> $GITHUB_OUTPUT
+            echo "author=$AUTHOR"
+            echo "date=$DATE"
+            echo "url=https://github.com/${{ github.repository }}/commit/$FULL_HASH"
+          } >> $GITHUB_OUTPUT
 
       - name: Detect commit type emoji
         id: emoji
         run: |
           TITLE="${{ steps.commit.outputs.title }}"
 
-          if [[ "$TITLE" == *"[FIX]"* ]]; then
-            echo "emoji=🐛" >> $GITHUB_OUTPUT
-          elif [[ "$TITLE" == *"[ADD]"* ]]; then
-            echo "emoji=✨" >> $GITHUB_OUTPUT
-          elif [[ "$TITLE" == *"[TWEAK]"* ]]; then
-            echo "emoji=⚙️" >> $GITHUB_OUTPUT
-          elif [[ "$TITLE" == *"[REMOVE]"* ]]; then
-            echo "emoji=🗑️" >> $GITHUB_OUTPUT
-          elif [[ "$TITLE" == *"[REFACTOR]"* ]]; then
-            echo "emoji=♻️" >> $GITHUB_OUTPUT
-          else
-            echo "emoji=📝" >> $GITHUB_OUTPUT
-          fi
+          case "$TITLE" in
+            *"[FIX]"*) echo "emoji=🐛" >> $GITHUB_OUTPUT ;;
+            *"[ADD]"*) echo "emoji=✨" >> $GITHUB_OUTPUT ;;
+            *"[TWEAK]"*) echo "emoji=⚙️" >> $GITHUB_OUTPUT ;;
+            *"[REMOVE]"*) echo "emoji=🗑️" >> $GITHUB_OUTPUT ;;
+            *"[REFACTOR]"*) echo "emoji=♻️" >> $GITHUB_OUTPUT ;;
+            *) echo "emoji=📝" >> $GITHUB_OUTPUT ;;
+          esac
 
       - name: Send to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
+          TITLE: ${{ steps.commit.outputs.title }}
+          BODY: ${{ steps.commit.outputs.body }}
+          URL: ${{ steps.commit.outputs.url }}
+          AUTHOR: ${{ steps.commit.outputs.author }}
+          HASH: ${{ steps.commit.outputs.short_hash }}
+          DATE: ${{ steps.commit.outputs.date }}
+          EMOJI: ${{ steps.emoji.outputs.emoji }}
+
         run: |
+          export LANG=C.UTF-8
+          export LC_ALL=C.UTF-8
+
           jq -n \
-            --arg emoji "${{ steps.emoji.outputs.emoji }}" \
-            --arg title "${{ steps.commit.outputs.title }}" \
-            --arg body "${{ steps.commit.outputs.body }}" \
-            --arg url "${{ steps.commit.outputs.url }}" \
-            --arg author "${{ steps.commit.outputs.author }}" \
-            --arg hash "${{ steps.commit.outputs.short_hash }}" \
-            --arg date "${{ steps.commit.outputs.date }}" \
+            --arg emoji "$EMOJI" \
+            --arg title "$TITLE" \
+            --arg body "$BODY" \
+            --arg url "$URL" \
+            --arg author "$AUTHOR" \
+            --arg hash "$HASH" \
+            --arg date "$DATE" \
             '{
               embeds: [{
                 title: ($emoji + " New Changelog"),
@@ -91,14 +101,10 @@ jobs:
               }]
             }' > payload.json
 
-          echo "Payload:"
-          cat payload.json
-
           curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
             "$DISCORD_WEBHOOK"
 
-          echo ""
           echo "Discord response:"
           cat response.txt
