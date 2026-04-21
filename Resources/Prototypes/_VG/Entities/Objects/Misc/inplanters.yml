@@ -1,0 +1,28 @@
+- type: entity
+  id: CriticalSaveImplant
+  parent: BaseSubdermalImplant
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: CriticalSaveImplant
+    duration: 5
+  - type: Tag
+    tags:
+    - SubdermalImplant
+
+- type: entity
+  id: CriticalSaveImplanter
+  name: critical save implanter
+  parent: BaseImplantOnlyImplanter
+  description: Contains a critical save implant.
+  components:
+  - type: Implanter
+    implant: CriticalSaveImplant
+
+- type: entity
+  id: SyndiCriticalSaveImplanter
+  name: critical save implanter
+  parent: BaseImplantOnlyImplanterSyndi
+  description: Contains a critical save implant.
+  components:
+  - type: Implanter
+    implant: CriticalSaveImplant
