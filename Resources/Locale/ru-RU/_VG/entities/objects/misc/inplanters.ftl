@@ -1,6 +1,8 @@
 critical-save-implant-activated = Крипто-спасатель активирован! Вы будете в строю ещё 5 секунд.
 critical-save-implant-expired = Крипто-спасатель разрядился... Вас накрывает волна слабости.
 
+critical-save-implant-do-message = делает глубокий вдох
+
 ent-CriticalSaveImplanter = имплантер последний вздох
     .desc = Содержит экстренный медицинский имплант для критических ситуаций.
 

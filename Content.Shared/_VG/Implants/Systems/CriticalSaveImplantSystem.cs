@@ -1,3 +1,4 @@
+using Content.Shared.Chat;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
@@ -17,6 +18,7 @@ public sealed class CriticalSaveImplantSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly SharedChatSystem _chat = default!;
 
     private readonly HashSet<EntityUid> _activatedImplants = new();
 
@@ -55,6 +57,12 @@ public sealed class CriticalSaveImplantSystem : EntitySystem
             comp.ExpireTime = _timing.CurTime + TimeSpan.FromSeconds(comp.Duration);
 
             _damageable.SetAllDamage(args.Target, FixedPoint2.Zero);
+
+            _chat.TrySendInGameICMessage(
+                args.Target,
+                Loc.GetString("critical-save-implant-do-message"),
+                InGameICChatType.Emote,
+                false);
 
             _popup.PopupEntity(Loc.GetString("critical-save-implant-activated"), args.Target, args.Target, PopupType.Medium);
             Dirty(uid, comp);
