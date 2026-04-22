@@ -46,7 +46,17 @@ namespace Content.Client.Lobby.UI
             CollapseButton.OnPressed += _ => TogglePanel(false);
             ExpandButton.OnPressed += _ => TogglePanel(true);
             
-            CharacterSetup.OnPressed += _ => SwitchState(LobbyGuiState.CharacterSetup);
+            CharacterSetup.OnPressed += _ => 
+            {
+                // VG-Tweak Start
+                if (ReadyButton.Pressed)
+                {
+                    _consoleHost.ExecuteCommand("toggleready False");
+                }
+                // VG-Tweak End
+
+                SwitchState(LobbyGuiState.CharacterSetup);
+            };
 
             // VG-Tweak Start
             if (SponsorInfoButton != null)
