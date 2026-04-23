@@ -5,3 +5,78 @@
   components:
   - type: Implanter
     implant: NeoRusskiyaTranslatorImplant
+
+- type: entity
+  id: CriticalSaveImplant
+  parent: BaseSubdermalImplant
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: CriticalSaveImplant
+    duration: 5
+  - type: Tag
+    tags:
+    - SubdermalImplant
+
+- type: entity
+  id: CriticalSaveImplanter
+  name: critical save implanter
+  parent: BaseImplantOnlyImplanter
+  description: Contains a critical save implant.
+  components:
+  - type: Implanter
+    implant: CriticalSaveImplant
+
+- type: entity
+  id: SyndiCriticalSaveImplanter
+  name: syndicate critical save implanter
+  parent: BaseImplantOnlyImplanterSyndi
+  description: Contains a critical save implant.
+  components:
+  - type: Implanter
+    implant: CriticalSaveImplant
+
+#HerathStop implant
+
+- type: entity
+  id: ActionHeartStopper
+  name: Stop Heart
+  description: Instantly stops your heart. You will revive after a short time.
+  categories: [HideSpawnMenu]
+  components:
+  - type: Action
+    icon:
+      sprite: Mobs/Species/Human/organs.rsi
+      state: heart-on
+    itemIconStyle: BigAction
+    useDelay: 60
+  - type: InstantAction
+    event: !type:HeartStopperActionEvent
+
+- type: entity
+  id: HeartStopperImplant
+  parent: BaseSubdermalImplant
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HeartStopperImplant
+    duration: 35
+  - type: Tag
+    tags:
+    - SubdermalImplant
+
+- type: entity
+  id: HeartStopperImplanter
+  name: heart-stopper implanter
+  parent: BaseImplantOnlyImplanter
+  description: A disposable syringe containing a heart-stopper implant.
+  components:
+  - type: Implanter
+    implant: HeartStopperImplant
+
+- type: entity
+  id: SyndiHeartStopperImplanter
+  name: syndicate heart-stopper implanter
+  parent: BaseImplantOnlyImplanterSyndi
+  description: A compact disposable syringe containing a heart-stopper implant. Use with caution.
+  components:
+  - type: Implanter
+    implant: HeartStopperImplant
