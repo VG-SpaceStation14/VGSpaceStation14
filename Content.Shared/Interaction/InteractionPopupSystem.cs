@@ -1,3 +1,4 @@
+using Content.Shared._VG.Mood;
 using Content.Shared.Bed.Sleep;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Components;
@@ -57,9 +58,6 @@ public sealed class InteractionPopupSystem : EntitySystem
         if (args.Handled || user == target)
             return;
 
-        //Handling does nothing and this thing annoyingly plays way too often.
-        // HUH? What does this comment even mean?
-
         if (HasComp<SleepingComponent>(uid))
             return;
 
@@ -78,11 +76,8 @@ public sealed class InteractionPopupSystem : EntitySystem
 
         component.LastInteractTime = curTime;
 
-        // TODO: Should be an attempt event
-        // TODO: Need to handle pausing with an accumulator.
-
-        var msg = ""; // Stores the text to be shown in the popup message
-        SoundSpecifier? sfx = null; // Stores the filepath of the sound to be played
+        var msg = "";
+        SoundSpecifier? sfx = null;
 
         var predict = component.SuccessChance is 0 or 1
                       && component.InteractSuccessSpawn == null
@@ -94,7 +89,20 @@ public sealed class InteractionPopupSystem : EntitySystem
         if (_random.Prob(component.SuccessChance))
         {
             if (component.InteractSuccessString != null)
-                msg = Loc.GetString(component.InteractSuccessString, ("target", Identity.Entity(uid, EntityManager))); // Success message (localized).
+            {
+                msg = Loc.GetString(component.InteractSuccessString, ("target", Identity.Entity(uid, EntityManager)));
+
+                // VG Mood: Hugging effect
+                if (component.InteractSuccessString == "hugging-success-generic")
+                {
+                    RaiseLocalEvent(target, new MoodEffectEvent("BeingHugged"));
+                }
+                // VG Mood: Petting effect
+                else if (component.InteractSuccessString.Contains("petting-success-"))
+                {
+                    RaiseLocalEvent(user, new MoodEffectEvent("PetAnimal"));
+                }
+            }
 
             if (component.InteractSuccessSound != null)
                 sfx = component.InteractSuccessSound;
@@ -108,7 +116,7 @@ public sealed class InteractionPopupSystem : EntitySystem
         else
         {
             if (component.InteractFailureString != null)
-                msg = Loc.GetString(component.InteractFailureString, ("target", Identity.Entity(uid, EntityManager))); // Failure message (localized).
+                msg = Loc.GetString(component.InteractFailureString, ("target", Identity.Entity(uid, EntityManager)));
 
             if (component.InteractFailureSound != null)
                 sfx = component.InteractFailureSound;
@@ -160,23 +168,11 @@ public sealed class InteractionPopupSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Sets <see cref="InteractionPopupComponent.InteractSuccessString"/>.
-    /// </summary>
-    /// <para>
-    /// This field is not networked automatically, so this method must be called on both sides of the network.
-    /// </para>
     public void SetInteractSuccessString(Entity<InteractionPopupComponent> ent, string str)
     {
         ent.Comp.InteractSuccessString = str;
     }
 
-    /// <summary>
-    /// Sets <see cref="InteractionPopupComponent.InteractFailureString"/>.
-    /// </summary>
-    /// <para>
-    /// This field is not networked automatically, so this method must be called on both sides of the network.
-    /// </para>
     public void SetInteractFailureString(Entity<InteractionPopupComponent> ent, string str)
     {
         ent.Comp.InteractFailureString = str;

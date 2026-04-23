@@ -1,4 +1,5 @@
 using Content.Server.Power.Components;
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.UserInterface;
 using Content.Server.Advertise.EntitySystems;
 using Content.Shared.Advertise.Components;
@@ -31,13 +32,6 @@ public sealed partial class SpaceVillainArcadeSystem : EntitySystem
         SubscribeLocalEvent<SpaceVillainArcadeComponent, PowerChangedEvent>(OnSVillainPower);
     }
 
-    /// <summary>
-    /// Called when the user wins the game.
-    /// Dispenses a prize if the arcade machine has any left.
-    /// </summary>
-    /// <param name="uid"></param>
-    /// <param name="arcade"></param>
-    /// <param name="xform"></param>
     public void ProcessWin(EntityUid uid, SpaceVillainArcadeComponent? arcade = null, TransformComponent? xform = null)
     {
         if (!Resolve(uid, ref arcade, ref xform))
@@ -49,19 +43,11 @@ public sealed partial class SpaceVillainArcadeSystem : EntitySystem
         arcade.RewardAmount--;
     }
 
-    /// <summary>
-    /// Picks a fight-verb from the list of possible Verbs.
-    /// </summary>
-    /// <returns>A fight-verb.</returns>
     public string GenerateFightVerb(SpaceVillainArcadeComponent arcade)
     {
         return _random.Pick(_prototypeManager.Index(arcade.PossibleFightVerbs));
     }
 
-    /// <summary>
-    /// Generates an enemy-name comprised of a first- and last-name.
-    /// </summary>
-    /// <returns>An enemy-name.</returns>
     public string GenerateEnemyName(SpaceVillainArcadeComponent arcade)
     {
         var possibleFirstEnemyNames = _prototypeManager.Index(arcade.PossibleFirstEnemyNames);
@@ -72,7 +58,6 @@ public sealed partial class SpaceVillainArcadeSystem : EntitySystem
 
     private void OnComponentInit(EntityUid uid, SpaceVillainArcadeComponent component, ComponentInit args)
     {
-        // Random amount of prizes
         component.RewardAmount = new Random().Next(component.RewardMinAmount, component.RewardMaxAmount + 1);
     }
 
@@ -83,13 +68,14 @@ public sealed partial class SpaceVillainArcadeSystem : EntitySystem
         if (!TryComp<ApcPowerReceiverComponent>(uid, out var power) || !power.Powered)
             return;
 
+        RaiseLocalEvent(msg.Actor, new MoodEffectEvent("ArcadePlay")); // VG-Tweak
+
         switch (msg.PlayerAction)
         {
             case SharedSpaceVillainArcadeComponent.PlayerAction.Attack:
             case SharedSpaceVillainArcadeComponent.PlayerAction.Heal:
             case SharedSpaceVillainArcadeComponent.PlayerAction.Recharge:
                 component.Game.ExecutePlayerAction(uid, msg.PlayerAction, component);
-                // Any sort of gameplay action counts
                 if (TryComp<SpeakOnUIClosedComponent>(uid, out var speakComponent))
                     _speakOnUIClosed.TrySetFlag((uid, speakComponent));
                 break;

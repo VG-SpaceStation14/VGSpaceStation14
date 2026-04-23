@@ -1,3 +1,4 @@
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.Arcade;
 using Robust.Server.GameObjects;
 using Robust.Shared.Random;
@@ -12,36 +13,13 @@ public sealed partial class BlockGame
     private readonly ArcadeSystem _arcadeSystem;
     private readonly UserInterfaceSystem _uiSystem;
 
-    /// <summary>
-    /// What entity is currently hosting this game of NT-BG.
-    /// </summary>
     private readonly EntityUid _owner = default!;
 
-    /// <summary>
-    /// Whether the game has been started.
-    /// </summary>
     public bool Started { get; private set; } = false;
-
-    /// <summary>
-    /// Whether the game is currently running (not paused).
-    /// </summary>
     private bool _running = false;
-
-    /// <summary>
-    /// Whether the game should not currently be running.
-    /// </summary>
     private bool Paused => !(Started && _running);
-
-    /// <summary>
-    /// Whether the game has finished.
-    /// </summary>
     private bool _gameOver = false;
-
-    /// <summary>
-    /// Whether the game should have finished given the current game state.
-    /// </summary>
     private bool IsGameOver => _field.Any(block => block.Position.Y == 0);
-
 
     public BlockGame(EntityUid owner)
     {
@@ -55,23 +33,15 @@ public sealed partial class BlockGame
         InitializeNewBlock();
     }
 
-    /// <summary>
-    /// Starts the game. Including relaying this info to everyone watching.
-    /// </summary>
     public void StartGame()
     {
         SendMessage(new BlockGameMessages.BlockGameSetScreenMessage(BlockGameMessages.BlockGameScreen.Game));
-
         FullUpdate();
-
         Started = true;
         _running = true;
         _gameOver = false;
     }
 
-    /// <summary>
-    /// Handles ending the game and updating the high scores.
-    /// </summary>
     private void InvokeGameover()
     {
         _running = false;
@@ -82,38 +52,29 @@ public sealed partial class BlockGame
         {
             _highScorePlacement = _arcadeSystem.RegisterHighScore(meta.EntityName, Points);
             SendHighscoreUpdate();
+            // VG-Tweak Start
+            var ev = new MoodEffectEvent("ArcadePlay");
+            _entityManager.EventBus.RaiseLocalEvent(meta.Owner, ev);
+            // VG-Tweak End
         }
         SendMessage(new BlockGameMessages.BlockGameGameOverScreenMessage(Points, _highScorePlacement?.LocalPlacement, _highScorePlacement?.GlobalPlacement));
     }
 
-    /// <summary>
-    /// Handle the game simulation and user input.
-    /// </summary>
-    /// <param name="frameTime">The amount of time the current game tick covers.</param>
     public void GameTick(float frameTime)
     {
         if (!_running)
             return;
 
         InputTick(frameTime);
-
         FieldTick(frameTime);
     }
 
-    /// <summary>
-    /// The amount of time that has passed since the active piece last moved vertically,
-    /// </summary>
     private float _accumulatedFieldFrameTime;
 
-    /// <summary>
-    /// Handles timing the movements of the active game piece.
-    /// </summary>
-    /// <param name="frameTime">The amount of time the current game tick covers.</param>
     private void FieldTick(float frameTime)
     {
         _accumulatedFieldFrameTime += frameTime;
 
-        // Speed goes negative sometimes. uhhhh max() it I guess!!!
         var checkTime = Math.Max(0.03f, Speed);
 
         while (_accumulatedFieldFrameTime >= checkTime)
@@ -122,15 +83,10 @@ public sealed partial class BlockGame
                 AddPoints(1);
 
             InternalFieldTick();
-
             _accumulatedFieldFrameTime -= checkTime;
         }
     }
 
-    /// <summary>
-    /// Handles the active game piece moving down.
-    /// Also triggers scanning for cleared lines.
-    /// </summary>
     private void InternalFieldTick()
     {
         if (CurrentPiece.Positions(_currentPiecePosition.AddToY(1), _currentRotation)
@@ -143,7 +99,6 @@ public sealed partial class BlockGame
             var blocks = CurrentPiece.Blocks(_currentPiecePosition, _currentRotation);
             _field.AddRange(blocks);
 
-            //check loose conditions
             if (IsGameOver)
             {
                 InvokeGameover();
@@ -154,13 +109,9 @@ public sealed partial class BlockGame
         }
 
         CheckField();
-
         UpdateFieldUI();
     }
 
-    /// <summary>
-    /// Handles scanning for cleared lines and accumulating points.
-    /// </summary>
     private void CheckField()
     {
         var pointsToAdd = 0;
@@ -170,7 +121,6 @@ public sealed partial class BlockGame
         {
             if (CheckLine(y))
             {
-                //line was cleared
                 y--;
                 consecutiveLines++;
                 clearedLines++;
@@ -193,11 +143,6 @@ public sealed partial class BlockGame
         AddPoints(pointsToAdd);
     }
 
-    /// <summary>
-    /// Returns whether the line at the given position is full.
-    /// Clears the line if it was full and moves the above lines down.
-    /// </summary>
-    /// <param name="y">The position of the line to check.</param>
     private bool CheckLine(int y)
     {
         for (var x = 0; x < 10; x++)
@@ -206,19 +151,11 @@ public sealed partial class BlockGame
                 return false;
         }
 
-        //clear line
         _field.RemoveAll(b => b.Position.Y == y);
-        //move everything down
         FillLine(y);
-
         return true;
     }
 
-    /// <summary>
-    /// Moves all of the lines above the given line down by one.
-    /// Used to fill in cleared lines.
-    /// </summary>
-    /// <param name="y">The position of the line above which to drop the lines.</param>
     private void FillLine(int y)
     {
         for (var c_y = y; c_y > 0; c_y--)
@@ -233,10 +170,6 @@ public sealed partial class BlockGame
         }
     }
 
-    /// <summary>
-    /// Generates a new active piece from the previewed next piece.
-    /// Repopulates the previewed next piece with a piece from the pool of possible next pieces.
-    /// </summary>
     private void InitializeNewBlock()
     {
         InitializeNewBlock(NextPiece);
@@ -246,24 +179,14 @@ public sealed partial class BlockGame
         SendMessage(new BlockGameMessages.BlockGameVisualUpdateMessage(NextPiece.BlocksForPreview(), BlockGameMessages.BlockGameVisualType.NextBlock));
     }
 
-    /// <summary>
-    /// Generates a new active piece from the previewed next piece.
-    /// </summary>
-    /// <param name="piece">The piece to set as the active piece.</param>
     private void InitializeNewBlock(BlockGamePiece piece)
     {
         _currentPiecePosition = new Vector2i(5, 0);
-
         _currentRotation = BlockGamePieceRotation.North;
-
         CurrentPiece = piece;
         UpdateFieldUI();
     }
 
-    /// <summary>
-    /// Buffers the currently active piece.
-    /// Replaces the active piece with either the previously held piece or the previewed next piece as necessary.
-    /// </summary>
     private void HoldPiece()
     {
         if (!_running)
@@ -284,9 +207,6 @@ public sealed partial class BlockGame
         InitializeNewBlock(tempHeld.Value);
     }
 
-    /// <summary>
-    /// Immediately drops the currently active piece the remaining distance.
-    /// </summary>
     private void PerformHarddrop()
     {
         var spacesDropped = 0;

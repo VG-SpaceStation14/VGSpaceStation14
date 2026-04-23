@@ -1,3 +1,4 @@
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.Administration.Logs;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
@@ -95,7 +96,7 @@ public sealed class SlipperySystem : EntitySystem
     private bool CanSlip(EntityUid uid, EntityUid toSlip)
     {
         return !_container.IsEntityInContainer(uid)
-                && _status.CanAddStatusEffect(toSlip, SharedStunSystem.StunId); //Should be KnockedDown instead?
+                && _status.CanAddStatusEffect(toSlip, SharedStunSystem.StunId);
     }
 
     public void TrySlip(EntityUid uid, SlipperyComponent component, EntityUid other, bool requiresContact = true)
@@ -104,7 +105,7 @@ public sealed class SlipperySystem : EntitySystem
         if (knockedDown && !component.SlipData.SuperSlippery)
             return;
 
-        var attemptEv = new SlipAttemptEvent(uid, targetSlots: component.IgnoreSlots ? SlotFlags.NONE : SlotFlags.FEET); //ADT-tweak: добавила игнор слотов
+        var attemptEv = new SlipAttemptEvent(uid, targetSlots: component.IgnoreSlots ? SlotFlags.NONE : SlotFlags.FEET);
         RaiseLocalEvent(other, attemptEv);
         if (attemptEv.SlowOverSlippery)
             _speedModifier.AddModifiedEntity(other);
@@ -128,13 +129,10 @@ public sealed class SlipperySystem : EntitySystem
                 EnsureComp<SlidingComponent>(other);
         }
 
-        // Preventing from playing the slip sound and stunning when you are already knocked down.
         if (!knockedDown)
         {
-            // Status effects should handle a TimeSpan of 0 properly...
             _stun.TryUpdateStunDuration(other, component.SlipData.StunTime);
 
-            // Don't make a new status effect entity if the entity wouldn't do anything
             if (!MathHelper.CloseTo(component.SlipData.SlipFriction, 1f))
             {
                 _movementMod.TryUpdateFrictionModDuration(
@@ -144,46 +142,35 @@ public sealed class SlipperySystem : EntitySystem
                 );
             }
 
-            _stamina.TakeStaminaDamage(other, component.StaminaDamage); // Note that this can StamCrit
+            _stamina.TakeStaminaDamage(other, component.StaminaDamage);
+
+            RaiseLocalEvent(other, new MoodEffectEvent("MobSlipped")); // VG-Tweak
 
             _audio.PlayPredicted(component.SlipSound, other, other);
         }
 
-        // Slippery is so tied to knockdown that we really just need to force it here.
         _stun.TryKnockdown(other, component.SlipData.KnockdownTime, force: true);
 
         _adminLogger.Add(LogType.Slip, LogImpact.Low, $"{ToPrettyString(other):mob} slipped on collision with {ToPrettyString(uid):entity}");
     }
 }
 
-/// <summary>
-///     Raised on an entity to determine if it can slip or not.
-/// </summary>
 public sealed class SlipAttemptEvent : EntityEventArgs, IInventoryRelayEvent
 {
     public bool NoSlip;
-
     public bool SlowOverSlippery;
-
     public EntityUid? SlipCausingEntity;
-
     public SlotFlags TargetSlots { get; } = SlotFlags.FEET;
 
-    public SlipAttemptEvent(EntityUid? slipCausingEntity, SlotFlags targetSlots) //ADT-tweak: добавила argetSlots
+    public SlipAttemptEvent(EntityUid? slipCausingEntity, SlotFlags targetSlots)
     {
         SlipCausingEntity = slipCausingEntity;
-        TargetSlots = targetSlots; //ADT-tweak
+        TargetSlots = targetSlots;
     }
 }
 
-/// <summary>
-/// Raised on an entity that is causing the slip event (e.g, the banana peel), to determine if the slip attempt should be cancelled.
-/// </summary>
-/// <param name="Cancelled">If the slip should be cancelled</param>
 [ByRefEvent]
 public record struct SlipCausingAttemptEvent (bool Cancelled);
 
-/// Raised on an entity that CAUSED some other entity to slip (e.g., the banana peel).
-/// <param name="Slipped">The entity being slipped</param>
 [ByRefEvent]
 public readonly record struct SlipEvent(EntityUid Slipped);

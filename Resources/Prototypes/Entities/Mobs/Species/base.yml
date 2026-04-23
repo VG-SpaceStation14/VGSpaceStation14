@@ -248,6 +248,7 @@
   - type: OfferItem # ADT-Tweak
   - type: RadiationPopup # ADT-Tweak
   - type: PickupHumans # ADT-Tweak
+  - type: Mood # VG-Tweak
   - type: Barotrauma
     damage:
       types:

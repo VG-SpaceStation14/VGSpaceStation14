@@ -1,3 +1,5 @@
+using Content.Shared._VG; // VG-Tweak
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.Alert;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Systems;
@@ -5,6 +7,7 @@ using Content.Shared.Nutrition.Components;
 using Content.Shared.Rejuvenate;
 using Content.Shared.StatusIcon;
 using JetBrains.Annotations;
+using Robust.Shared.Configuration; // VG-Tweak
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
@@ -22,6 +25,7 @@ public sealed class ThirstSystem : EntitySystem
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movement = default!;
     [Dependency] private readonly SharedJetpackSystem _jetpack = default!;
+    [Dependency] private readonly IConfigurationManager _config = default!; // VG-Tweak
 
     private static readonly ProtoId<SatiationIconPrototype> ThirstIconOverhydratedId = "ThirstIconOverhydrated";
     private static readonly ProtoId<SatiationIconPrototype> ThirstIconThirstyId = "ThirstIconThirsty";
@@ -38,7 +42,6 @@ public sealed class ThirstSystem : EntitySystem
 
     private void OnMapInit(EntityUid uid, ThirstComponent component, MapInitEvent args)
     {
-        // Do not change behavior unless starting value is explicitly defined
         if (component.CurrentThirst < 0)
         {
             component.CurrentThirst = _random.Next(
@@ -49,8 +52,7 @@ public sealed class ThirstSystem : EntitySystem
         }
         component.NextUpdateTime = _timing.CurTime;
         component.CurrentThirstThreshold = GetThirstThreshold(component, component.CurrentThirst);
-        component.LastThirstThreshold = ThirstThreshold.Okay; // TODO: Potentially change this -> Used Okay because no effects.
-        // TODO: Check all thresholds make sense and throw if they don't.
+        component.LastThirstThreshold = ThirstThreshold.Okay;
         UpdateEffects(uid, component);
 
         DirtyFields(uid, component, null, nameof(ThirstComponent.NextUpdateTime), nameof(ThirstComponent.CurrentThirstThreshold), nameof(ThirstComponent.LastThirstThreshold));
@@ -61,8 +63,8 @@ public sealed class ThirstSystem : EntitySystem
 
     private void OnRefreshMovespeed(EntityUid uid, ThirstComponent component, RefreshMovementSpeedModifiersEvent args)
     {
-        // TODO: This should really be taken care of somewhere else
-        if (_jetpack.IsUserFlying(uid))
+        if (_config.GetCVar(VGCCVars.MoodEnabled)
+            || _jetpack.IsUserFlying(uid))
             return;
 
         var mod = component.CurrentThirstThreshold <= ThirstThreshold.Parched ? 0.75f : 1.0f;
@@ -147,13 +149,13 @@ public sealed class ThirstSystem : EntitySystem
 
     private void UpdateEffects(EntityUid uid, ThirstComponent component)
     {
-        if (IsMovementThreshold(component.LastThirstThreshold) != IsMovementThreshold(component.CurrentThirstThreshold) &&
-                TryComp(uid, out MovementSpeedModifierComponent? movementSlowdownComponent))
+        if (!_config.GetCVar(VGCCVars.MoodEnabled)
+            && IsMovementThreshold(component.LastThirstThreshold) != IsMovementThreshold(component.CurrentThirstThreshold)
+            && TryComp(uid, out MovementSpeedModifierComponent? movementSlowdownComponent))
         {
             _movement.RefreshMovementSpeedModifiers(uid, movementSlowdownComponent);
         }
 
-        // Update UI
         if (ThirstComponent.ThirstThresholdAlertTypes.TryGetValue(component.CurrentThirstThreshold, out var alertId))
         {
             _alerts.ShowAlert(uid, alertId);
@@ -165,6 +167,8 @@ public sealed class ThirstSystem : EntitySystem
 
         DirtyField(uid, component, nameof(ThirstComponent.LastThirstThreshold));
         DirtyField(uid, component, nameof(ThirstComponent.ActualDecayRate));
+
+        RaiseLocalEvent(uid, new MoodEffectEvent("Thirst" + component.CurrentThirstThreshold)); // VG-Tweak
 
         switch (component.CurrentThirstThreshold)
         {
@@ -179,7 +183,6 @@ public sealed class ThirstSystem : EntitySystem
                 return;
 
             case ThirstThreshold.Thirsty:
-                // Same as okay except with UI icon saying drink soon.
                 component.LastThirstThreshold = component.CurrentThirstThreshold;
                 component.ActualDecayRate = component.BaseDecayRate * 0.8f;
                 return;

@@ -1,6 +1,7 @@
 using Content.Server.Bible.Components;
 using Content.Server.Ghost.Roles.Events;
 using Content.Server.Popups;
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
 using Content.Shared.Bible;
@@ -49,8 +50,7 @@ public sealed class BibleSystem : EntitySystem
         SubscribeLocalEvent<FamiliarComponent, MobStateChangedEvent>(OnFamiliarDeath);
         SubscribeLocalEvent<FamiliarComponent, GhostRoleSpawnerUsedEvent>(OnSpawned);
     }
-    // Too much changes and I forgor what is not changed.
-    // ADT File.
+
     private void OnAfterInteract(EntityUid uid, BibleComponent component, AfterInteractEvent args)
     {
         if (!args.CanReach)
@@ -67,7 +67,6 @@ public sealed class BibleSystem : EntitySystem
         var target = args.Target.Value;
         var user = args.User;
 
-        // Now chaplain is the only one who can interact with bible
         if (!TryComp<ChaplainComponent>(user, out var chaplain))
         {
             _popupSystem.PopupEntity(Loc.GetString("bible-sizzle"), user, user);
@@ -79,7 +78,6 @@ public sealed class BibleSystem : EntitySystem
             return;
         }
 
-        // Tries to use chaplain's energy
         if (!_chaplain.TryUseAbility(user, chaplain, component.HealCost))
         {
             var othersFailMessage = Loc.GetString(component.LocPrefix + "-heal-fail-others", ("user", Identity.Entity(user, EntityManager)), ("target", Identity.Entity(target, EntityManager)), ("bible", uid));
@@ -111,7 +109,6 @@ public sealed class BibleSystem : EntitySystem
             checkPhantom = true;
         }
 
-        // Checks phantom components and removing it
         if (TryComp<PhantomHolderComponent>(target, out var haunted))
         {
             var othersFailMessage = Loc.GetString(component.LocPrefix + "-phantom-out-others", ("user", Identity.Entity(user, EntityManager)), ("target", Identity.Entity(target, EntityManager)), ("bible", uid));
@@ -145,7 +142,6 @@ public sealed class BibleSystem : EntitySystem
             checkPhantom = true;
         }
 
-        // If the body is controlled by a phantom
         if (TryComp<ControlledComponent>(target, out var controlled) && controlled.Key == "Phantom")
         {
             var othersFailMessage = Loc.GetString(component.LocPrefix + "-phantom-controlled-others", ("user", Identity.Entity(user, EntityManager)), ("target", Identity.Entity(target, EntityManager)), ("bible", uid));
@@ -188,6 +184,8 @@ public sealed class BibleSystem : EntitySystem
             _audio.PlayPvs(component.HealSoundPath, user);
             _delay.TryResetDelay((uid, useDelay));
         }
+
+        RaiseLocalEvent(target, new MoodEffectEvent("GotBlessed")); // VG-Tweak
     }
 
     private void AddSummonVerb(EntityUid uid, SummonableComponent component, GetVerbsEvent<AlternativeVerb> args)
@@ -229,12 +227,10 @@ public sealed class BibleSystem : EntitySystem
         if (!_blocker.CanInteract(user, uid))
             return;
 
-        // Make this familiar the component's summon
         var familiar = EntityManager.SpawnEntity(component.SpecialItemPrototype, xForm.Coordinates);
         component.Summon = familiar;
         component.PersonSummoned = user;
 
-        // If this is going to use a ghost role mob spawner, attach it to the bible.
         if (HasComp<GhostRoleMobSpawnerComponent>(familiar))
         {
             _popupSystem.PopupEntity(Loc.GetString("bible-summon-requested"), user, PopupType.Medium);

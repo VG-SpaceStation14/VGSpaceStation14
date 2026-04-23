@@ -3,6 +3,7 @@ using Content.Server.Atmos.Components;
 using Content.Server.Stunnable;
 using Content.Server.Temperature.Systems;
 using Content.Server.Damage.Components;
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.ActionBlocker;
 using Content.Shared.Alert;
 using Content.Shared.Atmos;
@@ -29,7 +30,7 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Random;
-using Content.Server.ADT.Temperature; //ADT-Tweak-Bonfire
+using Content.Server.ADT.Temperature;
 
 namespace Content.Server.Atmos.EntitySystems
 {
@@ -54,12 +55,11 @@ namespace Content.Server.Atmos.EntitySystems
         private EntityQuery<InventoryComponent> _inventoryQuery;
         private EntityQuery<PhysicsComponent> _physicsQuery;
 
-        // This should probably be moved to the component, requires a rewrite, all fires tick at the same time
         private const float UpdateTime = 1f;
-
         private float _timer;
 
         private readonly Dictionary<Entity<FlammableComponent>, float> _fireEvents = new();
+
         public override void Initialize()
         {
             UpdatesAfter.Add(typeof(AtmosphereSystem));
@@ -88,8 +88,6 @@ namespace Content.Server.Atmos.EntitySystems
 
         private void OnExtinguishEvent(Entity<FlammableComponent> ent, ref ExtinguishEvent args)
         {
-            // You know I'm really not sure if having AdjustFireStacks *after* Extinguish,
-            // but I'm just moving this code, not questioning it.
             Extinguish(ent, ent.Comp);
             AdjustFireStacks(ent, args.FireStacksAdjustment, ent.Comp);
         }
@@ -122,7 +120,6 @@ namespace Content.Server.Atmos.EntitySystems
             if (!TryComp(otherEnt, out FlammableComponent? flammable))
                 return;
 
-            //Only ignite when the colliding fixture is projectile or ignition.
             if (args.OurFixtureId != component.FixtureId && args.OurFixtureId != SharedProjectileSystem.ProjectileFixture)
             {
                 return;
@@ -138,10 +135,6 @@ namespace Content.Server.Atmos.EntitySystems
 
         private void OnMapInit(EntityUid uid, FlammableComponent component, MapInitEvent args)
         {
-            // Sets up a fixture for flammable collisions.
-            // TODO: Should this be generalized into a general non-hard 'effects' fixture or something? I can't think of other use cases for it.
-            // This doesn't seem great either (lots more collisions generated) but there isn't a better way to solve it either that I can think of.
-
             if (!TryComp<PhysicsComponent>(uid, out var body))
                 return;
 
@@ -196,13 +189,9 @@ namespace Content.Server.Atmos.EntitySystems
         {
             var otherUid = args.OtherEntity;
 
-            // Collisions cause events to get raised directed at both entities. We only want to handle this collision
-            // once, hence the uid check.
             if (otherUid.Id < uid.Id)
                 return;
 
-            // Normal hard collisions, though this isn't generally possible since most flammable things are mobs
-            // which don't collide with one another, shouldn't work here.
             if (args.OtherFixtureId != flammable.FlammableFixtureID && args.OurFixtureId != flammable.FlammableFixtureID)
                 return;
 
@@ -213,10 +202,8 @@ namespace Content.Server.Atmos.EntitySystems
                 return;
 
             if (!flammable.OnFire && !otherFlammable.OnFire)
-                return; // Neither are on fire
+                return;
 
-            // Both are on fire -> equalize fire stacks.
-            // Weight each thing's firestacks by its mass
             var mass1 = 1f;
             var mass2 = 1f;
             if (_physicsQuery.TryComp(uid, out var physics) && _physicsQuery.TryComp(otherUid, out var otherPhys))
@@ -225,18 +212,13 @@ namespace Content.Server.Atmos.EntitySystems
                 mass2 = otherPhys.Mass;
             }
 
-            // when the thing on fire is more massive than the other, the following happens:
-            // - the thing on fire loses a small number of firestacks
-            // - the other thing gains a large number of firestacks
-            // so a person on fire engulfs a mouse, but an engulfed mouse barely does anything to a person
             var total = mass1 + mass2;
             var avg = (flammable.FireStacks + otherFlammable.FireStacks) / total;
 
-            // swap the entity losing stacks depending on whichever has the most firestack kilos
             var (src, dest) = flammable.FireStacks * mass1 > otherFlammable.FireStacks * mass2
                 ? (-1f, 1f)
                 : (1f, -1f);
-            // bring each entity to the same firestack mass, firestacks being scaled by the other's mass
+
             AdjustFireStacks(uid, src * avg * mass2, flammable, ignite: true);
             AdjustFireStacks(otherUid, dest * avg * mass1, otherFlammable, ignite: true);
         }
@@ -277,11 +259,6 @@ namespace Content.Server.Atmos.EntitySystems
 
             _appearance.SetData(uid, FireVisuals.OnFire, flammable.OnFire, appearance);
             _appearance.SetData(uid, FireVisuals.FireStacks, flammable.FireStacks, appearance);
-
-            // Also enable toggleable-light visuals
-            // This is intended so that matches & candles can re-use code for un-shaded layers on in-hand sprites.
-            // However, this could cause conflicts if something is ACTUALLY both a toggleable light and flammable.
-            // if that ever happens, then fire visuals will need to implement their own in-hand sprite management.
             _appearance.SetData(uid, ToggleableVisuals.Enabled, flammable.OnFire, appearance);
         }
 
@@ -327,10 +304,9 @@ namespace Content.Server.Atmos.EntitySystems
 
             var extinguished = new ExtinguishedEvent();
             RaiseLocalEvent(uid, ref extinguished);
-            //ADT bonfire
+
             var ev = new OnFireChangedEvent(flammable.OnFire);
             RaiseLocalEvent(uid, ref ev);
-            //ADT bonfire end
 
             UpdateAppearance(uid, flammable);
         }
@@ -354,47 +330,35 @@ namespace Content.Server.Atmos.EntitySystems
                     _adminLogger.Add(LogType.Flammable, $"{ToPrettyString(uid):target} set on fire by {ToPrettyString(ignitionSource):actor}");
                 flammable.OnFire = true;
 
-
                 var extinguished = new IgnitedEvent();
                 RaiseLocalEvent(uid, ref extinguished);
 
-                //ADT bonfire
                 var ev = new OnFireChangedEvent(flammable.OnFire);
                 RaiseLocalEvent(uid, ref ev);
-                //ADT bonfire end
             }
 
             UpdateAppearance(uid, flammable);
 
-            //ADT bonfire
             if (flammable.FirestackFadeOnIgnite != null)
                 flammable.FirestackFade = flammable.FirestackFadeOnIgnite.Value;
-            //ADT bonfire end
         }
 
         private void OnDamageChanged(EntityUid uid, IgniteOnHeatDamageComponent component, DamageChangedEvent args)
         {
-            // Make sure the entity is flammable
             if (!TryComp<FlammableComponent>(uid, out var flammable))
                 return;
 
-            // Make sure the damage delta isn't null
             if (args.DamageDelta == null)
                 return;
 
-            // Check if its' taken any heat damage, and give the value
             if (args.DamageDelta.DamageDict.TryGetValue("Heat", out FixedPoint2 value))
             {
-                // Make sure the value is greater than the threshold
-                if(value <= component.Threshold)
+                if (value <= component.Threshold)
                     return;
 
-                // Ignite that sucker
                 flammable.FireStacks += component.FireStacks;
                 Ignite(uid, uid, flammable);
             }
-
-
         }
 
         public void Resist(EntityUid uid,
@@ -411,7 +375,6 @@ namespace Content.Server.Atmos.EntitySystems
             _popup.PopupEntity(Loc.GetString("flammable-component-resist-message"), uid, uid);
             _stunSystem.TryUpdateParalyzeDuration(uid, TimeSpan.FromSeconds(2f));
 
-            // TODO FLAMMABLE: Make this not use TimerComponent...
             uid.SpawnTimer(2000, () =>
             {
                 flammable.Resisting = false;
@@ -419,13 +382,11 @@ namespace Content.Server.Atmos.EntitySystems
                 UpdateAppearance(uid, flammable);
             });
         }
-        
+
         public override void Update(float frameTime)
         {
-            // process all fire events
             foreach (var (flammable, deltaTemp) in _fireEvents)
             {
-                // 100 -> 1, 200 -> 2, 400 -> 3...
                 var fireStackMod = Math.Max(MathF.Log2(deltaTemp / 100) + 1, 0);
                 var fireStackDelta = fireStackMod - flammable.Comp.FireStacks;
                 var flammableEntity = flammable.Owner;
@@ -444,11 +405,9 @@ namespace Content.Server.Atmos.EntitySystems
 
             _timer -= UpdateTime;
 
-            // TODO: This needs cleanup to take off the crust from TemperatureComponent and shit.
             var query = EntityQueryEnumerator<FlammableComponent, TransformComponent>();
             while (query.MoveNext(out var uid, out var flammable, out _))
             {
-                // Slowly dry ourselves off if wet.
                 if (flammable.FireStacks < 0)
                 {
                     flammable.FireStacks = MathF.Min(0, flammable.FireStacks + 1);
@@ -462,11 +421,12 @@ namespace Content.Server.Atmos.EntitySystems
 
                 _alertsSystem.ShowAlert(uid, flammable.FireAlert);
 
+                RaiseLocalEvent(uid, new MoodEffectEvent("OnFire")); // VG-Tweak
+
                 if (flammable.FireStacks > 0)
                 {
                     var air = _atmosphereSystem.GetContainingMixture(uid);
 
-                    // If we're in an oxygenless environment, put the fire out.
                     if (air == null || air.GetMoles(Gas.Oxygen) < 1f)
                     {
                         Extinguish(uid, flammable);
@@ -480,9 +440,7 @@ namespace Content.Server.Atmos.EntitySystems
                         _temperatureSystem.ChangeHeat(uid, 12500 * flammable.FireStacks, false, temp);
 
                     var ev = new GetFireProtectionEvent();
-                    // let the thing on fire handle it
                     RaiseLocalEvent(uid, ref ev);
-                    // and whatever it's wearing
                     if (_inventoryQuery.TryComp(uid, out var inv))
                         _inventory.RelayEvent((uid, inv), ref ev);
 
@@ -490,10 +448,8 @@ namespace Content.Server.Atmos.EntitySystems
 
                     AdjustFireStacks(uid, flammable.FirestackFade * (flammable.Resisting ? 10f : 1f), flammable, flammable.OnFire);
 
-                    //ADT bonfire
                     if (flammable.FirestackFadeFade != 0)
                         flammable.FirestackFade += flammable.FirestackFadeFade * frameTime;
-                    //ADT bonfire end
                 }
                 else
                 {

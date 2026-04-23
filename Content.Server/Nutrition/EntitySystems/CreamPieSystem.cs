@@ -1,6 +1,7 @@
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Nutrition.Components;
 using Content.Server.Popups;
+using Content.Shared._VG.Mood; // VG-Tweak
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Nutrition;
@@ -34,13 +35,11 @@ namespace Content.Server.Nutrition.EntitySystems
             base.Initialize();
 
             SubscribeLocalEvent<CreamPieComponent, SliceFoodEvent>(OnSlice);
-
             SubscribeLocalEvent<CreamPiedComponent, RejuvenateEvent>(OnRejuvenate);
         }
 
         protected override void SplattedCreamPie(Entity<CreamPieComponent, EdibleComponent?> entity)
         {
-            // The entity is deleted, so play the sound at its position rather than parenting
             var coordinates = Transform(entity).Coordinates;
             _audio.PlayPvs(_audio.ResolveSound(entity.Comp1.Sound), coordinates, AudioParams.Default.WithVariation(0.125f));
 
@@ -56,11 +55,6 @@ namespace Content.Server.Nutrition.EntitySystems
 
             QueueDel(entity);
         }
-
-        // TODO
-        // A regression occured here. Previously creampies would activate their hidden payload if you tried to eat them.
-        // However, the refactor to IngestionSystem caused the event to not be reached,
-        // because eating is blocked if an item is inside the food.
 
         private void OnSlice(Entity<CreamPieComponent> entity, ref SliceFoodEvent args)
         {
@@ -93,6 +87,8 @@ namespace Content.Server.Nutrition.EntitySystems
                                             ("owner", Identity.Entity(uid, EntityManager)),
                                             ("thrown", Identity.Entity(args.Thrown, EntityManager))),
                                             uid, otherPlayers, false);
+
+            RaiseLocalEvent(uid, new MoodEffectEvent("Creampied")); // VG-Tweak
         }
 
         private void OnRejuvenate(Entity<CreamPiedComponent> entity, ref RejuvenateEvent args)
