@@ -1,0 +1,68 @@
+- type: reagent
+  id: TurboVodka
+  name: reagent-name-turbovodka
+  parent: BaseAlcohol
+  desc: reagent-desc-turbovodka
+  physicalDesc: reagent-physical-desc-strong-smelling
+  flavor: vodka
+  color: "#d1d1d155"
+  recognizable: true
+  metamorphicSprite:
+    sprite: Objects/Consumable/Drinks/ginvodkaglass.rsi
+    state: icon_empty
+  metamorphicMaxFillLevels: 4
+  metamorphicFillBaseName: fill-
+  metamorphicChangeColor: false
+  metabolisms:
+    Drink:
+      effects:
+      - !type:SatiateThirst
+        factor: 2
+      - !type:AdjustReagent
+        reagent: Ethanol
+        amount: 1.5
+      - !type:AdjustReagent
+        reagent: Ephedrine
+        amount: 0.1
+      - !type:HealthChange
+        conditions:
+        damage:
+          types:
+            Radiation: -1
+        probability: 0.5
+
+- type: reagent
+  id: NitroAlcohol
+  name: reagent-name-nitroalcohol
+  parent: BaseAlcohol
+  desc: reagent-desc-nitroalcohol
+  physicalDesc: reagent-physical-desc-strong-smelling
+  flavor: vodka
+  color: "#d1d1d155"
+  recognizable: true
+  metamorphicSprite:
+    sprite: Objects/Consumable/Drinks/ginvodkaglass.rsi
+    state: icon_empty
+  metamorphicMaxFillLevels: 4
+  metamorphicFillBaseName: fill-
+  metamorphicChangeColor: false
+  metabolisms:
+    Drink:
+      effects:
+      - !type:SatiateThirst
+        factor: 2
+      - !type:AdjustReagent
+        reagent: Ethanol
+        amount: 0.2
+      - !type:AdjustReagent
+        reagent: Ephedrine
+        amount: 0.2
+      - !type:AdjustReagent
+        reagent: WeldingFuel
+        amount: 0.01
+      - !type:HealthChange
+        conditions:
+        damage:
+          types:
+            Radiation: -1
+        probability: 0.5

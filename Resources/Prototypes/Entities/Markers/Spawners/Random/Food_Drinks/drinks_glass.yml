@@ -119,6 +119,10 @@
       - DrinkShakeWhite
       - DrinkTheMartinez
       - DrinkMoonshineGlass
+      # VG-Tweak Start
+      - DrinkTurboVodkaGlass
+      - DrinkNitroAlcoholGlass
+      # VG-Tweak End
     chance: 0.8
     offset: 0.0
     #rare

@@ -1,0 +1,28 @@
+- type: entityTable
+  id: GenericTurboVodkaItems
+  table: !type:GroupSelector
+    children:
+    - !type:GroupSelector
+      weight: 100
+      children:
+      - id: BottleCrateFilled
+      
+
+- type: entity
+  name: TurboVodka Spawner
+  id: TurboVodkaSpawner
+  parent: MarkerBase
+  suffix: 5
+  components:
+    - type: Sprite
+      layers:
+        - state: red
+        - sprite: _VG/Objects/Tools/Toolboxes/pivnoicrate.rsi
+          state: icon
+    - type: EntityTableSpawner
+      offset: 0.2
+      table: !type:NestedSelector
+        tableId: GenericTurboVodkaItems
+        prob: 0.05
+  placement:
+    mode: AlignTileAny

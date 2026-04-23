@@ -1,0 +1,35 @@
+- type: entity
+  parent: [DrinkVisualsAllFilled, DrinkBottleGlassBaseFull]
+  id: DrinkTurboVodkaBottleFull
+  name: turbovodka bottle
+  description: Aah, vodka. Prime choice of drink AND fuel by Russians worldwide.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        reagents:
+        - ReagentId: TurboVodka
+          Quantity: 100
+  - type: Label
+    currentLabel: reagent-name-turbovodka
+  - type: Sprite
+    sprite: _VG/Objects/Consumable/Drinks/turbovodkabottle.rsi
+
+- type: entity
+  parent: [DrinkVisualsAllFilled, DrinkBottleGlassBaseFull]
+  id: DrinkTurboVodkaBottleEmpty
+  name: turbovodka bottle
+  description: Aah, vodka. Prime choice of drink AND fuel by Russians worldwide.
+  suffix: Empty
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 100
+        reagents:
+        - ReagentId: TurboVodka
+          Quantity: 0
+  - type: Label
+    currentLabel: reagent-name-turbovodka
+  - type: Sprite
+    sprite: _VG/Objects/Consumable/Drinks/turbovodkabottle.rsi

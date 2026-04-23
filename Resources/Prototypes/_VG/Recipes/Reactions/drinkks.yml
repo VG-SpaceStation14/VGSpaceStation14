@@ -1,0 +1,15 @@
+- type: reaction
+  id: NitroAlcohol
+  requiredMixerCategories:
+  - Shake
+  reactants:
+    TurboVodka:
+      amount: 1
+    WeldingFuel:
+      amount: 1
+    BlackRussian:
+      amount: 1
+    WhiteRussian:
+      amount: 1
+  products:
+    NitroAlcohol: 4

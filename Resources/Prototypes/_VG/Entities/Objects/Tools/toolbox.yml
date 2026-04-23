@@ -1,0 +1,28 @@
+- type: entity
+  name: bottle crate
+  parent: ToolboxBase
+  id: BottleCrate
+  description: A bottle crate.
+  components:
+  - type: Sprite
+    sprite: _VG/Objects/Tools/Toolboxes/pivnoicrate.rsi
+    state: icon
+  - type: Item
+    sprite: _VG/Objects/Tools/Toolboxes/pivnoicrate.rsi
+  - type: EmitSoundOnLand
+    sound:
+      path: /Audio/_VG/Items/bottlecratedrop.ogg
+  - type: Storage
+    maxItemSize: Normal
+    grid:
+    - 0,0,5,3
+    storageOpenSound: /Audio/_VG/Items/bottlecrateopen.ogg
+    storageCloseSound: /Audio/_VG/Items/bottlecratclose.ogg
+    storageInsertSound: /Audio/_VG/Items/bottlein.ogg
+    storageRemoveSound: /Audio/_VG/Items/bottleout.ogg
+  - type: MeleeWeapon
+    damage:
+      types:
+        Blunt: 5
+    soundHit:
+      path: "/Audio/Weapons/smash.ogg"

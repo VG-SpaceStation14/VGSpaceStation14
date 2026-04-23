@@ -1,0 +1,20 @@
+- type: entity
+  id: BottleCrateFilled
+  name: bottle crate
+  parent: BottleCrate
+  suffix: Filled
+  components:
+  - type: StorageFill
+    contents:
+      - id: DrinkTurboVodkaBottleEmpty
+      - id: DrinkTurboVodkaBottleEmpty
+      - id: DrinkTurboVodkaBottleEmpty
+      - id: DrinkTurboVodkaBottleEmpty
+      
+      - id: DrinkTurboVodkaBottleFull
+        prob: 0.50
+      - id: DrinkTurboVodkaBottleFull
+        prob: 0.15
+  - type: Tag # ADT-Tweak
+    tags:
+    - Toolbox
