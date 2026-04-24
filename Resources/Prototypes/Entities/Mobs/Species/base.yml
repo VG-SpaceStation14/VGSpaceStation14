@@ -249,6 +249,7 @@
   - type: RadiationPopup # ADT-Tweak
   - type: PickupHumans # ADT-Tweak
   - type: Mood # VG-Tweak
+  - type: CritHeartbeat # VG-Tweak
   - type: Barotrauma
     damage:
       types:
