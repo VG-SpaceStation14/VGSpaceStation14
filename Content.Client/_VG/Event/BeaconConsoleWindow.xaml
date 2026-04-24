@@ -1,0 +1,117 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+                      xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+                      xmlns:ui="clr-namespace:Content.Client.Shuttles.UI"
+                      Title="Терминал Управления Маяком"
+                      SetSize="900 650">
+
+    <BoxContainer Orientation="Vertical" Margin="4">
+
+        <!-- LOCK -->
+        <BoxContainer Name="LockoutScreen"
+                      Orientation="Vertical"
+                      VerticalExpand="True"
+                      Visible="False"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+
+            <Label Text="СИСТЕМА ЗАБЛОКИРОВАНА"
+                   FontColorOverride="Red"
+                   StyleClasses="LabelBig"/>
+
+            <Label Text="Обнаружена попытка взлома. Доступ закрыт."
+                   HorizontalAlignment="Center"/>
+        </BoxContainer>
+
+        <!-- AUTH -->
+        <BoxContainer Name="AuthScreen"
+                      Orientation="Vertical"
+                      VerticalExpand="True"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+
+            <Label Text="Введите код авторизации"
+                   Margin="0 10"
+                   HorizontalAlignment="Center"/>
+
+            <LineEdit Name="PasswordField"
+                      PlaceHolder="Пароль..."
+                      MinWidth="250"/>
+
+            <Button Name="AuthButton"
+                    Text="Войти"
+                    Margin="0 10"/>
+        </BoxContainer>
+
+        <!-- MAIN -->
+        <BoxContainer Name="MainContent"
+                      Orientation="Horizontal"
+                      VerticalExpand="True"
+                      Visible="False">
+
+            <!-- RADAR -->
+            <BoxContainer HorizontalExpand="True"
+                          Margin="2"
+                          Orientation="Vertical">
+
+                <PanelContainer Name="RadarContainer"
+                                HorizontalExpand="True"
+                                VerticalExpand="True">
+
+                    <PanelContainer Name="RadarBackground"
+                                    HorizontalExpand="True"
+                                    VerticalExpand="True"/>
+
+                    <PanelContainer Name="RadarDisabledOverlay"
+                                    HorizontalExpand="True"
+                                    VerticalExpand="True"
+                                    MouseFilter="Stop">
+
+                        <Label Text="МАЯК НЕАКТИВЕН"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               StyleClasses="LabelBig"/>
+                    </PanelContainer>
+
+                    <ui:ShuttleNavControl Name="RadarScreen"
+                                          Visible="False"
+                                          HorizontalExpand="True"
+                                          VerticalExpand="True"/>
+
+                </PanelContainer>
+
+            </BoxContainer>
+
+            <!-- RIGHT -->
+            <BoxContainer Orientation="Vertical"
+                          MinWidth="200"
+                          Margin="5">
+
+                <Label Text="СТАТУС СИСТЕМЫ"
+                       HorizontalAlignment="Center"
+                       StyleClasses="LabelSubtle"/>
+
+                <Label Name="StatusLabel"
+                       Text="ОЖИДАНИЕ"
+                       HorizontalAlignment="Center"
+                       Margin="0 5"/>
+
+                <Button Name="ActivateButton"
+                        Text="ВКЛЮЧИТЬ МАЯК"
+                        Margin="0 20 0 5"
+                        StyleClasses="ButtonCaution"/>
+
+                <Button Text="Диагностика" Disabled="True" Margin="0 2"/>
+                <Button Text="Калибровка" Disabled="True" Margin="0 2"/>
+                <Button Text="Сброс частот" Disabled="True" Margin="0 2"/>
+
+                <Label Text="Сигнал: НИЗКИЙ"
+                       VerticalAlignment="Bottom"
+                       VerticalExpand="True"/>
+
+            </BoxContainer>
+
+        </BoxContainer>
+
+    </BoxContainer>
+
+</controls:FancyWindow>

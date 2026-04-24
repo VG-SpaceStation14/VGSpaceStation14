@@ -1,0 +1,27 @@
+- type: entity
+  parent: BaseComputerAiAccess
+  id: ComputerBeaconEvent
+  name: терминал управления маяком
+  description: Требуется авторизация для доступа к системам навигации.
+  components:
+  - type: Sprite
+    layers:
+    - map: ["computerLayerBody"]
+      state: computer
+    - map: ["computerLayerKeyboard"]
+      state: generic_keyboard
+    - map: ["computerLayerScreen"]
+      state: solar_screen
+    - map: ["computerLayerKeys"]
+      state: generic_keys
+  - type: BeaconConsole
+    password: "ADMIN"
+  - type: RadarConsole 
+  - type: ActivatableUI
+    key: enum.BeaconConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.BeaconConsoleUiKey.Key:
+        type: BeaconConsoleBoundUserInterface
+  - type: Computer
+    board: RadarConsoleCircuitboard
