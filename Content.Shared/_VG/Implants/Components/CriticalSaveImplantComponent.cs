@@ -16,6 +16,15 @@ public sealed partial class CriticalSaveImplantComponent : Component
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
     public TimeSpan? ExpireTime;
 
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
+    public TimeSpan? ActivateTime;
+
     [DataField, AutoNetworkedField]
     public DamageSpecifier? SavedDamage;
+
+    [DataField, AutoNetworkedField]
+    public float CurrentHeartbeatCooldown;
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField]
+    public TimeSpan NextHeartbeatTime;
 }

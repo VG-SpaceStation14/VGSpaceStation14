@@ -1,3 +1,4 @@
+using Content.Shared._VG.Implants.Components;
 using Content.Shared.Chat;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
@@ -6,21 +7,23 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Implants.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Popups;
-using Content.Shared._VG.Implants.Components;
-using Robust.Shared.Timing;
 using Robust.Shared.Network;
+using Robust.Shared.Timing;
 
 namespace Content.Shared._VG.Implants.Systems;
 
-public sealed class CriticalSaveImplantSystem : EntitySystem
+public abstract class SharedCriticalSaveImplantSystem : EntitySystem
 {
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly SharedChatSystem _chat = default!;
+    [Dependency] protected readonly IGameTiming Timing = default!;
+    [Dependency] protected readonly SharedPopupSystem Popup = default!;
+    [Dependency] protected readonly DamageableSystem Damageable = default!;
+    [Dependency] protected readonly INetManager Net = default!;
+    [Dependency] protected readonly SharedChatSystem Chat = default!;
 
-    private readonly HashSet<EntityUid> _activatedImplants = new();
+    protected readonly HashSet<EntityUid> ActivatedImplants = new();
+
+    protected const float InitialHeartbeatCooldown = 0.3f;
+    protected const float FinalHeartbeatCooldown = 1.5f;
 
     public override void Initialize()
     {
@@ -40,10 +43,10 @@ public sealed class CriticalSaveImplantSystem : EntitySystem
             if (implant.ImplantedEntity != args.Target)
                 continue;
 
-            if (comp.IsActive || _activatedImplants.Contains(uid))
+            if (comp.IsActive || ActivatedImplants.Contains(uid))
                 continue;
 
-            _activatedImplants.Add(uid);
+            ActivatedImplants.Add(uid);
 
             if (TryComp<DamageableComponent>(args.Target, out var damageable))
             {
@@ -54,17 +57,22 @@ public sealed class CriticalSaveImplantSystem : EntitySystem
             }
 
             comp.IsActive = true;
-            comp.ExpireTime = _timing.CurTime + TimeSpan.FromSeconds(comp.Duration);
+            comp.ActivateTime = Timing.CurTime;
+            comp.ExpireTime = Timing.CurTime + TimeSpan.FromSeconds(comp.Duration);
 
-            _damageable.SetAllDamage(args.Target, FixedPoint2.Zero);
+            // Start heartbeat immediately
+            comp.CurrentHeartbeatCooldown = InitialHeartbeatCooldown;
+            comp.NextHeartbeatTime = Timing.CurTime;
 
-            _chat.TrySendInGameICMessage(
+            Damageable.SetAllDamage(args.Target, FixedPoint2.Zero);
+
+            Chat.TrySendInGameICMessage(
                 args.Target,
                 Loc.GetString("critical-save-implant-do-message"),
                 InGameICChatType.Emote,
                 false);
 
-            _popup.PopupEntity(Loc.GetString("critical-save-implant-activated"), args.Target, args.Target, PopupType.Medium);
+            Popup.PopupEntity(Loc.GetString("critical-save-implant-activated"), args.Target, args.Target, PopupType.Medium);
             Dirty(uid, comp);
 
             return;
@@ -73,30 +81,19 @@ public sealed class CriticalSaveImplantSystem : EntitySystem
 
     private void OnComponentRemove(Entity<CriticalSaveImplantComponent> ent, ref ComponentRemove args)
     {
-        _activatedImplants.Remove(ent);
+        ActivatedImplants.Remove(ent);
     }
 
-    public override void Update(float frameTime)
+    protected void UpdateHeartbeatCooldown(CriticalSaveImplantComponent comp, TimeSpan curTime)
     {
-        if (_net.IsClient)
+        if (comp.ActivateTime == null)
             return;
 
-        var curTime = _timing.CurTime;
-        var query = EntityQueryEnumerator<CriticalSaveImplantComponent, SubdermalImplantComponent>();
+        var elapsed = (float)(curTime - comp.ActivateTime.Value).TotalSeconds;
+        var totalDuration = comp.Duration;
+        var progress = Math.Clamp(elapsed / totalDuration, 0f, 1f);
 
-        while (query.MoveNext(out var uid, out var comp, out var implant))
-        {
-            if (!comp.IsActive || comp.ExpireTime == null || curTime < comp.ExpireTime)
-                continue;
-
-            if (implant.ImplantedEntity is { } target && comp.SavedDamage != null)
-            {
-                _damageable.ChangeDamage((target, null), comp.SavedDamage, ignoreResistances: true);
-                _popup.PopupEntity(Loc.GetString("critical-save-implant-expired"), target, target, PopupType.MediumCaution);
-            }
-
-            _activatedImplants.Remove(uid);
-            QueueDel(uid);
-        }
+        comp.CurrentHeartbeatCooldown = InitialHeartbeatCooldown +
+                                        (FinalHeartbeatCooldown - InitialHeartbeatCooldown) * progress;
     }
 }
