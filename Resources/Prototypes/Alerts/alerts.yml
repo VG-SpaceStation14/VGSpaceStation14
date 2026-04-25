@@ -5,6 +5,7 @@
   id: BaseAlertOrder
   order:
     - category: Health
+    - category: Mood # VG-Tweak
     - category: Stamina
     - alertType: SuitPower
     - category: Internals
