@@ -2,7 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using Robust.Shared.IoC;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Log;
 
 namespace Content.Server._VG.EventDrop;
 
@@ -16,15 +18,15 @@ public interface IEventDropPresetManager
     List<EntProtoId> GetItemsFromPreset(string presetId);
 }
 
-public sealed class EventDropPresetManager : IEventDropPresetManager
+public sealed class EventDropPresetManager : IEventDropPresetManager, IPostInjectInit
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     
-    private ISawmill _sawmill = null!;
+    private ISawmill _sawmill = default!;
     private readonly string _presetsPath = "data/eventdrop_presets.json";
     private EventDropPresetData _presetData = new();
     
-    public void Initialize()
+    public void PostInject()
     {
         _sawmill = Logger.GetSawmill("eventdrop.presets");
         LoadPresets();
@@ -38,32 +40,41 @@ public sealed class EventDropPresetManager : IEventDropPresetManager
             if (!File.Exists(_presetsPath))
             {
                 _presetData = new EventDropPresetData();
-                SavePresets();
+                SavePresetsInternal();
+                _sawmill.Info($"Created new presets file at {_presetsPath}");
                 return;
             }
             
             var json = File.ReadAllText(_presetsPath);
             _presetData = JsonSerializer.Deserialize<EventDropPresetData>(json) ?? new EventDropPresetData();
-            _sawmill?.Info($"Loaded {_presetData.Presets.Count} presets from {_presetsPath}");
+            _sawmill.Info($"Loaded {_presetData.Presets.Count} presets from {_presetsPath}");
         }
         catch (Exception e)
         {
-            _sawmill?.Error($"Failed to load presets: {e.Message}");
+            _sawmill.Error($"Failed to load presets: {e}");
             _presetData = new EventDropPresetData();
         }
     }
     
-    private void SavePresets()
+    private void SavePresetsInternal()
     {
         try
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             var json = JsonSerializer.Serialize(_presetData, options);
-            File.WriteAllText(_presetsPath, json);
+            
+            // Атомарное сохранение через временный файл
+            var tempPath = _presetsPath + ".tmp";
+            File.WriteAllText(tempPath, json);
+            
+            if (File.Exists(_presetsPath))
+                File.Delete(_presetsPath);
+                
+            File.Move(tempPath, _presetsPath);
         }
         catch (Exception e)
         {
-            _sawmill?.Error($"Failed to save presets: {e.Message}");
+            _sawmill.Error($"Failed to save presets: {e}");
         }
     }
     
@@ -86,20 +97,20 @@ public sealed class EventDropPresetManager : IEventDropPresetManager
             {
                 if (!_prototypeManager.HasIndex<EntityPrototype>(item.PrototypeId))
                 {
-                    _sawmill?.Warning($"Invalid prototype in preset: {item.PrototypeId}");
+                    _sawmill.Warning($"Invalid prototype in preset '{presetId}': {item.PrototypeId}");
                     return false;
                 }
             }
             
             preset.Name = presetId;
             _presetData.Presets[presetId] = preset;
-            SavePresets();
-            _sawmill?.Info($"Saved preset '{presetId}' with {preset.Items.Count} items");
+            SavePresetsInternal();
+            _sawmill.Info($"Saved preset '{presetId}' with {preset.Items.Count} items");
             return true;
         }
         catch (Exception e)
         {
-            _sawmill?.Error($"Failed to save preset '{presetId}': {e.Message}");
+            _sawmill.Error($"Failed to save preset '{presetId}': {e}");
             return false;
         }
     }
@@ -110,16 +121,16 @@ public sealed class EventDropPresetManager : IEventDropPresetManager
         {
             if (_presetData.Presets.Remove(presetId))
             {
-                SavePresets();
-                _sawmill?.Info($"Deleted preset '{presetId}'");
+                SavePresetsInternal();
+                _sawmill.Info($"Deleted preset '{presetId}'");
                 return true;
             }
-            _sawmill?.Warning($"Preset '{presetId}' not found for deletion");
+            _sawmill.Warning($"Preset '{presetId}' not found for deletion");
             return false;
         }
         catch (Exception e)
         {
-            _sawmill?.Error($"Failed to delete preset '{presetId}': {e.Message}");
+            _sawmill.Error($"Failed to delete preset '{presetId}': {e}");
             return false;
         }
     }
