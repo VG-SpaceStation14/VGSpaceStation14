@@ -53,6 +53,14 @@
         transferForensics: true
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
+  # VG-Tweak Start
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/ADT/Entities/drinkglass_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/ADT/Entities/Objects/drinkglass_drop.ogg
+  # VG-Tweak End
 
 - type: entity
   abstract: true

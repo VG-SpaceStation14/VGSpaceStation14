@@ -49,6 +49,14 @@
   - type: PhysicalComposition
     materialComposition:
       Glass: 25
+  # VG-Tweak Start
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/ADT/Entities/drinkglass_pickup.ogg
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/ADT/Entities/Objects/drinkglass_drop.ogg
+  # VG-Tweak End
 
 # Porcelain (like glass but no shard)
 - type: entity
