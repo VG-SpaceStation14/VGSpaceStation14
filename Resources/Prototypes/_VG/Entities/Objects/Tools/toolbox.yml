@@ -4,6 +4,19 @@
   id: BottleCrate
   description: A bottle crate.
   components:
+  - type: EmitSoundOnPickup
+    sound:
+      collection: GenericPickup
+      params:
+        volume: -7
+  - type: EmitSoundOnDrop
+    sound:
+      collection: GenericDrop
+      params:
+        volume: -7
+  # - type: EmitSoundOnLand
+    # sound:
+      # collection: GenericDrop
   - type: Sprite
     sprite: _VG/Objects/Tools/Toolboxes/pivnoicrate.rsi
     state: icon
