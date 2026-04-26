@@ -59,7 +59,7 @@ jobs:
           TITLE="${{ steps.commit.outputs.title }}"
 
           case "$TITLE" in
-            *"[FIX]"*) echo "emoji=🐛" >> $GITHUB_OUTPUT ;;
+            *"[FIX]"*) echo "emoji=🩹" >> $GITHUB_OUTPUT ;;
             *"[ADD]"*) echo "emoji=✨" >> $GITHUB_OUTPUT ;;
             *"[TWEAK]"*) echo "emoji=⚙️" >> $GITHUB_OUTPUT ;;
             *"[REMOVE]"*) echo "emoji=🗑️" >> $GITHUB_OUTPUT ;;
