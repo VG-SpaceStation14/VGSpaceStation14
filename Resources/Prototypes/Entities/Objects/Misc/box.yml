@@ -3,6 +3,7 @@
   parent: BaseStorageItem
   abstract: true
   components:
+  - type: ContainerInteractionAnimationVisuals # VG-Tweak
   - type: Sprite
     sprite: Objects/Storage/boxes.rsi
   - type: Item

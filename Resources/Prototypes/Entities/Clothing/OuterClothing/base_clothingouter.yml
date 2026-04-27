@@ -65,6 +65,7 @@
         type: StorageBoundUserInterface
   - type: StaticPrice
     price: 70
+  - type: ContainerInteractionAnimationVisuals # VG-Tweak
 
 - type: entity
   abstract: true

@@ -5,6 +5,7 @@
   name: base MOD control unit
   description: A civilian class suit by Nakamura Engineering, doesn't offer much other than slightly quicker movement.
   components:
+  - type: ContainerInteractionAnimationVisuals # VG-Tweak
   - type: Sprite
     sprite: ADT/Clothing/Back/Modsuit/standart.rsi
     state: icon

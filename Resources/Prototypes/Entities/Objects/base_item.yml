@@ -66,6 +66,7 @@
   parent: BaseItem
   abstract: true
   components:
+  - type: ContainerInteractionAnimationVisuals # VG-Tweak
   - type: Storage
   - type: UserInterface
     interfaces:

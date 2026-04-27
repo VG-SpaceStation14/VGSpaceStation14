@@ -40,6 +40,7 @@
   parent: ClothingBeltBase
   id: ClothingBeltStorageBase
   components:
+  - type: ContainerInteractionAnimationVisuals # VG-Tweak
   - type: Storage
     maxItemSize: Normal
     defaultStorageOrientation: Vertical
