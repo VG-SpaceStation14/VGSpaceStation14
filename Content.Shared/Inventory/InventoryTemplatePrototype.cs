@@ -18,9 +18,6 @@ public sealed partial class SlotDefinition
 {
     [DataField("name", required: true)] public string Name { get; private set; } = string.Empty;
     [DataField("slotTexture")] public string TextureName { get; private set; } = "pocket";
-    /// <summary>
-    /// The texture displayed in a slot when it has an item inside of it.
-    /// </summary>
     [DataField] public string FullTextureName { get; private set; } = "SlotBackground";
     [DataField("slotFlags")] public SlotFlags SlotFlags { get; private set; } = SlotFlags.PREVENTEQUIP;
     [DataField("showInWindow")] public bool ShowInWindow { get; private set; } = true;
@@ -40,24 +37,15 @@ public sealed partial class SlotDefinition
     [DataField("displayName", required: true)]
     public string DisplayName { get; private set; } = string.Empty;
 
-    /// <summary>
-    ///     Whether or not this slot will have its item hidden in the strip menu, and block interactions.
-    ///     <seealso cref="SharedStrippableSystem.IsStripHidden"/>
-    /// </summary>
     [DataField("stripHidden")] public bool StripHidden { get; private set; }
 
-    /// <summary>
-    ///     Offset for the clothing sprites.
-    /// </summary>
     [DataField("offset")] public Vector2 Offset { get; private set; } = Vector2.Zero;
 
-    /// <summary>
-    ///     Entity whitelist for CanEquip checks.
-    /// </summary>
     [DataField("whitelist")] public EntityWhitelist? Whitelist = null;
 
-    /// <summary>
-    ///     Entity blacklist for CanEquip checks.
-    /// </summary>
     [DataField("blacklist")] public EntityWhitelist? Blacklist = null;
+
+    // start-_VG: surgery
+    [DataField] public bool Disabled;
+    // end-_VG: surgery
 }

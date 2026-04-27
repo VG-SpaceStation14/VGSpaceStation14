@@ -25,6 +25,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Chat;
+using Content.Shared._VG.Surgery.Body;
+using Content.Shared._VG.Mood;
 
 namespace Content.Server.Body.Systems;
 
@@ -377,13 +379,15 @@ public sealed class RespiratorSystem : EntitySystem
         if (ent.Comp.SuffocationCycles == 2)
             _adminLogger.Add(LogType.Asphyxiation, $"{ToPrettyString(ent):entity} started suffocating");
 
-        _damageableSys.ChangeDamage(ent.Owner, ent.Comp.Damage, interruptsDoAfters: false);
+        _damageableSys.TryChangeDamage(ent, HasComp<DebrainedComponent>(ent) ? ent.Comp.Damage * 4.5f : ent.Comp.Damage, interruptsDoAfters: false);
 
         if (ent.Comp.SuffocationCycles < ent.Comp.SuffocationCycleThreshold)
             return;
 
         var ev = new SuffocationEvent();
         RaiseLocalEvent(ent, ref ev);
+
+        RaiseLocalEvent(ent, new MoodEffectEvent("Suffocating"));
     }
 
     private void StopSuffocation(Entity<RespiratorComponent> ent)
@@ -391,7 +395,7 @@ public sealed class RespiratorSystem : EntitySystem
         if (ent.Comp.SuffocationCycles >= 2)
             _adminLogger.Add(LogType.Asphyxiation, $"{ToPrettyString(ent):entity} stopped suffocating");
 
-        _damageableSys.ChangeDamage(ent.Owner, ent.Comp.DamageRecovery);
+        _damageableSys.TryChangeDamage(ent, ent.Comp.DamageRecovery);
 
         var ev = new StopSuffocatingEvent();
         RaiseLocalEvent(ent, ref ev);

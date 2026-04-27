@@ -3,8 +3,10 @@ using System.Linq;
 using Content.Shared.DisplacementMap;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Storage;
+using Content.Shared.Random;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Utility;
 
 namespace Content.Shared.Inventory;
@@ -13,6 +15,8 @@ public partial class InventorySystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IViewVariablesManager _vvm = default!;
+    [Dependency] private readonly RandomHelperSystem _randomHelper = default!;
+    [Dependency] private readonly ISerializationManager _serializationManager = default!;
 
     private void InitializeSlots()
     {
@@ -31,9 +35,6 @@ public partial class InventorySystem : EntitySystem
             .RemoveHandler(HandleViewVariablesSlots, ListViewVariablesSlots);
     }
 
-    /// <summary>
-    /// Tries to find an entity in the specified slot with the specified component.
-    /// </summary>
     public bool TryGetInventoryEntity<T>(Entity<InventoryComponent?> entity, out Entity<T?> target)
         where T : IComponent, IClothingSlots
     {
@@ -56,14 +57,15 @@ public partial class InventorySystem : EntitySystem
         return false;
     }
 
-    /// <summary>
-    /// Copy this component's datafields from one entity to another.
-    /// This can't use CopyComp because the template needs to be applied using the API method.
-    /// <summary>
     public void CopyComponent(Entity<InventoryComponent?> source, EntityUid target)
     {
         if (!Resolve(source, ref source.Comp))
             return;
+
+        if (!_prototypeManager.TryIndex(source.Comp.TemplateId, out InventoryTemplatePrototype? invTemplate))
+            return;
+
+        _serializationManager.CopyTo(invTemplate.Slots, ref source.Comp.Slots, notNullableOverride: true);
 
         var targetComp = EnsureComp<InventoryComponent>(target);
         targetComp.SpeciesId = source.Comp.SpeciesId;
@@ -86,22 +88,18 @@ public partial class InventorySystem : EntitySystem
 
     protected virtual void UpdateInventoryTemplate(Entity<InventoryComponent> ent)
     {
-        if (!_prototypeManager.Resolve(ent.Comp.TemplateId, out var invTemplate))
+        if (!_prototypeManager.TryIndex(ent.Comp.TemplateId, out var invTemplate))
             return;
 
-        // Remove any containers that aren't in the new template.
         foreach (var container in ent.Comp.Containers)
         {
             if (invTemplate.Slots.Any(s => s.Name == container.ID))
                 continue;
 
-            // Empty container before deletion so the contents don't get deleted.
-            // For cases when we update the template while items are already worn.
             _containerSystem.EmptyContainer(container);
             _containerSystem.ShutdownContainer(container);
         }
 
-        // Ensure the containers from the template.
         ent.Comp.Slots = invTemplate.Slots;
         ent.Comp.Containers = new ContainerSlot[ent.Comp.Slots.Length];
         for (var i = 0; i < ent.Comp.Containers.Length; i++)
@@ -163,7 +161,7 @@ public partial class InventorySystem : EntitySystem
 
         foreach (var slotDef in inventory.Slots)
         {
-            if (!slotDef.Name.Equals(slot))
+            if (!slotDef.Name.Equals(slot) || slotDef.Disabled)
                 continue;
             slotDefinition = slotDef;
             return true;
@@ -218,15 +216,33 @@ public partial class InventorySystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Change the inventory template ID an entity is using
-    /// and drop any item that does not have a slot according to the new template.
-    /// This will update the client-side UI accordingly.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <param name="ent">The entity to update.</param>
-    /// <param name="newTemplate">The ID of the new inventory template prototype.</param>
+    public void SetSlotStatus(EntityUid uid, string slotName, bool isDisabled, InventoryComponent? inventory = null)
+    {
+        if (!Resolve(uid, ref inventory))
+            return;
+
+        foreach (var slot in inventory.Slots)
+        {
+            if (slot.Name != slotName)
+                continue;
+
+            if (!TryGetSlotContainer(uid, slotName, out var container, out _, inventory))
+                break;
+
+            if (isDisabled && container.ContainedEntity is { } containedEnt)
+            {
+                var xform = Transform(containedEnt);
+                if (xform.MapUid != null)
+                {
+                    _randomHelper.RandomOffset(containedEnt, 0.5f);
+                }
+            }
+            break;
+        }
+
+        Dirty(uid, inventory);
+    }
+
     public void SetTemplateId(Entity<InventoryComponent> ent, ProtoId<InventoryTemplatePrototype> newTemplate)
     {
         if (ent.Comp.TemplateId == newTemplate)
@@ -237,10 +253,6 @@ public partial class InventorySystem : EntitySystem
         Dirty(ent);
     }
 
-    /// <summary>
-    /// Enumerator for iterating over an inventory's slot containers. Also has methods that skip empty containers.
-    /// It should be safe to add or remove items while enumerating.
-    /// </summary>
     public struct InventorySlotEnumerator
     {
         private readonly SlotDefinition[] _slots;
@@ -270,7 +282,7 @@ public partial class InventorySystem : EntitySystem
                 var i = _nextIdx++;
                 var slot = _slots[i];
 
-                if ((slot.SlotFlags & _flags) == 0)
+                if ((slot.SlotFlags & _flags) == 0 || slot.Disabled)
                     continue;
 
                 container = _containers[i];
@@ -288,7 +300,7 @@ public partial class InventorySystem : EntitySystem
                 var i = _nextIdx++;
                 var slot = _slots[i];
 
-                if ((slot.SlotFlags & _flags) == 0)
+                if ((slot.SlotFlags & _flags) == 0 || slot.Disabled)
                     continue;
 
                 var container = _containers[i];
@@ -325,5 +337,33 @@ public partial class InventorySystem : EntitySystem
             slot = null;
             return false;
         }
+    }
+
+    public void DropSlotContents(EntityUid uid, string slotName, InventoryComponent? inventory = null)
+    {
+        if (!Resolve(uid, ref inventory))
+            return;
+
+        foreach (var slot in inventory.Slots)
+        {
+            if (slot.Name != slotName)
+                continue;
+
+            if (!TryGetSlotContainer(uid, slotName, out var container, out _, inventory))
+                break;
+
+            if (container.ContainedEntity is { } containedEnt)
+            {
+                var xform = Transform(containedEnt);
+                if (xform.MapUid != null)
+                {
+                    _randomHelper.RandomOffset(containedEnt, 0.5f);
+                }
+            }
+
+            break;
+        }
+
+        Dirty(uid, inventory);
     }
 }

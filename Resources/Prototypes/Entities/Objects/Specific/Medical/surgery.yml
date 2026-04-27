@@ -11,6 +11,7 @@
   - type: Tag
     tags:
     - SurgeryTool
+  - type: SurgeryTool
 
 # Cautery
 
@@ -32,6 +33,16 @@
         Heat: 5
     soundHit:
       path: /Audio/Effects/lightburn.ogg
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/cautery1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/cautery2.ogg
+  - type: Cautery
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - Cautery
 
 # Drill
 
@@ -57,6 +68,14 @@
       path: /Audio/Items/drill_hit.ogg
   - type: StaticPrice
     price: 40
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/saw.ogg
+  - type: Drill
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - Drill
 
 # Scalpel
 
@@ -67,11 +86,11 @@
   description: A surgical tool used to make incisions into flesh.
   components:
   - type: Sharp
-    butcherDelayModifier: 1.5 # Butchering with a scalpel, regardless of the type, will take 50% longer
+    butcherDelayModifier: 1.5
   - type: Tool
     qualities:
     - Slicing
-    speedModifier: 0.66 # pretend the sixes go on forever :)
+    speedModifier: 0.66
   - type: Utensil
     types:
       - Knife
@@ -90,12 +109,22 @@
         Slash: 8
     soundHit:
       path: /Audio/Weapons/bladeslice.ogg
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel2.ogg
+  - type: Scalpel
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - Scalpel
 
 - type: entity
   name: shiv
   id: ScalpelShiv
   parent: Scalpel
-  description: A pointy piece of glass, abraded to an edge and wrapped in tape for a handle. # Could become a decent tool or weapon with right tool mods.
+  description: A pointy piece of glass, abraded to an edge and wrapped in tape for a handle.
   components:
   - type: Sprite
     state: shiv
@@ -116,19 +145,27 @@
     damage:
       types:
         Slash: 12
+  - type: Scalpel
+    speed: 1.25
 
 - type: entity
   name: laser scalpel
   id: ScalpelLaser
   parent: Scalpel
-  description: A scalpel which uses a directed laser to slice instead of a blade, for more precise surgery while also cauterizing as it cuts.
+  description: A scalpel which uses a directed laser to slice instead of a blade.
   components:
   - type: Sprite
     state: laser
   - type: Item
     heldPrefix: laser
+  - type: Scalpel
+    speed: 1.5
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - ScalpelLaser
 
-# Scissors
+# Retractor
 
 - type: entity
   name: retractor
@@ -142,25 +179,77 @@
   - type: Item
     sprite: Objects/Specific/Medical/Surgery/scissors.rsi
     storedRotation: 90
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
+  - type: Retractor
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - Retractor
+
+# Hemostat
 
 - type: entity
   name: hemostat
   id: Hemostat
-  parent: Retractor
+  parent: BaseToolSurgery
   description: A surgical tool used to compress blood vessels to prevent bleeding.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
     state: hemostat
   - type: Item
     heldPrefix: hemostat
+    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
     storedRotation: 90
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/hemostat1.ogg
+  - type: Hemostat
+  - type: Tweezers
+  - type: Tending
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - Hemostat
 
-  # - type: entity
-  #   name: bone setter
-  #   id: BoneSetter
-  #   parent: Retractor
-  #   description: A surgical tool used for setting bones.
-  #   components:
+# Bone setter
+
+- type: entity
+  parent: BaseToolSurgery
+  id: BoneSetter
+  name: bone setter
+  description: Used for setting bones back into place.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/bonesetter.rsi
+    state: bonesetter
+  - type: Item
+    sprite: Objects/Specific/Medical/Surgery/bonesetter.rsi
+  - type: BoneSetter
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - BoneSetter
+
+# Bone Gel
+
+- type: entity
+  parent: BaseToolSurgery
+  id: BoneGel
+  name: bottle of bone gel
+  description: A container for bone gel that often needs to be refilled from a specialized machine.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/bone_gel.rsi
+    state: bone-gel
+  - type: BoneGel
+
 # Saws
 
 - type: entity
@@ -183,13 +272,22 @@
   - type: Tool
     qualities:
       - Sawing
-# No melee for regular saw because have you ever seen someone use a band saw as a weapon? It's dumb.
+    speedModifier: 1.0
+  - type: MeleeWeapon
+    attackRate: 0.75
+    range: 1.35
+    damage:
+      types:
+        Blunt: 2.5
+        Slash: 6.5
+    angle: 20
+  - type: BoneSaw
 
 - type: entity
   name: choppa
   id: SawImprov
   parent: Saw
-  description: A wicked serrated blade made of whatever nasty sharp things you could find. # It would make a pretty decent weapon, given there are more space for some tool mods too.
+  description: A wicked serrated blade made of whatever nasty sharp things you could find.
   components:
   - type: Sprite
     state: improv
@@ -203,7 +301,11 @@
     soundHit:
       path: /Audio/Weapons/bladeslice.ogg
   - type: Tool
+    qualities:
+      - Sawing
     speedModifier: 0.5
+  - type: BoneSaw
+    speed: 0.5
 
 - type: entity
   name: circular saw
@@ -212,8 +314,11 @@
   description: For heavy duty cutting.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/saw.rsi
     state: electric
   - type: Item
+    size: Normal
+    sprite: Objects/Specific/Medical/Surgery/saw.rsi
     heldPrefix: electric
   - type: MeleeWeapon
     damage:
@@ -222,13 +327,21 @@
     soundHit:
       path: /Audio/Items/drill_hit.ogg
   - type: Tool
+    qualities:
+      - Sawing
     speedModifier: 1.5
+  - type: BoneSaw
+    speed: 1.5
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - SawElectric
 
 - type: entity
   name: advanced circular saw
   id: SawAdvanced
   parent: [ SawElectric, BaseSyndicateContraband ]
-  description: Interdyne's state-of-the-art surgical saw. Guaranteed to stay spotless and sterile, no matter how messy the job.
+  description: Interdyne's state-of-the-art surgical saw.
   components:
   - type: Sprite
     state: advanced
@@ -237,4 +350,8 @@
   - type: MeleeWeapon
     attackRate: 1.5
   - type: Tool
+    qualities:
+      - Sawing
     speedModifier: 2.0
+  - type: BoneSaw
+    speed: 2

@@ -66,7 +66,7 @@ public sealed partial class DamageableSystem : EntitySystem
 
         // TODO DAMAGE
         // byref struct event.
-        RaiseLocalEvent(ent, new DamageChangedEvent(ent.Comp, damageDelta, interruptsDoAfters, origin));
+        RaiseLocalEvent(ent, new DamageChangedEvent(ent.Comp, damageDelta, interruptsDoAfters, origin, true));
     }
 
     private void DamageableGetState(Entity<DamageableComponent> ent, ref ComponentGetState args)

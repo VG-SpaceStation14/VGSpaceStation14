@@ -1,3 +1,4 @@
+using Content.Shared.Body.Part;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Standing;
@@ -42,6 +43,10 @@ public abstract partial class SharedBodySystem : EntitySystem
 
         InitializeBody();
         InitializeParts();
+        InitializeBkm(); // VG: surgery
+        InitializeOrgans(); // VG: surgery
+        // To try and mitigate the server load due to integrity checks, we set up a Job Queue.
+        InitializePartAppearances();
     }
 
     /// <summary>

@@ -44,6 +44,13 @@
       - Slicing
     useSound:
       path: /Audio/Items/Culinary/chop.ogg
+  - type: Scalpel # VG-Tweak
+    speed: 0.65
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel2.ogg
 
 - type: entity
   parent: BaseKnife

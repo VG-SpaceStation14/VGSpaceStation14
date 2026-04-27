@@ -36,6 +36,11 @@
     sound:
       collection: LasersDrop
   # VG-Tweak End
+  - type: Cautery # _VG
+    speed: 0.9
+  - type: SurgeryTool # VG-Tweak
+    endSound:
+      path: /Audio/Weapons/Guns/Gunshots/laser.ogg
 
 - type: entity
   parent: [BaseWeaponBattery, BaseGunWieldable]
@@ -107,6 +112,11 @@
   - type: ContainerContainer
     containers:
       cell_slot: !type:ContainerSlot
+  - type: Cautery # _VG
+    speed: 0.9
+  - type: SurgeryTool # VG-Tweak
+    endSound:
+      path: /Audio/Weapons/Guns/Gunshots/laser.ogg
 
 - type: entity
   id: BaseWeaponBatterySmall

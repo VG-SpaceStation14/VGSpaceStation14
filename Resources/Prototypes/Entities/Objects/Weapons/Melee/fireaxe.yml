@@ -51,6 +51,13 @@
     stealGroup: FireAxe
   - type: IgniteOnMeleeHit
     fireStacks: -4
+  - type: Scalpel # VG-Tweak
+    speed: 0.3
+  - type: BoneSaw # VG-Tweak
+    speed: 0.5
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/saw.ogg
 
 - type: entity
   id: FireAxeFlaming

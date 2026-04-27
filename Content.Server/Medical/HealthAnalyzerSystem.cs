@@ -1,10 +1,17 @@
+using Content.Server.Body.Components;
 using Content.Server.Medical.Components;
 using Content.Server.PowerCell;
+using Content.Server.Temperature.Components;
+using Content.Server.Traits.Assorted;
+using Content.Shared._VG.Targeting;
 using Content.Shared.Body.Components;
+using Content.Shared.Body.Part;
+using Content.Shared.Body.Systems;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage.Components;
+using Content.Shared.Temperature.Components;
 using Content.Shared.DoAfter;
-using Content.Shared.FixedPoint; // ADT-Tweak
+using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
@@ -13,12 +20,12 @@ using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.MedicalScanner;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Popups;
-using Content.Shared.Temperature.Components;
 using Content.Shared.Traits.Assorted;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Timing;
+using System.Linq;
 
 namespace Content.Server.Medical;
 
@@ -30,6 +37,7 @@ public sealed class HealthAnalyzerSystem : EntitySystem
     [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
     [Dependency] private readonly ItemToggleSystem _toggle = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly SharedBodySystem _bodySystem = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
     [Dependency] private readonly TransformSystem _transformSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
@@ -41,6 +49,11 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         SubscribeLocalEvent<HealthAnalyzerComponent, EntGotInsertedIntoContainerMessage>(OnInsertedIntoContainer);
         SubscribeLocalEvent<HealthAnalyzerComponent, ItemToggledEvent>(OnToggled);
         SubscribeLocalEvent<HealthAnalyzerComponent, DroppedEvent>(OnDropped);
+
+        Subs.BuiEvents<HealthAnalyzerComponent>(HealthAnalyzerUiKey.Key, subs =>
+        {
+            subs.Event<HealthAnalyzerPartMessage>(OnHealthAnalyzerPartSelected);
+        });
     }
 
     public override void Update(float frameTime)
@@ -48,11 +61,10 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         var analyzerQuery = EntityQueryEnumerator<HealthAnalyzerComponent, TransformComponent>();
         while (analyzerQuery.MoveNext(out var uid, out var component, out var transform))
         {
-            //Update rate limited to 1 second
             if (component.NextUpdate > _timing.CurTime)
                 continue;
 
-            if (component.ScannedEntity is not {} patient)
+            if (component.ScannedEntity is not { } patient)
                 continue;
 
             if (Deleted(patient))
@@ -61,25 +73,28 @@ public sealed class HealthAnalyzerSystem : EntitySystem
                 continue;
             }
 
+            if (component.CurrentBodyPart != null
+                && (Deleted(component.CurrentBodyPart)
+                || TryComp(component.CurrentBodyPart, out BodyPartComponent? bodyPartComponent)
+                && bodyPartComponent.Body is null))
+            {
+                BeginAnalyzingEntity((uid, component), patient, null);
+                continue;
+            }
+
             component.NextUpdate = _timing.CurTime + component.UpdateInterval;
 
-            //Get distance between health analyzer and the scanned entity
-            //null is infinite range
             var patientCoordinates = Transform(patient).Coordinates;
             if (component.MaxScanRange != null && !_transformSystem.InRange(patientCoordinates, transform.Coordinates, component.MaxScanRange.Value))
             {
-                //Range too far, disable updates
                 StopAnalyzingEntity((uid, component), patient);
                 continue;
             }
 
-            UpdateScannedUser(uid, patient, true);
+            UpdateScannedUser(uid, patient, true, component.CurrentBodyPart);
         }
     }
 
-    /// <summary>
-    /// Trigger the doafter for scanning
-    /// </summary>
     private void OnAfterInteract(Entity<HealthAnalyzerComponent> uid, ref AfterInteractEvent args)
     {
         if (args.Target == null || !args.CanReach || !HasComp<MobStateComponent>(args.Target) || !_cell.HasDrawCharge(uid, user: args.User))
@@ -113,27 +128,18 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         args.Handled = true;
     }
 
-    /// <summary>
-    /// Turn off when placed into a storage item or moved between slots/hands
-    /// </summary>
     private void OnInsertedIntoContainer(Entity<HealthAnalyzerComponent> uid, ref EntGotInsertedIntoContainerMessage args)
     {
         if (uid.Comp.ScannedEntity is { } patient)
             _toggle.TryDeactivate(uid.Owner);
     }
 
-    /// <summary>
-    /// Disable continuous updates once turned off
-    /// </summary>
     private void OnToggled(Entity<HealthAnalyzerComponent> ent, ref ItemToggledEvent args)
     {
         if (!args.Activated && ent.Comp.ScannedEntity is { } patient)
             StopAnalyzingEntity(ent, patient);
     }
 
-    /// <summary>
-    /// Turn off the analyser when dropped
-    /// </summary>
     private void OnDropped(Entity<HealthAnalyzerComponent> uid, ref DroppedEvent args)
     {
         if (uid.Comp.ScannedEntity is { } patient)
@@ -148,43 +154,42 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         _uiSystem.OpenUi(analyzer, HealthAnalyzerUiKey.Key, user);
     }
 
-    /// <summary>
-    /// Mark the entity as having its health analyzed, and link the analyzer to it
-    /// </summary>
-    /// <param name="healthAnalyzer">The health analyzer that should receive the updates</param>
-    /// <param name="target">The entity to start analyzing</param>
-    private void BeginAnalyzingEntity(Entity<HealthAnalyzerComponent> healthAnalyzer, EntityUid target)
+    private void BeginAnalyzingEntity(Entity<HealthAnalyzerComponent> healthAnalyzer, EntityUid target, EntityUid? part = null)
     {
-        //Link the health analyzer to the scanned entity
         healthAnalyzer.Comp.ScannedEntity = target;
+        healthAnalyzer.Comp.CurrentBodyPart = part;
 
         _toggle.TryActivate(healthAnalyzer.Owner);
-
-        UpdateScannedUser(healthAnalyzer, target, true);
+        UpdateScannedUser(healthAnalyzer, target, true, part);
     }
 
-    /// <summary>
-    /// Remove the analyzer from the active list, and remove the component if it has no active analyzers
-    /// </summary>
-    /// <param name="healthAnalyzer">The health analyzer that's receiving the updates</param>
-    /// <param name="target">The entity to analyze</param>
     private void StopAnalyzingEntity(Entity<HealthAnalyzerComponent> healthAnalyzer, EntityUid target)
     {
-        //Unlink the analyzer
         healthAnalyzer.Comp.ScannedEntity = null;
+        healthAnalyzer.Comp.CurrentBodyPart = null;
 
         _toggle.TryDeactivate(healthAnalyzer.Owner);
-
         UpdateScannedUser(healthAnalyzer, target, false);
     }
 
-    /// <summary>
-    /// Send an update for the target to the healthAnalyzer
-    /// </summary>
-    /// <param name="healthAnalyzer">The health analyzer</param>
-    /// <param name="target">The entity being scanned</param>
-    /// <param name="scanMode">True makes the UI show ACTIVE, False makes the UI show INACTIVE</param>
-    public void UpdateScannedUser(EntityUid healthAnalyzer, EntityUid target, bool scanMode)
+    private void OnHealthAnalyzerPartSelected(Entity<HealthAnalyzerComponent> healthAnalyzer, ref HealthAnalyzerPartMessage args)
+    {
+        if (!TryGetEntity(args.Owner, out var owner))
+            return;
+
+        if (args.BodyPart == null)
+        {
+            BeginAnalyzingEntity(healthAnalyzer, owner.Value, null);
+        }
+        else
+        {
+            var (targetType, targetSymmetry) = _bodySystem.ConvertTargetBodyPart(args.BodyPart.Value);
+            if (_bodySystem.GetBodyChildrenOfType(owner.Value, targetType, symmetry: targetSymmetry) is { } part)
+                BeginAnalyzingEntity(healthAnalyzer, owner.Value, part.FirstOrDefault().Id);
+        }
+    }
+
+    public void UpdateScannedUser(EntityUid healthAnalyzer, EntityUid target, bool scanMode, EntityUid? part = null)
     {
         if (!_uiSystem.HasUi(healthAnalyzer, HealthAnalyzerUiKey.Key))
             return;
@@ -193,7 +198,6 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             return;
 
         var bodyTemperature = float.NaN;
-
         if (TryComp<TemperatureComponent>(target, out var temp))
             bodyTemperature = temp.CurrentTemperature;
 
@@ -212,7 +216,6 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         if (TryComp<UnrevivableComponent>(target, out var unrevivableComp) && unrevivableComp.Analyzable)
             unrevivable = true;
 
-        // ADT-Tweak start: - Get a list of metabolizing chemicals
         List<(string ReagentId, FixedPoint2 Quantity)>? metabolizingReagents = null;
         if (TryComp<BloodstreamComponent>(target, out var bloodstreamComp) &&
             _solutionContainerSystem.TryGetSolution(target, BloodstreamComponent.DefaultChemicalsSolutionName, out _, out var chemicalsSolution))
@@ -223,7 +226,10 @@ public sealed class HealthAnalyzerSystem : EntitySystem
                 metabolizingReagents.Add((reagent.Prototype, quantity));
             }
         }
-        // ADT-Tweak end
+
+        Dictionary<TargetBodyPart, TargetIntegrity>? body = null;
+        if (HasComp<TargetingComponent>(target))
+            body = _bodySystem.GetBodyPartStatus(target);
 
         _uiSystem.ServerSendUiMessage(healthAnalyzer, HealthAnalyzerUiKey.Key, new HealthAnalyzerScannedUserMessage(
             GetNetEntity(target),
@@ -232,7 +238,9 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             scanMode,
             bleeding,
             unrevivable,
-            metabolizingReagents // ADT-Tweak - add metabolizing chemicals to ui message
+            metabolizingReagents,
+            body,
+            part != null ? GetNetEntity(part) : null
         ));
     }
 }

@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
-using Content.Server._CorvaxNext.Speech.Components;
+using Content.Server._VG.Speech.Components;
 using Content.Shared.Speech;
 using Robust.Shared.Random;
 
-namespace Content.Server._CorvaxNext.Speech.EntitySystems;
+namespace Content.Server._VG.Speech.EntitySystems;
 
 public sealed class ResomiAccentSystem : EntitySystem
 {

@@ -254,6 +254,20 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(EngineKeyFunctions.EscapeMenu);
             AddButton(ContentKeyFunctions.EscapeContext);
 
+            // start-_VG: surgery
+            AddHeader("ui-options-header-targeting");
+            AddButton(ContentKeyFunctions.TargetHead);
+            AddButton(ContentKeyFunctions.TargetTorso);
+            AddButton(ContentKeyFunctions.TargetLeftArm);
+            AddButton(ContentKeyFunctions.TargetLeftHand);
+            AddButton(ContentKeyFunctions.TargetRightArm);
+            AddButton(ContentKeyFunctions.TargetRightHand);
+            AddButton(ContentKeyFunctions.TargetLeftLeg);
+            AddButton(ContentKeyFunctions.TargetLeftFoot);
+            AddButton(ContentKeyFunctions.TargetRightLeg);
+            AddButton(ContentKeyFunctions.TargetRightFoot);
+            // end-_VG: surgery
+
             AddHeader("ui-options-header-misc");
             AddButton(ContentKeyFunctions.TakeScreenshot);
             AddButton(ContentKeyFunctions.TakeScreenshotNoUI);

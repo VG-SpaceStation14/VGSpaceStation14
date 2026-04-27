@@ -95,6 +95,12 @@ namespace Content.Client.Input
             human.AddFunction(ContentKeyFunctions.OfferItem); // ADT-Tweak
             human.AddFunction(ContentKeyFunctions.PickupHumans); // ADT-Tweak
             human.AddFunction(ContentKeyFunctions.TogglePosing); // ADT-Tweak
+            human.AddFunction(ContentKeyFunctions.TargetHead); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.TargetTorso); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.TargetLeftArm); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.TargetRightArm); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.TargetLeftLeg); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.TargetRightLeg); // CorvaxNext: surgery
 
             // actions should be common (for ghosts, mobs, etc)
             common.AddFunction(ContentKeyFunctions.OpenActionsMenu);

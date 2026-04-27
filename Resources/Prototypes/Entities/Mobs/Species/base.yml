@@ -195,6 +195,8 @@
         type: HumanoidMarkingModifierBoundUserInterface
       enum.StrippingUiKey.Key:
         type: StrippableBoundUserInterface
+      enum.SurgeryUIKey.Key: # _VG: surgery
+        type: SurgeryBui
       # Goobstation - changelings & heretics
       enum.StoreUiKey.Key:
         type: StoreBoundUserInterface
@@ -232,6 +234,8 @@
   - type: SpeechBarks
   - type: Posing
   # ADT tweak end
+  - type: Targeting # VG-Tweak
+  - type: SurgeryTarget # VG-Tweak
 
 - type: entity
   save: false
@@ -250,6 +254,7 @@
   - type: PickupHumans # ADT-Tweak
   - type: Mood # VG-Tweak
   - type: CritHeartbeat # VG-Tweak
+  - type: Targeting # VG-Tweak
   - type: Barotrauma
     damage:
       types:

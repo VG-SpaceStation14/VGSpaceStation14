@@ -3,8 +3,9 @@ using System.Numerics;
 using Content.Client.Message;
 using Content.Shared.Atmos;
 using Content.Client.UserInterface.Controls;
-using Content.Shared.Chemistry.Reagent; // ADT-Tweak
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Alert;
+using Content.Shared._VG.Targeting;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
@@ -33,13 +34,20 @@ namespace Content.Client.HealthAnalyzer.UI
     [GenerateTypedNameReferences]
     public sealed partial class HealthAnalyzerWindow : FancyWindow
     {
-        private static readonly Color Green = Color.FromHex("#00FF00"); // ADT-Tweak
-        private static readonly Color Red = Color.FromHex("#FF0000"); // ADT-Tweak
+        private static readonly Color Green = Color.FromHex("#00FF00");
+        private static readonly Color Red = Color.FromHex("#FF0000");
 
         private readonly IEntityManager _entityManager;
         private readonly SpriteSystem _spriteSystem;
         private readonly IPrototypeManager _prototypes;
         private readonly IResourceCache _cache;
+
+        private EntityUid _spriteViewEntity;
+        private readonly EntProtoId _bodyView = "AlertSpriteView";
+        private readonly Dictionary<TargetBodyPart, TextureButton> _bodyPartControls;
+        private EntityUid? _target;
+
+        public event Action<TargetBodyPart?, EntityUid>? OnBodyPartSelected;
 
         public HealthAnalyzerWindow()
         {
@@ -50,22 +58,74 @@ namespace Content.Client.HealthAnalyzer.UI
             _spriteSystem = _entityManager.System<SpriteSystem>();
             _prototypes = dependencies.Resolve<IPrototypeManager>();
             _cache = dependencies.Resolve<IResourceCache>();
+
+            _bodyPartControls = new Dictionary<TargetBodyPart, TextureButton>
+            {
+                { TargetBodyPart.Head, HeadButton },
+                { TargetBodyPart.Torso, ChestButton },
+                { TargetBodyPart.Groin, GroinButton },
+                { TargetBodyPart.LeftArm, LeftArmButton },
+                { TargetBodyPart.LeftHand, LeftHandButton },
+                { TargetBodyPart.RightArm, RightArmButton },
+                { TargetBodyPart.RightHand, RightHandButton },
+                { TargetBodyPart.LeftLeg, LeftLegButton },
+                { TargetBodyPart.LeftFoot, LeftFootButton },
+                { TargetBodyPart.RightLeg, RightLegButton },
+                { TargetBodyPart.RightFoot, RightFootButton },
+            };
+
+            foreach (var bodyPartButton in _bodyPartControls)
+            {
+                bodyPartButton.Value.MouseFilter = MouseFilterMode.Stop;
+                bodyPartButton.Value.OnPressed += _ => SetActiveBodyPart(bodyPartButton.Key, bodyPartButton.Value);
+            }
+            ReturnButton.OnPressed += _ => ResetBodyPart();
+        }
+
+        public void SetActiveBodyPart(TargetBodyPart part, TextureButton button)
+        {
+            if (_target == null)
+                return;
+            OnBodyPartSelected?.Invoke(part == TargetBodyPart.Groin ? TargetBodyPart.Torso : part, _target.Value);
+        }
+
+        public void ResetBodyPart()
+        {
+            if (_target == null)
+                return;
+            OnBodyPartSelected?.Invoke(null, _target.Value);
+        }
+
+        public void SetActiveButtons(bool isHumanoid)
+        {
+            foreach (var button in _bodyPartControls)
+                button.Value.Visible = isHumanoid;
         }
 
         public void Populate(HealthAnalyzerScannedUserMessage msg)
         {
-            var target = _entityManager.GetEntity(msg.TargetEntity);
+            _target = _entityManager.GetEntity(msg.TargetEntity);
+            EntityUid? part = msg.Part != null ? _entityManager.GetEntity(msg.Part.Value) : null;
+            var isPart = part != null;
 
-            if (target == null
-                || !_entityManager.TryGetComponent<DamageableComponent>(target, out var damageable))
+            if (_target == null
+                || !_entityManager.TryGetComponent<DamageableComponent>(isPart ? part : _target, out var damageable))
             {
                 NoPatientDataText.Visible = true;
                 return;
             }
 
-            NoPatientDataText.Visible = false;
+            SetActiveButtons(_entityManager.HasComponent<TargetingComponent>(_target.Value));
 
-            // Scan Mode
+            ReturnButton.Visible = isPart;
+            PartNameLabel.Visible = isPart;
+
+            if (part != null)
+                PartNameLabel.Text = _entityManager.HasComponent<MetaDataComponent>(part)
+                    ? Identity.Name(part.Value, _entityManager)
+                    : Loc.GetString("health-analyzer-window-entity-unknown-value-text");
+
+            NoPatientDataText.Visible = false;
 
             ScanModeLabel.Text = msg.ScanMode.HasValue
                 ? msg.ScanMode.Value
@@ -75,52 +135,44 @@ namespace Content.Client.HealthAnalyzer.UI
 
             ScanModeLabel.FontColorOverride = msg.ScanMode.HasValue && msg.ScanMode.Value ? Color.Green : Color.Red;
 
-            // Patient Information
-
-            SpriteView.SetEntity(target.Value);
+            SpriteView.SetEntity(SetupIcon(msg.Body) ?? _target.Value);
             SpriteView.Visible = msg.ScanMode.HasValue && msg.ScanMode.Value;
+            PartView.Visible = SpriteView.Visible;
             NoDataTex.Visible = !SpriteView.Visible;
 
             var name = new FormattedMessage();
             name.PushColor(Color.White);
-            name.AddText(_entityManager.HasComponent<MetaDataComponent>(target.Value)
-                ? Identity.Name(target.Value, _entityManager)
+            name.AddText(_entityManager.HasComponent<MetaDataComponent>(_target.Value)
+                ? Identity.Name(_target.Value, _entityManager)
                 : Loc.GetString("health-analyzer-window-entity-unknown-text"));
             NameLabel.SetMessage(name);
 
             SpeciesLabel.Text =
-                _entityManager.TryGetComponent<HumanoidAppearanceComponent>(target.Value,
-                    out var humanoidAppearanceComponent)
+                _entityManager.TryGetComponent<HumanoidAppearanceComponent>(_target.Value, out var humanoidAppearanceComponent)
                     ? Loc.GetString(_prototypes.Index<SpeciesPrototype>(humanoidAppearanceComponent.Species).Name)
                     : Loc.GetString("health-analyzer-window-entity-unknown-species-text");
-
-            // Basic Diagnostic
 
             TemperatureLabel.Text = !float.IsNaN(msg.Temperature)
                 ? $"{msg.Temperature - Atmospherics.T0C:F1} °C ({msg.Temperature:F1} K)"
                 : Loc.GetString("health-analyzer-window-entity-unknown-value-text");
 
-            // ADT-Tweak start: - blood level color gradient and exclaimation marks to show severity
+            // ADT-Tweak: blood color gradient
             if (!float.IsNaN(msg.BloodLevel))
             {
                 var bloodPercent = msg.BloodLevel;
-                var exclamations = bloodPercent switch {
-                  <= 0f => "!!!!",
-                  <= 0.25f => "!!!",
-                  <= 0.5f => "!!",
-                  <= 0.75f => "!",
-                  _ => ""
+                var exclamations = bloodPercent switch
+                {
+                    <= 0f => "!!!!",
+                    <= 0.25f => "!!!",
+                    <= 0.5f => "!!",
+                    <= 0.75f => "!",
+                    _ => ""
                 };
-
                 BloodLabel.Text = $"{bloodPercent * 100:F1}%{exclamations}";
-
-                // Color gradient: Goes from green at 100% to red at 50% then stays red.
                 var clampedPercent = Math.Max(bloodPercent, 0.5f);
                 var scaled = (clampedPercent - 0.5f) / 0.5f;
-
                 BloodLabel.FontColorOverride = Color.InterpolateBetween(Red, Green, scaled);
             }
-            // ADT-Tweak end
             else
             {
                 BloodLabel.Text = Loc.GetString("health-analyzer-window-entity-unknown-value-text");
@@ -128,18 +180,13 @@ namespace Content.Client.HealthAnalyzer.UI
             }
 
             StatusLabel.Text =
-                _entityManager.TryGetComponent<MobStateComponent>(target.Value, out var mobStateComponent)
+                _entityManager.TryGetComponent<MobStateComponent>(_target.Value, out var mobStateComponent)
                     ? GetStatus(mobStateComponent.CurrentState)
                     : Loc.GetString("health-analyzer-window-entity-unknown-text");
 
-            // Total Damage
-
             DamageLabel.Text = damageable.TotalDamage.ToString();
 
-            // Alerts
-
             var showAlerts = msg.Unrevivable == true || msg.Bleeding == true;
-
             AlertsDivider.Visible = showAlerts;
             AlertsContainer.Visible = showAlerts;
 
@@ -162,19 +209,14 @@ namespace Content.Client.HealthAnalyzer.UI
                     MaxWidth = 300
                 });
 
-            // Damage Groups
-
             IReadOnlyDictionary<string, FixedPoint2> damagePerType = damageable.Damage.DamageDict;
-            // ADT-Tweak start
             var groupOrder = new List<string> { "Burn", "Brute", "Airloss", "Toxin", "Genetic" };
             var sortedGroups = damageable.DamagePerGroup
                 .OrderBy(g => groupOrder.IndexOf(g.Key))
                 .ToDictionary(g => g.Key, g => g.Value);
 
             DrawDiagnosticGroups(sortedGroups, damagePerType);
-
             DrawMetabolizingChemicals(msg.MetabolizingReagents);
-            // ADT-Tweak end
         }
 
         private static string GetStatus(MobState mobState)
@@ -187,79 +229,39 @@ namespace Content.Client.HealthAnalyzer.UI
                 _ => Loc.GetString("health-analyzer-window-entity-unknown-text"),
             };
         }
-        
-        // ADT-Tweak start: - Draw Damage Groups in a vertical list with standard font
-        private void DrawDiagnosticGroups(
-            Dictionary<string, FixedPoint2> groups,
-            IReadOnlyDictionary<string, FixedPoint2> damageDict)
+
+        // ADT-Tweak: Diagnostic Groups
+        private void DrawDiagnosticGroups(Dictionary<string, FixedPoint2> groups, IReadOnlyDictionary<string, FixedPoint2> damageDict)
         {
             GroupsContainer.RemoveAllChildren();
-
-            // Растягиваем контейнер на всю ширину
             GroupsContainer.HorizontalExpand = true;
-            
-            // Вертикальный список для групп повреждений
+
             var listContainer = new BoxContainer
             {
                 Orientation = BoxContainer.LayoutOrientation.Vertical,
                 HorizontalExpand = true,
                 SeparationOverride = 4,
             };
-
             GroupsContainer.AddChild(listContainer);
 
             foreach (var (damageGroupId, damageAmount) in groups)
             {
-                // Пропускаем группы без урона
                 if (damageAmount <= 0)
                     continue;
-                    
-                var groupTitleText = $"{Loc.GetString(
-                    "health-analyzer-window-damage-group-text",
-                    ("damageGroup", _prototypes.Index<DamageGroupPrototype>(damageGroupId).LocalizedName),
-                    ("amount", damageAmount)
-                )}";
 
-                // Создаём блок для группы
-                var groupBox = new PanelContainer
-                {
-                    Margin = new Thickness(2),
-                    HorizontalExpand = true,
-                };
+                var groupTitleText = $"{Loc.GetString("health-analyzer-window-damage-group-text", ("damageGroup", _prototypes.Index<DamageGroupPrototype>(damageGroupId).LocalizedName), ("amount", damageAmount))}";
 
-                groupBox.PanelOverride = new StyleBoxFlat
-                {
-                    BorderColor = Color.Gray,
-                    BorderThickness = new Thickness(1),
-                    ContentMarginLeftOverride = 4,
-                    ContentMarginRightOverride = 4,
-                    ContentMarginTopOverride = 4,
-                    ContentMarginBottomOverride = 4,
-                };
+                var groupBox = new PanelContainer { Margin = new Thickness(2), HorizontalExpand = true };
+                groupBox.PanelOverride = new StyleBoxFlat { BorderColor = Color.Gray, BorderThickness = new Thickness(1), ContentMarginLeftOverride = 4, ContentMarginRightOverride = 4, ContentMarginTopOverride = 4, ContentMarginBottomOverride = 4 };
 
-                var groupContainer = new BoxContainer
-                {
-                    Align = BoxContainer.AlignMode.Begin,
-                    Orientation = BoxContainer.LayoutOrientation.Vertical,
-                    HorizontalExpand = true,
-                };
+                var groupContainer = new BoxContainer { Align = BoxContainer.AlignMode.Begin, Orientation = BoxContainer.LayoutOrientation.Vertical, HorizontalExpand = true };
+                groupContainer.AddChild(CreateDiagnosticGroupTitleRow(groupTitleText, (float)damageAmount, damageGroupId));
 
-                // Заголовок группы с иконкой
-                var titleRow = CreateDiagnosticGroupTitleRow(groupTitleText, (float)damageAmount, damageGroupId);
-                groupContainer.AddChild(titleRow);
-
-                // Разделитель
-                var divider = new PanelContainer
-                {
-                    MinHeight = 1,
-                    Margin = new Thickness(0, 0, 0, 4),
-                    HorizontalExpand = true,
-                };
+                var divider = new PanelContainer { MinHeight = 1, Margin = new Thickness(0, 0, 0, 4), HorizontalExpand = true };
                 divider.PanelOverride = new StyleBoxFlat(Color.Gray);
                 groupContainer.AddChild(divider);
 
                 var group = _prototypes.Index<DamageGroupPrototype>(damageGroupId);
-
                 foreach (var type in group.DamageTypes)
                 {
                     if (!damageDict.TryGetValue(type, out var typeAmount) || typeAmount <= 0)
@@ -268,39 +270,10 @@ namespace Content.Client.HealthAnalyzer.UI
                     var damageTypeName = _prototypes.Index<DamageTypePrototype>(type).LocalizedName;
                     var typeId = type.ToString().ToLowerInvariant();
 
-                    var damageRow = new BoxContainer
-                    {
-                        Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                        Margin = new Thickness(0, 2),
-                        HorizontalExpand = true,
-                    };
-
-                    // Иконка типа повреждения
-                    damageRow.AddChild(new TextureRect
-                    {
-                        SetSize = new Vector2(15, 15),
-                        Texture = GetTexture(typeId),
-                        Margin = new Thickness(0, 0, 4, 0),
-                        VerticalAlignment = VAlignment.Center,
-                    });
-
-                    // Название типа (стандартный шрифт)
-                    var typeLabel = new Label
-                    {
-                        Text = damageTypeName,
-                        HorizontalExpand = true,
-                        HorizontalAlignment = HAlignment.Left,
-                    };
-
-                    // Значение урона (стандартный шрифт)
-                    var amountLabel = new Label
-                    {
-                        Text = typeAmount.ToString(),
-                        HorizontalAlignment = HAlignment.Right,
-                    };
-
-                    damageRow.AddChild(typeLabel);
-                    damageRow.AddChild(amountLabel);
+                    var damageRow = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, Margin = new Thickness(0, 2), HorizontalExpand = true };
+                    damageRow.AddChild(new TextureRect { SetSize = new Vector2(15, 15), Texture = GetTexture(typeId), Margin = new Thickness(0, 0, 4, 0), VerticalAlignment = VAlignment.Center });
+                    damageRow.AddChild(new Label { Text = damageTypeName, HorizontalExpand = true, HorizontalAlignment = HAlignment.Left });
+                    damageRow.AddChild(new Label { Text = typeAmount.ToString(), HorizontalAlignment = HAlignment.Right });
                     groupContainer.AddChild(damageRow);
                 }
 
@@ -309,135 +282,97 @@ namespace Content.Client.HealthAnalyzer.UI
             }
         }
 
-        // Metabolizing chemicals display
         private void DrawMetabolizingChemicals(List<(string ReagentId, FixedPoint2 Quantity)>? reagents)
         {
             ChemicalsContainer.RemoveAllChildren();
-
             var hasChemicals = reagents != null && reagents.Count > 0;
-
             ChemicalsDivider.Visible = hasChemicals;
             ChemicalsContainer.Visible = hasChemicals;
 
             if (!hasChemicals || reagents == null)
                 return;
 
-            // Растягиваем контейнер на всю ширину
             ChemicalsContainer.HorizontalExpand = true;
-
-            // Sort by quantity descending
             var sortedReagents = reagents.OrderByDescending(r => r.Quantity).ToList();
 
             foreach (var reagent in sortedReagents)
             {
                 var reagentName = reagent.ReagentId;
                 var reagentColor = Color.White;
-
                 if (_prototypes.TryIndex<ReagentPrototype>(reagent.ReagentId, out var reagentProto))
                 {
                     reagentName = reagentProto.LocalizedName;
                     reagentColor = reagentProto.SubstanceColor;
                 }
 
-                var rowContainer = new BoxContainer
-                {
-                    Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                    Margin = new Thickness(0, 2),
-                    HorizontalExpand = true,
-                };
-
-                // Color bar
-                var colorBar = new PanelContainer
-                {
-                    MinWidth = 10,
-                    MinHeight = 16,
-                    Margin = new Thickness(0, 0, 6, 0),
-                };
+                var rowContainer = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, Margin = new Thickness(0, 2), HorizontalExpand = true };
+                var colorBar = new PanelContainer { MinWidth = 10, MinHeight = 16, Margin = new Thickness(0, 0, 6, 0) };
                 colorBar.PanelOverride = new StyleBoxFlat(reagentColor);
-
-                var nameLabel = new Label
-                {
-                    Text = reagentName,
-                    HorizontalExpand = true,
-                    HorizontalAlignment = HAlignment.Left,
-                };
-
-                var quantityLabel = new Label
-                {
-                    Text = $"{reagent.Quantity}u",
-                    HorizontalAlignment = HAlignment.Right,
-                };
-
                 rowContainer.AddChild(colorBar);
-                rowContainer.AddChild(nameLabel);
-                rowContainer.AddChild(quantityLabel);
+                rowContainer.AddChild(new Label { Text = reagentName, HorizontalExpand = true, HorizontalAlignment = HAlignment.Left });
+                rowContainer.AddChild(new Label { Text = $"{reagent.Quantity}u", HorizontalAlignment = HAlignment.Right });
                 ChemicalsContainer.AddChild(rowContainer);
             }
         }
-        // ADT-Tweak end
 
         private Texture GetTexture(string texture)
         {
-            var rsiPath = new ResPath("/Textures/ADT/Objects/Devices/health_analyzer.rsi"); // ADT-Tweak - new rsi for new icons :)
+            var rsiPath = new ResPath("/Textures/ADT/Objects/Devices/health_analyzer.rsi");
             var rsiSprite = new SpriteSpecifier.Rsi(rsiPath, texture);
-
             var rsi = _cache.GetResource<RSIResource>(rsiSprite.RsiPath).RSI;
             if (!rsi.TryGetState(rsiSprite.RsiState, out var state))
-            {
                 rsiSprite = new SpriteSpecifier.Rsi(rsiPath, "unknown");
-            }
-
             return _spriteSystem.Frame0(rsiSprite);
         }
 
-        // ADT-Tweak start: - damage group titles get a color gradient and exclamations to indicate severity
         private BoxContainer CreateDiagnosticGroupTitleRow(string text, float damageAmount, string damageGroupId)
         {
-            // Color gradient: green (0) -> red (100+)
             var clampedDamage = Math.Min(damageAmount, 100f);
             var damagePercent = clampedDamage / 100f;
-
             var titleColor = Color.InterpolateBetween(Green, Red, damagePercent);
 
-            var exclamations = damageAmount switch {
+            var exclamations = damageAmount switch
+            {
                 > 200f => " !!!!",
                 > 100f => " !!!",
                 > 75f => " !!",
                 > 50f => " !",
                 _ => ""
             };
-            
-            var titleRow = new BoxContainer
-            {
-                Orientation = BoxContainer.LayoutOrientation.Horizontal,
-                Margin = new Thickness(0, 0, 0, 4),
-                HorizontalExpand = true,
-            };
 
-            var groupId = damageGroupId.ToLowerInvariant();
-
-            // Add damage group icon
-            titleRow.AddChild(new TextureRect
-            {
-                SetSize = new Vector2(15, 15),
-                Texture = GetTexture(groupId),
-                Margin = new Thickness(0, 0, 4, 0),
-                VerticalAlignment = VAlignment.Center,
-            });
-
-            // Название группы (стандартный шрифт, без FontSizeOverride)
-            var titleLabel = new Label
-            {
-                Text = text + exclamations,
-                HorizontalExpand = true,
-                HorizontalAlignment = HAlignment.Left,
-                FontColorOverride = titleColor,
-            };
-
-            titleRow.AddChild(titleLabel);
-
+            var titleRow = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, Margin = new Thickness(0, 0, 0, 4), HorizontalExpand = true };
+            titleRow.AddChild(new TextureRect { SetSize = new Vector2(15, 15), Texture = GetTexture(damageGroupId.ToLowerInvariant()), Margin = new Thickness(0, 0, 4, 0), VerticalAlignment = VAlignment.Center });
+            titleRow.AddChild(new Label { Text = text + exclamations, HorizontalExpand = true, HorizontalAlignment = HAlignment.Left, FontColorOverride = titleColor });
             return titleRow;
         }
-        // ADT-Tweak end
+
+        private EntityUid? SetupIcon(Dictionary<TargetBodyPart, TargetIntegrity>? body)
+        {
+            if (body is null)
+                return null;
+
+            if (!_entityManager.Deleted(_spriteViewEntity))
+                _entityManager.QueueDeleteEntity(_spriteViewEntity);
+
+            _spriteViewEntity = _entityManager.Spawn(_bodyView);
+
+            if (!_entityManager.TryGetComponent<SpriteComponent>(_spriteViewEntity, out var sprite))
+                return null;
+
+            int layer = 0;
+            foreach (var (bodyPart, integrity) in body)
+            {
+                string enumName = Enum.GetName(typeof(TargetBodyPart), bodyPart) ?? "Unknown";
+                int enumValue = (int)integrity;
+                var rsi = new SpriteSpecifier.Rsi(new ResPath($"/Textures/_VG/Interface/Targeting/Status/{enumName.ToLowerInvariant()}.rsi"), $"{enumName.ToLowerInvariant()}_{enumValue}");
+                if (!sprite.TryGetLayer(layer, out _))
+                    sprite.AddLayer(_spriteSystem.Frame0(rsi));
+                else
+                    sprite.LayerSetTexture(layer, _spriteSystem.Frame0(rsi));
+                sprite.LayerSetScale(layer, new Vector2(3f, 3f));
+                layer++;
+            }
+            return _spriteViewEntity;
+        }
     }
 }

@@ -96,6 +96,13 @@
     - ADTLighter
   # ADT Tweak END
   - type: PhysicalComposition
+  - type: Cautery # _VG
+    speed: 0.45
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      collection: lighterOnSounds
+    endSound:
+      collection: lighterOffSounds
 
 - type: entity
   name: cheap lighter

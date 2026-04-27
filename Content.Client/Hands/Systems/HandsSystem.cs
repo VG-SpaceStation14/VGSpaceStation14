@@ -4,6 +4,8 @@ using Content.Client.DisplacementMap;
 using Content.Client.Examine;
 using Content.Client.Strip;
 using Content.Client.Verbs.UI;
+using Content.Shared._VG.Surgery.Body.Events;
+using Content.Shared.Body.Part;
 using Content.Shared.Hands;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -49,6 +51,8 @@ namespace Content.Client.Hands.Systems
             SubscribeLocalEvent<HandsComponent, ComponentShutdown>(OnHandsShutdown);
             SubscribeLocalEvent<HandsComponent, ComponentHandleState>(HandleComponentState);
             SubscribeLocalEvent<HandsComponent, VisualsChangedEvent>(OnVisualsChanged);
+            SubscribeLocalEvent<HandsComponent, Content.Shared._VG.Surgery.Body.Events.BodyPartRemovedEvent>(HandleBodyPartRemoved);
+            SubscribeLocalEvent<HandsComponent, Content.Shared._VG.Surgery.Body.Events.BodyPartDisabledEvent>(HandleBodyPartDisabled);
 
             OnHandSetActive += OnHandActivated;
         }
@@ -59,8 +63,8 @@ namespace Content.Client.Hands.Systems
             if (args.Current is not HandsComponentState state)
                 return;
 
-            var newHands = state.Hands.Keys.Except(ent.Comp.Hands.Keys); // hands that were added between states
-            var oldHands = ent.Comp.Hands.Keys.Except(state.Hands.Keys); // hands that were removed between states
+            var newHands = state.Hands.Keys.Except(ent.Comp.Hands.Keys);
+            var oldHands = ent.Comp.Hands.Keys.Except(state.Hands.Keys);
 
             foreach (var handId in oldHands)
             {
@@ -105,9 +109,6 @@ namespace Content.Client.Hands.Systems
             return TryGetPlayerHands(out var hands) ? GetActiveItem(hands.Value.AsNullable()) : null;
         }
 
-        /// <summary>
-        ///     Get the hands component of the local player
-        /// </summary>
         public bool TryGetPlayerHands([NotNullWhen(true)] out Entity<HandsComponent>? hands)
         {
             var player = _playerManager.LocalEntity;
@@ -119,9 +120,6 @@ namespace Content.Client.Hands.Systems
             return true;
         }
 
-        /// <summary>
-        ///     Called when a user clicked on their hands GUI
-        /// </summary>
         public void UIHandClick(Entity<HandsComponent> ent, string handName)
         {
             var hands = ent.Comp;
@@ -133,37 +131,28 @@ namespace Content.Client.Hands.Systems
 
             if (handName == hands.ActiveHandId && activeEntity != null)
             {
-                // use item in hand
-                // it will always be attack_self() in my heart.
                 RaisePredictiveEvent(new RequestUseInHandEvent());
                 return;
             }
 
             if (handName != hands.ActiveHandId && pressedEntity == null)
             {
-                // change active hand
                 RaisePredictiveEvent(new RequestSetHandEvent(handName));
                 return;
             }
 
             if (handName != hands.ActiveHandId && pressedEntity != null && activeEntity != null)
             {
-                // use active item on held item
                 RaisePredictiveEvent(new RequestHandInteractUsingEvent(handName));
                 return;
             }
 
             if (handName != hands.ActiveHandId && pressedEntity != null && activeEntity == null)
             {
-                // move the item to the active hand
                 RaisePredictiveEvent(new RequestMoveHandItemEvent(handName));
             }
         }
 
-        /// <summary>
-        ///     Called when a user clicks on the little "activation" icon in the hands GUI. This is currently only used
-        ///     by storage (backpacks, etc).
-        /// </summary>
         public void UIHandActivate(string handName)
         {
             RaisePredictiveEvent(new RequestActivateInHandEvent(handName));
@@ -180,10 +169,6 @@ namespace Content.Client.Hands.Systems
             _examine.DoExamine(heldEntity.Value);
         }
 
-        /// <summary>
-        ///     Called when a user clicks on the little "activation" icon in the hands GUI. This is currently only used
-        ///     by storage (backpacks, etc).
-        /// </summary>
         public void UIHandOpenContextMenu(string handName)
         {
             if (!TryGetPlayerHands(out var hands) ||
@@ -199,6 +184,38 @@ namespace Content.Client.Hands.Systems
         {
             RaisePredictiveEvent(new RequestHandAltInteractEvent(handName));
         }
+
+        #region surgery
+
+        private void HideLayers(EntityUid uid, HandsComponent component, Entity<BodyPartComponent> part, SpriteComponent? sprite = null)
+        {
+            if (part.Comp.PartType != BodyPartType.Hand || !Resolve(uid, ref sprite, logMissing: false))
+                return;
+
+            var location = part.Comp.Symmetry switch
+            {
+                BodyPartSymmetry.None => HandLocation.Middle,
+                BodyPartSymmetry.Left => HandLocation.Left,
+                BodyPartSymmetry.Right => HandLocation.Right,
+                _ => throw new ArgumentOutOfRangeException(nameof(part.Comp.Symmetry))
+            };
+
+            if (component.RevealedLayers.TryGetValue(location, out var revealedLayers))
+            {
+                foreach (var key in revealedLayers)
+                    _sprite.RemoveLayer((uid, sprite), key);
+
+                revealedLayers.Clear();
+            }
+        }
+
+        private void HandleBodyPartRemoved(EntityUid uid, HandsComponent component, ref Content.Shared._VG.Surgery.Body.Events.BodyPartRemovedEvent args)
+            => HideLayers(uid, component, args.Part);
+
+        private void HandleBodyPartDisabled(EntityUid uid, HandsComponent component, ref Content.Shared._VG.Surgery.Body.Events.BodyPartDisabledEvent args)
+            => HideLayers(uid, component, args.Part);
+
+        #endregion
 
         #region visuals
 
@@ -240,9 +257,6 @@ namespace Content.Client.Hands.Systems
                 OnPlayerHandUnblocked?.Invoke(args.Container.ID);
         }
 
-        /// <summary>
-        ///     Update the players sprite with new in-hand visuals.
-        /// </summary>
         private void UpdateHandVisuals(Entity<HandsComponent?, SpriteComponent?> ent, EntityUid held, string handId)
         {
             if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2, false))
@@ -253,15 +267,12 @@ namespace Content.Client.Hands.Systems
             if (!TryGetHand((ent, handComp), handId, out var hand))
                 return;
 
-            // visual update might involve changes to the entity's effective sprite -> need to update hands GUI.
             if (ent == _playerManager.LocalEntity)
                 OnPlayerItemAdded?.Invoke(handId, held);
 
             if (!handComp.ShowInHands)
                 return;
 
-            // Remove old layers. We could also just set them to invisible, but as items may add arbitrary layers, this
-            // may eventually bloat the player with lots of layers.
             if (handComp.RevealedLayers.TryGetValue(hand.Value.Location, out var revealedLayers))
             {
                 foreach (var key in revealedLayers)
@@ -279,7 +290,6 @@ namespace Content.Client.Hands.Systems
 
             if (HandIsEmpty((ent, handComp), handId))
             {
-                // the held item was removed.
                 RaiseLocalEvent(held, new HeldVisualsUpdatedEvent(ent, revealedLayers), true);
                 return;
             }
@@ -293,7 +303,6 @@ namespace Content.Client.Hands.Systems
                 return;
             }
 
-            // add the new layers
             foreach (var (key, layerData) in ev.Layers)
             {
                 if (!revealedLayers.Add(key))
@@ -304,7 +313,6 @@ namespace Content.Client.Hands.Systems
 
                 var index = _sprite.LayerMapReserve((ent, sprite), key);
 
-                // In case no RSI is given, use the item's base RSI as a default. This cuts down on a lot of unnecessary yaml entries.
                 if (layerData.RsiPath == null
                     && layerData.TexturePath == null
                     && sprite[index].Rsi == null)
@@ -318,14 +326,12 @@ namespace Content.Client.Hands.Systems
                 _sprite.LayerSetData((ent, sprite), index, layerData);
 
                 // ADT-Tweak start
-                // Apply in-hand item scale if defined
                 if (handComp.InHandItemScale is { } scale)
                 {
                     _sprite.LayerSetScale((ent, sprite), index, scale);
                 }
                 // ADT-Tweak end
 
-                // Add displacement maps
                 var displacement = hand.Value.Location switch
                 {
                     HandLocation.Left => handComp.LeftHandDisplacement,
@@ -342,7 +348,6 @@ namespace Content.Client.Hands.Systems
 
         private void OnVisualsChanged(EntityUid uid, HandsComponent component, VisualsChangedEvent args)
         {
-            // update hands visuals if this item is in a hand (rather then inventory or other container).
             if (!component.Hands.ContainsKey(args.ContainerId))
                 return;
             UpdateHandVisuals((uid, component), GetEntity(args.Item), args.ContainerId);

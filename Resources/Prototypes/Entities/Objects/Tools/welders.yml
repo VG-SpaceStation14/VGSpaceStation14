@@ -113,6 +113,13 @@
     price: 40
   - type: IgnitionSource
     temperature: 700
+  - type: Cautery # _VG
+    speed: 0.7
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      collection: Welder
+    endSound:
+      collection: WelderOff
 
 - type: entity
   name: industrial welding tool

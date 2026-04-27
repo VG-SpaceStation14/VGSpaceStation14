@@ -5,6 +5,7 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Radiation.Events;
 using Content.Shared.Rejuvenate;
+using Content.Shared._VG.Targeting; // Added for TargetBodyPart
 using Robust.Shared.GameStates;
 
 namespace Content.Shared.Damage.Systems;
@@ -203,11 +204,32 @@ public sealed partial class DamageableSystem
     }
 }
 
+// ========== EVENTS ==========
+
 /// <summary>
 ///     Raised before damage is done, so stuff can cancel it if necessary.
 /// </summary>
 [ByRefEvent]
-public record struct BeforeDamageChangedEvent(DamageSpecifier Damage, EntityUid? Origin = null, bool Cancelled = false);
+public record struct BeforeDamageChangedEvent(
+    DamageSpecifier Damage,
+    EntityUid? Origin = null,
+    TargetBodyPart? TargetPart = null,
+    bool CanEvade = false,
+    bool Cancelled = false);
+
+/// <summary>
+///     CorvaxNext: surgery - Raised on parts before damage is done so we can cancel the damage if they evade.
+/// </summary>
+[ByRefEvent]
+public record struct TryChangePartDamageEvent(
+    DamageSpecifier Damage,
+    EntityUid? Origin = null,
+    TargetBodyPart? TargetPart = null,
+    bool CanSever = true,
+    bool CanEvade = false,
+    float PartMultiplier = 1.00f,
+    bool Evaded = false,
+    bool Cancelled = false);
 
 /// <summary>
 ///     Raised on an entity when damage is about to be dealt,
@@ -216,14 +238,23 @@ public record struct BeforeDamageChangedEvent(DamageSpecifier Damage, EntityUid?
 ///
 ///     For example, armor.
 /// </summary>
-public sealed class DamageModifyEvent(DamageSpecifier damage, EntityUid? origin = null)
-    : EntityEventArgs, IInventoryRelayEvent
+public sealed class DamageModifyEvent : EntityEventArgs, IInventoryRelayEvent
 {
     // Whenever locational damage is a thing, this should just check only that bit of armour.
     public SlotFlags TargetSlots => ~SlotFlags.POCKET;
 
-    public readonly DamageSpecifier OriginalDamage = damage;
-    public DamageSpecifier Damage = damage;
+    public readonly DamageSpecifier OriginalDamage;
+    public DamageSpecifier Damage;
+    public EntityUid? Origin;
+    public readonly TargetBodyPart? TargetPart;
+
+    public DamageModifyEvent(DamageSpecifier damage, EntityUid? origin = null, TargetBodyPart? targetPart = null)
+    {
+        OriginalDamage = damage;
+        Damage = damage;
+        Origin = origin;
+        TargetPart = targetPart;
+    }
 }
 
 public sealed class DamageChangedEvent : EntityEventArgs
@@ -261,16 +292,23 @@ public sealed class DamageChangedEvent : EntityEventArgs
     /// </summary>
     public readonly EntityUid? Origin;
 
+    /// <summary>
+    ///     Can this damage event sever parts?
+    /// </summary>
+    public readonly bool CanSever;
+
     public DamageChangedEvent(
         DamageableComponent damageable,
         DamageSpecifier? damageDelta,
         bool interruptsDoAfters,
-        EntityUid? origin
+        EntityUid? origin,
+        bool canSever = true
     )
     {
         Damageable = damageable;
         DamageDelta = damageDelta;
         Origin = origin;
+        CanSever = canSever;
 
         if (DamageDelta is null)
             return;

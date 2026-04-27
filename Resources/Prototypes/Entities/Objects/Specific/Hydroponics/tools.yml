@@ -47,6 +47,15 @@
   - type: PhysicalComposition
     materialComposition:
       Steel: 100
+  - type: Retractor # _VG: Same as wirecutters
+    speed: 0.35
+  - type: Hemostat
+    speed: 0.6
+  - type: SurgeryTool # _VG
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
 
 - type: entity
   name: scythe
@@ -102,6 +111,11 @@
   - type: PhysicalComposition
     materialComposition:
       Steel: 100
+  - type: BoneSaw # _VG
+    speed: 0.35
+  - type: SurgeryTool # _VG
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/saw.ogg
 
 - type: entity
   name: spade

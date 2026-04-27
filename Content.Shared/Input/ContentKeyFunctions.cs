@@ -73,6 +73,16 @@ namespace Content.Shared.Input
         public static readonly BoundKeyFunction PosingOffsetDown = "PosingOffsetDown"; // ADT-Tweak
         public static readonly BoundKeyFunction PosingRotateNegative = "PosingRotateNegative"; // ADT-Tweak
         public static readonly BoundKeyFunction PosingRotatePositive = "PosingRotatePositive"; // ADT-Tweak
+        public static readonly BoundKeyFunction TargetHead = "TargetHead"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetTorso = "TargetTorso"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetLeftArm = "TargetLeftArm"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetLeftHand = "TargetLeftHand"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetRightArm = "TargetRightArm"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetRightHand = "TargetRightHand"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetLeftLeg = "TargetLeftLeg"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetLeftFoot = "TargetLeftFoot"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetRightLeg = "TargetRightLeg"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction TargetRightFoot = "TargetRightFoot"; // CorvaxNext: surgery
 
         public static readonly BoundKeyFunction ArcadeUp = "ArcadeUp";
         public static readonly BoundKeyFunction ArcadeDown = "ArcadeDown";

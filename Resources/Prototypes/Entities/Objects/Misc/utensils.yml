@@ -8,6 +8,11 @@
   - type: Item # TODO add inhand sprites for all utensils
     sprite: Objects/Misc/utensils.rsi
   - type: SpaceGarbage
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/hemostat1.ogg
 
 - type: entity
   parent: UtensilBase

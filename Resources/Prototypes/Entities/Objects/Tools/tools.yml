@@ -51,6 +51,19 @@
       Steel: 100
   - type: StaticPrice
     price: 30
+  - type: Retractor # _VG
+    speed: 0.35
+  - type: Hemostat # _VG
+    speed: 0.6
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      path: /Audio/Items/wirecutter.ogg
+      params:
+        variation: 0.125
+    endSound:
+      path: /Audio/Items/wirecutter.ogg
+      params:
+        variation: 0.125
 
 - type: entity
   name: screwdriver
@@ -103,6 +116,15 @@
       Steel: 100
   - type: StaticPrice
     price: 30
+  - type: Retractor # _VG
+    speed: 0.45
+  - type: Tending # _VG
+    speed: 0.65
+  - type: SurgeryTool # VG-Tweak
+    startSound:
+      collection: Screwdriver
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
 
 - type: entity
   name: wrench
