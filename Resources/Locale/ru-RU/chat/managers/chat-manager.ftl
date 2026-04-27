@@ -20,8 +20,7 @@ chat-manager-server-wrap-message = [bold]{ $message }[/bold]
 ##ADT Tweak start
 chat-manager-sender-announcement = системы безопасности станции
 ##ADT Tweak end
-chat-manager-sender-announcement-wrap-message = [font size=14][bold]Объявление { $sender }:[/font][font size=12]
-    { $message }[/bold][/font]
+chat-manager-sender-announcement-wrap-message = [font size=14][bold][tex path="{ $senderIconPath }" state="{ $senderIconState }" scale=2 offsetY=3] [color={ $senderColor }]{ $sender }[/color][/bold][/font] [color=#cfcfcf]|[/color] [color=white]{ $message }[/color]
 chat-manager-entity-say-wrap-message = [BubbleHeader][bold][Name]{ $entityName }[/Name][/bold][/BubbleHeader] { $verb }, "[BubbleContent][tfont="{ $fontType }" size={ $fontSize } defaultFont={ $defaultFont } defaultSize={ $defaultSize }]{ $message }[/tfont][/BubbleContent]"
 chat-manager-entity-say-bold-wrap-message = [BubbleHeader][bold][Name]{ $entityName }[/Name][/bold][/BubbleHeader] { $verb }, "[BubbleContent][tfont="{ $fontType }" size={ $fontSize } defaultFont={ $defaultFont } defaultSize={ $defaultSize } ][bold]{ $message }[/bold][/tfont][/BubbleContent]"
 chat-manager-entity-whisper-wrap-message = [font size=11][italic][BubbleHeader][Name]{ $entityName }[/Name][/BubbleHeader] шепчет,"[BubbleContent][tfont="{ $fontType }" size={ $fontSize } defaultFont={ $defaultFont } defaultSize={ $defaultSize } ]{ $message }[/tfont][/BubbleContent]"[/italic][/font]

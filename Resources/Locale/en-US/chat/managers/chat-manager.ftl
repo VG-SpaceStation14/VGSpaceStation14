@@ -20,8 +20,7 @@ chat-manager-whisper-headset-on-message = You can't whisper on the radio!
 
 chat-manager-server-wrap-message = [bold]{$message}[/bold]
 chat-manager-sender-announcement = Central Command
-chat-manager-sender-announcement-wrap-message = [font size=14][bold]{$sender} Announcement:[/font][font size=12]
-                                                {$message}[/bold][/font]
+chat-manager-sender-announcement-wrap-message = [font size=14][bold][tex path="{$senderIconPath}" state="{$senderIconState}" scale=2 offsetY=3] [color={$senderColor}]{$sender}[/color][/bold][/font] [color=#cfcfcf]|[/color] [color=white]{$message}[/color]
 chat-manager-entity-say-wrap-message = [BubbleHeader][bold][Name]{$entityName}[/Name][/bold][/BubbleHeader] {$verb}, [font={$fontType} size={$fontSize}]"[BubbleContent]{$message}[/BubbleContent]"[/font]
 chat-manager-entity-say-bold-wrap-message = [BubbleHeader][bold][Name]{$entityName}[/Name][/bold][/BubbleHeader] {$verb}, [font={$fontType} size={$fontSize}]"[BubbleContent][bold]{$message}[/bold][/BubbleContent]"[/font]
 
