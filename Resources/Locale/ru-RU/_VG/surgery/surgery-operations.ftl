@@ -27,6 +27,10 @@ ent-SurgeryStepInsertLungs = Вставить лёгкие
 ent-SurgeryStepInsertLiver = Вставить печень
 ent-SurgeryStepInsertEyes = Вставить глаза
 ent-SurgeryStepInsertHeart = Вставить сердце
+ent-SurgeryStepInsertStomach = Вставить желудок
+ent-SurgeryStepSealOrganWound = Прижечь раны органа
+ent-SurgeryStepLobotomize = Выполнить трепанацию
+ent-SurgeryStepMendBrainTissue = Восстановить ткани мозга
 
 
 ent-SurgeryOpenIncision = Открыть разрез
@@ -43,6 +47,9 @@ ent-SurgeryAttachLeftHand = Прикрепить левую ладонь
 ent-SurgeryAttachRightHand = Прикрепить правую ладонь
 ent-SurgeryAttachLeftFoot = Прикрепить левую стопу
 ent-SurgeryAttachRightFoot = Прикрепить правую стопу
+ent-SurgeryAttachLegs = Прикрепить ноги
+ent-SurgeryAttachHands = Прикрепить руки
+ent-SurgeryAttachFeet = Прикрепить ступни
 ent-SurgeryAttachTail = Прикрепить хвост
 
 ent-SurgeryTendWoundsBrute = Восстановить механические повреждения
@@ -62,4 +69,5 @@ ent-SurgeryRemoveStomach = Удалить желудок
 ent-SurgeryInsertStomach = Вставить желудок
 ent-SurgeryRemoveEyes = Удалить глаза
 ent-SurgeryInsertEyes = Вставить глаза
+ent-SurgeryMendBrainTissue = Восстановить ткани мозга
 ent-SurgeryLobotomize = Лоботомировать

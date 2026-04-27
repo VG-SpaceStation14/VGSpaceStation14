@@ -329,9 +329,9 @@ public abstract partial class SharedSurgerySystem
             && TryComp(activeHandEntity, out ItemComponent? itemComp)
             && (itemComp.Size.Id == "Tiny"
             || itemComp.Size.Id == "Small"))
-            _itemSlotsSystem.TryInsert(ent, partComp.ItemInsertionSlot, activeHandEntity, args.User);
+            _itemSlotsSystem.TryInsert(args.Part, partComp.ItemInsertionSlot, activeHandEntity, args.User);
         else if (ent.Comp.Action == "Remove")
-            _itemSlotsSystem.TryEjectToHands(ent, partComp.ItemInsertionSlot, args.User);
+            _itemSlotsSystem.TryEjectToHands(args.Part, partComp.ItemInsertionSlot, args.User);
     }
 
     private void OnCavityCheck(Entity<SurgeryStepCavityEffectComponent> ent, ref SurgeryStepCompleteCheckEvent args)
@@ -617,15 +617,25 @@ public abstract partial class SharedSurgerySystem
             GetEntity(args.Part) is not { Valid: true } targetPart ||
             !IsSurgeryValid(body, targetPart, args.Surgery, args.Step, user, out var surgery, out var part, out var step))
         {
+            if (_net.IsServer)
+                Log.Warning($"[Surgery] StepChosen failed initial validation. actor={ToPrettyString(user)}, bodyEntity={args.Entity}, partEntity={args.Part}, surgery={args.Surgery}, step={args.Step}");
             return;
         }
 
         if (!PreviousStepsComplete(body, part, surgery, args.Step) ||
             IsStepComplete(body, part, args.Step, surgery))
+        {
+            if (_net.IsServer)
+                Log.Info($"[Surgery] StepChosen blocked by progression. actor={ToPrettyString(user)}, body={ToPrettyString(body)}, part={ToPrettyString(part)}, surgery={args.Surgery}, step={args.Step}");
             return;
+        }
 
-        if (!CanPerformStep(user, body, part, step, true, out _, out _, out var validTools))
+        if (!CanPerformStep(user, body, part, step, true, out var popup, out var reason, out var validTools))
+        {
+            if (_net.IsServer)
+                Log.Info($"[Surgery] StepChosen cannot perform step. actor={ToPrettyString(user)}, body={ToPrettyString(body)}, part={ToPrettyString(part)}, step={ToPrettyString(step)}, reason={reason}, popup={popup ?? "<null>"}");
             return;
+        }
 
         var speed = 1f;
         var usedEv = new SurgeryToolUsedEvent(user, body);
@@ -646,7 +656,7 @@ public abstract partial class SharedSurgerySystem
                 foreach (var tool in validTools.Keys)
                 {
                     if (TryComp(tool, out SurgeryToolComponent? toolComp) &&
-                        toolComp.EndSound != null)
+                        toolComp.StartSound != null)
                     {
                         _audio.PlayEntity(toolComp.StartSound, user, tool);
                     }
@@ -657,14 +667,10 @@ public abstract partial class SharedSurgerySystem
         if (TryComp(body, out TransformComponent? xform))
             _rotateToFace.TryFaceCoordinates(user, _transform.GetMapCoordinates(body, xform).Position);
 
-        var ev = new SurgeryDoAfterEvent(args.Surgery, args.Step);
-        // TODO: Move 2 seconds to a field of SurgeryStepComponent
-        var duration = 2f / speed;
-        if (TryComp(user, out SurgerySpeedModifierComponent? surgerySpeedMod)
-            && surgerySpeedMod is not null)
-            duration = duration / surgerySpeedMod.SpeedModifier;
+        var ev = new SurgeryDoAfterEvent(args.Surgery, args.Step, args.Part);
+        var duration = GetSurgeryDuration(step, user, speed);
 
-        var doAfter = new DoAfterArgs(EntityManager, user, TimeSpan.FromSeconds(duration), ev, body, part)
+        var doAfter = new DoAfterArgs(EntityManager, user, TimeSpan.FromSeconds(duration), ev, body, body)
         {
             BreakOnMove = true,
             CancelDuplicate = true,
@@ -675,6 +681,9 @@ public abstract partial class SharedSurgerySystem
 
         if (_doAfter.TryStartDoAfter(doAfter))
         {
+            if (_net.IsServer)
+                Log.Info($"[Surgery] DoAfter started. actor={ToPrettyString(user)}, body={ToPrettyString(body)}, part={ToPrettyString(part)}, surgery={args.Surgery}, step={args.Step}, duration={duration}");
+
             var userName = Identity.Entity(user, EntityManager);
             var targetName = Identity.Entity(ent.Owner, EntityManager);
 
@@ -688,9 +697,13 @@ public abstract partial class SharedSurgerySystem
 
             _popup.PopupEntity(locResult, user);
         }
+        else if (_net.IsServer)
+        {
+            Log.Warning($"[Surgery] DoAfter failed to start. actor={ToPrettyString(user)}, body={ToPrettyString(body)}, part={ToPrettyString(part)}, surgery={args.Surgery}, step={args.Step}, duration={duration}");
+        }
     }
 
-    private float GetSurgeryDuration(EntityUid surgeryStep, EntityUid user, EntityUid target, float toolSpeed)
+    private float GetSurgeryDuration(EntityUid surgeryStep, EntityUid user, float toolSpeed)
     {
         if (!TryComp(surgeryStep, out SurgeryStepComponent? stepComp))
             return 2f; // Shouldnt really happen but just a failsafe.

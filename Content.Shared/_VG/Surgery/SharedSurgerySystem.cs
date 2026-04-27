@@ -81,14 +81,31 @@ public abstract partial class SharedSurgerySystem : EntitySystem
         if (!_timing.IsFirstTimePredicted)
             return;
 
-        if (args.Cancelled
-            || args.Handled
-            || args.Target is not { } target
-            || !IsSurgeryValid(ent, target, args.Surgery, args.Step, args.User, out var surgery, out var part, out var step)
+        if (args.Cancelled || args.Handled)
+        {
+            if (_net.IsServer)
+                Log.Info($"[Surgery] OnTargetDoAfter ignored: cancelled={args.Cancelled}, handled={args.Handled}, body={ToPrettyString(ent)}, user={ToPrettyString(args.User)}");
+            return;
+        }
+
+        EntityUid? target = null;
+        if (GetEntity(args.Part) is { Valid: true } resolvedPart)
+            target = resolvedPart;
+        else
+            target = args.Target;
+
+        if (target is not { } surgeryTarget)
+        {
+            if (_net.IsServer)
+                Log.Warning($"[Surgery] OnTargetDoAfter failed: no valid target part. body={ToPrettyString(ent)}, user={ToPrettyString(args.User)}, args.Target={args.Target}, args.Part={args.Part}");
+            return;
+        }
+
+        if (!IsSurgeryValid(ent, surgeryTarget, args.Surgery, args.Step, args.User, out var surgery, out var part, out var step)
             || !PreviousStepsComplete(ent, part, surgery, args.Step)
             || !CanPerformStep(args.User, ent, part, step, false))
         {
-            Log.Warning($"{ToPrettyString(args.User)} tried to start invalid surgery.");
+            Log.Warning($"[Surgery] OnTargetDoAfter failed validation. user={ToPrettyString(args.User)}, body={ToPrettyString(ent)}, part={ToPrettyString(surgeryTarget)}, surgery={args.Surgery}, step={args.Step}");
             return;
         }
 
@@ -217,7 +234,7 @@ public abstract partial class SharedSurgerySystem : EntitySystem
             && bodyAppearance.MarkingSet.Markings.TryGetValue(markingCategory, out var markingList)
             && markingList.Any(marking => marking.MarkingId.Contains(ent.Comp.MatchString));
 
-        if ((!ent.Comp.Inverse && hasMarking) || (ent.Comp.Inverse && !hasMarking))
+        if ((!ent.Comp.Inverse && !hasMarking) || (ent.Comp.Inverse && hasMarking))
             args.Cancelled = true;
     }
 
