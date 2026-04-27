@@ -51,6 +51,10 @@ namespace Content.Server.Chat.Systems;
 /// </summary>
 public sealed partial class ChatSystem : SharedChatSystem
 {
+    private const string DefaultAnnouncementIconPath = "/Textures/Interface/Misc/job_icons.rsi";
+    private const string VGAnnouncementIconPath = "/Textures/_VG/Interface/Misc/job_icons.rsi";
+    private const string ADTAnnouncementIconPath = "/Textures/ADT/Interface/Misc/job_icons.rsi";
+
     [Dependency] private readonly IReplayRecordingManager _replay = default!;
     [Dependency] private readonly IConfigurationManager _configurationManager = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
@@ -339,7 +343,7 @@ public sealed partial class ChatSystem : SharedChatSystem
     {
         sender ??= Loc.GetString("chat-manager-sender-announcement");
 
-        var wrappedMessage = Loc.GetString("chat-manager-sender-announcement-wrap-message", ("sender", sender), ("message", FormattedMessage.EscapeText(message)));
+        var wrappedMessage = BuildAnnouncementMessage(sender, message, colorOverride);
         _chatManager.ChatMessageToAll(ChatChannel.Radio, message, wrappedMessage, default, false, true, colorOverride);
         if (playSound)
         {
@@ -361,7 +365,7 @@ public sealed partial class ChatSystem : SharedChatSystem
     {
         sender ??= Loc.GetString("chat-manager-sender-announcement");
 
-        var wrappedMessage = Loc.GetString("chat-manager-sender-announcement-wrap-message", ("sender", sender), ("message", FormattedMessage.EscapeText(message)));
+        var wrappedMessage = BuildAnnouncementMessage(sender, message, colorOverride);
         _chatManager.ChatMessageToManyFiltered(filter, ChatChannel.Radio, message, wrappedMessage, source ?? default, false, true, colorOverride);
         if (playSound)
         {
@@ -381,7 +385,7 @@ public sealed partial class ChatSystem : SharedChatSystem
     {
         sender ??= Loc.GetString("chat-manager-sender-announcement");
 
-        var wrappedMessage = Loc.GetString("chat-manager-sender-announcement-wrap-message", ("sender", sender), ("message", FormattedMessage.EscapeText(message)));
+        var wrappedMessage = BuildAnnouncementMessage(sender, message, colorOverride);
         var station = _stationSystem.GetOwningStation(source);
 
         if (station == null)
@@ -407,6 +411,143 @@ public sealed partial class ChatSystem : SharedChatSystem
     #endregion
 
     #region Private API
+
+    private string BuildAnnouncementMessage(string sender, string message, Color? colorOverride)
+    {
+        var (iconPath, iconState) = GetAnnouncementIcon(sender);
+
+        return Loc.GetString("chat-manager-sender-announcement-wrap-message",
+            ("sender", FormattedMessage.EscapeText(sender)),
+            ("message", FormattedMessage.EscapeText(message)),
+            ("senderColor", (colorOverride ?? Color.Gold).ToHexNoAlpha()),
+            ("senderIconPath", iconPath),
+            ("senderIconState", iconState));
+    }
+
+    private static (string IconPath, string IconState) GetAnnouncementIcon(string sender)
+    {
+        if (ContainsAny(sender, "tsf", "тсф"))
+            return (VGAnnouncementIconPath, "TSF");
+
+        if (ContainsAny(sender, "ussp", "сссп"))
+            return (VGAnnouncementIconPath, "USSPOfficer");
+
+        if (ContainsAny(sender, "syndicate", "синдикат", "nukie", "ядерн"))
+            return (DefaultAnnouncementIconPath, "Syndicate");
+
+        if (ContainsAny(sender, "wizard", "волшеб"))
+            return (DefaultAnnouncementIconPath, "Wizard");
+
+        if (ContainsAny(sender, "station ai", "station-ai", "станционн", " ии"))
+            return (DefaultAnnouncementIconPath, "StationAi");
+
+        if (ContainsAny(sender, "centcom", "central command", "центральн"))
+            return (DefaultAnnouncementIconPath, "Nanotrasen");
+
+        if (ContainsAny(sender, "communications console", "консоль связи", "station security systems", "системы безопасности станции"))
+            return (DefaultAnnouncementIconPath, "Captain");
+
+        if (TryGetAnnouncementIconByJobTitle(sender, out var icon))
+            return icon;
+
+        return (DefaultAnnouncementIconPath, "Unknown");
+    }
+
+    private static bool TryGetAnnouncementIconByJobTitle(string sender, out (string IconPath, string IconState) icon)
+    {
+        foreach (var rule in AnnouncementJobIconRules)
+        {
+            if (!ContainsAny(sender, rule.Aliases))
+                continue;
+
+            icon = (rule.IconPath, rule.IconState);
+            return true;
+        }
+
+        icon = default;
+        return false;
+    }
+
+    private static bool ContainsAny(string value, params string[] patterns)
+    {
+        foreach (var pattern in patterns)
+        {
+            if (value.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
+    private readonly record struct AnnouncementJobIconRule(string IconPath, string IconState, string[] Aliases);
+
+    private static readonly AnnouncementJobIconRule[] AnnouncementJobIconRules =
+    {
+        new(DefaultAnnouncementIconPath, "ERTLeader", new[] { "ert leader", "лидер обр" }),
+        new(DefaultAnnouncementIconPath, "ERTSecurity", new[] { "ert security", "офицер безопасности обр" }),
+        new(DefaultAnnouncementIconPath, "ERTEngineer", new[] { "ert engineer", "инженер обр" }),
+        new(DefaultAnnouncementIconPath, "ERTMedical", new[] { "ert medic", "медик обр" }),
+        new(DefaultAnnouncementIconPath, "ERTChaplain", new[] { "ert chaplain", "священник обр" }),
+        new(DefaultAnnouncementIconPath, "ERTJanitor", new[] { "ert janitor", "уборщик обр" }),
+        new(DefaultAnnouncementIconPath, "DeathSquad", new[] { "deathsquad", "death squad", "centcomm agent", "агент центком" }),
+        new(DefaultAnnouncementIconPath, "CBURN", new[] { "cburn", "quarantine officer", "карантинной службы центком" }),
+        new(ADTAnnouncementIconPath, "ADTBlueShieldOfficer", new[] { "blue shield", "blueshield", "офицер синего щита" }),
+        new(ADTAnnouncementIconPath, "Magistrat", new[] { "magistrat", "магистрат" }),
+        new(ADTAnnouncementIconPath, "ADTConsultant", new[] { "consultant", "консультант" }),
+        new(ADTAnnouncementIconPath, "ADTPathologist", new[] { "pathologist", "патологоанатом" }),
+        new(ADTAnnouncementIconPath, "ADTCorrectionsofficer", new[] { "corrections officer", "исправительный офицер" }),
+        new(ADTAnnouncementIconPath, "JobIconUSSPArmyOfficer", new[] { "ussp officer", "ussp army officer", "офицер сссп" }),
+        new(ADTAnnouncementIconPath, "JobIconUSSPArmyPrivate", new[] { "ussp private", "ussp soldier", "солдат сссп" }),
+        new(DefaultAnnouncementIconPath, "HeadOfSecurity", new[] { "head of security", "глава службы безопасности" }),
+        new(DefaultAnnouncementIconPath, "ChiefEngineer", new[] { "chief engineer", "старший инженер" }),
+        new(DefaultAnnouncementIconPath, "ChiefMedicalOfficer", new[] { "chief medical officer", "главный врач" }),
+        new(DefaultAnnouncementIconPath, "HeadOfPersonnel", new[] { "head of personnel", "глава персонала" }),
+        new(DefaultAnnouncementIconPath, "ResearchDirector", new[] { "research director", "научный руководитель" }),
+        new(DefaultAnnouncementIconPath, "QuarterMaster", new[] { "quartermaster", "квартирмейстер" }),
+        new(DefaultAnnouncementIconPath, "Captain", new[] { "captain", "капитан" }),
+        new(DefaultAnnouncementIconPath, "SecurityCadet", new[] { "security cadet", "кадет сб" }),
+        new(DefaultAnnouncementIconPath, "SecurityOfficer", new[] { "security officer", "офицер сб" }),
+        new(DefaultAnnouncementIconPath, "Warden", new[] { "warden", "смотритель" }),
+        new(DefaultAnnouncementIconPath, "Detective", new[] { "detective", "детектив" }),
+        new(DefaultAnnouncementIconPath, "Brigmedic", new[] { "brigmedic", "бригмедик" }),
+        new(DefaultAnnouncementIconPath, "ResearchAssistant", new[] { "research assistant", "лаборант" }),
+        new(DefaultAnnouncementIconPath, "Scientist", new[] { "scientist", "научный сотрудник" }),
+        new(DefaultAnnouncementIconPath, "Roboticist", new[] { "roboticist", "робототехник" }),
+        new(DefaultAnnouncementIconPath, "MedicalIntern", new[] { "medical intern", "интерн" }),
+        new(DefaultAnnouncementIconPath, "MedicalDoctor", new[] { "medical doctor", "doctor", "врач" }),
+        new(DefaultAnnouncementIconPath, "Paramedic", new[] { "paramedic", "парамедик" }),
+        new(DefaultAnnouncementIconPath, "Psychologist", new[] { "psychologist", "психолог" }),
+        new(DefaultAnnouncementIconPath, "Chemist", new[] { "chemist", "химик" }),
+        new(DefaultAnnouncementIconPath, "Geneticist", new[] { "geneticist", "генетик" }),
+        new(DefaultAnnouncementIconPath, "Virologist", new[] { "virologist", "вирусолог" }),
+        new(DefaultAnnouncementIconPath, "AtmosphericTechnician", new[] { "atmospheric technician", "атмосферный техник" }),
+        new(DefaultAnnouncementIconPath, "TechnicalAssistant", new[] { "technical assistant", "технический ассистент" }),
+        new(DefaultAnnouncementIconPath, "StationEngineer", new[] { "station engineer", "инженер" }),
+        new(DefaultAnnouncementIconPath, "CargoTechnician", new[] { "cargo technician", "грузчик" }),
+        new(DefaultAnnouncementIconPath, "ShaftMiner", new[] { "salvage specialist", "утилизатор" }),
+        new(DefaultAnnouncementIconPath, "Bartender", new[] { "bartender", "бармен" }),
+        new(DefaultAnnouncementIconPath, "Botanist", new[] { "botanist", "ботаник" }),
+        new(DefaultAnnouncementIconPath, "Boxer", new[] { "boxer", "боксёр", "боксер" }),
+        new(DefaultAnnouncementIconPath, "Chaplain", new[] { "chaplain", "священник" }),
+        new(DefaultAnnouncementIconPath, "Chef", new[] { "chef", "шеф-повар" }),
+        new(DefaultAnnouncementIconPath, "Janitor", new[] { "janitor", "уборщик" }),
+        new(DefaultAnnouncementIconPath, "Lawyer", new[] { "lawyer", "юрист" }),
+        new(DefaultAnnouncementIconPath, "Librarian", new[] { "librarian", "библиотекарь" }),
+        new(DefaultAnnouncementIconPath, "Reporter", new[] { "reporter", "репортёр", "репортер" }),
+        new(DefaultAnnouncementIconPath, "ServiceWorker", new[] { "service worker", "сервисный работник" }),
+        new(DefaultAnnouncementIconPath, "Zookeeper", new[] { "zookeeper", "зоотехник" }),
+        new(DefaultAnnouncementIconPath, "Clown", new[] { "clown", "клоун" }),
+        new(DefaultAnnouncementIconPath, "Mime", new[] { "mime", "мим" }),
+        new(DefaultAnnouncementIconPath, "Musician", new[] { "musician", "музыкант" }),
+        new(DefaultAnnouncementIconPath, "Passenger", new[] { "passenger", "ассистент", "пассажир" }),
+        new(DefaultAnnouncementIconPath, "Visitor", new[] { "visitor", "посетитель" }),
+        new(DefaultAnnouncementIconPath, "Borg", new[] { "cyborg", "borg", "киборг" }),
+        new(DefaultAnnouncementIconPath, "StationAi", new[] { "station ai", "ии станции", "станционный ии" }),
+        new(DefaultAnnouncementIconPath, "Prisoner", new[] { "prisoner", "заключённый", "заключенный" }),
+        new(DefaultAnnouncementIconPath, "Cluwne", new[] { "cluwne", "клувень" }),
+        new(DefaultAnnouncementIconPath, "Zombie", new[] { "zombie", "зомби" }),
+        new(DefaultAnnouncementIconPath, "Nanotrasen", new[] { "centcomm official", "centcom official", "представитель центком" }),
+    };
 
     private void SendEntitySpeak(
         EntityUid source,
