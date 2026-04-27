@@ -1,14 +1,14 @@
+using System.Linq;
 using Content.Server.Access.Systems;
 using Content.Server.Popups;
 using Content.Shared.Paper;
-using Content.Server.Paper;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
 using Content.Shared.Verbs;
 using Robust.Server.Audio;
 using Robust.Shared.Player;
 
-namespace Content.Server._VG.Paper;
+namespace Content.Server.Paper;
 
 public sealed class SignatureSystem : EntitySystem
 {
@@ -18,12 +18,8 @@ public sealed class SignatureSystem : EntitySystem
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly TagSystem _tags = default!;
 
-    // The sprite used to visualize "signatures" on paper entities.
-    private const string SignatureStampState = "sign"; // VG: Изменено на "sign" для использования кастомного спрайта
-
-    // VG: Красивый шрифт для подписей
-    private const string SignatureFont = "/Fonts/_VG/GoodVibesCyr.ttf"; // VG: Путь к шрифту
-    private static readonly Color SignatureColor = Color.FromHex("#004391"); // VG: Цвет подписи (синий как в ADT)
+    private const string SignatureStampState = "sign";
+    private const string SignatureFont = "/Fonts/VG/goodvibescyr.ttf";
 
     public override void Initialize()
     {
@@ -35,7 +31,7 @@ public sealed class SignatureSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract)
             return;
 
-        if (args.Using is not {} pen || !_tags.HasTag(pen, "Write"))
+        if (args.Using is not { } pen || !_tags.HasTag(pen, "Write"))
             return;
 
         var user = args.User;
@@ -53,7 +49,7 @@ public sealed class SignatureSystem : EntitySystem
     }
 
     /// <summary>
-    ///     Tries add add a signature to the paper with signer's name.
+    ///     Tries to add a signature to the paper with the signer's name.
     /// </summary>
     public bool TrySignPaper(Entity<PaperComponent> paper, EntityUid signer, EntityUid pen)
     {
@@ -65,19 +61,33 @@ public sealed class SignatureSystem : EntitySystem
             return false;
 
         var signatureName = DetermineEntitySignature(signer);
+        if (comp.StampedBy.Any(stamp => stamp.Type == StampType.Signature && stamp.StampedName == signatureName))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("paper-signed-failure", ("target", paper.Owner)),
+                signer,
+                signer,
+                PopupType.SmallCaution);
 
-        // VG: Создаем информацию о подписи с красивым шрифтом и цветом
-        var stampInfo = new StampDisplayInfo()
+            return false;
+        }
+
+        var signatureColor = SignatureInkColor.Black.ToColor();
+
+        if (TryComp<SignatureComponent>(pen, out var signatureComp))
+            signatureColor = signatureComp.Color.ToColor();
+
+        var stampInfo = new StampDisplayInfo
         {
             StampedName = signatureName,
-            StampedColor = Color.DarkSlateGray,
+            StampedColor = signatureColor,
             Type = StampType.Signature,
-            Font = "/Fonts/VG/goodvibescyr.ttf"
+            Font = SignatureFont
         };
 
-        if (!comp.StampedBy.Contains(stampInfo) && _paper.TryStamp(paper, stampInfo, SignatureStampState))
+        if (!comp.StampedBy.Contains(stampInfo) &&
+            _paper.TryStamp(paper, stampInfo, SignatureStampState, signatureColor))
         {
-            // Show popups and play a paper writing sound
             var signedOtherMessage = Loc.GetString("paper-signed-other", ("user", signer), ("target", paper.Owner));
             _popup.PopupEntity(signedOtherMessage, signer, Filter.PvsExcept(signer, entityManager: EntityManager), true);
 
@@ -90,22 +100,21 @@ public sealed class SignatureSystem : EntitySystem
 
             return true;
         }
-        else
-        {
-            // Show an error popup
-            _popup.PopupEntity(Loc.GetString("paper-signed-failure", ("target", paper.Owner)), signer, signer, PopupType.SmallCaution);
 
-            return false;
-        }
+        _popup.PopupEntity(
+            Loc.GetString("paper-signed-failure", ("target", paper.Owner)),
+            signer,
+            signer,
+            PopupType.SmallCaution);
+
+        return false;
     }
 
     private string DetermineEntitySignature(EntityUid uid)
     {
-        // If the entity has an ID, use the name on it.
         if (_idCard.TryFindIdCard(uid, out var id) && !string.IsNullOrWhiteSpace(id.Comp.FullName))
             return id.Comp.FullName;
 
-        // Alternatively, return the entity name
         return Name(uid);
     }
 }

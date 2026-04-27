@@ -24,6 +24,8 @@
       params:
         volume: -4
         maxDistance: 2
+  - type: Signature
+    color: Black
   - type: UseDelay
     delay: 1.5
   - type: Fixtures
@@ -121,6 +123,8 @@
     state: pen_centcom
   - type: Item
     heldPrefix: pen_centcom
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: captain's fountain pen
@@ -130,6 +134,8 @@
   components:
   - type: Sprite
     state: pen_cap
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: hop's fountain pen
@@ -139,6 +145,8 @@
   components:
   - type: Sprite
     state: pen_hop
+  - type: Signature
+    color: LightBlue
 
 - type: entity
   name: wizard's magical pen
@@ -153,3 +161,5 @@
     - WriteIgnoreStamps
     - Write
     - Pen
+  - type: Signature
+    color: Purple

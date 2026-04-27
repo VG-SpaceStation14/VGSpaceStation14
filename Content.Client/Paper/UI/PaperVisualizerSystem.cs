@@ -27,6 +27,11 @@ public sealed class PaperVisualizerSystem : VisualizerSystem<PaperVisualsCompone
             }
 
         }
+
+        if (AppearanceSystem.TryGetData<Color>(uid, PaperVisuals.StampColor, out var stampColor, args.Component))
+            SpriteSystem.LayerSetColor((uid, args.Sprite), PaperVisualLayers.Stamp, stampColor);
+        else
+            SpriteSystem.LayerSetColor((uid, args.Sprite), PaperVisualLayers.Stamp, Color.White);
     }
 }
 

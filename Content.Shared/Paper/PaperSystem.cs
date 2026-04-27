@@ -70,7 +70,10 @@ public sealed class PaperSystem : EntitySystem
                 _appearance.SetData(entity, PaperVisuals.Status, PaperStatus.Written, appearance);
 
             if (entity.Comp.StampState != null)
+            {
                 _appearance.SetData(entity, PaperVisuals.Stamp, entity.Comp.StampState, appearance);
+                _appearance.SetData(entity, PaperVisuals.StampColor, entity.Comp.StampColor, appearance);
+            }
         }
     }
 
@@ -245,7 +248,7 @@ public sealed class PaperSystem : EntitySystem
     /// <summary>
     ///     Accepts the name and state to be stamped onto the paper, returns true if successful.
     /// </summary>
-    public bool TryStamp(Entity<PaperComponent> entity, StampDisplayInfo stampInfo, string spriteStampState)
+    public bool TryStamp(Entity<PaperComponent> entity, StampDisplayInfo stampInfo, string spriteStampState, Color? stampColor = null)
     {
         if (!entity.Comp.StampedBy.Contains(stampInfo))
         {
@@ -254,9 +257,11 @@ public sealed class PaperSystem : EntitySystem
             if ((entity.Comp.StampState == null || entity.Comp.StampState == "paper_stamp-void") && TryComp<AppearanceComponent>(entity, out var appearance)) // ADT-BookPrinter
             {
                 entity.Comp.StampState = spriteStampState;
+                entity.Comp.StampColor = stampColor ?? Color.White;
                 // Would be nice to be able to display multiple sprites on the paper
                 // but most of the existing images overlap
                 _appearance.SetData(entity, PaperVisuals.Stamp, entity.Comp.StampState, appearance);
+                _appearance.SetData(entity, PaperVisuals.StampColor, entity.Comp.StampColor, appearance);
             }
         }
         return true;
@@ -269,6 +274,7 @@ public sealed class PaperSystem : EntitySystem
         {
             var stampState = entity.Comp.StampState ?? "paper_stamp-void";
             _appearance.SetData(entity, PaperVisuals.Stamp, stampState, appearance);
+            _appearance.SetData(entity, PaperVisuals.StampColor, entity.Comp.StampColor, appearance);
         }
         else
         {
@@ -284,12 +290,14 @@ public sealed class PaperSystem : EntitySystem
 
         target.Comp.StampedBy = new List<StampDisplayInfo>(source.Comp.StampedBy);
         target.Comp.StampState = source.Comp.StampState;
+        target.Comp.StampColor = source.Comp.StampColor;
         Dirty(target);
 
         if (TryComp<AppearanceComponent>(target, out var appearance))
         {
             // delete any stamps if the stamp state is null
             _appearance.SetData(target, PaperVisuals.Stamp, target.Comp.StampState ?? "", appearance);
+            _appearance.SetData(target, PaperVisuals.StampColor, target.Comp.StampColor, appearance);
         }
     }
 
