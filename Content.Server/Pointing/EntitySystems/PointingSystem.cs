@@ -1,7 +1,9 @@
 using System.Linq;
 using Content.Server.Administration.Logs;
+using Content.Server.Chat.Managers;
 using Content.Server.Pointing.Components;
 using Content.Shared.CCVar;
+using Content.Shared.Chat;
 using Content.Shared.Database;
 using Content.Shared.Examine;
 using Content.Shared.Eye;
@@ -22,9 +24,11 @@ using Robust.Shared.Enums;
 using Robust.Shared.GameStates;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Map;
+using Robust.Shared.Maths;
 using Robust.Shared.Player;
 using Robust.Shared.Replays;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Server.Pointing.EntitySystems
 {
@@ -45,6 +49,7 @@ namespace Content.Server.Pointing.EntitySystems
         [Dependency] private readonly SharedTransformSystem _transform = default!;
         [Dependency] private readonly SharedMapSystem _map = default!;
         [Dependency] private readonly IAdminLogManager _adminLogger = default!;
+        [Dependency] private readonly IChatManager _chatManager = default!;
         [Dependency] private readonly ExamineSystemShared _examine = default!;
 
         private TimeSpan _pointDelay = TimeSpan.FromSeconds(0.5f);
@@ -56,6 +61,7 @@ namespace Content.Server.Pointing.EntitySystems
         private readonly Dictionary<ICommonSession, TimeSpan> _pointers = new();
 
         private const float PointingRange = 15f;
+        private static readonly Color PointingChatColor = Color.FromHex("#b8b0c7");
 
         private void GetCompState(Entity<PointingArrowComponent> entity, ref ComponentGetState args)
         {
@@ -79,15 +85,23 @@ namespace Content.Server.Pointing.EntitySystems
         // TODO: FOV
         private void SendMessage(
             EntityUid source,
+            ICommonSession sourceSession,
             IEnumerable<ICommonSession> viewers,
             EntityUid pointed,
             string selfMessage,
             string viewerMessage,
-            string? viewerPointedAtMessage = null)
+            string? viewerPointedAtMessage = null,
+            EntityUid? iconTarget = null)
         {
             var netSource = GetNetEntity(source);
+            var viewerList = viewers.Distinct().ToList();
 
-            foreach (var viewer in viewers)
+            if (!viewerList.Contains(sourceSession))
+                viewerList.Add(sourceSession);
+
+            Log.Info($"[Pointing] Sending messages: source={ToPrettyString(source)}, pointed={ToPrettyString(pointed)}, viewers={viewerList.Count}, selfIncluded={viewerList.Contains(sourceSession)}");
+
+            foreach (var viewer in viewerList)
             {
                 if (viewer.AttachedEntity is not {Valid: true} viewerEntity)
                 {
@@ -106,7 +120,51 @@ namespace Content.Server.Pointing.EntitySystems
                 RaiseNetworkEvent(new PopupEntityEvent(message, popupType, netSource), viewerEntity);
             }
 
+            var selfChatWrappedMessage = BuildPointingChatMessage(viewerMessage, iconTarget);
+
+            Log.Info($"[Pointing] Chat self -> {sourceSession.Name}: {viewerMessage}");
+            _chatManager.ChatMessageToOne(
+                ChatChannel.Local,
+                viewerMessage,
+                selfChatWrappedMessage,
+                EntityUid.Invalid,
+                false,
+                sourceSession.Channel,
+                PointingChatColor);
+
+            foreach (var viewer in viewerList)
+            {
+                if (viewer == sourceSession)
+                    continue;
+
+                var viewerEntity = viewer.AttachedEntity;
+                var chatMessage = viewerEntity == pointed && viewerPointedAtMessage != null
+                    ? viewerPointedAtMessage
+                    : viewerMessage;
+                var wrappedChatMessage = BuildPointingChatMessage(chatMessage, iconTarget);
+
+                Log.Info($"[Pointing] Chat -> {viewer.Name}: {chatMessage}");
+                _chatManager.ChatMessageToOne(
+                    ChatChannel.Local,
+                    chatMessage,
+                    wrappedChatMessage,
+                    EntityUid.Invalid,
+                    false,
+                    viewer.Channel,
+                    PointingChatColor);
+            }
+
             _replay.RecordServerMessage(new PopupEntityEvent(viewerMessage, PopupType.Small, netSource));
+        }
+
+        private string BuildPointingChatMessage(string message, EntityUid? iconTarget)
+        {
+            var escapedMessage = FormattedMessage.EscapeText(message);
+
+            if (iconTarget == null || !Exists(iconTarget.Value))
+                return escapedMessage;
+
+            return $"{escapedMessage} [enttex id=\"{(int) GetNetEntity(iconTarget.Value)}\" size=\"16\" scale=\"1\" offsetX=\"1\" offsetY=\"0\"]";
         }
 
         public bool InRange(EntityUid pointer, EntityCoordinates coordinates)
@@ -128,6 +186,8 @@ namespace Content.Server.Pointing.EntitySystems
                 Log.Warning($"Player {session} attempted to point without any attached entity");
                 return false;
             }
+
+            Log.Info($"[Pointing] TryPoint start: session={session.Name}, player={ToPrettyString(player)}, pointed={ToPrettyString(pointed)}, coords={coordsPointed}");
 
             if (!coordsPointed.IsValid(EntityManager))
             {
@@ -202,6 +262,8 @@ namespace Content.Server.Pointing.EntitySystems
                 .AddWhere(session1 => ViewerPredicate(session1))
                 .Recipients;
 
+            Log.Info($"[Pointing] Viewers collected for {session.Name}: {string.Join(", ", viewers.Select(v => v.Name))}");
+
             string selfMessage;
             string viewerMessage;
             string? viewerPointedAtMessage = null;
@@ -209,6 +271,7 @@ namespace Content.Server.Pointing.EntitySystems
 
             if (Exists(pointed))
             {
+                var iconTarget = pointed;
                 var pointedName = Identity.Entity(pointed, EntityManager);
 
                 EntityUid? containingInventory = null;
@@ -278,6 +341,12 @@ namespace Content.Server.Pointing.EntitySystems
                 RaiseLocalEvent(pointed, ref gotev);
 
                 _adminLogger.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(player):user} pointed at {ToPrettyString(pointed):target} {Transform(pointed).Coordinates}");
+
+                _pointers[session] = _gameTiming.CurTime;
+
+                SendMessage(player, session, viewers, pointed, selfMessage, viewerMessage, viewerPointedAtMessage, iconTarget);
+
+                return true;
             }
             else
             {
@@ -302,7 +371,7 @@ namespace Content.Server.Pointing.EntitySystems
 
             _pointers[session] = _gameTiming.CurTime;
 
-            SendMessage(player, viewers, pointed, selfMessage, viewerMessage, viewerPointedAtMessage);
+            SendMessage(player, session, viewers, pointed, selfMessage, viewerMessage, viewerPointedAtMessage);
 
             return true;
         }
@@ -327,9 +396,13 @@ namespace Content.Server.Pointing.EntitySystems
         private void OnPointAttempt(PointingAttemptEvent ev, EntitySessionEventArgs args)
         {
             var target = GetEntity(ev.Target);
+            Log.Info($"[Pointing] OnPointAttempt: sender={args.SenderSession.Name}, targetNet={ev.Target}, target={ToPrettyString(target)}");
 
             if (TryComp(target, out TransformComponent? xformTarget))
-                TryPoint(args.SenderSession, xformTarget.Coordinates, target);
+            {
+                var result = TryPoint(args.SenderSession, xformTarget.Coordinates, target);
+                Log.Info($"[Pointing] OnPointAttempt result: sender={args.SenderSession.Name}, success={result}");
+            }
             else
                 Log.Warning($"User {args.SenderSession} attempted to point at a non-existent entity uid: {ev.Target}");
         }

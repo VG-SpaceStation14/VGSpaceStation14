@@ -17,6 +17,7 @@ chat-manager-no-radio-key = Не задан ключ канала!
 chat-manager-no-such-channel = Нет канала с ключём '{ $key }'!
 chat-manager-whisper-headset-on-message = Вы не можете шептать в радио!
 chat-manager-server-wrap-message = [bold]{ $message }[/bold]
+chat-manager-pointing-wrap-message = [color=#b8b0c7]{ $message }[/color]
 ##ADT Tweak start
 chat-manager-sender-announcement = системы безопасности станции
 ##ADT Tweak end
