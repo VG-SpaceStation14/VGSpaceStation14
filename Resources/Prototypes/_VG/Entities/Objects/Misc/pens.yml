@@ -7,6 +7,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: atmos
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: booze pen
@@ -17,6 +19,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: bartender
+  - type: Signature
+    color: Brown
 
 - type: entity
   name: cargo pen
@@ -27,6 +31,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: cargo
+  - type: Signature
+    color: Orange
 
 - type: entity
   name: chaplain's pen
@@ -47,6 +53,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: chemistry
+  - type: Signature
+    color: Orange
 
 - type: entity
   name: engineering pen
@@ -57,6 +65,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: engineering
+  - type: Signature
+    color: Yellow
 
 - type: entity
   name: green pen
@@ -67,6 +77,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: green
+  - type: Signature
+    color: Green
 
 - type: entity
   name: hearts pen
@@ -77,6 +89,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: hearts
+  - type: Signature
+    color: Pink
 
 - type: entity
   name: hydroponics pen
@@ -87,6 +101,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: hydroponics
+  - type: Signature
+    color: Green
 
 - type: entity
   name: janitorial pen
@@ -97,6 +113,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: janitor
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: light-blue pen
@@ -107,6 +125,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: medical1
+  - type: Signature
+    color: LightBlue
 
 - type: entity
   name: medical pen
@@ -117,6 +137,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: medical2
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: cheap medical pen
@@ -127,6 +149,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: medical3
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: camouflage pen
@@ -137,6 +161,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: military
+  - type: Signature
+    color: Green
 
 - type: entity
   name: mime pen
@@ -147,6 +173,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: mime
+  - type: Signature
+    color: Gray
 
 - type: entity
   name: pink pen
@@ -157,6 +185,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: pink
+  - type: Signature
+    color: Pink
 
 - type: entity
   name: magic pen
@@ -167,6 +197,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: purple
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: rainbow fountain pen
@@ -177,6 +209,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: rainbow
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: media pen
@@ -187,6 +221,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: reporter
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: yellow pen
@@ -197,6 +233,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: yellow
+  - type: Signature
+    color: Yellow
 
 - type: entity
   name: violet pen
@@ -207,6 +245,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: violet
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: starry pen
@@ -217,6 +257,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: star
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: fountain science pen
@@ -227,6 +269,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: scientist_fountain
+  - type: Signature
+    color: LightBlue
 
 - type: entity
   name: overpriced science pen
@@ -237,6 +281,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: scientist1
+  - type: Signature
+    color: Blue
   - type: Tool
     qualities:
       - Screwing
@@ -252,6 +298,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: scientist2
+  - type: Signature
+    color: Blue
 
 - type: entity
   name: brigmedic pen
@@ -262,6 +310,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: security1
+  - type: Signature
+    color: Red
 
 - type: entity
   name: black security pen
@@ -272,6 +322,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: security2
+  - type: Signature
+    color: Black
 
 - type: entity
   name: red security pen
@@ -282,6 +334,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: security3
+  - type: Signature
+    color: Red
 
 - type: entity
   name: security fountain pen
@@ -292,6 +346,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: security_fountain1
+  - type: Signature
+    color: Red
 
 - type: entity
   name: metallic fountain pen
@@ -302,6 +358,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: security_fountain2
+  - type: Signature
+    color: Red
   - type: MeleeWeapon
     wideAnimationRotation: -45
     damage:
@@ -322,6 +380,8 @@
     tags:
     - Write
     - Pickaxe
+  - type: Signature
+    color: Black
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: fountain_black
@@ -345,6 +405,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: medical4
+  - type: Signature
+    color: LightBlue
 
 - type: entity
   name: engineer fountain pen
@@ -355,6 +417,8 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: engineering2
+  - type: Signature
+    color: Yellow
 
 - type: entity
   name: cargo fountain pen
@@ -365,3 +429,5 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/pens.rsi
     state: cargo2
+  - type: Signature
+    color: Gold
