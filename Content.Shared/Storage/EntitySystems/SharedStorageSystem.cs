@@ -1216,6 +1216,16 @@ public abstract class SharedStorageSystem : EntitySystem
 
             if (canPlaySound)
                 Audio.PlayPredicted(storageComp.StorageInsertSound, uid, user, _audioParams);
+            // VG-Tweak Start
+            if (user != null)
+            {
+                PlayPickupAnimation(insertEnt,
+                    Transform(user.Value).Coordinates,
+                    Transform(uid).Coordinates,
+                    Transform(insertEnt).LocalRotation,
+                    user);
+            }
+            // VG-Tweak End
 
             return true;
         }
@@ -1243,6 +1253,17 @@ public abstract class SharedStorageSystem : EntitySystem
             // Failed to insert anything.
             return false;
         }
+
+        // VG-Tweak Start
+        if (user != null)
+        {
+            PlayPickupAnimation(insertEnt,
+                Transform(user.Value).Coordinates,
+                Transform(uid).Coordinates,
+                Transform(insertEnt).LocalRotation,
+                user);
+        }
+        // VG-Tweak End
 
         if (canPlaySound)
             Audio.PlayPredicted(storageComp.StorageInsertSound, uid, user, _audioParams);

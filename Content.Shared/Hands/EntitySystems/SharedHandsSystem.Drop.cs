@@ -165,6 +165,19 @@ public abstract partial class SharedHandsSystem
         var origin = new MapCoordinates(itemPos, itemXform.MapID);
         var target = TransformSystem.ToMapCoordinates(targetDropLocation.Value);
         TransformSystem.SetWorldPositionRotation(entity.Value, GetFinalDropCoordinates(ent, origin, target, entity.Value), itemRot);
+
+        // VG-Tweak Start
+        var currentCoords = TransformSystem.GetMoverCoordinates(entity.Value);
+        var currentMapCoords = TransformSystem.GetMapCoordinates(entity.Value);
+
+        if (itemXform.MapID == userXform.MapID
+            && (currentMapCoords.Position - TransformSystem.GetMapCoordinates(ent, userXform).Position).Length() <= MaxAnimationRange
+            && MetaData(entity.Value).VisibilityMask == MetaData(ent).VisibilityMask) // Don't animate aghost pickups.
+        {
+            _storage.PlayPickupAnimation(entity.Value, userXform.Coordinates, currentCoords, itemXform.LocalRotation, ent);
+        }
+        // VG-Tweak End
+
         return true;
     }
 
