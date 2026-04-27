@@ -42,6 +42,7 @@
     short: true
     shortscale: 0.95 # VG-Tweak
   #End ADT tweak
+  - type: FootprintEmitter # VG-Tweak
 
 
 - type: entity

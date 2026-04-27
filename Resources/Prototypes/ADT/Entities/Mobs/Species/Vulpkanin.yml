@@ -173,6 +173,7 @@
       - DoorBumpOpener
       - AnomalyHost
       - ADTDogEmotes
+    - type: FootprintEmitter # VG-Tweak
 
 - type: entity
   save: false

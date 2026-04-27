@@ -219,6 +219,7 @@
     solution: puddle
   - type: BadDrink
   - type: IgnoresFingerprints
+  - type: PuddleFootprint # VG-Tweak
   - type: Tag
     tags:
     - DNASolutionScannable

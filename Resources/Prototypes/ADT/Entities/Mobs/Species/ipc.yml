@@ -186,6 +186,7 @@
   - type: AnimatedEmotes
   - type: Posing
   - type: SoftWalk
+  - type: FootprintEmitter # VG-Tweak
 
 - type: entity
   save: false

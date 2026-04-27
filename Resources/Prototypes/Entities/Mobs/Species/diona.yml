@@ -125,6 +125,13 @@
     shortscale: 0.9 # VG-Tweak
   - type: CollectiveMindRank
   # ADT tweak end
+  # VG-Tweak Start
+  - type: FootprintEmitter
+    leftBareFootState:
+      - "footprint-left-bare-diona"
+    rightBareFootState:
+      - "footprint-right-bare-diona"
+  # VG-Tweak End
 
 - type: entity
   parent: BaseSpeciesDummy

@@ -284,6 +284,7 @@
     tallscale: 1.15
     short: true
     shortscale: 1
+  - type: FootprintEmitter # VG-Tweak
 
 - type: entity
   save: false

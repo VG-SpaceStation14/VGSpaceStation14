@@ -74,6 +74,13 @@
       GalacticCommon: Speak
       Dwarf: Speak
   # ADT tweak end
+  # VG-Tweak Start
+  - type: FootprintEmitter
+    leftBareFootState:
+    - "footprint-left-bare-dwarf"
+    rightBareFootState:
+    - "footprint-right-bare-dwarf"
+  # VG-Tweak End
 
 - type: entity
   parent: BaseSpeciesDummy

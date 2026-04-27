@@ -234,6 +234,13 @@
         32:
           sprite: Mobs/Species/Vox/displacement.rsi
           state: hand_r
+  # VG-Tweak Start
+  - type: FootprintEmitter
+    leftBareFootState:
+    - "footprint-left-bare-lizard"
+    rightBareFootState:
+    - "footprint-right-bare-lizard"
+  # VG-Tweak End
 
 - type: entity
   parent: BaseSpeciesDummy

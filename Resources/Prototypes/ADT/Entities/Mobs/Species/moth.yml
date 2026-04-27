@@ -154,6 +154,7 @@
   - type: DashAction
     actionProto: ADTActionDashMoth
     # ADT-Tweak Moth Roll end
+  - type: FootprintEmitter # VG-Tweak
     
 - type: entity
   parent: BaseSpeciesDummy

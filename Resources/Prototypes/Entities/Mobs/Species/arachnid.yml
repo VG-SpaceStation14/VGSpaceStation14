@@ -140,6 +140,13 @@
     short: true
     shortscale: 0.95 # VG-Tweak
   # ADT tweak end
+  # VG-Tweak Start
+  - type: FootprintEmitter
+    leftBareFootState:
+      - "footprint-left-bare-spider"
+    rightBareFootState:
+      - "footprint-right-bare-spider"
+  # VG-Tweak End
 
 - type: entity
   parent: BaseSpeciesDummy

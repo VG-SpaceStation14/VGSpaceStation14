@@ -103,6 +103,7 @@
     shortscale: 0.8
   - type: Thieving
     stealthy: false
+  - type: FootprintEmitter # VG-Twea
 
 - type: entity
   parent: BaseSpeciesDummy

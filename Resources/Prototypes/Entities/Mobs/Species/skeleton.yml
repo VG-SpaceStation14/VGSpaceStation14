@@ -141,7 +141,8 @@
       proto: SkeletonBarkOne
       sound:
         collection: ADTSkeletonBark
-# ADT-Tweak-end
+  # ADT-Tweak-end
+  - type: FootprintEmitter # VG-Tweak
 
 - type: entity
   parent: BaseSpeciesDummy
