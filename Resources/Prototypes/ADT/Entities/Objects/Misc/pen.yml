@@ -29,6 +29,8 @@
   components:
   - type: Sprite
     state: pen_ce
+  - type: Signature
+    color: Yellow
 
 - type: entity
   name: cmo's fountain pen
@@ -38,6 +40,8 @@
   components:
   - type: Sprite
     state: pen_cmo
+  - type: Signature
+    color: LightBlue
 
 - type: entity
   name: QM's fountain pen
@@ -47,6 +51,8 @@
   components:
   - type: Sprite
     state: pen_qm
+  - type: Signature
+    color: Gold
 
 - type: entity
   name: RD's fountain pen
@@ -56,6 +62,8 @@
   components:
   - type: Sprite
     state: pen_rd
+  - type: Signature
+    color: Purple
 
 - type: entity
   name: Hos's fountain pen
@@ -65,6 +73,8 @@
   components:
   - type: Sprite
     state: pen_hos
+  - type: Signature
+    color: Red
 
 - type: entity
   name: gorlax's fountain pen
@@ -74,6 +84,8 @@
   components:
   - type: Sprite
     state: pen_gorlax
+  - type: Signature
+    color: Red
 
 - type: entity
   name: DV`s pen
@@ -83,6 +95,8 @@
   components:
   - type: Sprite
     state: pen_dv
+  - type: Signature
+    color: Orange
   - type: DamageOtherOnHit
     damage:
       types:
@@ -99,3 +113,5 @@
     state: pen_capdv
   - type: Item
     sprite: ADT/Objects/Misc/pens.rsi
+  - type: Signature
+    color: Blue

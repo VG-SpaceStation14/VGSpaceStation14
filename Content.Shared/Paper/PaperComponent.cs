@@ -23,6 +23,9 @@ public sealed partial class PaperComponent : Component
     [DataField("stampState"), AutoNetworkedField]
     public string? StampState { get; set; }
 
+    [DataField("stampColor"), AutoNetworkedField]
+    public Color StampColor { get; set; } = Color.White;
+
     [DataField, AutoNetworkedField]
     public bool EditingDisabled;
 
@@ -75,7 +78,8 @@ public sealed partial class PaperComponent : Component
     public enum PaperVisuals : byte
     {
         Status,
-        Stamp
+        Stamp,
+        StampColor
     }
 
     [Serializable, NetSerializable]
