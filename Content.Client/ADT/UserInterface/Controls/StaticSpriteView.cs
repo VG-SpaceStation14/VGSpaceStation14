@@ -1,9 +1,14 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
+using Robust.Shared.GameObjects;
+using Robust.Shared.IoC;
+using Robust.Shared.Maths;
 using Robust.Shared.Utility;
+using Robust.Shared.ViewVariables;
 
 namespace Content.Client.ADT.UserInterface.Controls;
 
@@ -13,9 +18,6 @@ public class StaticSpriteView : Control
     protected SpriteSystem? SpriteSystem;
     private SharedTransformSystem? _transform;
     protected readonly IEntityManager EntMan;
-
-    private SpriteComponent? _cachedSprite;
-    private readonly Angle _cachedWorldRotation = Angle.Zero;
 
     [ViewVariables]
     public SpriteComponent? Sprite => Entity?.Comp1;
@@ -28,46 +30,24 @@ public class StaticSpriteView : Control
 
     public bool IsVisible { get; set; } = true;
 
-    /// <summary>
-    /// This field configures automatic scaling of the sprite. This automatic scaling is done before
-    /// applying the explicitly set scale <see cref="SunriseStaticSpriteView.Scale"/>.
-    /// </summary>
-    public StretchMode Stretch  { get; set; } = StretchMode.Fit;
+    public StretchMode Stretch { get; set; } = StretchMode.Fit;
 
     public enum StretchMode
     {
-        /// <summary>
-        /// Don't automatically scale the sprite. The sprite can still be scaled via <see cref="SunriseStaticSpriteView.Scale"/>
-        /// </summary>
         None,
-
-        /// <summary>
-        /// Scales the sprite down so that it fits within the control. Does not scale the sprite up. Keeps the same
-        /// aspect ratio. This automatic scaling is done before applying <see cref="SunriseStaticSpriteView.Scale"/>.
-        /// </summary>
         Fit,
-
-        /// <summary>
-        /// Scale the sprite up or down so that it fills the whole control. Keeps the same aspect ratio. This
-        /// automatic scaling is done before applying <see cref="SunriseStaticSpriteView.Scale"/>.
-        /// </summary>
         Fill
     }
 
-    /// <summary>
-    /// Overrides the direction used to render the sprite.
-    /// </summary>
-    /// <remarks>
-    /// If null, the world space orientation of the entity will be used. Otherwise the specified direction will be
-    /// used.
-    /// </remarks>
     public Direction? OverrideDirection { get; set; }
-
-    #region Transform
 
     private Vector2 _scale = Vector2.One;
     private Angle _eyeRotation = Angle.Zero;
     private Angle? _worldRotation = Angle.Zero;
+    private Vector2 _spriteSize;
+
+    public Vector2 Offset { get; set; } = Vector2.Zero;
+    public bool SpriteOffset { get; set; }
 
     public Angle EyeRotation
     {
@@ -79,10 +59,6 @@ public class StaticSpriteView : Control
         }
     }
 
-    /// <summary>
-    /// Used to override the entity's world rotation. Note that the desired size of the control will not
-    /// automatically get updated as the entity's world rotation changes.
-    /// </summary>
     public Angle? WorldRotation
     {
         get => _worldRotation;
@@ -93,9 +69,6 @@ public class StaticSpriteView : Control
         }
     }
 
-    /// <summary>
-    /// Scale to apply when rendering the sprite. This is separate from the sprite's scale.
-    /// </summary>
     public Vector2 Scale
     {
         get => _scale;
@@ -105,19 +78,6 @@ public class StaticSpriteView : Control
             InvalidateMeasure();
         }
     }
-
-    /// <summary>
-    /// Cached desired size. Differs from <see cref="Control.DesiredSize"/> as it it is not clamped by the
-    /// minimum/maximum size options.
-    /// </summary>
-    private Vector2 _spriteSize;
-
-    /// <summary>
-    /// Determines whether or not the sprite's offset be applied to the control.
-    /// </summary>
-    public bool SpriteOffset { get; set; }
-
-    #endregion
 
     public StaticSpriteView()
     {
@@ -150,16 +110,8 @@ public class StaticSpriteView : Control
         if (netEnt == NetEnt)
             return;
 
-        if (EntMan.TryGetEntity(netEnt, out var uid))
-        {
-            SetEntity(uid);
-        }
-        else
-        {
-            // Подписаться на событие появления сущности
-            Entity = null;
-            NetEnt = netEnt;
-        }
+        Entity = null;
+        NetEnt = netEnt;
     }
 
     public void SetEntity(EntityUid? uid)
@@ -167,25 +119,25 @@ public class StaticSpriteView : Control
         if (Entity?.Owner == uid)
             return;
 
-        if (!EntMan.TryGetComponent(uid, out SpriteComponent? sprite)
-            || !EntMan.TryGetComponent(uid, out TransformComponent? xform))
+        if (!EntMan.TryGetComponent(uid, out SpriteComponent? sprite) ||
+            !EntMan.TryGetComponent(uid, out TransformComponent? xform))
         {
             Entity = null;
             NetEnt = null;
             return;
         }
 
-        // Создаем глубокую копию спрайта
-        _cachedSprite = new SpriteComponent();
-        _cachedSprite.CopyFrom(sprite); // Используем встроенный метод копирования
-
         Entity = new(uid.Value, sprite, xform);
         NetEnt = EntMan.GetNetEntity(uid);
     }
+
     protected override Vector2 MeasureOverride(Vector2 availableSize)
     {
-        // TODO Make this get called when sprite bounds/properties update?
         UpdateSize();
+        var setSize = SetSize;
+        if (!float.IsNaN(setSize.X) && !float.IsNaN(setSize.Y))
+            return setSize;
+
         return _spriteSize;
     }
 
@@ -194,22 +146,16 @@ public class StaticSpriteView : Control
         if (!ResolveEntity(out _, out var sprite, out _))
             return;
 
-        var spriteBox = sprite.CalculateRotatedBoundingBox(default,  _worldRotation ?? Angle.Zero, _eyeRotation)
+        var spriteBox = sprite.CalculateRotatedBoundingBox(default, _worldRotation ?? Angle.Zero, _eyeRotation)
             .CalcBoundingBox();
 
         if (!SpriteOffset)
-        {
-            // re-center the box.
             spriteBox = spriteBox.Translated(-spriteBox.Center);
-        }
 
-        // Scale the box (including any offset);
         var scale = _scale * EyeManager.PixelsPerMeter;
         var bl = spriteBox.BottomLeft * scale;
         var tr = spriteBox.TopRight * scale;
 
-        // This view will be centered on (0,0). If the sprite was shifted by (1,2) the actual size of the control
-        // would need to be at least (2,4).
         tr = Vector2.Max(tr, Vector2.Zero);
         bl = Vector2.Min(bl, Vector2.Zero);
         tr = Vector2.Max(tr, -bl);
@@ -219,15 +165,12 @@ public class StaticSpriteView : Control
         DebugTools.Assert(box.Contains(Vector2.Zero));
         DebugTools.Assert(box.TopLeft.EqualsApprox(-box.BottomRight));
 
-        if (_worldRotation != null
-            && _eyeRotation == Angle.Zero) // TODO This shouldn't need to be here, but I just give up at this point I am going fucking insane looking at rotating blobs of pixels. I doubt anyone will ever even use rotated sprite views.?
+        if (_worldRotation != null && _eyeRotation == Angle.Zero)
         {
             _spriteSize = box.Size;
             return;
         }
 
-        // Size does not auto-update with world rotation. So if it is not fixed by _worldRotation we will just take
-        // the maximum possible size.
         var size = box.Size;
         var longestSide = MathF.Max(size.X, size.Y);
         var longestRotatedSide = Math.Max(longestSide, (size.X + size.Y) / MathF.Sqrt(2));
@@ -236,11 +179,12 @@ public class StaticSpriteView : Control
 
     protected override void Draw(IRenderHandle renderHandle)
     {
-        if (!ResolveEntity(out var uid, out _, out var xform) || _cachedSprite == null)
+        if (!ResolveEntity(out var uid, out var sprite, out var xform))
             return;
 
         SpriteSystem ??= EntMan.System<SpriteSystem>();
         _transform ??= EntMan.System<TransformSystem>();
+        SpriteSystem.ForceUpdate(uid);
 
         var stretchVec = Stretch switch
         {
@@ -252,26 +196,16 @@ public class StaticSpriteView : Control
 
         var offset = SpriteOffset
             ? Vector2.Zero
-            : - (-_eyeRotation).RotateVec(_cachedSprite.Offset * _scale) * new Vector2(1, -1) * EyeManager.PixelsPerMeter;
+            : -(-_eyeRotation).RotateVec(sprite.Offset * _scale) * new Vector2(1, -1) * EyeManager.PixelsPerMeter;
 
-        var position = PixelSize / 2 + offset * stretch * UIScale;
+        var position = PixelSize / 2 + offset * stretch * UIScale + Offset * UIScale;
         var scale = Scale * UIScale * stretch;
 
         var world = renderHandle.DrawingHandleWorld;
         var oldModulate = world.Modulate;
         world.Modulate *= Modulate * ActualModulateSelf;
 
-        renderHandle.DrawEntity(
-            uid,
-            position,
-            scale,
-            _cachedWorldRotation, // Используем сохраненный поворот
-            _eyeRotation,
-            OverrideDirection,
-            _cachedSprite, // Кэшированный спрайт
-            xform
-        );
-
+        renderHandle.DrawEntity(uid, position, scale, _worldRotation, _eyeRotation, OverrideDirection, sprite, xform, _transform);
         world.Modulate = oldModulate;
     }
 
@@ -280,18 +214,17 @@ public class StaticSpriteView : Control
         [NotNullWhen(true)] out SpriteComponent? sprite,
         [NotNullWhen(true)] out TransformComponent? xform)
     {
-        sprite = _cachedSprite; // Возвращаем кэшированный спрайт
-        xform = null; // Не используем текущий transform
-
         if (NetEnt != null && Entity == null && EntMan.TryGetEntity(NetEnt, out var ent))
             SetEntity(ent);
 
         if (Entity != null)
         {
-            uid = Entity.Value.Owner;
+            (uid, sprite, xform) = Entity.Value;
             return !EntMan.Deleted(uid);
         }
 
+        sprite = null;
+        xform = null;
         uid = default;
         return false;
     }
