@@ -41,6 +41,10 @@
     reduction: 0.25
   - type: CoveredSlot
     slots: [innerclothing, underwearb, underweart, socks]
+  - type: HideLayerClothing # VG-Tweak: fix-tail
+    slots:
+    - Tail
+    hideOnToggle: true
 
 - type: entity
   parent: ADTClothingOuterModsuitBodyBase

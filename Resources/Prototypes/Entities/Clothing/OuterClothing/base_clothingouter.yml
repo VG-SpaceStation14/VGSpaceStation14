@@ -186,9 +186,10 @@
       params:
         volume: -4
   # VG-Tweak End
-  # - type: HideLayerClothing # ADT-Tweak: fix-tail
-  #   slots:
-  #   - Tail
+  - type: HideLayerClothing # VG-Tweak: fix-tail
+    slots:
+    - Tail
+    hideOnToggle: true
   #ADT-Tweak-Start
   - type: CoveredSlot
     slots: [innerclothing, gloves, feet, underwearb, underweart, socks]
