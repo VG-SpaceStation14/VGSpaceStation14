@@ -6,30 +6,33 @@
   - type: Sprite
     sprite: _VG/Objects/Misc/id_cards.rsi
     layers:
-    - state: blue
-    - state: idtsf
+    - state: tsf
+    - sprite: _VG/Interface/Misc/job_icons.rsi
+      offset: -0.19, 0
+      state: TSF
   - type: Item
-    heldPrefix: blue
+    heldPrefix: silver
   - type: IdCard
     jobTitle: job-title-tsf-representative
     jobIcon: JobIconTSF
-#    jobColor: "#2A5760"
   - type: Access
     tags:
-     - Maintenance
+    - Maintenance
 
 - type: entity
   parent: IDCardStandard
   id: USSPSoldierIDCard
-  name: USSP soldier ID card.
+  name: USSP soldier ID card
   components:
   - type: Sprite
     sprite: _VG/Objects/Misc/id_cards.rsi
     layers:
-    - state: red
-    - state: idusspsoldier
+    - state: sssp-red
+    - sprite: _VG/Interface/Misc/job_icons.rsi
+      offset: -0.19, 0
+      state: USSPSoldier
   - type: Item
-    heldPrefix: red
+    heldPrefix: silver
   - type: IdCard
     jobTitle: job-title-ussp-soldier
     jobIcon: JobIconUSSPSoldier
@@ -37,15 +40,17 @@
 - type: entity
   parent: IDCardStandard
   id: USSPMedicalIDCard
-  name: USSP medic ID card.
+  name: USSP medic ID card
   components:
   - type: Sprite
     sprite: _VG/Objects/Misc/id_cards.rsi
     layers:
-    - state: red
-    - state: idusspmedical
+    - state: sssp-red
+    - sprite: _VG/Interface/Misc/job_icons.rsi
+      offset: -0.19, 0
+      state: USSPMedical
   - type: Item
-    heldPrefix: red
+    heldPrefix: silver
   - type: IdCard
     jobTitle: job-title-ussp-medical
     jobIcon: JobIconUSSPMedical
@@ -53,15 +58,17 @@
 - type: entity
   parent: IDCardStandard
   id: USSPOfficerIDCard
-  name: USSP officer ID card.
+  name: USSP officer ID card
   components:
   - type: Sprite
     sprite: _VG/Objects/Misc/id_cards.rsi
     layers:
-    - state: red
-    - state: idusspofficer
+    - state: sssp-red
+    - sprite: _VG/Interface/Misc/job_icons.rsi
+      offset: -0.19, 0
+      state: USSPOfficer
   - type: Item
-    heldPrefix: red
+    heldPrefix: silver
   - type: IdCard
     jobTitle: job-title-ussp-officer 
     jobIcon: JobIconUSSPOfficer
