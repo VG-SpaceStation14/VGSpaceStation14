@@ -26,6 +26,9 @@
             "name": "footprint-left-bare-spider"
         },
         {
+            "name": "footprint-left-bare-fluffy"
+        },
+        {
             "name": "footprint-right-bare-diona"
         },
         {
@@ -42,6 +45,21 @@
         },
         {
             "name": "footprint-right-bare-spider"
+        },
+        {
+            "name": "footprint-right-bare-fluffy"
+        },
+        {
+            "name": "footprint-shoes-lizard"
+        },
+        {
+            "name": "footprint-shoes-fluffy"
+        },
+        {
+            "name": "footprint-suit-fluffy"
+        },
+        {
+            "name": "footprint-suit-lizzard"
         },
         {
             "name": "footprint-shoes"

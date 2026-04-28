@@ -173,7 +173,17 @@
       - DoorBumpOpener
       - AnomalyHost
       - ADTDogEmotes
-    - type: FootprintEmitter # VG-Tweak
+    # VG-Tweak Start
+    - type: FootprintEmitter
+      leftBareFootState:
+        - "footprint-left-bare-fluffy"
+      rightBareFootState:
+        - "footprint-right-bare-fluffy"
+      shoeFootState:
+        - "footprint-shoes-fluffy"
+      pressureSuitFootState:
+        - "footprint-suit-fluffy"
+    # VG-Tweak End
 
 - type: entity
   save: false
