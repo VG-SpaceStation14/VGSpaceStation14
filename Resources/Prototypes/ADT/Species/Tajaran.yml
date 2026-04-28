@@ -51,6 +51,7 @@
     RLeg: MobTajaranRLeg
     LFoot: MobTajaranLFoot
     RFoot: MobTajaranRFoot
+    HeadTop: MobHumanoidAnyMarking
     Tail: MobHumanoidAnyMarking
 
 - type: markingPoints
@@ -73,6 +74,10 @@
       points: 1
       required: true
       defaultMarkings: [ TailColor ]
+    HeadTop:
+      points: 1
+      required: true
+      defaultMarkings: [ Head1 ]
     Head:
       points: 3
       required: false

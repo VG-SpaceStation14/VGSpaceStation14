@@ -244,6 +244,8 @@
       species: VulpkaninSpecies
       hideLayersOnEquip:
       - SnoutOverlay
+      - Tail # VG-Tweak
+      - HeadTop # VG-Tweak
     - type: Sprite
       netsync: false
       noRot: true

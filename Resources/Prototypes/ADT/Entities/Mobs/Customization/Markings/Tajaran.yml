@@ -483,7 +483,7 @@
 ##Голова (верх)
 - type: marking
   id: Head1
-  bodyPart: Head
+  bodyPart: HeadTop
   markingCategory: HeadTop
   speciesRestriction: [TajaranSpecies]
   sprites:
