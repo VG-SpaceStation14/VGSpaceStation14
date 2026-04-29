@@ -80,7 +80,6 @@ namespace Content.Client.HealthAnalyzer.UI
                 bodyPartButton.Value.MouseFilter = MouseFilterMode.Stop;
                 bodyPartButton.Value.OnPressed += _ => SetActiveBodyPart(bodyPartButton.Key, bodyPartButton.Value);
             }
-            ReturnButton.OnPressed += _ => ResetBodyPart();
         }
 
         public void SetActiveBodyPart(TargetBodyPart part, TextureButton button)
@@ -88,13 +87,6 @@ namespace Content.Client.HealthAnalyzer.UI
             if (_target == null)
                 return;
             OnBodyPartSelected?.Invoke(part == TargetBodyPart.Groin ? TargetBodyPart.Torso : part, _target.Value);
-        }
-
-        public void ResetBodyPart()
-        {
-            if (_target == null)
-                return;
-            OnBodyPartSelected?.Invoke(null, _target.Value);
         }
 
         public void SetActiveButtons(bool isHumanoid)
@@ -113,18 +105,11 @@ namespace Content.Client.HealthAnalyzer.UI
                 || !_entityManager.TryGetComponent<DamageableComponent>(isPart ? part : _target, out var damageable))
             {
                 NoPatientDataText.Visible = true;
+                SpriteView.Visible = false;
+                PartView.Visible = false;
+                NoDataTex.Visible = false;
                 return;
             }
-
-            SetActiveButtons(_entityManager.HasComponent<TargetingComponent>(_target.Value));
-
-            ReturnButton.Visible = isPart;
-            PartNameLabel.Visible = isPart;
-
-            if (part != null)
-                PartNameLabel.Text = _entityManager.HasComponent<MetaDataComponent>(part)
-                    ? Identity.Name(part.Value, _entityManager)
-                    : Loc.GetString("health-analyzer-window-entity-unknown-value-text");
 
             NoPatientDataText.Visible = false;
 
@@ -136,10 +121,31 @@ namespace Content.Client.HealthAnalyzer.UI
 
             ScanModeLabel.FontColorOverride = msg.ScanMode.HasValue && msg.ScanMode.Value ? Color.Green : Color.Red;
 
-            SpriteView.SetEntity(SetupIcon(msg.Body) ?? _target.Value);
-            SpriteView.Visible = msg.ScanMode.HasValue && msg.ScanMode.Value;
-            PartView.Visible = SpriteView.Visible;
-            NoDataTex.Visible = !SpriteView.Visible;
+            if (!msg.ScanMode.HasValue || !msg.ScanMode.Value)
+            {
+                SpriteView.Visible = false;
+                PartView.Visible = false;
+                NoDataTex.Visible = true;
+                return;
+            }
+
+            SpriteView.SetEntity(_target.Value);
+            SpriteView.Visible = true;
+            NoDataTex.Visible = false;
+
+            var hasTargeting = _entityManager.HasComponent<TargetingComponent>(_target.Value);
+            PartView.Visible = hasTargeting && msg.Body != null;
+            if (PartView.Visible)
+            {
+                var dollEntity = SetupIcon(msg.Body);
+                DollSpriteView.SetEntity(dollEntity);
+            }
+            else
+            {
+                DollSpriteView.SetEntity(null);
+            }
+
+            SetActiveButtons(hasTargeting);
 
             var name = new FormattedMessage();
             name.PushColor(Color.White);
@@ -157,7 +163,6 @@ namespace Content.Client.HealthAnalyzer.UI
                 ? $"{msg.Temperature - Atmospherics.T0C:F1} °C ({msg.Temperature:F1} K)"
                 : Loc.GetString("health-analyzer-window-entity-unknown-value-text");
 
-            // ADT-Tweak: blood color gradient
             if (!float.IsNaN(msg.BloodLevel))
             {
                 var bloodPercent = msg.BloodLevel;
@@ -231,7 +236,6 @@ namespace Content.Client.HealthAnalyzer.UI
             };
         }
 
-        // ADT-Tweak: Diagnostic Groups
         private void DrawDiagnosticGroups(Dictionary<string, FixedPoint2> groups, IReadOnlyDictionary<string, FixedPoint2> damageDict)
         {
             GroupsContainer.RemoveAllChildren();
@@ -372,10 +376,9 @@ namespace Content.Client.HealthAnalyzer.UI
                     sprite.AddLayer(_spriteSystem.Frame0(rsi));
                 else
                     sprite.LayerSetTexture(layer, _spriteSystem.Frame0(rsi));
-                sprite.LayerSetScale(layer, new Vector2(3f, 3f));
                 layer++;
             }
             return _spriteViewEntity;
-        }       
+        }
     }
 }
