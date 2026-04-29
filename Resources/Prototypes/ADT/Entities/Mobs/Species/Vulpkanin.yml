@@ -230,6 +230,8 @@
         - "footprint-shoes-fluffy"
       pressureSuitFootState:
         - "footprint-suit-fluffy"
+    - type: SurgeryTarget
+      dollPath: /Textures/_VG/Interface/Targeting/Status/Vulpkanin
     # VG-Tweak End
 
 - type: entity

@@ -232,6 +232,8 @@
       - "footprint-shoes-lizard"
     pressureSuitFootState:
       - "footprint-suit-lizzard"
+  - type: SurgeryTarget
+    dollPath: /Textures/_VG/Interface/Targeting/Status/Reptilian
   # VG-Tweak End
 
 - type: entity

@@ -28,6 +28,7 @@ using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Content.Shared.Damage.Components;
+using Content.Shared._VG.Surgery;
 
 namespace Content.Client.HealthAnalyzer.UI
 {
@@ -348,7 +349,7 @@ namespace Content.Client.HealthAnalyzer.UI
 
         private EntityUid? SetupIcon(Dictionary<TargetBodyPart, TargetIntegrity>? body)
         {
-            if (body is null)
+            if (body is null || _target == null)
                 return null;
 
             if (!_entityManager.Deleted(_spriteViewEntity))
@@ -359,12 +360,14 @@ namespace Content.Client.HealthAnalyzer.UI
             if (!_entityManager.TryGetComponent<SpriteComponent>(_spriteViewEntity, out var sprite))
                 return null;
 
+            var dollPath = _entityManager.GetComponent<SurgeryTargetComponent>(_target.Value).DollPath!;
+
             int layer = 0;
             foreach (var (bodyPart, integrity) in body)
             {
                 string enumName = Enum.GetName(typeof(TargetBodyPart), bodyPart) ?? "Unknown";
                 int enumValue = (int)integrity;
-                var rsi = new SpriteSpecifier.Rsi(new ResPath($"/Textures/_VG/Interface/Targeting/Status/{enumName.ToLowerInvariant()}.rsi"), $"{enumName.ToLowerInvariant()}_{enumValue}");
+                var rsi = new SpriteSpecifier.Rsi(new ResPath($"{dollPath}/{enumName.ToLowerInvariant()}.rsi"), $"{enumName.ToLowerInvariant()}_{enumValue}");
                 if (!sprite.TryGetLayer(layer, out _))
                     sprite.AddLayer(_spriteSystem.Frame0(rsi));
                 else
@@ -373,6 +376,6 @@ namespace Content.Client.HealthAnalyzer.UI
                 layer++;
             }
             return _spriteViewEntity;
-        }
+        }       
     }
 }
