@@ -72,6 +72,16 @@
   - type: Tag
     tags:
     - HidesHair
+  # VG-Tweak Start
+  - type: HideLayerClothing
+    slots:
+    - Hair
+    - Snout
+    - HeadTop
+    - HeadSide
+    - FacialHair
+    - SnoutOverlay # ADT Tweak
+  # VG-Tweak End
 
 - type: entity
   parent: ADTClothingHeadHelmetMiner
@@ -83,6 +93,16 @@
     sprite: ADT/Clothing/Head/Helmets/mining_reinforced_one.rsi
   - type: Clothing
     sprite: ADT/Clothing/Head/Helmets/mining_reinforced_one.rsi
+  # VG-Tweak Start
+  - type: HideLayerClothing
+    slots:
+    - Hair
+    - Snout
+    - HeadTop
+    - HeadSide
+    - FacialHair
+    - SnoutOverlay # ADT Tweak
+  # VG-Tweak End
 
 - type: entity
   parent: ADTClothingHeadHelmetMiner
@@ -94,6 +114,16 @@
     sprite: ADT/Clothing/Head/Helmets/mining_reinforced_two.rsi
   - type: Clothing
     sprite: ADT/Clothing/Head/Helmets/mining_reinforced_two.rsi
+  # VG-Tweak Start
+  - type: HideLayerClothing
+    slots:
+    - Hair
+    - Snout
+    - HeadTop
+    - HeadSide
+    - FacialHair
+    - SnoutOverlay # ADT Tweak
+  # VG-Tweak End
 
 - type: entity
   parent: ClothingHeadBase
@@ -116,6 +146,16 @@
   - type: Tag
     tags:
     - HidesHair
+  # VG-Tweak Start
+  - type: HideLayerClothing
+    slots:
+    - Hair
+    - Snout
+    - HeadTop
+    - HeadSide
+    - FacialHair
+    - SnoutOverlay # ADT Tweak
+  # VG-Tweak End
 
 - type: entity
   parent: ClothingHeadBase
