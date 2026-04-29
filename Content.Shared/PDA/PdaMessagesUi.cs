@@ -37,3 +37,14 @@ public sealed class PdaRequestUpdateInterfaceMessage : BoundUserInterfaceMessage
 {
     public PdaRequestUpdateInterfaceMessage() { }
 }
+
+[Serializable, NetSerializable]
+public sealed class PdaSetWallpaperColorMessage : BoundUserInterfaceMessage
+{
+    public Color Color;
+
+    public PdaSetWallpaperColorMessage(Color color)
+    {
+        Color = color;
+    }
+}

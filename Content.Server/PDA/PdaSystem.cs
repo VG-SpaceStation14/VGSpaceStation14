@@ -52,6 +52,7 @@ namespace Content.Server.PDA
             SubscribeLocalEvent<PdaComponent, PdaShowMusicMessage>(OnUiMessage);
             SubscribeLocalEvent<PdaComponent, PdaShowUplinkMessage>(OnUiMessage);
             SubscribeLocalEvent<PdaComponent, PdaLockUplinkMessage>(OnUiMessage);
+            SubscribeLocalEvent<PdaComponent, PdaSetWallpaperColorMessage>(OnUiMessage);
 
             SubscribeLocalEvent<PdaComponent, CartridgeLoaderNotificationSentEvent>(OnNotification);
 
@@ -217,7 +218,9 @@ namespace Content.Server.PDA
                 pda.StationName,
                 showUplink,
                 hasInstrument,
-                address);
+                address,
+                pda.HasWallpaperColor,
+                pda.WallpaperColor);
 
             _ui.SetUiState(uid, PdaUiKey.Key, state);
         }
@@ -286,6 +289,16 @@ namespace Content.Server.PDA
                 _ringer.LockUplink((uid, uplink));
                 UpdatePdaUi(uid, pda);
             }
+        }
+
+        private void OnUiMessage(EntityUid uid, PdaComponent pda, PdaSetWallpaperColorMessage msg)
+        {
+            if (!PdaUiKey.Key.Equals(msg.UiKey))
+                return;
+
+            pda.WallpaperColor = msg.Color.WithAlpha(1f);
+            pda.HasWallpaperColor = true;
+            UpdatePdaUi(uid, pda);
         }
 
         private bool IsUnlocked(EntityUid uid)

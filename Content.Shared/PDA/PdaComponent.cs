@@ -38,5 +38,11 @@ namespace Content.Shared.PDA
         [ViewVariables] public string? StationName;
         [ViewVariables] public string? StationAlertLevel;
         [ViewVariables] public Color StationAlertColor = Color.White;
+
+        [DataField]
+        public bool HasWallpaperColor;
+
+        [DataField]
+        public Color WallpaperColor = Color.White;
     }
 }

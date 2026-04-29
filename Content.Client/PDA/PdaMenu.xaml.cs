@@ -35,12 +35,16 @@ namespace Content.Client.PDA
         private string _alertLevel = Loc.GetString("comp-pda-ui-unknown");
         private string _instructions = Loc.GetString("comp-pda-ui-unknown");
 
+        private bool _hasWallpaperColor;
+        private bool _settingWallpaperColorFromState;
+        private Color _wallpaperColor = Color.White;
 
         private int _currentView;
 
         public event Action<EntityUid>? OnProgramItemPressed;
         public event Action<EntityUid>? OnUninstallButtonPressed;
         public event Action<EntityUid>? OnInstallButtonPressed;
+        public event Action<Color>? OnWallpaperColorSelected;
         public PdaMenu()
         {
             IoCManager.InjectDependencies(this);
@@ -134,6 +138,28 @@ namespace Content.Client.PDA
                 _clipboard.SetText(_instructions);
                 popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
             };
+
+            WallpaperColorSelector.OnColorChanged += color =>
+            {
+                if (_settingWallpaperColorFromState)
+                    return;
+
+                _hasWallpaperColor = true;
+                _wallpaperColor = color.WithAlpha(1f);
+                WallpaperColor = _wallpaperColor;
+
+                if (!WallpaperColorSelector.IsGrabbed)
+                    OnWallpaperColorSelected?.Invoke(_wallpaperColor);
+            };
+
+            WallpaperColorSelector.OnColorReleased += color =>
+            {
+                _hasWallpaperColor = true;
+                _wallpaperColor = color.WithAlpha(1f);
+                WallpaperColor = _wallpaperColor;
+                OnWallpaperColorSelected?.Invoke(_wallpaperColor);
+            };
+
             HideAllViews();
             ToHomeScreen();
         }
@@ -141,6 +167,24 @@ namespace Content.Client.PDA
         public void UpdateState(PdaUpdateState state)
         {
             FlashLightToggleButton.IsActive = state.FlashlightEnabled;
+
+            var effectiveWallpaperColor = state.HasWallpaperColor
+                ? state.WallpaperColor
+                : DefaultWallpaperColor ?? state.WallpaperColor;
+
+            WallpaperColor = state.HasWallpaperColor ? state.WallpaperColor : null;
+            if (!WallpaperColorSelector.IsGrabbed &&
+                (state.HasWallpaperColor != _hasWallpaperColor ||
+                !ColorsClose(effectiveWallpaperColor, _wallpaperColor))
+            )
+            {
+                _settingWallpaperColorFromState = true;
+                WallpaperColorSelector.Color = effectiveWallpaperColor;
+                _settingWallpaperColorFromState = false;
+            }
+
+            _hasWallpaperColor = state.HasWallpaperColor;
+            _wallpaperColor = effectiveWallpaperColor;
 
             if (state.PdaOwnerInfo.ActualOwnerName != null)
             {
@@ -341,6 +385,15 @@ namespace Content.Client.PDA
             {
                 view.Visible = false;
             }
+        }
+
+        private static bool ColorsClose(Color a, Color b)
+        {
+            const float epsilon = 0.001f;
+            return System.Math.Abs(a.R - b.R) < epsilon
+                && System.Math.Abs(a.G - b.G) < epsilon
+                && System.Math.Abs(a.B - b.B) < epsilon
+                && System.Math.Abs(a.A - b.A) < epsilon;
         }
 
         protected override void Draw(DrawingHandleScreen handle)

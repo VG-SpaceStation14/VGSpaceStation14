@@ -72,6 +72,11 @@ namespace Content.Client.PDA
                 SendMessage(new PdaLockUplinkMessage());
             };
 
+            _menu.OnWallpaperColorSelected += color =>
+            {
+                SendMessage(new PdaSetWallpaperColorMessage(color));
+            };
+
             _menu.OnProgramItemPressed += ActivateCartridge;
             _menu.OnInstallButtonPressed += InstallCartridge;
             _menu.OnUninstallButtonPressed += UninstallCartridge;
@@ -84,6 +89,7 @@ namespace Content.Client.PDA
             _menu.BorderColor = borderColorComponent.BorderColor;
             _menu.AccentHColor = borderColorComponent.AccentHColor;
             _menu.AccentVColor = borderColorComponent.AccentVColor;
+            _menu.DefaultWallpaperColor = GetDefaultWallpaperColor(borderColorComponent);
         }
 
         protected override void UpdateState(BoundUserInterfaceState state)
@@ -126,6 +132,20 @@ namespace Content.Client.PDA
         private PdaBorderColorComponent? GetBorderColorComponent()
         {
             return EntMan.GetComponentOrNull<PdaBorderColorComponent>(Owner);
+        }
+
+        private static Color GetDefaultWallpaperColor(PdaBorderColorComponent borderColor)
+        {
+            var source = borderColor.AccentVColor
+                ?? borderColor.AccentHColor
+                ?? borderColor.BorderColor;
+
+            var color = Color.FromHex(source, Color.FromHex("#25252a"));
+            return new Color(
+                color.R * 0.24f,
+                color.G * 0.24f,
+                color.B * 0.24f,
+                1f);
         }
     }
 }

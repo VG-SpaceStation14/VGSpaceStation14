@@ -53,6 +53,13 @@ public sealed class LegacyColorSelectorSliders : Control
     }
 
     public Action<Color>? OnColorChanged;
+    public Action<Color>? OnColorReleased;
+
+    public bool IsGrabbed =>
+        _topColorSlider.Grabbed ||
+        _middleColorSlider.Grabbed ||
+        _bottomColorSlider.Grabbed ||
+        _alphaSlider.Grabbed;
 
     private readonly static HsvSliderStrategy _hsvStrategy = new();
     private readonly static RgbSliderStrategy _rgbStrategy = new();
@@ -128,6 +135,11 @@ public sealed class LegacyColorSelectorSliders : Control
         _middleColorSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Middle); };
         _bottomColorSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Bottom); };
         _alphaSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Alpha); };
+
+        _topColorSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
+        _middleColorSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
+        _bottomColorSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
+        _alphaSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
 
         _topInputBox = new SpinBox
         {
