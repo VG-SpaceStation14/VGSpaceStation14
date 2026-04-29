@@ -42,6 +42,8 @@ comp-pda-ui-ringtone-button = Ringtone
 
 comp-pda-ui-ringtone-button-description = Change your PDA's ringtone
 
+comp-pda-ui-wallpaper-color = Wallpaper color
+
 comp-pda-ui-toggle-flashlight-button = Toggle Flashlight
 
 pda-bound-user-interface-music-button = Music Instrument

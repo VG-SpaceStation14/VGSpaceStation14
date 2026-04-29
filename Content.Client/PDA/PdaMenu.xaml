@@ -1,5 +1,6 @@
 <pda:PdaWindow  xmlns="https://spacestation14.io"
                 xmlns:pda="clr-namespace:Content.Client.PDA"
+                xmlns:adt="clr-namespace:Content.Client.ADT.UserInterface.Controls"
                 xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
                 MinSize="576 750"
                 SetSize="576 750"> <!-- VG-Tweak -->
@@ -80,6 +81,8 @@
                                        Visible="False"
                                        Text="{Loc 'pda-bound-user-interface-lock-uplink-title'}"
                                        Description="{Loc 'pda-bound-user-interface-lock-uplink-description'}"/>
+                <Label Text="{Loc 'comp-pda-ui-wallpaper-color'}" Margin="8 10 8 0"/>
+                <adt:LegacyColorSelectorSliders Name="WallpaperColorSelector" Margin="8 2 8 4"/>
             </BoxContainer>
         </ScrollContainer>
         <BoxContainer Orientation="Vertical"
