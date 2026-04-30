@@ -48,3 +48,10 @@ public sealed class PdaSetWallpaperColorMessage : BoundUserInterfaceMessage
         Color = color;
     }
 }
+
+// VG-Boot
+[Serializable, NetSerializable]
+public sealed class PdaBootFinishedMessage : BoundUserInterfaceMessage
+{
+    public PdaBootFinishedMessage() { }
+}

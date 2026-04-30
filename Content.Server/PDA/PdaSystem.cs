@@ -53,6 +53,8 @@ namespace Content.Server.PDA
             SubscribeLocalEvent<PdaComponent, PdaShowUplinkMessage>(OnUiMessage);
             SubscribeLocalEvent<PdaComponent, PdaLockUplinkMessage>(OnUiMessage);
             SubscribeLocalEvent<PdaComponent, PdaSetWallpaperColorMessage>(OnUiMessage);
+            // VG-Boot
+            SubscribeLocalEvent<PdaComponent, PdaBootFinishedMessage>(OnUiMessage);
 
             SubscribeLocalEvent<PdaComponent, CartridgeLoaderNotificationSentEvent>(OnNotification);
 
@@ -64,7 +66,6 @@ namespace Content.Server.PDA
 
         private void ChameleonControllerOutfitItemSelected(Entity<PdaComponent> ent, ref InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent> args)
         {
-            // Relay it to your ID so it can update as well.
             if (ent.Comp.ContainedId != null)
                 RaiseLocalEvent(ent.Comp.ContainedId.Value, args);
         }
@@ -113,7 +114,6 @@ namespace Content.Server.PDA
             if (args.Container.ID != pda.IdSlot.ID && args.Container.ID != pda.PenSlot.ID && args.Container.ID != pda.PaiSlot.ID)
                 return;
 
-            // TODO: This is super cursed just use compstates please.
             if (MetaData(uid).EntityLifeStage >= EntityLifeStage.Terminating)
                 return;
 
@@ -175,9 +175,6 @@ namespace Content.Server.PDA
                 actor.PlayerSession.Channel);
         }
 
-        /// <summary>
-        /// Send new UI state to clients, call if you modify something like uplink.
-        /// </summary>
         public override void UpdatePdaUi(EntityUid uid, PdaComponent? pda = null)
         {
             if (!Resolve(uid, ref pda, false))
@@ -192,10 +189,7 @@ namespace Content.Server.PDA
 
             UpdateStationName(uid, pda);
             UpdateAlertLevel(uid, pda);
-            // TODO: Update the level and name of the station with each call to UpdatePdaUi is only needed for latejoin players.
-            // TODO: If someone can implement changing the level and name of the station when changing the PDA grid, this can be removed.
 
-            // TODO don't make this depend on cartridge loader!?!?
             if (!TryComp(uid, out CartridgeLoaderComponent? loader))
                 return;
 
@@ -220,7 +214,8 @@ namespace Content.Server.PDA
                 hasInstrument,
                 address,
                 pda.HasWallpaperColor,
-                pda.WallpaperColor);
+                pda.WallpaperColor,
+                pda.Booted); // VG-Boot
 
             _ui.SetUiState(uid, PdaUiKey.Key, state);
         }
@@ -246,8 +241,6 @@ namespace Content.Server.PDA
             if (!PdaUiKey.Key.Equals(msg.UiKey))
                 return;
 
-            // TODO PREDICTION
-            // When moving this to shared, fill in the user field
             _unpoweredFlashlight.TryToggleLight(uid, user: null);
         }
 
@@ -274,7 +267,6 @@ namespace Content.Server.PDA
             if (!PdaUiKey.Key.Equals(msg.UiKey))
                 return;
 
-            // check if its locked again to prevent malicious clients opening locked uplinks
             if (HasComp<UplinkComponent>(uid) && IsUnlocked(uid))
                 _store.ToggleUi(msg.Actor, uid);
         }
@@ -298,6 +290,23 @@ namespace Content.Server.PDA
 
             pda.WallpaperColor = msg.Color.WithAlpha(1f);
             pda.HasWallpaperColor = true;
+            UpdatePdaUi(uid, pda);
+        }
+
+        // VG-Boot
+        private void OnUiMessage(EntityUid uid, PdaComponent pda, PdaBootFinishedMessage msg)
+        {
+            if (!PdaUiKey.Key.Equals(msg.UiKey))
+                return;
+
+            if (pda.Booted)
+                return;
+
+            pda.Booted = true;
+            EntityManager.Dirty(uid, pda);
+
+            _ringer.RingerPlayRingtone(uid);
+
             UpdatePdaUi(uid, pda);
         }
 

@@ -4,6 +4,7 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.PDA;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
+using Robust.Shared.Timing;
 
 namespace Content.Client.PDA
 {
@@ -14,6 +15,8 @@ namespace Content.Client.PDA
 
         [ViewVariables]
         private PdaMenu? _menu;
+
+        private bool _bootFinishedSent;
 
         public PdaBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
         {
@@ -26,6 +29,8 @@ namespace Content.Client.PDA
 
             if (_menu == null)
                 CreateMenu();
+
+            _bootFinishedSent = false;
         }
 
         private void CreateMenu()
@@ -106,6 +111,24 @@ namespace Content.Client.PDA
             }
 
             _menu.UpdateState(updateState);
+
+            if (!updateState.Booted && !_bootFinishedSent)
+            {
+                _menu.ShowBootScreen(true);
+                _bootFinishedSent = true;
+                Timer.Spawn(2000, () =>
+                {
+                    if (_menu?.IsOpen == true)
+                    {
+                        SendMessage(new PdaBootFinishedMessage());
+                        _menu.ShowBootScreen(false);
+                    }
+                });
+            }
+            else if (updateState.Booted)
+            {
+                _menu.ShowBootScreen(false);
+            }
         }
 
         protected override void AttachCartridgeUI(Control cartridgeUIFragment, string? title)

@@ -10,6 +10,10 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface.XAML;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
+using Robust.Shared.IoC;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Content.Client.PDA
 {
@@ -20,13 +24,13 @@ namespace Content.Client.PDA
         [Dependency] private readonly IGameTiming _gameTiming = default!;
         [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
         [Dependency] private readonly IEntityManager _entMan = default!;
-        private readonly ClientGameTicker _gameTicker;
+        private ClientGameTicker _gameTicker = default!;
 
         public const int HomeView = 0;
         public const int ProgramListView = 1;
         public const int SettingsView = 2;
         public const int ProgramContentView = 3;
-
+        public const int BootViewIndex = 4;
 
         private string _pdaOwner = Loc.GetString("comp-pda-ui-unknown");
         private string _owner = Loc.GetString("comp-pda-ui-unknown");
@@ -40,11 +44,15 @@ namespace Content.Client.PDA
         private Color _wallpaperColor = Color.White;
 
         private int _currentView;
+        private bool _bootScreenVisible;
+        private CancellationTokenSource? _bootAnimationCts;
+        private CancellationTokenSource? _fadeAnimationCts;
 
         public event Action<EntityUid>? OnProgramItemPressed;
         public event Action<EntityUid>? OnUninstallButtonPressed;
         public event Action<EntityUid>? OnInstallButtonPressed;
         public event Action<Color>? OnWallpaperColorSelected;
+
         public PdaMenu()
         {
             IoCManager.InjectDependencies(this);
@@ -60,9 +68,8 @@ namespace Content.Client.PDA
             EjectPaiButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/Interface/pai.png"));
             ProgramCloseButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/Interface/Nano/cross.svg.png"));
 
-
-            /// Переменная для получения <see cref="SharedPopupSystem"/>
-            var popupsystem = _entMan.System<SharedPopupSystem>(); // ADT-Tweak
+            var popupsystem = _entMan.System<SharedPopupSystem>();
+            
             HomeButton.OnPressed += _ => ToHomeScreen();
 
             ProgramListButton.OnPressed += _ =>
@@ -71,10 +78,8 @@ namespace Content.Client.PDA
                 ProgramListButton.IsCurrent = true;
                 SettingsButton.IsCurrent = false;
                 ProgramTitle.IsCurrent = false;
-
                 ChangeView(ProgramListView);
             };
-
 
             SettingsButton.OnPressed += _ =>
             {
@@ -82,7 +87,6 @@ namespace Content.Client.PDA
                 ProgramListButton.IsCurrent = false;
                 SettingsButton.IsCurrent = true;
                 ProgramTitle.IsCurrent = false;
-
                 ChangeView(SettingsView);
             };
 
@@ -92,7 +96,6 @@ namespace Content.Client.PDA
                 ProgramListButton.IsCurrent = false;
                 SettingsButton.IsCurrent = false;
                 ProgramTitle.IsCurrent = true;
-
                 ChangeView(ProgramContentView);
             };
 
@@ -105,49 +108,47 @@ namespace Content.Client.PDA
             PdaOwnerButton.OnPressed += _ =>
             {
                 _clipboard.SetText(_pdaOwner);
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             IdInfoButton.OnPressed += _ =>
             {
                 _clipboard.SetText(_owner + ", " + _jobTitle);
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             StationNameButton.OnPressed += _ =>
             {
                 _clipboard.SetText(_stationName);
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             StationAlertLevelButton.OnPressed += _ =>
             {
                 _clipboard.SetText(_alertLevel);
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             StationTimeButton.OnPressed += _ =>
             {
                 var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
-                _clipboard.SetText((stationTime.ToString("hh\\:mm\\:ss")));
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                _clipboard.SetText(stationTime.ToString("hh\\:mm\\:ss"));
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             StationAlertLevelInstructionsButton.OnPressed += _ =>
             {
                 _clipboard.SetText(_instructions);
-                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda")); // ADT-Tweak
+                popupsystem.PopupCursor(Loc.GetString("ui-copy-text-in-pda"));
             };
 
             WallpaperColorSelector.OnColorChanged += color =>
             {
                 if (_settingWallpaperColorFromState)
                     return;
-
                 _hasWallpaperColor = true;
                 _wallpaperColor = color.WithAlpha(1f);
                 WallpaperColor = _wallpaperColor;
-
                 if (!WallpaperColorSelector.IsGrabbed)
                     OnWallpaperColorSelected?.Invoke(_wallpaperColor);
             };
@@ -161,7 +162,116 @@ namespace Content.Client.PDA
             };
 
             HideAllViews();
+            BootView.Visible = false;
+            BootView.Modulate = Color.White;
+            
             ToHomeScreen();
+        }
+
+        public void ShowBootScreen(bool show)
+        {
+            if (show == _bootScreenVisible)
+                return;
+
+            _bootScreenVisible = show;
+            if (show)
+            {
+                _bootAnimationCts?.Cancel();
+                _bootAnimationCts = new CancellationTokenSource();
+                _ = AnimateBootIcon(_bootAnimationCts.Token);
+                
+                BootWelcomeLabel.Text = Loc.GetString("pda-boot-welcome");
+                BootView.Modulate = Color.White;
+                ChangeView(BootViewIndex);
+                NavigationBar.Visible = false;
+                ContentFooter.Visible = false;
+            }
+            else
+            {
+                _bootAnimationCts?.Cancel();
+                _bootAnimationCts = null;
+                _ = FadeOutBootAndShowMain();
+            }
+        }
+
+        private async Task FadeOutBootAndShowMain()
+        {
+            _fadeAnimationCts?.Cancel();
+            _fadeAnimationCts = new CancellationTokenSource();
+            var token = _fadeAnimationCts.Token;
+
+            float opacity = 1f;
+            float step = 0.05f;
+            while (opacity > 0 && !token.IsCancellationRequested)
+            {
+                opacity -= step;
+                if (opacity < 0) opacity = 0;
+                BootView.Modulate = new Color(1f, 1f, 1f, opacity);
+                await Task.Delay(16, token);
+            }
+
+            BootView.Visible = false;
+            BootView.Modulate = Color.White;
+
+            var mainView = ViewContainer.GetChild(HomeView);
+            mainView.Visible = true;
+            mainView.Modulate = new Color(1f, 1f, 1f, 0f);
+            
+            opacity = 0f;
+            while (opacity < 1f && !token.IsCancellationRequested)
+            {
+                opacity += step;
+                if (opacity > 1f) opacity = 1f;
+                mainView.Modulate = new Color(1f, 1f, 1f, opacity);
+                await Task.Delay(16, token);
+            }
+
+            for (int i = 0; i < ViewContainer.ChildCount; i++)
+            {
+                ViewContainer.GetChild(i).Modulate = Color.White;
+            }
+
+            ToHomeScreen();
+            
+            NavigationBar.Visible = true;
+            ContentFooter.Visible = true;
+            _bootScreenVisible = false;
+            
+            _fadeAnimationCts = null;
+        }
+
+        private async Task AnimateBootIcon(CancellationToken token)
+        {
+            float opacity = 1f;
+            float step = 0.05f;
+            bool increasing = false;
+            
+            while (!token.IsCancellationRequested)
+            {
+                if (increasing)
+                {
+                    opacity += step;
+                    if (opacity >= 1f)
+                    {
+                        opacity = 1f;
+                        increasing = false;
+                    }
+                }
+                else
+                {
+                    opacity -= step;
+                    if (opacity <= 0.3f)
+                    {
+                        opacity = 0.3f;
+                        increasing = true;
+                    }
+                }
+                
+                BootIcon.Modulate = new Color(1f, 1f, 1f, opacity);
+                await Task.Delay(50, token);
+            }
+            
+            BootIcon.Modulate = Color.White;
         }
 
         public void UpdateState(PdaUpdateState state)
@@ -175,8 +285,7 @@ namespace Content.Client.PDA
             WallpaperColor = state.HasWallpaperColor ? state.WallpaperColor : null;
             if (!WallpaperColorSelector.IsGrabbed &&
                 (state.HasWallpaperColor != _hasWallpaperColor ||
-                !ColorsClose(effectiveWallpaperColor, _wallpaperColor))
-            )
+                !ColorsClose(effectiveWallpaperColor, _wallpaperColor)))
             {
                 _settingWallpaperColorFromState = true;
                 WallpaperColorSelector.Color = effectiveWallpaperColor;
@@ -198,7 +307,6 @@ namespace Content.Client.PDA
                 PdaOwnerLabel.Visible = false;
             }
 
-
             if (state.PdaOwnerInfo.IdOwner != null || state.PdaOwnerInfo.JobTitle != null)
             {
                 _owner = state.PdaOwnerInfo.IdOwner ?? Loc.GetString("comp-pda-ui-unknown");
@@ -215,10 +323,8 @@ namespace Content.Client.PDA
             _stationName = state.StationName ?? Loc.GetString("comp-pda-ui-unknown");
             StationNameLabel.SetMarkup(Loc.GetString("comp-pda-ui-station",
                 ("station", _stationName)));
-            
 
             var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
-
             StationTimeLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-time",
                 ("time", stationTime.ToString("hh\\:mm\\:ss"))));
 
@@ -230,13 +336,12 @@ namespace Content.Client.PDA
             StationAlertLevelLabel.SetMarkup(Loc.GetString(
                 "comp-pda-ui-station-alert-level",
                 ("color", alertColor),
-                ("level", _alertLevel)
-            ));
+                ("level", _alertLevel)));
+
             _instructions = Loc.GetString($"{alertLevelKey}-instructions");
             StationAlertLevelInstructions.SetMarkup(Loc.GetString(
                 "comp-pda-ui-station-alert-level-instructions",
-                ("instructions", _instructions))
-            );
+                ("instructions", _instructions)));
 
             AddressLabel.Text = state.Address?.ToUpper() ?? " - ";
 
@@ -251,7 +356,6 @@ namespace Content.Client.PDA
         public void UpdateAvailablePrograms(List<(EntityUid, CartridgeComponent)> programs)
         {
             ProgramList.RemoveAllChildren();
-
             if (programs.Count == 0)
             {
                 ProgramList.AddChild(new Label()
@@ -261,7 +365,6 @@ namespace Content.Client.PDA
                     VerticalAlignment = VAlignment.Center,
                     VerticalExpand = true
                 });
-
                 return;
             }
 
@@ -271,7 +374,6 @@ namespace Content.Client.PDA
 
             foreach (var (uid, component) in programs)
             {
-                //Create a new row every second program item starting from the first
                 if (itemCount % 2 != 0)
                 {
                     row = CreateProgramListRow();
@@ -279,10 +381,8 @@ namespace Content.Client.PDA
                 }
 
                 var item = new PdaProgramItem();
-
                 if (component.Icon is not null)
                     item.Icon.SetFromSpriteSpecifier(component.Icon);
-
                 item.OnPressed += _ => OnProgramItemPressed?.Invoke(uid);
 
                 switch (component.InstallationStatus)
@@ -302,31 +402,22 @@ namespace Content.Client.PDA
                 item.ProgramName.Text = Loc.GetString(component.ProgramName);
                 item.SetHeight = 20;
                 row.AddChild(item);
-
                 itemCount++;
             }
 
-            //Add a filler item to the last row when it only contains one item
             if (itemCount % 2 == 0)
                 row.AddChild(new Control() { HorizontalExpand = true });
         }
 
-        /// <summary>
-        /// Changes the current view to the home screen (view 0) and sets the tabs `IsCurrent` flag accordingly
-        /// </summary>
         public void ToHomeScreen()
         {
             HomeButton.IsCurrent = true;
             ProgramListButton.IsCurrent = false;
             SettingsButton.IsCurrent = false;
             ProgramTitle.IsCurrent = false;
-
             ChangeView(HomeView);
         }
 
-        /// <summary>
-        /// Hides the program title and close button.
-        /// </summary>
         public void HideProgramHeader()
         {
             ProgramTitle.IsCurrent = false;
@@ -336,9 +427,6 @@ namespace Content.Client.PDA
             SettingsButton.Visible = true;
         }
 
-        /// <summary>
-        /// Changes the current view to the program content view (view 3), sets the program title and sets the tabs `IsCurrent` flag accordingly
-        /// </summary>
         public void ToProgramView(string title)
         {
             HomeButton.IsCurrent = false;
@@ -350,21 +438,16 @@ namespace Content.Client.PDA
             ProgramCloseButton.Visible = true;
             ProgramListButton.Visible = false;
             SettingsButton.Visible = false;
-
             ProgramTitle.LabelText = title;
             ChangeView(ProgramContentView);
         }
 
-
-        /// <summary>
-        /// Changes the current view to the given view number
-        /// </summary>
         public void ChangeView(int view)
         {
             if (ViewContainer.ChildCount <= view)
                 return;
-
-            ViewContainer.GetChild(_currentView).Visible = false;
+            if (_currentView >= 0 && _currentView < ViewContainer.ChildCount)
+                ViewContainer.GetChild(_currentView).Visible = false;
             ViewContainer.GetChild(view).Visible = true;
             _currentView = view;
         }
@@ -380,28 +463,23 @@ namespace Content.Client.PDA
 
         private void HideAllViews()
         {
-            var views = ViewContainer.Children;
-            foreach (var view in views)
-            {
+            foreach (var view in ViewContainer.Children)
                 view.Visible = false;
-            }
         }
 
         private static bool ColorsClose(Color a, Color b)
         {
             const float epsilon = 0.001f;
-            return System.Math.Abs(a.R - b.R) < epsilon
-                && System.Math.Abs(a.G - b.G) < epsilon
-                && System.Math.Abs(a.B - b.B) < epsilon
-                && System.Math.Abs(a.A - b.A) < epsilon;
+            return Math.Abs(a.R - b.R) < epsilon
+                && Math.Abs(a.G - b.G) < epsilon
+                && Math.Abs(a.B - b.B) < epsilon
+                && Math.Abs(a.A - b.A) < epsilon;
         }
 
         protected override void Draw(DrawingHandleScreen handle)
         {
             base.Draw(handle);
-
             var stationTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
-
             StationTimeLabel.SetMarkup(Loc.GetString("comp-pda-ui-station-time",
                 ("time", stationTime.ToString("hh\\:mm\\:ss"))));
         }
