@@ -1,18 +1,35 @@
 <DefaultWindow
     xmlns="https://spacestation14.io"
     Title="{Loc admin-announce-title}"
-    MinWidth="500">
-    <GridContainer Columns="1">
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
-            <LineEdit Name="Announcer" Access="Public" PlaceHolder="{Loc admin-announce-announcer-placeholder}" Text="{Loc admin-announce-announcer-default}" HorizontalExpand="True" SizeFlagsStretchRatio="2"/>
-            <Control HorizontalExpand="True" SizeFlagsStretchRatio="1" />
-            <OptionButton Name="AnnounceMethod" Access="Public" HorizontalExpand="True" SizeFlagsStretchRatio="2"/>
-        </BoxContainer>
-        <TextEdit Name="Announcement" Access="Public" VerticalExpand="True" MinHeight="100" />
+    MinSize="500 400">
+    
+    <BoxContainer Orientation="Vertical" VerticalExpand="True" Margin="10">
+        
+        <!-- Верхняя панель: объявитель и тип -->
+        <GridContainer Columns="2" VerticalExpand="False" Margin="0 0 0 10">
+            <Label Text="{Loc admin-announce-announcer}" VerticalAlignment="Center" />
+            <LineEdit Name="Announcer" Access="Public" PlaceHolder="{Loc admin-announce-announcer-placeholder}" 
+                     Text="{Loc admin-announce-announcer-default}" HorizontalExpand="True" />
 
-        <GridContainer Rows="1">
-            <CheckBox Name="KeepWindowOpen" Access="Public" Text="{Loc 'admin-announce-keep-open'}" />
-            <Button Name="AnnounceButton" Access="Public" Disabled="True" Text="{Loc admin-announce-button}" HorizontalAlignment="Center"/>
+            <Label Text="{Loc admin-announce-type}" VerticalAlignment="Center" />
+            <OptionButton Name="AnnounceMethod" Access="Public" HorizontalExpand="True" />
         </GridContainer>
-    </GridContainer>
+
+        <!-- Пресет объявителя -->
+        <GridContainer Columns="2" VerticalExpand="False" Margin="0 0 0 10">
+            <Label Text="{Loc admin-announce-announcer-preset}" VerticalAlignment="Center" />
+            <OptionButton Name="AnnouncerPreset" Access="Public" HorizontalExpand="True" />
+        </GridContainer>
+
+        <!-- Текст объявления -->
+        <Label Text="{Loc admin-announce-announcement}" VerticalAlignment="Center" Margin="0 5 0 0" />
+        <TextEdit Name="Announcement" Access="Public" VerticalExpand="True" MinHeight="150" />
+
+        <!-- Нижняя панель: чекбокс и кнопка -->
+        <GridContainer Columns="2" VerticalExpand="False" Margin="0 10 0 0">
+            <CheckBox Name="KeepWindowOpen" Access="Public" Text="{Loc admin-announce-keep-open}" />
+            <Button Name="AnnounceButton" Access="Public" Disabled="True" Text="{Loc admin-announce-button}" HorizontalAlignment="Center" />
+        </GridContainer>
+
+    </BoxContainer>
 </DefaultWindow>

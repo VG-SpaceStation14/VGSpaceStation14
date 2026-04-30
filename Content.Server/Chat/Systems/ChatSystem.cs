@@ -444,8 +444,11 @@ public sealed partial class ChatSystem : SharedChatSystem
         if (ContainsAny(sender, "centcom", "central command", "центральн"))
             return (DefaultAnnouncementIconPath, "Nanotrasen");
 
-        if (ContainsAny(sender, "communications console", "консоль связи", "station security systems", "системы безопасности станции"))
+        if (ContainsAny(sender, "communications console", "консоль связи"))
             return (DefaultAnnouncementIconPath, "Captain");
+
+        if (ContainsAny(sender, "station security systems", "системы безопасности станции"))
+            return (DefaultAnnouncementIconPath, "SecurityOfficer");
 
         if (TryGetAnnouncementIconByJobTitle(sender, out var icon))
             return icon;

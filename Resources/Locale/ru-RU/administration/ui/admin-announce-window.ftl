@@ -8,3 +8,7 @@ admin-announce-type-server = Сервер
 admin-announce-keep-open = Держать открытым
 cmd-announceui-desc = Открывает интерфейс меню объявлений.
 cmd-announceui-help = Использование: announceui
+admin-announce-announcer = Объявитель:
+admin-announce-type = Тип объявления:
+admin-announce-announcement = Текст объявления:
+admin-announce-announcer-preset = Выбрать объявителя:

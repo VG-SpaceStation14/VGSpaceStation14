@@ -18,15 +18,50 @@ namespace Content.Client.Administration.UI
             RobustXamlLoader.Load(this);
             IoCManager.InjectDependencies(this);
 
-            Announcement.Placeholder = new Rope.Leaf(_localization.GetString("admin-announce-announcement-placeholder"));
+            Announcement.Placeholder = new Rope.Leaf(
+                _localization.GetString("admin-announce-announcement-placeholder"));
+
             AnnounceMethod.AddItem(_localization.GetString("admin-announce-type-station"));
             AnnounceMethod.SetItemMetadata(0, AdminAnnounceType.Station);
             AnnounceMethod.AddItem(_localization.GetString("admin-announce-type-server"));
             AnnounceMethod.SetItemMetadata(1, AdminAnnounceType.Server);
             AnnounceMethod.OnItemSelected += AnnounceMethodOnOnItemSelected;
+            // VG-Tweak Start
+            AnnouncerPreset.AddItem("ТСФ");
+            AnnouncerPreset.SetItemMetadata(0, "ТСФ");
+            AnnouncerPreset.AddItem("СССП");
+            AnnouncerPreset.SetItemMetadata(1, "СССП");
+            AnnouncerPreset.AddItem("Синдикат");
+            AnnouncerPreset.SetItemMetadata(2, "Синдикат");
+            AnnouncerPreset.AddItem("Волшебник");
+            AnnouncerPreset.SetItemMetadata(3, "Волшебник");
+            AnnouncerPreset.AddItem("Станционный ИИ");
+            AnnouncerPreset.SetItemMetadata(4, "Станционный ИИ");
+            AnnouncerPreset.AddItem("Центральное командование");
+            AnnouncerPreset.SetItemMetadata(5, "Центральное командование");
+            AnnouncerPreset.AddItem("Капитан");
+            AnnouncerPreset.SetItemMetadata(6, "Капитан");
+            AnnouncerPreset.AddItem("Системы безопасности станции");
+            AnnouncerPreset.SetItemMetadata(7, "системы безопасности станции");
+            AnnouncerPreset.AddItem("Консоль связи");
+            AnnouncerPreset.SetItemMetadata(8, "Консоль связи"); 
+            
+
+            AnnouncerPreset.OnItemSelected += AnnouncerPresetOnItemSelected;
+
             Announcement.OnKeyBindUp += AnnouncementOnOnTextChanged;
         }
 
+        private void AnnouncerPresetOnItemSelected(OptionButton.ItemSelectedEventArgs args)
+        {
+            AnnouncerPreset.SelectId(args.Id);
+
+            if (args.Button.GetItemMetadata(args.Id) is string presetKey)
+            {
+                Announcer.Text = presetKey;
+            }
+        }
+        // VG-Tweak End
         private void AnnouncementOnOnTextChanged(GUIBoundKeyEventArgs args)
         {
             AnnounceButton.Disabled = Rope.Collapse(Announcement.TextRope).TrimStart() == "";
@@ -35,7 +70,9 @@ namespace Content.Client.Administration.UI
         private void AnnounceMethodOnOnItemSelected(OptionButton.ItemSelectedEventArgs args)
         {
             AnnounceMethod.SelectId(args.Id);
-            Announcer.Editable = ((AdminAnnounceType?)args.Button.SelectedMetadata ?? AdminAnnounceType.Station) == AdminAnnounceType.Station;
+
+            Announcer.Editable = ((AdminAnnounceType?)args.Button.SelectedMetadata ?? AdminAnnounceType.Station)
+                == AdminAnnounceType.Station;
         }
     }
 }
