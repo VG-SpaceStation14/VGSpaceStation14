@@ -415,11 +415,12 @@ public sealed partial class ChatSystem : SharedChatSystem
     private string BuildAnnouncementMessage(string sender, string message, Color? colorOverride)
     {
         var (iconPath, iconState) = GetAnnouncementIcon(sender);
+        var finalColor = colorOverride ?? Color.Gold;
 
         return Loc.GetString("chat-manager-sender-announcement-wrap-message",
             ("sender", FormattedMessage.EscapeText(sender)),
             ("message", FormattedMessage.EscapeText(message)),
-            ("senderColor", (colorOverride ?? Color.Gold).ToHexNoAlpha()),
+            ("senderColor", finalColor.ToHexNoAlpha()),
             ("senderIconPath", iconPath),
             ("senderIconState", iconState));
     }
