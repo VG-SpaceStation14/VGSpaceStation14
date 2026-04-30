@@ -1,0 +1,81 @@
+- type: entity
+  id: BigGlassAirlockBase
+  parent: AirlockGlass
+  name: большой стеклянный шлюз
+  description: Это с виду обычный шлюз... Но очень широкий
+  suffix: Шлюз на 3 тайла
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: false
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-1.49,-0.49,1.49,0.49"
+        density: 100
+        mask:
+        - FullTileMask
+        layer:
+        - GlassAirlockLayer
+  - type: Sprite
+    snapCardinals: false
+    offset: 0,0
+
+- type: entity
+  id: BigExternalAirlockGlass
+  parent: [BigGlassAirlockBase, AirlockExternalGlass]
+  name: большой стеклянный экстренный шлюз
+  components:
+  - type: Sprite
+    sprite: _VG/Structures/Doors/Airlocks/Glass/big_external_glass_lua.rsi
+
+- type: entity
+  id: BigMedicalAirlockGlass
+  parent: [BigGlassAirlockBase, AirlockGlass]
+  name: большой стеклянный медицинский шлюз
+  components:
+  - type: Sprite
+    sprite: _VG/Structures/Doors/Airlocks/Glass/big_medical_glass_lua.rsi
+
+- type: entity
+  id: BigAirlockGlass
+  parent: [BigGlassAirlockBase, AirlockGlass]
+  name: большой стеклянный шлюз
+  components:
+  - type: Sprite
+    sprite: _VG/Structures/Doors/Airlocks/Glass/big_glass_lua.rsi
+
+- type: entity
+  id: MediumGlassAirlockBase
+  parent: AirlockGlass
+  name: средний стеклянный шлюз
+  description: Это с виду обычный шлюз... Но очень широкий
+  suffix: Шлюз на 2 тайла
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    noRot: false
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,1.49,0.49"
+        density: 100
+        mask:
+        - FullTileMask
+        layer:
+        - GlassAirlockLayer
+  - type: Sprite
+    snapCardinals: false
+    offset: 0.5,0
+
+- type: entity
+  id: MediumMedicalAirlockGlass
+  parent: [MediumGlassAirlockBase, AirlockGlass]
+  name: средний стеклянный медицинский шлюз
+  components:
+  - type: Sprite
+    sprite: _VG/Structures/Doors/Airlocks/Glass/medium_medical_glass_lua.rsi
