@@ -1,0 +1,18 @@
+- type: entity
+  id: CrateSkillBooks
+  parent: CrateGenericSteel
+  name: skill books crate
+  description: Contains one of each type of skill book.
+  components:
+    - type: StorageFill
+      contents:
+        - id: SimpleSkillBookPiloting
+        - id: SimpleSkillBookEngineering
+        - id: SimpleSkillBookMedicine
+        - id: SimpleSkillBookWeapons
+        - id: SimpleSkillBookAnomalistic
+        - id: SimpleSkillBookXenoarchiology
+        - id: SimpleSkillBookRobotech
+        - id: SimpleSkillBookBotanika
+        - id: SimpleSkillBookAtmos
+        - id: SimpleSkillBookBreaking

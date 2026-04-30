@@ -128,6 +128,18 @@
   category: cargoproduct-category-name-service
   group: market
 
+# VG-Tweak Start
+- type: cargoProduct
+  id: SkillsBooks
+  icon:
+    sprite: Objects/Misc/books.rsi
+    state: book_icon
+  product: CrateSkillBooks
+  cost: 2000
+  category: cargoproduct-category-name-service
+  group: market
+# VG-Tweak End
+
 - type: cargoProduct
   id: ServiceGuidebooks
   icon:
