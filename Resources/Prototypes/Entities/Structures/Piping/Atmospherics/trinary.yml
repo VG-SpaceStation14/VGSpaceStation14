@@ -5,6 +5,8 @@
   placement:
     mode: SnapgridCenter
   components:
+    - type: SimpleSkillRequired #VG-Skillsntegration
+      requiredSkill: Atmos
     - type: AtmosDevice
     - type: StationAiWhitelist #ADT-Tweak
     - type: Tag
