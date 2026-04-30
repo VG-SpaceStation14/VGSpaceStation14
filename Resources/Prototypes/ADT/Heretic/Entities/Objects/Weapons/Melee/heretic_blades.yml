@@ -4,6 +4,23 @@
   name: eldritch blade
   description: The sickly blade used by sinister individuals for rituals and sacrifices.
   components:
+  # VG-Tweak Start
+  - type: EmitSoundOnPickup
+    sound:
+      path: /Audio/_VG/Items/handling/knife_pickup.ogg
+      params:
+        volume: -8
+  - type: EmitSoundOnDrop
+    sound:
+      path: /Audio/_VG/Items/handling/knife_drop.ogg
+      params:
+        volume: -8
+  - type: EmitSoundOnLand
+    sound:
+      path: /Audio/_VG/Items/handling/knife_drop.ogg
+      params:
+        volume: -8
+  # VG-Tweak End
   - type: HereticBlade
   - type: Sharp
   - type: Sprite
