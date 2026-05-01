@@ -72,7 +72,7 @@
     Tail:
       points: 1
       required: true
-      defaultMarkings: [ ADTVulpkanintailAll ]
+      defaultMarkings: [ VGVulpkanintailAll ]
     HeadTop:
       points: 1
       required: true

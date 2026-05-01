@@ -6,6 +6,7 @@ marking-ADTVulpkanintail2-tail_m = Хвост
 marking-ADTVulpkanintail2-tail2 = Хвост, 2
 marking-ADTVulpkanintailAll = Вульпканин, хвост
 marking-ADTVulpkanintailAll-tail_m = Хвост
+marking-VGVulpkanintailAll = Хвост
 marking-ADTVulpkaninear = Вульпканин, уши
 marking-ADTVulpkaninear-ear = Уши
 marking-ADTVulpkaninearBack = Вульпканин, уши (Зад)
