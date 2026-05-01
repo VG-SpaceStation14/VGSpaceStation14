@@ -41,6 +41,9 @@ public sealed partial class MoodComponent : Component
 
     [ViewVariables(VVAccess.ReadOnly)]
     public FixedPoint2 CritThresholdBeforeModify;
+    
+    [DataField]
+    public ProtoId<MoodAlertSetPrototype>? AlertSet = "DefaultMoodAlerts";
 
     [DataField(customTypeSerializer: typeof(DictionarySerializer<MoodThreshold, float>))]
     public Dictionary<MoodThreshold, float> MoodThresholds = new()

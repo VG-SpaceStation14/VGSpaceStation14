@@ -273,13 +273,23 @@ public sealed class MoodSystem : EntitySystem
             RefreshShaders(uid, modifier);
         }
 
-        if (component.MoodThresholdsAlerts.TryGetValue(component.CurrentMoodThreshold, out var alertId))
-            _alerts.ShowAlert(uid, alertId);
+        if (component.AlertSet != null && 
+            _prototypeManager.TryIndex<MoodAlertSetPrototype>(component.AlertSet, out var alertSet))
+        {
+            if (alertSet.AlertMapping.TryGetValue(component.CurrentMoodThreshold, out var alertId))
+                _alerts.ShowAlert(uid, alertId);
+            else
+                _alerts.ClearAlertCategory(uid, "Mood");
+        }
         else
-            _alerts.ClearAlertCategory(uid, "Mood");
+        {
+            if (component.MoodThresholdsAlerts.TryGetValue(component.CurrentMoodThreshold, out var alertId))
+                _alerts.ShowAlert(uid, alertId);
+            else
+                _alerts.ClearAlertCategory(uid, "Mood");
+        }
 
         UpdateAppearance(uid, component);
-
         component.LastThreshold = component.CurrentMoodThreshold;
     }
 

@@ -1,0 +1,29 @@
+- type: moodAlertSet
+  id: DefaultMoodAlerts
+  alertMapping:
+    Dead: MoodDead
+    Horrible: Horrible
+    Terrible: Terrible
+    Bad: Bad
+    Meh: Meh
+    Neutral: Neutral
+    Good: Good
+    Great: Great
+    Exceptional: Exceptional
+    Perfect: Perfect
+    Insane: Insane
+
+- type: moodAlertSet
+  id: VulpkaninMoodAlerts
+  alertMapping:
+    Dead: MoodDeadVulpkanin
+    Horrible: HorribleVulpkanin
+    Terrible: TerribleVulpkanin
+    Bad: BadVulpkanin
+    Meh: MehVulpkanin
+    Neutral: NeutralVulpkanin
+    Good: GoodVulpkanin
+    Great: GreatVulpkanin
+    Exceptional: ExceptionalVulpkanin
+    Perfect: PerfectVulpkanin
+    Insane: InsaneVulpkanin

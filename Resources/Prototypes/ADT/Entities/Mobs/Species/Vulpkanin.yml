@@ -232,6 +232,8 @@
         - "footprint-suit-fluffy"
     - type: SurgeryTarget
       dollPath: /Textures/_VG/Interface/Targeting/Status/Vulpkanin
+    - type: Mood
+      alertSet: VulpkaninMoodAlerts
     # VG-Tweak End
 
 - type: entity

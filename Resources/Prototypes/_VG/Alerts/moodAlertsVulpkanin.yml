@@ -1,0 +1,110 @@
+# Базовые алерты для вулпканин
+- type: alert
+  id: InsaneVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood_insane
+  name: alerts-mood-insane-name
+  description: alerts-mood-insane-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: HorribleVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood1
+  name: alerts-mood-horrible-name
+  description: alerts-mood-horrible-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: TerribleVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood2
+  name: alerts-mood-terrible-name
+  description: alerts-mood-terrible-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: BadVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood3
+  name: alerts-mood-bad-name
+  description: alerts-mood-bad-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: MehVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood4
+  name: alerts-mood-meh-name
+  description: alerts-mood-meh-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: NeutralVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood5
+  name: alerts-mood-neutral-name
+  description: alerts-mood-neutral-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: GoodVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood6
+  name: alerts-mood-good-name
+  description: alerts-mood-good-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: GreatVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood7
+  name: alerts-mood-great-name
+  description: alerts-mood-great-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: ExceptionalVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood8
+  name: alerts-mood-exceptional-name
+  description: alerts-mood-exceptional-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: PerfectVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood9
+  name: alerts-mood-perfect-name
+  description: alerts-mood-perfect-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
+
+- type: alert
+  id: MoodDeadVulpkanin
+  category: Mood
+  icons:
+  - sprite: /Textures/_VG/Interface/Alerts/Moods/vulpkanin.rsi
+    state: mood_happiness_bad
+  name: alerts-mood-dead-name
+  description: alerts-mood-dead-desc
+  clickEvent: !type:ShowMoodEffectsAlertEvent
