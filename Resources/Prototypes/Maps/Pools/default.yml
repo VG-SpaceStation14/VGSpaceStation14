@@ -30,12 +30,11 @@
   - ADT_Train
 # Lowpop 20 - 35
   - ADT_Bagel
-  - ADT_Saltern
+  - VG_Saltern
   - ADT_Aspid
-  - ADT_Cluster
+  - VG_Cluster
 # Micropop 0 - 20
-  - ADT_Cluster_Legacy #VG_Tweak
- # - ADT_Reach #VG-Tweak
+  - ADT_Reach
   - ADT_Silly
 
 # ADT Maps Выведенные на переработку

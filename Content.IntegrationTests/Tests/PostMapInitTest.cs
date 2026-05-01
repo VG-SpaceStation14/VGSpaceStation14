@@ -128,13 +128,13 @@ namespace Content.IntegrationTests.Tests
             "ADT_Bagel",
             "ADT_Barratry",
             "ADT_Box",
-            "ADT_Cluster",
+            //"ADT_Cluster",
             "ADT_Fland",
             "ADT_Delta",
             "ADT_Marathon",
             "ADT_Kerberos",
             "ADT_kilo",
-            "ADT_Saltern",
+            //"ADT_Saltern",
             "ADT_Gemini",
             "ADT_Aspid",
             "ADT_Cluster_Legacy",
@@ -148,7 +148,9 @@ namespace Content.IntegrationTests.Tests
             // ADT-End
             // VG-Start
             "VG_Reach",
-            "VG_Batcher"
+            "VG_Batcher",
+            "VG_Saltern",
+            "VG_Cluster"
             // VG-End
         };
 
