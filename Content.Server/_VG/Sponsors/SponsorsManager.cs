@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Content.Server.ADT.SponsorLoadout;
 using Content.Server.Database;
 using Content.Shared._VG.Sponsors;
+using Content.Shared.Humanoid.Markings;
 using Content.Shared.Roles;
 using Robust.Server.Player;
 using Robust.Shared.Configuration;
@@ -28,7 +29,9 @@ public sealed class SponsorsManager : ISponsorsManager
 
     private readonly Dictionary<NetUserId, SponsorInfo> _cachedSponsors = new();
 
-    // Pending actions for offline users (username -> list of actions)
+    private string[] _sponsorOnlyMarkingIds = Array.Empty<string>();
+    private bool _isSponsorMarkingsCached = false;
+
     private Dictionary<string, List<PendingSponsorAction>> _pendingActions = new();
     private readonly string _pendingActionsPath = "data/pending_sponsor_actions.json";
 
@@ -46,6 +49,8 @@ public sealed class SponsorsManager : ISponsorsManager
 
         LoadPendingActions();
 
+        _prototypeManager.PrototypesReloaded += OnPrototypesReloaded;
+
         _netMgr.RegisterNetMessage<MsgSponsorInfo>();
 
         _netMgr.Connecting += OnConnecting;
@@ -56,6 +61,50 @@ public sealed class SponsorsManager : ISponsorsManager
 
         _sawmill.Info("SponsorsManager initialized with local JSON storage and pending actions");
     }
+
+    #region Sponsor-only markings
+
+    private void CacheSponsorOnlyMarkings()
+    {
+        try
+        {
+            var markings = _prototypeManager.EnumeratePrototypes<MarkingPrototype>();
+            _sponsorOnlyMarkingIds = markings
+                .Where(m => m.SponsorOnly)
+                .Select(m => m.ID)
+                .ToArray();
+            _isSponsorMarkingsCached = true;
+            _sawmill.Info($"Cached {_sponsorOnlyMarkingIds.Length} sponsor-only markings");
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("No prototypes have been loaded yet"))
+        {
+            _sawmill.Debug("Prototypes not loaded yet, will retry later");
+            _isSponsorMarkingsCached = false;
+        }
+        catch (Exception e)
+        {
+            _sawmill.Error($"Failed to cache sponsor-only markings: {e.Message}");
+            _isSponsorMarkingsCached = false;
+        }
+    }
+
+    private void OnPrototypesReloaded(PrototypesReloadedEventArgs args)
+    {
+        if (args.WasModified<MarkingPrototype>() || !_isSponsorMarkingsCached)
+        {
+            CacheSponsorOnlyMarkings();
+        }
+    }
+
+    private void EnsureSponsorMarkingsCached()
+    {
+        if (!_isSponsorMarkingsCached)
+        {
+            CacheSponsorOnlyMarkings();
+        }
+    }
+
+    #endregion
 
     #region Pending Actions
 
@@ -192,7 +241,6 @@ public sealed class SponsorsManager : ISponsorsManager
             _dataHandler.Save();
             _sawmill.Info($"Added custom loadout {loadoutId} to {entry.Username}");
             
-            // Update cache and send to client
             if (_cachedSponsors.TryGetValue(userId, out var info))
             {
                 info.CustomLoadouts = entry.CustomLoadouts.ToArray();
@@ -231,7 +279,6 @@ public sealed class SponsorsManager : ISponsorsManager
 
     private async Task OnConnecting(NetConnectingArgs e)
     {
-        // No longer set cache here; we will do it in OnConnected after processing pending actions
         await Task.CompletedTask;
     }
 
@@ -246,19 +293,24 @@ public sealed class SponsorsManager : ISponsorsManager
 
         var username = session.Name;
 
-        // Process any pending actions for this username
         ProcessPendingActionsForUser(username, userId);
 
-        // Now load sponsor entry (which may have been added/updated by pending actions)
         var entry = _dataHandler.GetSponsor(userId);
 
         if (entry == null)
         {
             _cachedSponsors.Remove(userId);
-            // Send null info to client (not a sponsor)
             var msg = new MsgSponsorInfo { Info = null };
             _netMgr.ServerSendMessage(msg, e.Channel);
             return;
+        }
+
+        EnsureSponsorMarkingsCached();
+
+        var allowedMarkings = _isSponsorMarkingsCached ? _sponsorOnlyMarkingIds : Array.Empty<string>();
+        if (!_isSponsorMarkingsCached)
+        {
+            _sawmill.Warning($"Sponsor markings not cached for user {username}, sponsor may not see sponsor-only markings");
         }
 
         var info = new SponsorInfo
@@ -269,11 +321,12 @@ public sealed class SponsorsManager : ISponsorsManager
             ExtraSlots = entry.Tier >= 3 ? 2 : (entry.Tier >= 2 ? 1 : 0),
             ExpireDate = entry.ExpireDate ?? DateTime.MaxValue,
             CharacterName = entry.Username,
-            CustomLoadouts = entry.CustomLoadouts.ToArray()
+            CustomLoadouts = entry.CustomLoadouts.ToArray(),
+            AllowedMarkings = allowedMarkings
         };
 
         _cachedSponsors[userId] = info;
-        _sawmill.Info($"Sponsor {username} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts");
+        _sawmill.Info($"Sponsor {username} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts, {allowedMarkings.Length} sponsor markings available");
 
         var msgSponsor = new MsgSponsorInfo { Info = info };
         _netMgr.ServerSendMessage(msgSponsor, e.Channel);
@@ -342,7 +395,11 @@ public sealed class SponsorsManager : ISponsorsManager
     public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
     {
         _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes, customLoadouts);
-    
+
+        EnsureSponsorMarkingsCached();
+
+        var allowedMarkings = _isSponsorMarkingsCached ? _sponsorOnlyMarkingIds : Array.Empty<string>();
+
         var info = new SponsorInfo
         {
             Tier = tier,
@@ -351,7 +408,8 @@ public sealed class SponsorsManager : ISponsorsManager
             ExtraSlots = tier >= 3 ? 2 : (tier >= 2 ? 1 : 0),
             ExpireDate = expireDate ?? DateTime.MaxValue,
             CharacterName = username,
-            CustomLoadouts = customLoadouts?.ToArray() ?? Array.Empty<string>()
+            CustomLoadouts = customLoadouts?.ToArray() ?? Array.Empty<string>(),
+            AllowedMarkings = allowedMarkings
         };
 
         _cachedSponsors[userId] = info;
