@@ -144,8 +144,12 @@ namespace Content.IntegrationTests.Tests
             "ADT_Gate",
             "ADT_Reach",
             "ADT_Silly",
-            "ADT_Train"
+            "ADT_Train",
             // ADT-End
+            // VG-Start
+            "VG_Reach",
+            "VG_Batcher"
+            // VG-End
         };
 
         private static readonly ProtoId<EntityCategoryPrototype> DoNotMapCategory = "DoNotMap";
