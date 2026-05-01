@@ -95,6 +95,7 @@ namespace Content.Client.PDA
             _menu.AccentHColor = borderColorComponent.AccentHColor;
             _menu.AccentVColor = borderColorComponent.AccentVColor;
             _menu.DefaultWallpaperColor = GetDefaultWallpaperColor(borderColorComponent);
+            _menu.OnWallpaperPathSelected += path => SendMessage(new PdaSetWallpaperMessage(path));
         }
 
         protected override void UpdateState(BoundUserInterfaceState state)

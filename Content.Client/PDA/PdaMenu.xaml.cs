@@ -26,6 +26,12 @@ namespace Content.Client.PDA
         [Dependency] private readonly IEntityManager _entMan = default!;
         private ClientGameTicker _gameTicker = default!;
 
+        public event Action<EntityUid>? OnProgramItemPressed;
+        public event Action<EntityUid>? OnUninstallButtonPressed;
+        public event Action<EntityUid>? OnInstallButtonPressed;
+        public event Action<Color>? OnWallpaperColorSelected;
+        public event Action<string?>? OnWallpaperPathSelected; // VG-Wallpaper
+
         public const int HomeView = 0;
         public const int ProgramListView = 1;
         public const int SettingsView = 2;
@@ -47,11 +53,6 @@ namespace Content.Client.PDA
         private bool _bootScreenVisible;
         private CancellationTokenSource? _bootAnimationCts;
         private CancellationTokenSource? _fadeAnimationCts;
-
-        public event Action<EntityUid>? OnProgramItemPressed;
-        public event Action<EntityUid>? OnUninstallButtonPressed;
-        public event Action<EntityUid>? OnInstallButtonPressed;
-        public event Action<Color>? OnWallpaperColorSelected;
 
         public PdaMenu()
         {
@@ -161,11 +162,38 @@ namespace Content.Client.PDA
                 OnWallpaperColorSelected?.Invoke(_wallpaperColor);
             };
 
+            // VG-Wallpaper
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-none"));
+            WallpaperDropdown.SetItemMetadata(0, string.Empty);
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-space"));
+            WallpaperDropdown.SetItemMetadata(1, "/Textures/_VG/PDA/Wallpapers/space1.png");
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-space2"));
+            WallpaperDropdown.SetItemMetadata(2, "/Textures/_VG/PDA/Wallpapers/space2.png");
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-blackhole"));
+            WallpaperDropdown.SetItemMetadata(3, "/Textures/_VG/PDA/Wallpapers/blackhole.png");
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-forest"));
+            WallpaperDropdown.SetItemMetadata(4, "/Textures/_VG/PDA/Wallpapers/forest.png");
+            WallpaperDropdown.OnItemSelected += OnWallpaperDropdownSelected;
+
             HideAllViews();
             BootView.Visible = false;
             BootView.Modulate = Color.White;
             
             ToHomeScreen();
+        }
+
+        private void OnWallpaperDropdownSelected(OptionButton.ItemSelectedEventArgs args)
+        {
+            WallpaperDropdown.SelectId(args.Id);
+            var path = args.Button.GetItemMetadata(args.Id) as string;
+            if (string.IsNullOrEmpty(path))
+            {
+                OnWallpaperPathSelected?.Invoke(null);
+            }
+            else
+            {
+                OnWallpaperPathSelected?.Invoke(path);
+            }
         }
 
         public void ShowBootScreen(bool show)
@@ -294,6 +322,9 @@ namespace Content.Client.PDA
 
             _hasWallpaperColor = state.HasWallpaperColor;
             _wallpaperColor = effectiveWallpaperColor;
+            
+            // VG-Wallpaper: обновляем обои
+            WallpaperPath = state.WallpaperPath;
 
             if (state.PdaOwnerInfo.ActualOwnerName != null)
             {

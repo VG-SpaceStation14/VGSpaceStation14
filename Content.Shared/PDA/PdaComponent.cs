@@ -42,5 +42,9 @@ namespace Content.Shared.PDA
         // VG-Boot
         [DataField, AutoNetworkedField]
         public bool Booted;
+
+        // VG-Wallpaper
+        [DataField, AutoNetworkedField]
+        public string? WallpaperPath;
     }
 }

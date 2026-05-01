@@ -62,6 +62,7 @@ namespace Content.Server.PDA
             SubscribeLocalEvent<EntityRenamedEvent>(OnEntityRenamed, after: new[] { typeof(IdCardSystem) });
             SubscribeLocalEvent<AlertLevelChangedEvent>(OnAlertLevelChanged);
             SubscribeLocalEvent<PdaComponent, InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent>>(ChameleonControllerOutfitItemSelected);
+            SubscribeLocalEvent<PdaComponent, PdaSetWallpaperMessage>(OnUiMessage);
         }
 
         private void ChameleonControllerOutfitItemSelected(Entity<PdaComponent> ent, ref InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent> args)
@@ -215,7 +216,8 @@ namespace Content.Server.PDA
                 address,
                 pda.HasWallpaperColor,
                 pda.WallpaperColor,
-                pda.Booted); // VG-Boot
+                pda.Booted, // VG-Boot
+                pda.WallpaperPath); 
 
             _ui.SetUiState(uid, PdaUiKey.Key, state);
         }
@@ -233,6 +235,16 @@ namespace Content.Server.PDA
             if (!PdaUiKey.Key.Equals(msg.UiKey))
                 return;
 
+            UpdatePdaUi(uid, pda);
+        }
+
+        private void OnUiMessage(EntityUid uid, PdaComponent pda, PdaSetWallpaperMessage msg)
+        {
+            if (!PdaUiKey.Key.Equals(msg.UiKey))
+                return;
+
+            pda.WallpaperPath = msg.Path;
+            EntityManager.Dirty(uid, pda);
             UpdatePdaUi(uid, pda);
         }
 

@@ -16,8 +16,9 @@ namespace Content.Shared.PDA
         public string? Address;
         public bool HasWallpaperColor;
         public Color WallpaperColor;
-        // VG-Boot
         public bool Booted;
+        // VG-Wallpaper
+        public string? WallpaperPath;
 
         public PdaUpdateState(
             List<NetEntity> programs,
@@ -32,7 +33,8 @@ namespace Content.Shared.PDA
             string? address = null,
             bool hasWallpaperColor = false,
             Color? wallpaperColor = null,
-            bool booted = false) // VG-Boot
+            bool booted = false,
+            string? wallpaperPath = null)
             : base(programs, activeUI)
         {
             FlashlightEnabled = flashlightEnabled;
@@ -45,7 +47,8 @@ namespace Content.Shared.PDA
             Address = address;
             HasWallpaperColor = hasWallpaperColor;
             WallpaperColor = wallpaperColor ?? Color.White;
-            Booted = booted; // VG-Boot
+            Booted = booted;
+            WallpaperPath = wallpaperPath;
         }
     }
 

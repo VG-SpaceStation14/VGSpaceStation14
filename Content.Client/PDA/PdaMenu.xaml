@@ -89,6 +89,9 @@
                                        Description="{Loc 'pda-bound-user-interface-lock-uplink-description'}"/>
                 <Label Text="{Loc 'comp-pda-ui-wallpaper-color'}" Margin="8 10 8 0"/>
                 <adt:LegacyColorSelectorSliders Name="WallpaperColorSelector" Margin="8 2 8 4"/>
+                <Label Text="{Loc 'pda-wallpaper-title'}" Margin="8 15 8 0"/>
+                <!-- VG-Wallpaper: DropDown -->
+                <OptionButton Name="WallpaperDropdown" Access="Public" Margin="8 4 8 4" MinWidth="200" HorizontalExpand="True" />
             </BoxContainer>
         </ScrollContainer>
 
