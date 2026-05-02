@@ -173,6 +173,8 @@ namespace Content.Client.PDA
             WallpaperDropdown.SetItemMetadata(3, "/Textures/_VG/PDA/Wallpapers/blackhole.png");
             WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-forest"));
             WallpaperDropdown.SetItemMetadata(4, "/Textures/_VG/PDA/Wallpapers/forest.png");
+            WallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-smile"));
+            WallpaperDropdown.SetItemMetadata(5, "/Textures/_VG/PDA/Wallpapers/smile.png");
             WallpaperDropdown.OnItemSelected += OnWallpaperDropdownSelected;
 
             HideAllViews();
