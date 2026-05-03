@@ -406,25 +406,17 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         {
             case LightAttackEvent light:
                 if (light.Target != null && !TryGetEntity(light.Target, out target))
-                {
-                    // Target was lightly attacked & deleted.
                     return false;
-                }
 
                 if (!Blocker.CanAttack(user, target, (weaponUid, weapon)))
                     return false;
 
-                // Can't self-attack if you're the weapon
                 if (weaponUid == target)
                     return false;
-
                 break;
             case DisarmAttackEvent disarm:
                 if (disarm.Target != null && !TryGetEntity(disarm.Target, out target))
-                {
-                    // Target was lightly attacked & deleted.
                     return false;
-                }
 
                 if (!Blocker.CanAttack(user, target, (weaponUid, weapon), true))
                     return false;
@@ -435,11 +427,9 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
                 break;
         }
 
-        // Windup time checked elsewhere.
         var fireRate = TimeSpan.FromSeconds(1f / GetAttackRate(weaponUid, user, weapon));
         var swings = 0;
 
-        // TODO: If we get autoattacks then probably need a shotcounter like guns so we can do timing properly.
         if (weapon.NextAttack < curTime)
             weapon.NextAttack = curTime;
 
@@ -451,21 +441,22 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
 
         DirtyField(weaponUid, weapon, nameof(MeleeWeaponComponent.NextAttack));
 
-        // Do this AFTER attack so it doesn't spam every tick
-        var ev = new AttemptMeleeEvent(user); //ADT tweaked
+        if (weapon.SwingBeverage)
+        {
+            weapon.SwingLeft = !weapon.SwingLeft;
+            DirtyField(weaponUid, weapon, nameof(MeleeWeaponComponent.SwingLeft));
+        }
+
+        var ev = new AttemptMeleeEvent(user);
         RaiseLocalEvent(weaponUid, ref ev);
 
         if (ev.Cancelled)
         {
             if (ev.Message != null)
-            {
                 PopupSystem.PopupClient(ev.Message, weaponUid, user);
-            }
-
             return false;
         }
 
-        // Attack confirmed
         for (var i = 0; i < swings; i++)
         {
             string animation;
@@ -479,13 +470,11 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
                 case DisarmAttackEvent disarm:
                     if (!DoDisarm(user, disarm, weaponUid, weapon, session))
                         return false;
-
-                    animation = weapon.DisarmAnimation; //ADT Tweak - добавил спрайт дизарма
+                    animation = weapon.DisarmAnimation;
                     break;
                 case HeavyAttackEvent heavy:
                     if (!DoHeavyAttack(user, heavy, weaponUid, weapon, session))
                         return false;
-
                     animation = weapon.WideAnimation;
                     break;
                 default:

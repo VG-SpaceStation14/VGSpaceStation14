@@ -15,17 +15,12 @@ public sealed partial class MeleeWeaponSystem
     private const string SlashAnimationKey = "melee-slash";
     private const string ThrustAnimationKey = "melee-thrust";
 
-    /// <summary>
-    /// Does all of the melee effects for a player that are predicted, i.e. character lunge and weapon animation.
-    /// </summary>
     public override void DoLunge(EntityUid user, EntityUid weapon, Angle angle, Vector2 localPos, string? animation, bool predicted = true)
     {
         if (!Timing.IsFirstTimePredicted)
             return;
 
         var lunge = GetLungeAnimation(localPos);
-
-        // Stop any existing lunges on the user.
         _animation.Stop(user, MeleeLungeKey);
         _animation.Play(user, lunge, MeleeLungeKey);
 
@@ -37,47 +32,53 @@ public sealed partial class MeleeWeaponSystem
 
         var animationUid = Spawn(animation, userXform.Coordinates);
 
-        if (!TryComp<SpriteComponent>(animationUid, out var sprite)
-            || !TryComp<WeaponArcVisualsComponent>(animationUid, out var arcComponent))
-        {
+        if (!TryComp<SpriteComponent>(animationUid, out var sprite) ||
+            !TryComp<WeaponArcVisualsComponent>(animationUid, out var arcComponent))
             return;
-        }
 
+        var length = 1f;
+        var offset = 1f;
         var spriteRotation = Angle.Zero;
-        if (arcComponent.Animation != WeaponArcAnimation.None
-            && TryComp(weapon, out MeleeWeaponComponent? meleeWeaponComponent))
+
+        if (arcComponent.Animation != WeaponArcAnimation.None && TryComp(weapon, out MeleeWeaponComponent? meleeWeapon))
         {
-            if (user != weapon &&
-                !meleeWeaponComponent.CustomWideAnim    // ADT tweak
-                && TryComp(weapon, out SpriteComponent? weaponSpriteComponent))
-                _sprite.CopySprite((weapon, weaponSpriteComponent), (animationUid, sprite));
+            if (user != weapon && !meleeWeapon.CustomWideAnim && TryComp(weapon, out SpriteComponent? weaponSprite))
+                _sprite.CopySprite((weapon, weaponSprite), (animationUid, sprite));
 
-            spriteRotation = meleeWeaponComponent.WideAnimationRotation;
+            spriteRotation = meleeWeapon.WideAnimationRotation;
 
-            if (meleeWeaponComponent.SwingLeft)
+            if (meleeWeapon.SwingLeft)
                 angle *= -1;
+
+            // Длина анимации зависит от скорости атаки
+            length = (1 / meleeWeapon.AttackRate) * 0.6f;
+            offset = meleeWeapon.AnimationOffset;
         }
+
         _sprite.SetRotation((animationUid, sprite), localPos.ToWorldAngle());
-        var distance = Math.Clamp(localPos.Length() / 2f, 0.2f, 1f);
 
         var xform = _xformQuery.GetComponent(animationUid);
         TrackUserComponent track;
+
+        // Динамическое смещение в зависимости от расстояния до цели
+        var distance = Math.Clamp(localPos.Length() / 1.5f, 0.3f, 1.2f);
+        var slashOffset = Math.Clamp(localPos.Length() / 1.2f, 0.5f, 1.5f);
 
         switch (arcComponent.Animation)
         {
             case WeaponArcAnimation.Slash:
                 track = EnsureComp<TrackUserComponent>(animationUid);
                 track.User = user;
-                _animation.Play(animationUid, GetSlashAnimation(sprite, angle, spriteRotation), SlashAnimationKey);
+                _animation.Play(animationUid, GetSlashAnimation((animationUid, sprite), angle, spriteRotation, length, slashOffset), SlashAnimationKey);
                 if (arcComponent.Fadeout)
-                    _animation.Play(animationUid, GetFadeAnimation(sprite, 0.065f, 0.065f + 0.05f), FadeAnimationKey);
+                    _animation.Play(animationUid, GetFadeAnimation(sprite, length * 0.5f, length + 0.15f), FadeAnimationKey);
                 break;
             case WeaponArcAnimation.Thrust:
                 track = EnsureComp<TrackUserComponent>(animationUid);
                 track.User = user;
-                _animation.Play(animationUid, GetThrustAnimation((animationUid, sprite), distance, spriteRotation), ThrustAnimationKey);
+                _animation.Play(animationUid, GetThrustAnimation((animationUid, sprite), distance, spriteRotation, length), ThrustAnimationKey);
                 if (arcComponent.Fadeout)
-                    _animation.Play(animationUid, GetFadeAnimation(sprite, 0.05f, 0.15f), FadeAnimationKey);
+                    _animation.Play(animationUid, GetFadeAnimation(sprite, length * 0.5f, length + 0.15f), FadeAnimationKey);
                 break;
             case WeaponArcAnimation.None:
                 var (mapPos, mapRot) = TransformSystem.GetWorldPositionRotation(userXform);
@@ -90,21 +91,21 @@ public sealed partial class MeleeWeaponSystem
         }
     }
 
-    private Animation GetSlashAnimation(SpriteComponent sprite, Angle arc, Angle spriteRotation)
+    private Animation GetSlashAnimation(Entity<SpriteComponent> sprite, Angle arc, Angle spriteRotation, float length, float offset)
     {
-        const float slashStart = 0.03f;
-        const float slashEnd = 0.065f;
-        const float length = slashEnd + 0.05f;
-        var startRotation = sprite.Rotation + arc / 2;
-        var endRotation = sprite.Rotation - arc / 2;
-        var startRotationOffset = startRotation.RotateVec(new Vector2(0f, -1f));
-        var endRotationOffset = endRotation.RotateVec(new Vector2(0f, -1f));
+        var startRotation = sprite.Comp.Rotation + (arc * 0.5f);
+        var endRotation = sprite.Comp.Rotation - (arc * 0.5f);
+
+        var startRotationOffset = startRotation.RotateVec(new Vector2(0f, -offset * 0.9f));
+        var minRotationOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -offset * 1.1f));
+        var endRotationOffset = endRotation.RotateVec(new Vector2(0f, -offset * 0.9f));
+
         startRotation += spriteRotation;
         endRotation += spriteRotation;
 
         return new Animation()
         {
-            Length = TimeSpan.FromSeconds(length),
+            Length = TimeSpan.FromSeconds(length + 0.05f),
             AnimationTracks =
             {
                 new AnimationTrackComponentProperty()
@@ -113,10 +114,12 @@ public sealed partial class MeleeWeaponSystem
                     Property = nameof(SpriteComponent.Rotation),
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(startRotation, 0f),
-                        new AnimationTrackProperty.KeyFrame(startRotation, slashStart),
-                        new AnimationTrackProperty.KeyFrame(endRotation, slashEnd)
-                    }
+                        new AnimationTrackProperty.KeyFrame(Angle.Lerp(startRotation, endRotation, 0.0f), length * 0.0f),
+                        new AnimationTrackProperty.KeyFrame(Angle.Lerp(startRotation, endRotation, 0.5f), length * 0.10f, Easings.OutCubic),
+                        new AnimationTrackProperty.KeyFrame(Angle.Lerp(startRotation, endRotation, 1.0f), length * 0.15f),
+                        new AnimationTrackProperty.KeyFrame(Angle.Lerp(startRotation, endRotation, 0.9f), length * 0.20f),
+                        new AnimationTrackProperty.KeyFrame(Angle.Lerp(startRotation, endRotation, 0.80f), length * 0.60f, Easings.OutQuart)
+                    },
                 },
                 new AnimationTrackComponentProperty()
                 {
@@ -124,21 +127,23 @@ public sealed partial class MeleeWeaponSystem
                     Property = nameof(SpriteComponent.Offset),
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(startRotationOffset, 0f),
-                        new AnimationTrackProperty.KeyFrame(startRotationOffset, slashStart),
-                        new AnimationTrackProperty.KeyFrame(endRotationOffset, slashEnd)
+                        new AnimationTrackProperty.KeyFrame(Vector2.Lerp(startRotationOffset, endRotationOffset, 0.0f), length * 0.0f),
+                        new AnimationTrackProperty.KeyFrame(minRotationOffset, length * 0.10f, Easings.OutCubic),
+                        new AnimationTrackProperty.KeyFrame(Vector2.Lerp(startRotationOffset, endRotationOffset, 1.0f), length * 0.15f),
+                        new AnimationTrackProperty.KeyFrame(Vector2.Lerp(startRotationOffset, endRotationOffset, 0.80f), length * 0.60f, Easings.OutQuart)
                     }
                 },
             }
         };
     }
 
-    private Animation GetThrustAnimation(Entity<SpriteComponent> sprite, float distance, Angle spriteRotation)
+    private Animation GetThrustAnimation(Entity<SpriteComponent> sprite, float offset, Angle spriteRotation, float length)
     {
-        const float thrustEnd = 0.05f;
-        const float length = 0.15f;
-        var startOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -distance / 5f));
-        var endOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -distance));
+        var startOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, 0f));
+        var midOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -offset * 0.8f));
+        var endOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -offset * 1.3f));
+        var backOffset = sprite.Comp.Rotation.RotateVec(new Vector2(0f, -offset * 0.5f));
+        
         _sprite.SetRotation(sprite.AsNullable(), sprite.Comp.Rotation + spriteRotation);
 
         return new Animation()
@@ -153,8 +158,10 @@ public sealed partial class MeleeWeaponSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(startOffset, 0f),
-                        new AnimationTrackProperty.KeyFrame(endOffset, thrustEnd),
-                        new AnimationTrackProperty.KeyFrame(endOffset, length),
+                        new AnimationTrackProperty.KeyFrame(midOffset, length * 0.1f, Easings.OutCubic),
+                        new AnimationTrackProperty.KeyFrame(endOffset, length * 0.25f, Easings.OutQuad),
+                        new AnimationTrackProperty.KeyFrame(backOffset, length * 0.45f, Easings.InQuad),
+                        new AnimationTrackProperty.KeyFrame(startOffset, length * 0.7f, Easings.OutExpo),
                     }
                 },
             }
@@ -175,20 +182,16 @@ public sealed partial class MeleeWeaponSystem
                     KeyFrames =
                     {
                         new AnimationTrackProperty.KeyFrame(sprite.Color, start),
-                        new AnimationTrackProperty.KeyFrame(sprite.Color.WithAlpha(0f), end)
+                        new AnimationTrackProperty.KeyFrame(sprite.Color.WithAlpha(0f), end, Easings.OutQuad)
                     }
                 }
             }
         };
     }
 
-    /// <summary>
-    /// Get the sprite offset animation to use for mob lunges.
-    /// </summary>
     private Animation GetLungeAnimation(Vector2 direction)
     {
         const float length = 0.1f;
-
         return new Animation
         {
             Length = TimeSpan.FromSeconds(length),
@@ -201,33 +204,29 @@ public sealed partial class MeleeWeaponSystem
                     InterpolationMode = AnimationInterpolationMode.Linear,
                     KeyFrames =
                     {
-                        new AnimationTrackProperty.KeyFrame(direction.Normalized() * 0.15f, 0f),
-                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, length)
-                    }
-                }
-            }
+                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, 0f),
+                        new AnimationTrackProperty.KeyFrame(direction.Normalized() * 0.15f, length * 0.4f, Easings.OutQuad),
+                        new AnimationTrackProperty.KeyFrame(Vector2.Zero, length * 0.6f, Easings.InQuad),
+                    },
+                },
+            },
         };
     }
 
-    /// <summary>
-    /// Updates the effect positions to follow the user
-    /// </summary>
     private void UpdateEffects()
     {
         var query = EntityQueryEnumerator<TrackUserComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var arcComponent, out var xform))
         {
-            if (arcComponent.User == null || EntityManager.Deleted(arcComponent.User))
+            if (arcComponent.User == null || Deleted(arcComponent.User))
                 continue;
 
-            Vector2 targetPos = TransformSystem.GetWorldPosition(arcComponent.User.Value);
-
+            var targetPos = TransformSystem.GetWorldPosition(arcComponent.User.Value);
             if (arcComponent.Offset != Vector2.Zero)
             {
                 var entRotation = TransformSystem.GetWorldRotation(xform);
                 targetPos += entRotation.RotateVec(arcComponent.Offset);
             }
-
             TransformSystem.SetWorldPosition(uid, targetPos);
         }
     }

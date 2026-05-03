@@ -101,7 +101,7 @@ public sealed partial class MeleeWeaponComponent : Component
     public Angle Angle = Angle.FromDegrees(60);
 
     [DataField, AutoNetworkedField]
-    public EntProtoId Animation = "WeaponArcPunch";
+    public EntProtoId Animation = "WeaponArcThrust"; // VG-Tweak
 
     [DataField, AutoNetworkedField]
     public EntProtoId WideAnimation = "WeaponArcSlash";
@@ -172,6 +172,16 @@ public sealed partial class MeleeWeaponComponent : Component
     [DataField]
     public int ShovesToDisarm = 3;
     // ADT Disarm tweak end
+    // VG-Tweak Start
+    [DataField, AutoNetworkedField]
+    public bool SwingBeverage = true;
+
+    [DataField, AutoNetworkedField]
+    public float AnimationOffset = 1f;
+
+    [DataField, AutoNetworkedField]
+    public bool CanHeavyAttack = true;
+    // VG-Tweak End
 }
 
 /// <summary>
