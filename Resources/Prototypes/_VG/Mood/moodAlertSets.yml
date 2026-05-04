@@ -42,3 +42,18 @@
     Exceptional: ExceptionalReptilian
     Perfect: PerfectReptilian
     Insane: InsaneReptilian
+
+- type: moodAlertSet
+  id: MothMoodAlerts
+  alertMapping:
+    Dead: MoodDeadMoth
+    Horrible: HorribleMoth
+    Terrible: TerribleMoth
+    Bad: BadMoth
+    Meh: MehMoth
+    Neutral: NeutralMoth
+    Good: GoodMoth
+    Great: GreatMoth
+    Exceptional: ExceptionalMoth
+    Perfect: PerfectMoth
+    Insane: InsaneMothn
