@@ -160,6 +160,8 @@
       - "footprint-left-bare-spider"
     rightBareFootState:
       - "footprint-right-bare-spider"
+  - type: SurgeryTarget
+    dollPath: /Textures/_VG/Interface/Targeting/Status/Moth
   - type: Mood
     alertSet: MothMoodAlerts
   # VG-Tweak End
