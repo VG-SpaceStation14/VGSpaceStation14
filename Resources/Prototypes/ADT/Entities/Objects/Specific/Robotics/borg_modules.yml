@@ -80,12 +80,8 @@
     - state: cargo
     - state: icon-pka
   - type: ItemBorgModule
-    droppableItems:
-    - id: WeaponProtoKineticAccelerator
-      whitelist:
-        tags:
-        - PKA
     hands:
+    - item: WeaponProtoKineticAccelerator
     - item: WeaponGrapplingGun
     - item: BorgHandheldGPSBasic
     - item: HandHeldMassScannerBorg
