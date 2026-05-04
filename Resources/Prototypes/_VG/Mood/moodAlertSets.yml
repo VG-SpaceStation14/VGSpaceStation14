@@ -27,3 +27,18 @@
     Exceptional: ExceptionalVulpkanin
     Perfect: PerfectVulpkanin
     Insane: InsaneVulpkanin
+
+- type: moodAlertSet
+  id: ReptilianMoodAlerts
+  alertMapping:
+    Dead: MoodDeadReptilian
+    Horrible: HorribleReptilian
+    Terrible: TerribleReptilian
+    Bad: BadReptilian
+    Meh: MehReptilian
+    Neutral: NeutralReptilian
+    Good: GoodReptilian
+    Great: GreatReptilian
+    Exceptional: ExceptionalReptilian
+    Perfect: PerfectReptilian
+    Insane: InsaneReptilian

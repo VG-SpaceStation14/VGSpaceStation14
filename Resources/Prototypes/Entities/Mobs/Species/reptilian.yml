@@ -234,6 +234,8 @@
       - "footprint-suit-lizzard"
   - type: SurgeryTarget
     dollPath: /Textures/_VG/Interface/Targeting/Status/Reptilian
+  - type: Mood
+    alertSet: ReptilianMoodAlerts
   # VG-Tweak End
 
 - type: entity
