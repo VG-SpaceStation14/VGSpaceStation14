@@ -15,6 +15,7 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Content.Shared._VG.Mood;
 
 namespace Content.Server._VG.Mood;
 
@@ -250,11 +251,17 @@ public sealed class MoodSystem : EntitySystem
         if (!Resolve(uid, ref component))
             return;
 
+        var old = component.CurrentMoodThreshold;
         var calculatedThreshold = GetMoodThreshold(component);
-        if (calculatedThreshold == component.CurrentMoodThreshold)
+
+        if (calculatedThreshold == old)
             return;
 
         component.CurrentMoodThreshold = calculatedThreshold;
+
+        var ev = new MoodThresholdChangedEvent(old, calculatedThreshold);
+        RaiseLocalEvent(uid, ev);
+
         DoMoodThresholdsEffects(uid, component);
     }
 

@@ -236,6 +236,7 @@
     dollPath: /Textures/_VG/Interface/Targeting/Status/Reptilian
   - type: Mood
     alertSet: ReptilianMoodAlerts
+  - type: AutoWagging
   # VG-Tweak End
 
 - type: entity
