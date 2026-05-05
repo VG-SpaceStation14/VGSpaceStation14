@@ -1,0 +1,140 @@
+name: Publish Multiple Changelog
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_range:
+        description: 'Commit range (e.g., "abc123..def456") or comma-separated SHAs (e.g., "abc123,def456,ghi789")'
+        required: true
+        type: string
+        default: 'HEAD~3..HEAD'
+      title:
+        description: 'Changelog title (optional)'
+        required: false
+        type: string
+        default: 'New Changelog'
+
+jobs:
+  publish:
+    name: Publish Changelog to Discord
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get commit list
+        id: commits
+        run: |
+          set -e
+          
+          INPUT="${{ github.event.inputs.commit_range }}"
+          
+          # Function to get commits between two SHAs
+          get_commits_in_range() {
+            git rev-list --reverse "$1"
+          }
+          
+          # Check if input is a range (contains ..)
+          if [[ "$INPUT" == *".."* ]]; then
+            COMMITS=$(git rev-list --reverse "$INPUT")
+          else
+            # Split by comma and get each commit
+            IFS=',' read -ra SHAS <<< "$INPUT"
+            COMMITS=""
+            for sha in "${SHAS[@]}"; do
+              sha=$(echo "$sha" | xargs) # trim whitespace
+              COMMITS="$COMMITS$(git rev-parse $sha)\n"
+            done
+            COMMITS=$(echo -e "$COMMITS" | grep -v '^$')
+          fi
+          
+          if [ -z "$COMMITS" ]; then
+            echo "No commits found!"
+            exit 1
+          fi
+          
+          # Store commits as multiline output
+          {
+            echo "commits<<EOF"
+            echo "$COMMITS"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Process commits and build changelog
+        id: changelog
+        run: |
+          CHANGELOG_ENTRIES=""
+          
+          while IFS= read -r FULL_HASH; do
+            [ -z "$FULL_HASH" ] && continue
+            
+            SHORT_HASH=$(git rev-parse --short $FULL_HASH)
+            TITLE=$(git log -1 --format=%s $FULL_HASH)
+            AUTHOR=$(git log -1 --format=%an $FULL_HASH)
+            
+            # Detect emoji based on prefix
+            case "$TITLE" in
+              *"[FIX]"*) EMOJI="🩹" ;;
+              *"[ADD]"*) EMOJI="✨" ;;
+              *"[TWEAK]"*) EMOJI="⚙️" ;;
+              *"[REMOVE]"*) EMOJI="🗑️" ;;
+              *"[REFACTOR]"*) EMOJI="♻️" ;;
+              *"[UPDATE]"*) EMOJI="📦" ;;
+              *"[SECURITY]"*) EMOJI="🔒" ;;
+              *"[PERFORMANCE]"*) EMOJI="⚡" ;;
+              *"[DOCS]"*) EMOJI="📚" ;;
+              *"[TEST]"*) EMOJI="🧪" ;;
+              *) EMOJI="📝" ;;
+            esac
+            
+            # Add to changelog
+            CHANGELOG_ENTRIES="${CHANGELOG_ENTRIES}${EMOJI} \`${SHORT_HASH}\` ${TITLE}\n"
+            
+          done <<< "${{ steps.commits.outputs.commits }}"
+          
+          # Trim trailing newline
+          CHANGELOG_ENTRIES=$(echo -e "$CHANGELOG_ENTRIES" | sed '/^$/d')
+          
+          {
+            echo "entries<<EOF"
+            echo -e "$CHANGELOG_ENTRIES"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Send to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
+          TITLE: ${{ github.event.inputs.title }}
+          ENTRIES: ${{ steps.changelog.outputs.entries }}
+        run: |
+          export LANG=C.UTF-8
+          export LC_ALL=C.UTF-8
+          
+          # Escape for JSON
+          ESCAPED_TITLE=$(echo "$TITLE" | jq -R -s '.')
+          ESCAPED_ENTRIES=$(echo -e "$ENTRIES" | jq -R -s '.')
+          
+          jq -n \
+            --arg title "$TITLE" \
+            --arg entries "$ENTRIES" \
+            '{
+              embeds: [{
+                title: ("📢 " + $title),
+                color: 5814783,
+                description: $entries,
+                footer: {
+                  text: "Total commits: " + ($entries | split("\n") | length | tostring)
+                }
+              }]
+            }' > payload.json
+          
+          curl -s -o response.txt -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "$DISCORD_WEBHOOK"
+          
+          echo "Discord response:"
+          cat response.txt
