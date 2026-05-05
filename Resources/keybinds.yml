@@ -687,6 +687,7 @@ binds:
   type: State
   key: E
 # ADT-Tweak-end
+# VG-Tweak Start
 - function: TargetHead
   type: State
   key: NumpadNum8
@@ -711,3 +712,8 @@ binds:
   type: State
   key: NumpadNum1
   mod1: Control
+- function: ForceStand
+  type: State
+  key: C
+  mod1: Shift
+# VG-Twea End

@@ -83,6 +83,7 @@ namespace Content.Shared.Input
         public static readonly BoundKeyFunction TargetLeftFoot = "TargetLeftFoot"; // CorvaxNext: surgery
         public static readonly BoundKeyFunction TargetRightLeg = "TargetRightLeg"; // CorvaxNext: surgery
         public static readonly BoundKeyFunction TargetRightFoot = "TargetRightFoot"; // CorvaxNext: surgery
+        public static readonly BoundKeyFunction ForceStand = "ForceStand"; // VG-Tweak
 
         public static readonly BoundKeyFunction ArcadeUp = "ArcadeUp";
         public static readonly BoundKeyFunction ArcadeDown = "ArcadeDown";

@@ -298,6 +298,7 @@ ui-options-function-text-scroll-to-bottom = Пролистать вниз
 ui-options-function-text-tab-complete = Tab completion
 ui-options-function-text-complete-next = Complete next
 ui-options-function-text-complete-prev = Complete previous
+ui-options-function-force-stand = Быстрое вставание
 ui-options-net-interp-ratio = Сетевое сглаживание
 ui-options-net-predict = Предугадывание на стороне клиента
 ui-options-net-interp-ratio-tooltip =

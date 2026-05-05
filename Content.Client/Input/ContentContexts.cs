@@ -101,6 +101,7 @@ namespace Content.Client.Input
             human.AddFunction(ContentKeyFunctions.TargetRightArm); // CorvaxNext: surgery
             human.AddFunction(ContentKeyFunctions.TargetLeftLeg); // CorvaxNext: surgery
             human.AddFunction(ContentKeyFunctions.TargetRightLeg); // CorvaxNext: surgery
+            human.AddFunction(ContentKeyFunctions.ForceStand); // VG-Tweak
 
             // actions should be common (for ghosts, mobs, etc)
             common.AddFunction(ContentKeyFunctions.OpenActionsMenu);

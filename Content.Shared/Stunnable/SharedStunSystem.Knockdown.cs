@@ -79,23 +79,13 @@ public abstract partial class SharedStunSystem
 
         CommandBinds.Builder
             .Bind(ContentKeyFunctions.ToggleKnockdown, InputCmdHandler.FromDelegate(HandleToggleKnockdown, handle: false))
+            .Bind(ContentKeyFunctions.ForceStand, InputCmdHandler.FromDelegate(HandleForceStand, handle: false))
             .Register<SharedStunSystem>();
     }
 
     public override void Update(float frameTime)
-    {   //ADT-tweak-start
-        // base.Update(frameTime);
-
-        // var query = EntityQueryEnumerator<KnockedDownComponent>();
-
-        // while (query.MoveNext(out var uid, out var knockedDown))
-        // {
-        //     if (!knockedDown.AutoStand || knockedDown.DoAfterId.HasValue || knockedDown.NextUpdate > GameTiming.CurTime)
-        //         continue;
-
-        //     TryStanding(uid);
-        // }
-        //ADT-tweak-end
+    {
+        // Updates are handled by the systems themselves now
     }
 
     private void OnRejuvenate(Entity<KnockedDownComponent> entity, ref RejuvenateEvent args)
@@ -110,14 +100,12 @@ public abstract partial class SharedStunSystem
 
     private void OnKnockInit(Entity<KnockedDownComponent> entity, ref ComponentInit args)
     {
-        // Other systems should handle dropping held items...
         _standingState.Down(entity, true, false);
         RefreshKnockedMovement(entity);
     }
 
     private void OnKnockShutdown(Entity<KnockedDownComponent> entity, ref ComponentShutdown args)
     {
-        // This is jank but if we don't do this it'll still use the knockedDownComponent modifiers for friction because it hasn't been deleted quite yet.
         entity.Comp.FrictionModifier = 1f;
         entity.Comp.SpeedModifier = 1f;
 
@@ -130,26 +118,8 @@ public abstract partial class SharedStunSystem
     #region API
 
     /// <summary>
-    /// Sets the autostand property of a <see cref="KnockedDownComponent"/> on an entity to true or false and dirties it.
-    /// Defaults to false.
-    /// </summary>
-    /// <param name="entity">Entity we want to edit the data field of.</param>
-    /// <param name="autoStand">What we want to set the data field to.</param>
-    //ADT-tweak-start
-    // public void SetAutoStand(Entity<KnockedDownComponent?> entity, bool autoStand = false)
-    // {
-    //     if (!Resolve(entity, ref entity.Comp, false))
-    //         return;
-
-    //     entity.Comp.AutoStand = autoStand;
-    //     DirtyField(entity, entity.Comp, nameof(KnockedDownComponent.AutoStand));
-    // }
-    //ADT-tweak-end
-
-    /// <summary>
     /// Cancels the DoAfter of an entity with the <see cref="KnockedDownComponent"/> who is trying to stand.
     /// </summary>
-    /// <param name="entity">Entity who we are canceling the DoAfter for.</param>
     public void CancelKnockdownDoAfter(Entity<KnockedDownComponent?> entity)
     {
         if (!Resolve(entity, ref entity.Comp, false))
@@ -166,8 +136,6 @@ public abstract partial class SharedStunSystem
     /// <summary>
     /// Sets the time left of the knockdown timer to the inputted value.
     /// </summary>
-    /// <param name="entity">Entity who's knockdown time we're updating.</param>
-    /// <param name="time">The time we're updating with.</param>
     public void SetKnockdownTime(Entity<KnockedDownComponent?> entity, TimeSpan time)
     {
         if (!Resolve(entity, ref entity.Comp, false))
@@ -179,9 +147,6 @@ public abstract partial class SharedStunSystem
     /// <summary>
     /// Updates the knockdown timer of a knocked down entity with a given inputted time, then dirties the time.
     /// </summary>
-    /// <param name="entity">Entity who's knockdown time we're updating.</param>
-    /// <param name="time">The time we're updating with.</param>
-    /// <param name="refresh">Whether we're resetting the timer or adding to the current timer.</param>
     public void UpdateKnockdownTime(Entity<KnockedDownComponent?> entity, TimeSpan time, bool refresh = true)
     {
         if (refresh)
@@ -194,8 +159,6 @@ public abstract partial class SharedStunSystem
     /// Refreshes the amount of time an entity is knocked down to the inputted time, if it is greater than
     /// the current time left.
     /// </summary>
-    /// <param name="entity">Entity whose timer we're updating</param>
-    /// <param name="time">The time we want them to be knocked down for.</param>
     public void RefreshKnockdownTime(Entity<KnockedDownComponent?> entity, TimeSpan time)
     {
         if (!Resolve(entity, ref entity.Comp, false))
@@ -209,8 +172,6 @@ public abstract partial class SharedStunSystem
     /// <summary>
     /// Adds our inputted time to an entity's knocked down timer, or sets it to the given time if their timer has expired.
     /// </summary>
-    /// <param name="entity">Entity whose timer we're updating</param>
-    /// <param name="time">The time we want to add to their knocked down timer.</param>
     public void AddKnockdownTime(Entity<KnockedDownComponent?> entity, TimeSpan time)
     {
         if (!Resolve(entity, ref entity.Comp, false))
@@ -232,8 +193,6 @@ public abstract partial class SharedStunSystem
     /// <summary>
     /// Sets the next update datafield of an entity's <see cref="KnockedDownComponent"/> to a specific time.
     /// </summary>
-    /// <param name="entity">Entity whose timer we're updating</param>
-    /// <param name="time">The exact time we're setting the next update to.</param>
     private void SetKnockdownNextUpdate(Entity<KnockedDownComponent> entity, TimeSpan time)
     {
         if (GameTiming.CurTime > time)
@@ -255,13 +214,23 @@ public abstract partial class SharedStunSystem
         ToggleKnockdown(playerEnt);
     }
 
+    private void HandleForceStand(ICommonSession? session)
+    {
+        if (session?.AttachedEntity is not { Valid: true } playerEnt || !Exists(playerEnt))
+            return;
+
+        if (!TryComp<KnockedDownComponent>(playerEnt, out _) || HasComp<StunnedComponent>(playerEnt))
+            return;
+
+        HandleStandAttempt(playerEnt);
+    }
+
     /// <summary>
     /// Handles an entity trying to make itself fall down.
+    /// C key - always slow standing with DoAfter
     /// </summary>
-    /// <param name="entity">Entity who is trying to fall down</param>
     private void ToggleKnockdown(Entity<CrawlerComponent?, KnockedDownComponent?> entity)
     {
-        // We resolve here instead of using TryCrawling to be extra sure someone without crawler can't stand up early.
         if (!Resolve(entity, ref entity.Comp1, false) || !_cfgManager.GetCVar(CCVars.MovementCrawling))
             return;
 
@@ -272,24 +241,18 @@ public abstract partial class SharedStunSystem
         }
 
         var stand = !entity.Comp2.DoAfterId.HasValue;
-        // SetAutoStand((entity, entity.Comp2), stand);
         
-        // VG-Tweak-start: Унифицированная логика вставания
         if (_standingState.IsDown(entity.Owner) && !HasComp<StunnedComponent>(entity))
         {
-            HandleStandAttempt(entity.Owner);
+            if (stand && !TryStanding((entity, entity.Comp2)))
+                CancelKnockdownDoAfter((entity, entity.Comp2));
             return;
         }
-        // VG-Tweak-end
-        
-        // var stand = !component.DoAfterId.HasValue;
-        // SetAutoStand(playerEnt, stand); //ADT-tweak
 
         if (!stand || !TryStanding((entity, entity.Comp2)))
             CancelKnockdownDoAfter((entity, entity.Comp2));
     }
 
-    // VG-Tweak-start: Новый метод для обработки попытки вставания
     private void HandleStandAttempt(EntityUid uid)
     {
         // Проверяем, свободна ли хотя бы одна рука
@@ -304,23 +267,18 @@ public abstract partial class SharedStunSystem
             TryStanding(uid);
         }
     }
-    // VG-Tweak-end
 
-    public bool TryStanding(Entity<KnockedDownComponent?> entity, bool DoDoAfter = true) //ADT-tweak: добавлен бул дудуафтер
+    public bool TryStanding(Entity<KnockedDownComponent?> entity, bool DoDoAfter = true)
     {
-        // If we aren't knocked down or can't be knocked down, then we did technically succeed in standing up
         if (!Resolve(entity, ref entity.Comp, false))
             return true;
 
         if (!KnockdownOver((entity, entity.Comp)))
             return false;
-        if (!DoDoAfter) return true; //ADT-tweak: если без дуафтера, то его не делаем
+        if (!DoDoAfter) return true;
 
         if (!_crawlerQuery.TryComp(entity, out var crawler) || !_cfgManager.GetCVar(CCVars.MovementCrawling))
         {
-            // If we can't crawl then just have us sit back up...
-            // In case you're wondering, the KnockdownOverCheck, returns if we're able to move, so if next update is null.
-            // An entity that can't crawl will stand up the next time they can move, which should prevent moving while knocked down.
             RemComp<KnockedDownComponent>(entity);
             _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has stood up from knockdown.");
             return true;
@@ -329,25 +287,18 @@ public abstract partial class SharedStunSystem
         if (!TryStand((entity, entity.Comp)))
             return false;
 
-        // ADT-Tweak-start: Зависимость скорости вставания от стамины
         var baseTime = crawler.StandTime;
         if (TryComp<StaminaComponent>(entity, out var stamina))
         {
-            // Чем больше стамины, тем быстрее подъём
-            // staminaDamageRatio: 0 = полная стамина (быстро), 1 = нет стамины (медленно)
             var staminaDamageRatio = Math.Clamp(stamina.StaminaDamage / stamina.CritThreshold, 0f, 1f);
-            // Множитель времени: от 0.5x (полная стамина) до 2.0x (нет стамины)
             var timeMultiplier = MathHelper.Lerp(0.5f, 2.0f, staminaDamageRatio);
             baseTime *= timeMultiplier;
         }
 
-        // VG-Tweak-start: Ограничиваем максимальное время до 2 секунд
         if (baseTime > TimeSpan.FromSeconds(2))
             baseTime = TimeSpan.FromSeconds(2);
-        // VG-Tweak-end
 
         var ev = new GetStandUpTimeEvent(baseTime);
-        // ADT-Tweak-end
         RaiseLocalEvent(entity, ref ev);
 
         var doAfterArgs = new DoAfterArgs(EntityManager, entity, ev.DoAfterTime, new TryStandDoAfterEvent(), entity, entity)
@@ -359,7 +310,6 @@ public abstract partial class SharedStunSystem
             BreakOnHandChange = true
         };
 
-        // If we try standing don't try standing again
         if (!DoAfter.TryStartDoAfter(doAfterArgs, out var doAfterId))
             return false;
 
@@ -378,10 +328,7 @@ public abstract partial class SharedStunSystem
 
     /// <summary>
     /// A variant of <see cref="CanStand"/> used when we're actually trying to stand.
-    /// Main difference is this one affects autostand datafields and also displays popups.
     /// </summary>
-    /// <param name="entity">Entity we're checking</param>
-    /// <returns>Returns whether the entity is able to stand</returns>
     public bool TryStand(Entity<KnockedDownComponent> entity)
     {
         if (!KnockdownOver(entity))
@@ -389,9 +336,6 @@ public abstract partial class SharedStunSystem
 
         var ev = new StandUpAttemptEvent(entity.Comp.AutoStand);
         RaiseLocalEvent(entity, ref ev);
-
-        // if (ev.Autostand != entity.Comp.AutoStand) //ADT-tweak
-        //     SetAutoStand((entity.Owner, entity.Comp), ev.Autostand); //ADT-tweak
 
         if (ev.Message != null)
         {
@@ -404,8 +348,6 @@ public abstract partial class SharedStunSystem
     /// <summary>
     /// Checks if an entity is able to stand, returns true if it can, returns false if it cannot.
     /// </summary>
-    /// <param name="entity">Entity we're checking</param>
-    /// <returns>Returns whether the entity is able to stand</returns>
     public bool CanStand(Entity<KnockedDownComponent> entity)
     {
         if (!KnockdownOver(entity))
@@ -426,9 +368,7 @@ public abstract partial class SharedStunSystem
             return false;
 
         _popup.PopupClient(Loc.GetString("knockdown-component-stand-no-room"), entity, entity, PopupType.SmallCaution);
-        //SetAutoStand(entity.Owner); //ADT-tweak
         return true;
-
     }
 
     private void OnForceStandup(ForceStandUpEvent msg, EntitySessionEventArgs args)
@@ -436,35 +376,32 @@ public abstract partial class SharedStunSystem
         if (args.SenderSession.AttachedEntity is not { } user)
             return;
 
-        // VG-Tweak-start: Используем унифицированную логику
         HandleStandAttempt(user);
-        // VG-Tweak-end
     }
 
+    /// <summary>
+    /// Force standing up. Costs 30% of stamina threshold, requires a free hand and no stun.
+    /// </summary>
     public void ForceStandUp(Entity<KnockedDownComponent?> entity)
     {
         if (!Resolve(entity, ref entity.Comp, false))
             return;
 
-        // That way if we fail to stand, the game will try to stand for us when we are able to
-        // SetAutoStand(entity, true); //ADT-tweak
+        if (HasComp<StunnedComponent>(entity))
+            return;
 
         if (StandingBlocked((entity, entity.Comp)))
             return;
 
-        // VG-Tweak-start: Проверка на пустые руки для быстрого вставания
         if (!_hands.TryGetEmptyHand(entity.Owner, out _))
             return;
-        // VG-Tweak-end
 
         if (!TryForceStand(entity.Owner))
             return;
 
-        // If we have a DoAfter, cancel it
         CancelKnockdownDoAfter(entity);
-        // Remove Component
         RemComp<KnockedDownComponent>(entity);
-        _standingState.Stand(entity); //ADT-tweak: укращение дуафтера
+        _standingState.Stand(entity);
 
         _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has force stood up from knockdown.");
     }
@@ -474,23 +411,17 @@ public abstract partial class SharedStunSystem
         if (args.Handled)
             return;
 
-        // VG-Tweak-start: Используем унифицированную логику
         HandleStandAttempt(entity.Owner);
-        // VG-Tweak-end
-
         args.Handled = true;
     }
 
     private bool TryForceStand(Entity<StaminaComponent?> entity)
     {
-        // Can't force stand if no Stamina.
         if (!Resolve(entity, ref entity.Comp, false))
             return false;
 
-        // ADT-Tweak-start: Быстрое поднятие отнимает 30% от порога стамины
         var staminaCost = entity.Comp.CritThreshold * 0.30f;
         var ev = new TryForceStandEvent(staminaCost);
-        // ADT-Tweak-end
         RaiseLocalEvent(entity, ref ev);
 
         if (!Stamina.TryTakeStamina(entity, ev.Stamina, entity.Comp, visual: true))
@@ -507,7 +438,6 @@ public abstract partial class SharedStunSystem
 
     /// <summary>
     ///     Checks if standing would cause us to collide with something and potentially get stuck.
-    ///     Returns true if we will collide with something, and false if we will not.
     /// </summary>
     private bool IntersectingStandingColliders(Entity<TransformComponent?> entity)
     {
@@ -557,7 +487,6 @@ public abstract partial class SharedStunSystem
 
     private void OnDamaged(Entity<CrawlerComponent> entity, ref DamageChangedEvent args)
     {
-        // We only want to extend our knockdown timer if it would've prevented us from standing up
         if (!args.InterruptsDoAfters || !args.DamageIncreased || args.DamageDelta == null || GameTiming.ApplyingState)
             return;
 
@@ -573,12 +502,9 @@ public abstract partial class SharedStunSystem
 
     private void OnWeightlessnessChanged(Entity<KnockedDownComponent> entity, ref WeightlessnessChangedEvent args)
     {
-        // I probably don't need this check since weightless -> non-weightless you shouldn't be knocked down
-        // But you never know.
         if (!args.Weightless)
             return;
 
-        // Targeted moth attack
         CancelKnockdownDoAfter((entity, entity.Comp));
         RemCompDeferred<KnockedDownComponent>(entity);
     }
@@ -586,7 +512,7 @@ public abstract partial class SharedStunSystem
     private void OnHandEquipped(Entity<KnockedDownComponent> entity, ref DidEquipHandEvent args)
     {
         if (GameTiming.ApplyingState)
-            return; // The result of the change is already networked separately in the same game state
+            return;
 
         RefreshKnockedMovement(entity);
     }
@@ -594,7 +520,7 @@ public abstract partial class SharedStunSystem
     private void OnHandUnequipped(Entity<KnockedDownComponent> entity, ref DidUnequipHandEvent args)
     {
         if (GameTiming.ApplyingState)
-            return; // The result of the change is already networked separately in the same game state
+            return;
 
         RefreshKnockedMovement(entity);
     }
@@ -602,21 +528,19 @@ public abstract partial class SharedStunSystem
     private void OnHandCountChanged(Entity<KnockedDownComponent> entity, ref HandCountChangedEvent args)
     {
         if (GameTiming.ApplyingState)
-            return; // The result of the change is already networked separately in the same game state
+            return;
 
         RefreshKnockedMovement(entity);
     }
 
     private void OnKnockdownAttempt(Entity<GravityAffectedComponent> entity, ref KnockDownAttemptEvent args)
     {
-        // Directed, targeted moth attack.
         if (entity.Comp.Weightless)
             args.Cancelled = true;
     }
 
     private void OnGetStandUpTime(Entity<GravityAffectedComponent> entity, ref GetStandUpTimeEvent args)
     {
-        // Get up instantly if weightless
         if (entity.Comp.Weightless)
             args.DoAfterTime = TimeSpan.Zero;
     }
@@ -651,8 +575,8 @@ public abstract partial class SharedStunSystem
             return;
         }
 
-        RemComp<KnockedDownComponent>(entity); //ADT tweak
-        _standingState.Stand(entity); //ADT tweak
+        RemComp<KnockedDownComponent>(entity);
+        _standingState.Stand(entity);
 
         RemComp<KnockedDownComponent>(entity);
 
