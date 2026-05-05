@@ -210,7 +210,6 @@
   id: BaseTraitorRule
   components:
   - type: TraitorRule
-    bloodBrotherChance: 0 #ADT-tweak
   # TODO: codewords in yml
   # TODO: uplink in yml
   - type: AntagRandomObjectives
@@ -347,7 +346,7 @@
   id: Wizard
   components:
   - type: GameRule
-    minPlayers: 15 # VG-Tweak
+    minPlayers: 1000 #ADT-Tweak - де факто отключаем визарда 10 > 1000
   - type: AntagSelection
     agentName: wizard-round-end-name
     selectionTime: PrePlayerSpawn
@@ -555,7 +554,7 @@
     - id: SolarPanelDamageVariationPass
     - id: SolarPanelEmptyVariationPass
     - id: BasicDecalDirtVariationPass
-   # - id: BasicDecalGraffitiVariationPass VG-Tweak
+    # - id: BasicDecalGraffitiVariationPass VG-Tweak
     - id: BasicDecalBurnsVariationPass
       prob: 0.50
       orGroup: monospaceDecals
