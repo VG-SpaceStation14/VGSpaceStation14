@@ -67,6 +67,7 @@ jobs:
         id: changelog
         run: |
           CHANGELOG_ENTRIES=""
+          COUNT=0
           
           while IFS= read -r FULL_HASH; do
             [ -z "$FULL_HASH" ] && continue
@@ -92,6 +93,7 @@ jobs:
             
             # Add to changelog
             CHANGELOG_ENTRIES="${CHANGELOG_ENTRIES}${EMOJI} \`${SHORT_HASH}\` ${TITLE}\n"
+            COUNT=$((COUNT + 1))
             
           done <<< "${{ steps.commits.outputs.commits }}"
           
@@ -102,6 +104,7 @@ jobs:
             echo "entries<<EOF"
             echo -e "$CHANGELOG_ENTRIES"
             echo "EOF"
+            echo "count=$COUNT"
           } >> $GITHUB_OUTPUT
 
       - name: Send to Discord
@@ -109,32 +112,53 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
           TITLE: ${{ github.event.inputs.title }}
           ENTRIES: ${{ steps.changelog.outputs.entries }}
+          COUNT: ${{ steps.changelog.outputs.count }}
         run: |
           export LANG=C.UTF-8
           export LC_ALL=C.UTF-8
           
           # Escape for JSON
           ESCAPED_TITLE=$(echo "$TITLE" | jq -R -s '.')
-          ESCAPED_ENTRIES=$(echo -e "$ENTRIES" | jq -R -s '.')
+          
+          # Create entries array and build description
+          DESCRIPTION=""
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            ESCAPED_LINE=$(echo "$line" | jq -R -s '.')
+            DESCRIPTION="${DESCRIPTION}${ESCAPED_LINE}\\n"
+          done <<< "$ENTRIES"
+          
+          # Remove trailing \n
+          DESCRIPTION=$(echo -e "$DESCRIPTION" | sed 's/\\n$//')
           
           jq -n \
             --arg title "$TITLE" \
-            --arg entries "$ENTRIES" \
+            --arg description "$DESCRIPTION" \
+            --arg count "$COUNT" \
             '{
               embeds: [{
                 title: ("📢 " + $title),
                 color: 5814783,
-                description: $entries,
+                description: $description,
                 footer: {
-                  text: "Total commits: " + ($entries | split("\n") | length | tostring)
+                  text: ("Total commits: " + $count)
                 }
               }]
             }' > payload.json
           
-          curl -s -o response.txt -w "%{http_code}" \
+          echo "Sending payload:"
+          cat payload.json
+          
+          HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
-            "$DISCORD_WEBHOOK"
+            "$DISCORD_WEBHOOK")
           
+          echo "HTTP Code: $HTTP_CODE"
           echo "Discord response:"
           cat response.txt
+          
+          if [ "$HTTP_CODE" -ne 204 ]; then
+            echo "Error sending to Discord"
+            exit 1
+          fi
