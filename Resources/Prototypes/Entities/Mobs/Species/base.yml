@@ -255,6 +255,7 @@
   - type: Mood # VG-Tweak
   - type: CritHeartbeat # VG-Tweak
   - type: Targeting # VG-Tweak
+  - type: Blink # VG-Tweak
   - type: Barotrauma
     damage:
       types:
