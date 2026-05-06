@@ -19,12 +19,10 @@ public sealed partial class BlinkComponent : Component
 
     [DataField] public float DamageWeight = 1.0f;
     [DataField] public float StaminaWeight = 0.7f;
-
     [DataField] public float SkipBlinkChance = 0.05f;
     [DataField] public float LongBlinkChance = 0.1f;
     [DataField] public float IntensityLongBlinkBonus = 0.3f;
     [DataField] public float LongBlinkMultiplier = 2.5f;
-
     [DataField] public float LongIntervalChance = 0.2f;
     [DataField] public float LongIntervalMultiplier = 2f;
 
@@ -32,10 +30,9 @@ public sealed partial class BlinkComponent : Component
     [DataField] public float ReflexBlinkDuration = 0.12f;
     [DataField] public float ReflexBlinkChance = 0.9f;
 
-    [AutoNetworkedField] public bool EyesClosed;
+    [AutoNetworkedField]
+    public bool EyesClosed;
 
-    [AutoNetworkedField] public TimeSpan NextBlinkTime;
-    [AutoNetworkedField] public TimeSpan BlinkEndTime;
-
-    public Color? OriginalEyeColor;
+    public TimeSpan NextBlinkTime;
+    public TimeSpan BlinkEndTime;
 }

@@ -1,9 +1,12 @@
 using System.Linq;
 using Content.Shared._VG.Blink;
 using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
+using Content.Shared.FixedPoint;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Stunnable;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Maths;
@@ -19,46 +22,37 @@ public sealed class BlinkSystem : EntitySystem
 
     public override void Initialize()
     {
+        base.Initialize();
         SubscribeLocalEvent<BlinkComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<BlinkComponent, DamageChangedEvent>(OnDamage);
     }
 
-
     private void OnMobStateChanged(EntityUid uid, BlinkComponent blink, MobStateChangedEvent args)
     {
-        if (!TryComp<HumanoidAppearanceComponent>(uid, out var humanoid))
-            return;
-
         switch (args.NewMobState)
         {
             case MobState.Alive:
-                SetEyesClosed(uid, blink, humanoid, false);
+                SetEyesClosed(uid, blink, false);
                 ScheduleNextBlink(uid, blink, 0f);
                 break;
-
             case MobState.Critical:
-                SetEyesClosed(uid, blink, humanoid, true);
+                SetEyesClosed(uid, blink, true);
                 blink.NextBlinkTime = TimeSpan.MaxValue;
-                blink.BlinkEndTime = TimeSpan.MaxValue;
-                Dirty(uid, blink);
                 break;
-
             case MobState.Dead:
-                SetEyesClosed(uid, blink, humanoid, false);
+                SetEyesClosed(uid, blink, false);
                 blink.NextBlinkTime = TimeSpan.MaxValue;
-                blink.BlinkEndTime = TimeSpan.MaxValue;
-                Dirty(uid, blink);
                 break;
         }
     }
 
-
     public override void Update(float frameTime)
     {
-        var query = EntityQueryEnumerator<BlinkComponent, HumanoidAppearanceComponent, MobStateComponent>();
+        base.Update(frameTime);
+        var query = EntityQueryEnumerator<BlinkComponent, MobStateComponent>();
         var curTime = _timing.CurTime;
 
-        while (query.MoveNext(out var uid, out var blink, out var humanoid, out var mobState))
+        while (query.MoveNext(out var uid, out var blink, out var mobState))
         {
             if (mobState.CurrentState != MobState.Alive)
                 continue;
@@ -69,7 +63,7 @@ public sealed class BlinkSystem : EntitySystem
             {
                 if (curTime >= blink.BlinkEndTime)
                 {
-                    SetEyesClosed(uid, blink, humanoid, false);
+                    SetEyesClosed(uid, blink, false);
                     ScheduleNextBlink(uid, blink, intensity);
                 }
                 continue;
@@ -77,32 +71,24 @@ public sealed class BlinkSystem : EntitySystem
 
             if (curTime >= blink.NextBlinkTime)
             {
-                if (_random.Prob(blink.SkipBlinkChance * (1f - intensity)))
+                float skipChance = blink.SkipBlinkChance * (1f - intensity);
+                if (_random.Prob(skipChance))
                 {
                     ScheduleNextBlink(uid, blink, intensity);
                     continue;
                 }
-
-                StartBlink(uid, blink, humanoid, intensity);
+                StartBlink(uid, blink, intensity);
             }
         }
     }
 
     private void OnDamage(EntityUid uid, BlinkComponent blink, ref DamageChangedEvent args)
     {
-        if (!args.DamageIncreased || args.DamageDelta == null)
-            return;
+        if (!args.DamageIncreased || args.DamageDelta == null) return;
+        if (!TryComp<MobStateComponent>(uid, out var mobState) || mobState.CurrentState != MobState.Alive) return;
 
-        if (!TryComp<MobStateComponent>(uid, out var mobState) || mobState.CurrentState != MobState.Alive)
-            return;
-
-        float damage = (float) args.DamageDelta.DamageDict.Values.Sum();
-
-        if (damage < blink.ReflexBlinkDamageThreshold)
-            return;
-
-        if (!_random.Prob(blink.ReflexBlinkChance))
-            return;
+        float damage = (float) args.DamageDelta.GetTotal();
+        if (damage < blink.ReflexBlinkDamageThreshold || !_random.Prob(blink.ReflexBlinkChance)) return;
 
         TriggerReflexBlink(uid, blink, damage);
     }
@@ -112,34 +98,25 @@ public sealed class BlinkSystem : EntitySystem
         if (blink.EyesClosed)
         {
             blink.BlinkEndTime += TimeSpan.FromSeconds(blink.ReflexBlinkDuration);
-            Dirty(uid, blink);
             return;
         }
 
-        SetEyesClosed(uid, blink, null, true);
-
-        float mult = Math.Clamp(damage / (blink.ReflexBlinkDamageThreshold * 2f), 1f, 2f);
-
-        blink.BlinkEndTime = _timing.CurTime + TimeSpan.FromSeconds(blink.ReflexBlinkDuration * mult);
+        SetEyesClosed(uid, blink, true);
+        float multiplier = Math.Clamp(damage / (blink.ReflexBlinkDamageThreshold * 2f), 1f, 2f);
+        blink.BlinkEndTime = _timing.CurTime + TimeSpan.FromSeconds(blink.ReflexBlinkDuration * multiplier);
         blink.NextBlinkTime = blink.BlinkEndTime;
-
-        Dirty(uid, blink);
     }
 
-    private void StartBlink(EntityUid uid, BlinkComponent blink, HumanoidAppearanceComponent humanoid, float intensity)
+    private void StartBlink(EntityUid uid, BlinkComponent blink, float intensity)
     {
-        if (!blink.EyesClosed)
-            blink.OriginalEyeColor = humanoid.EyeColor;
+        float duration = MathHelper.Lerp(blink.NormalBlinkDuration, blink.InjuredBlinkDuration, intensity);
+        float longBlinkChance = blink.LongBlinkChance + intensity * blink.IntensityLongBlinkBonus;
 
-        float duration = MathHelper.Lerp(
-            blink.NormalBlinkDuration,
-            blink.InjuredBlinkDuration,
-            intensity);
+        if (_random.Prob(longBlinkChance))
+            duration *= blink.LongBlinkMultiplier;
 
-        SetEyesClosed(uid, blink, humanoid, true);
-
+        SetEyesClosed(uid, blink, true);
         blink.BlinkEndTime = _timing.CurTime + TimeSpan.FromSeconds(duration);
-        Dirty(uid, blink);
     }
 
     private void ScheduleNextBlink(EntityUid uid, BlinkComponent blink, float intensity)
@@ -147,34 +124,19 @@ public sealed class BlinkSystem : EntitySystem
         float min = MathHelper.Lerp(blink.NormalMinBlinkInterval, blink.InjuredMinBlinkInterval, intensity);
         float max = MathHelper.Lerp(blink.NormalMaxBlinkInterval, blink.InjuredMaxBlinkInterval, intensity);
 
-        float interval = _random.NextFloat(min, max);
-
-        blink.NextBlinkTime = _timing.CurTime + TimeSpan.FromSeconds(interval);
-        Dirty(uid, blink);
-    }
-
-    private void SetEyesClosed(EntityUid uid, BlinkComponent blink, HumanoidAppearanceComponent? humanoid, bool closed)
-    {
-        if (blink.EyesClosed == closed)
-            return;
-
-        blink.EyesClosed = closed;
-
-        if (humanoid != null)
+        if (_random.Prob(blink.LongIntervalChance * (1f - intensity)))
         {
-            if (closed)
-            {
-                blink.OriginalEyeColor ??= humanoid.EyeColor;
-                humanoid.EyeColor = humanoid.SkinColor;
-            }
-            else if (blink.OriginalEyeColor.HasValue)
-            {
-                humanoid.EyeColor = blink.OriginalEyeColor.Value;
-            }
-
-            Dirty(uid, humanoid);
+            min *= blink.LongIntervalMultiplier;
+            max *= blink.LongIntervalMultiplier;
         }
 
+        blink.NextBlinkTime = _timing.CurTime + TimeSpan.FromSeconds(_random.NextFloat(min, max));
+    }
+
+    private void SetEyesClosed(EntityUid uid, BlinkComponent blink, bool closed)
+    {
+        if (blink.EyesClosed == closed) return;
+        blink.EyesClosed = closed;
         Dirty(uid, blink);
     }
 
@@ -182,34 +144,22 @@ public sealed class BlinkSystem : EntitySystem
     {
         float damage = GetDamageFraction(uid);
         float stamina = GetStaminaFraction(uid);
-
-        return Math.Clamp(
-            damage * blink.DamageWeight +
-            stamina * blink.StaminaWeight,
-            0f, 1f);
+        return Math.Clamp(damage * blink.DamageWeight + stamina * blink.StaminaWeight, 0f, 1f);
     }
 
     private float GetDamageFraction(EntityUid uid)
     {
-        if (!TryComp<DamageableComponent>(uid, out var damageable))
-            return 0f;
+        if (!TryComp<DamageableComponent>(uid, out var damageable)) return 0f;
+        var maxHP = FixedPoint2.New(DefaultMaxHp);
+        if (TryComp<MobThresholdsComponent>(uid, out var thresholds) && thresholds.Thresholds.Count > 0)
+            maxHP = thresholds.Thresholds.Keys.Max();
 
-        float max = FixedPoint2.New(DefaultMaxHp);
-
-        if (TryComp<MobThresholdsComponent>(uid, out var thresholds) &&
-            thresholds.Thresholds.Count > 0)
-        {
-            max = thresholds.Thresholds.Keys.Max();
-        }
-
-        return Math.Clamp((float)(damageable.TotalDamage / max), 0f, 1f);
+        return Math.Clamp((float)(damageable.TotalDamage / maxHP), 0f, 1f);
     }
 
     private float GetStaminaFraction(EntityUid uid)
     {
-        if (!TryComp<StaminaComponent>(uid, out var stamina) || stamina.CritThreshold <= 0f)
-            return 0f;
-
+        if (!TryComp<StaminaComponent>(uid, out var stamina) || stamina.CritThreshold <= 0f) return 0f;
         return Math.Clamp(stamina.StaminaDamage / stamina.CritThreshold, 0f, 1f);
     }
 }
