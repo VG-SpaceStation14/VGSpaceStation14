@@ -11,8 +11,12 @@
             <LayeredTextureRect Name="Texture" Access="Public"
                                 HorizontalExpand="False" VerticalExpand="False"
                                 MinSize="24 24" SetSize="24 24" Margin="0" />
-            <Label Name="ItemName" Access="Public" MinWidth="200" Margin="8 0 0 0" ClipText="True" VerticalAlignment="Center" />
-            <Control HorizontalExpand="True" />
+            <!-- Убираем фиксированный MinWidth, добавляем HorizontalExpand и отключаем ClipText -->
+            <Label Name="ItemName" Access="Public" 
+                   Margin="8 0 0 0" 
+                   ClipText="False" 
+                   HorizontalExpand="True" 
+                   VerticalAlignment="Center" />
             <Label Name="Price" Access="Public" StyleClasses="LabelSubText" MinWidth="45" Align="Right" VerticalAlignment="Center" />
             <Button Name="TooltipButton" Access="Public" Text="?" MinWidth="18" StyleClasses="ButtonSquare" Margin="4 0 2 0" />
             <Button Name="BuyButton" Access="Public" Text="Купить" MinWidth="55" StyleClasses="ButtonSquare" />
