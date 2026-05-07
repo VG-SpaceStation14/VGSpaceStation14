@@ -1,0 +1,143 @@
+- type: job
+  id: SSTTeam
+  name: Специалист СУО
+  description: Специалист СпецУтильОтряда
+  playTimeTracker: JobSSTSpecialist
+  requirements:
+#    - !type:DepartmentTimeRequirement
+#      department: Cargo
+#      time: 10800 # 3 hrs
+#    - !type:OverallPlaytimeRequirement
+#      time: 36000 #10 hrs
+# ADT Restrict Start
+    - !type:SpeciesRequirement
+      inverted: true
+      species:
+      - Resomi
+  # ADT RESTRICT End
+  icon: "JobIconSST"
+  startingGear: SalvageSpecialistGear
+  supervisors: job-supervisors-qm
+  access:
+  - Cargo
+  - Salvage
+  - Maintenance
+  - External
+
+  special:
+  - !type:AddSkillGroupSpecial 
+    group: SalvageSkills #VG-Tweak SkillsIntegration
+
+- type: loadout
+  id: SStPDA
+  equipment:
+    id: SStPDA
+
+- type: roleLoadout
+  id: JobSSTTeam
+  groups:
+  - Inventory # Corvax-Loadouts
+  - GroupTankHarness
+    #ADT Loadouts Start
+  - ADTSalvageSpecialistJumpsuit
+  - ADTSalvageNeck  #VG-Tweak
+  - VGSalvageBelt #VG-Tweak
+    #ADT Loadouts End
+  - SalvageSpecialistBackpack
+  - ADTSalvageSpecialistEars # ADT tweak
+  - SalvageSpecialistOuterClothing
+  - SalvageSpecialistShoes
+  - Glasses
+  - SSTPDA # ADT tweak
+  # ADT underwear tweak start
+  - ADTTop
+  - ADTBottom
+  - ADTSocks
+  # ADT underwear tweak end
+  - Survival
+  - Trinkets
+  - SalvageSpecialistJobTrinkets
+  - GroupSpeciesBreathTool
+
+
+- type: entity
+  parent: BasePDA
+  id: SStPDA
+  name: КПК СУО
+  description: Smells like ash.
+  components:
+  - type: Pda
+    id: SSTIDCard
+  - type: Appearance
+    appearanceDataInit:
+     enum.PdaVisuals.PdaType:
+       !type:String
+       pda-qm
+  - type: PdaBorderColor
+    borderColor: "#996e2e"
+    accentVColor: "#7a2699"
+    accentHColor: "#99461d"
+  - type: Icon
+    state: pda-qm
+  - type: CartridgeLoader
+    uiKey: enum.PdaUiKey.Key
+    preinstalled:
+      - CrewManifestCartridge
+      - NotekeeperCartridge
+      - NanoTaskCartridge
+      - NewsReaderCartridge
+      - AstroNavCartridge
+      - NanoChatCartridge # ADT-tweak: Наночат
+      - ADTWalletCartridge # ADT-Economy
+      - NavigatorCartridge # VG-Tweak
+    diskSpace: 8 # ADT tweak
+
+- type: loadoutGroup
+  id: SSTPDA
+  name: СУО ID
+  minLimit: 1
+  maxLimit: 1
+  loadouts:
+  - SStPDA
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconSST
+  icon:
+    sprite: /Textures/_VG/Interface/Misc/job_icons.rsi
+    state: SST
+  jobName: Специалист СУО
+
+- type: entity
+  id: SpawnPointSSTSpecialist
+  parent: SpawnPointJobBase
+  name: Спавн СУО
+  components:
+  - type: SpawnPoint
+    job_id: SSTTeam
+  - type: Sprite
+    layers:
+      - state: green
+      - state: salvagespecialist
+
+- type: entity
+  parent: IDCardStandard
+  id: SSTIDCard
+  name: ID карта специалиста СУО
+  components:
+  # VG-Start
+  - type: Sprite
+    sprite: _VG/Objects/Misc/id_cards.rsi
+    layers:
+    - state: default
+    - state: department-side
+      color: "#b18644"
+  # VG-End
+    - sprite: _VG/Interface/Misc/job_icons.rsi
+      offset: -0.19, 0
+      state: SST
+  - type: PresetIdCard
+    job: SSTTeam
+
+- type: playTimeTracker
+  id: JobSSTSpecialist

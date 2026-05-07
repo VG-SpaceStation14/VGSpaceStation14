@@ -40,6 +40,7 @@
             #supply (2)
             CargoTechnician: [ 1, 1 ]
             SalvageSpecialist: [ 1, 1 ]
+            SSTTeam: [ 4, 4 ]
             #civilian (3+)
             Passenger: [ -1, -1 ] #infinite, not counted
             Clown: [ 1, 1 ]
