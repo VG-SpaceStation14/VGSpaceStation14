@@ -1,7 +1,9 @@
 using System.Linq;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Sprite; // VG-Tweak
 using Robust.Client.GameObjects;
+using Robust.Shared.Containers; // VG-Tweak
 using Robust.Shared.Utility;
 
 namespace Content.Client.Storage.Systems;
@@ -14,57 +16,149 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
     public override void Initialize()
     {
         base.Initialize();
+
         SubscribeLocalEvent<ItemMapperComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<ItemMapperComponent, AppearanceChangeEvent>(OnAppearance);
     }
 
+    // VG-Tweak Start
     private void OnStartup(EntityUid uid, ItemMapperComponent component, ComponentStartup args)
     {
-        if (TryComp<SpriteComponent>(uid, out var sprite))
+        if (TryComp(uid, out SpriteComponent? sprite))
         {
             component.RSIPath ??= sprite.BaseRSI!.Path;
         }
     }
+    // VG-Tweak End
 
+    // VG-Tweak Start
     private void OnAppearance(EntityUid uid, ItemMapperComponent component, ref AppearanceChangeEvent args)
     {
-        if (TryComp<SpriteComponent>(uid, out var spriteComponent))
-        {
-            if (component.SpriteLayers.Count == 0)
-            {
-                InitLayers((uid, component, spriteComponent, args.Component));
-            }
-
-            EnableLayers((uid, component, spriteComponent, args.Component));
-        }
-    }
-
-    private void InitLayers(Entity<ItemMapperComponent, SpriteComponent, AppearanceComponent> ent)
-    {
-        var (owner, component, spriteComponent, appearance) = ent;
-        if (!_appearance.TryGetData<ShowLayerData>(owner, StorageMapVisuals.InitLayers, out var wrapper, appearance))
+        if (!TryComp(uid, out SpriteComponent? spriteComponent))
             return;
+
+        if (component.SpriteLayers.Count == 0)
+        {
+            InitLayers(uid, component, spriteComponent, args.Component);
+        }
+
+        EnableLayers(uid, component, spriteComponent, args.Component);
+    }
+    // VG-Tweak End
+
+    // VG-Tweak Start
+    private void InitLayers(
+        EntityUid uid,
+        ItemMapperComponent component,
+        SpriteComponent spriteComponent,
+        AppearanceComponent appearance)
+    {
+        if (!_appearance.TryGetData<ShowLayerData>(
+                uid,
+                StorageMapVisuals.InitLayers,
+                out var wrapper,
+                appearance))
+        {
+            return;
+        }
 
         component.SpriteLayers.AddRange(wrapper.QueuedEntities);
 
         foreach (var sprite in component.SpriteLayers)
         {
-            _sprite.LayerMapReserve((owner, spriteComponent), sprite);
-            _sprite.LayerSetSprite((owner, spriteComponent), sprite, new SpriteSpecifier.Rsi(component.RSIPath!.Value, sprite));
-            _sprite.LayerSetVisible((owner, spriteComponent), sprite, false);
-        }
-    }
+            _sprite.LayerMapReserve((uid, spriteComponent), sprite);
 
-    private void EnableLayers(Entity<ItemMapperComponent, SpriteComponent, AppearanceComponent> ent)
+            _sprite.LayerSetSprite(
+                (uid, spriteComponent),
+                sprite,
+                new SpriteSpecifier.Rsi(component.RSIPath!.Value, sprite));
+
+            _sprite.LayerSetVisible((uid, spriteComponent), sprite, false);
+        }
+
+        CreateCustomLayer(uid, spriteComponent, component, "cutters_handle");
+        CreateCustomLayer(uid, spriteComponent, component, "screwdriver");
+    }
+    // VG-Tweak End
+
+    // VG-Tweak Start
+    private void CreateCustomLayer(
+        EntityUid uid,
+        SpriteComponent sprite,
+        ItemMapperComponent component,
+        string layer)
     {
-        var (owner, component, spriteComponent, appearance) = ent;
-        if (!_appearance.TryGetData<ShowLayerData>(owner, StorageMapVisuals.LayerChanged, out var wrapper, appearance))
+        _sprite.LayerMapReserve((uid, sprite), layer);
+
+        _sprite.LayerSetSprite(
+            (uid, sprite),
+            layer,
+            new SpriteSpecifier.Rsi(component.RSIPath!.Value, layer));
+
+        _sprite.LayerSetVisible((uid, sprite), layer, false);
+    }
+    // VG-Tweak End
+
+    // VG-Tweak Start
+    private void EnableLayers(
+        EntityUid uid,
+        ItemMapperComponent component,
+        SpriteComponent spriteComponent,
+        AppearanceComponent appearance)
+    {
+        if (!_appearance.TryGetData<ShowLayerData>(
+                uid,
+                StorageMapVisuals.LayerChanged,
+                out var wrapper,
+                appearance))
+        {
             return;
+        }
 
         foreach (var layerName in component.SpriteLayers)
         {
             var show = wrapper.QueuedEntities.Contains(layerName);
-            _sprite.LayerSetVisible((owner, spriteComponent), layerName, show);
+
+            _sprite.LayerSetVisible((uid, spriteComponent), layerName, show);
+        }
+
+        _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", false);
+        _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", Color.White);
+
+        _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", false);
+        _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", Color.White);
+
+        if (!TryComp(uid, out ContainerManagerComponent? containers))
+            return;
+
+        if (!containers.TryGetContainer("storagebase", out var container))
+            return;
+
+        foreach (var entity in container.ContainedEntities)
+        {
+            if (!TryComp(entity, out RandomSpriteComponent? randomSprite))
+                continue;
+
+            if (!randomSprite.Selected.TryGetValue(
+                    "enum.DamageStateVisualLayers.Base",
+                    out var data))
+                continue;
+
+            var color = data.Color ?? Color.White;
+            var proto = MetaData(entity).EntityPrototype?.ID ?? "";
+
+            if (proto == "Wirecutter")
+            {
+                _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", true);
+                _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", color);
+            }
+
+            if (proto == "Screwdriver")
+            {
+                _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", true);
+                _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", color);
+            }
         }
     }
+    // VG-Tweak End
 }
