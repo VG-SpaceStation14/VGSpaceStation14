@@ -125,10 +125,21 @@ namespace Content.Server.Administration.Systems
                     prayerVerb.Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/pray.svg.png"));
                     prayerVerb.Act = () =>
                     {
-                        _quickDialog.OpenDialog(player, "Subtle Message", "Message", "Popup Message", (string message, string popupMessage) =>
+                        // VG-Tweak Start
+                        var prompts = new[] { "Message", "Popup Message", "Message Prefix (optional)" };
+                        var defaults = new[] { "", "", "Вы слышите голос в своей голове..." };
+    
+                        _quickDialog.OpenDialogDynamic(player, "Subtle Message", prompts, defaults, (string[] results) =>
                         {
-                            _prayerSystem.SendSubtleMessage(targetActor.PlayerSession, player, message, popupMessage == "" ? Loc.GetString("prayer-popup-subtle-default") : popupMessage);
+                            var message = results[0];
+                            var popupMessage = results[1];
+                            var messagePrefix = string.IsNullOrWhiteSpace(results[2]) 
+                                ? Loc.GetString("prayer-popup-subtle-default") 
+                                : results[2];
+        
+                            _prayerSystem.SendSubtleMessage(targetActor.PlayerSession, player, message, popupMessage == "" ? messagePrefix : popupMessage);
                         });
+                        // VG-Tweak End
                     };
                     prayerVerb.Impact = LogImpact.Low;
                     args.Verbs.Add(prayerVerb);
