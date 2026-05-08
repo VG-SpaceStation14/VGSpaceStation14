@@ -41,10 +41,14 @@ jobs:
             IFS=',' read -ra SHAS <<< "$INPUT"
             for sha in "${SHAS[@]}"; do
               sha=$(echo "$sha" | xargs)
+              [ -z "$sha" ] && continue
               COMMITS+=$(git rev-parse "$sha")
               COMMITS+=$'\n'
             done
           fi
+
+          # Убираем пустые строки, чтобы не было фантомных коммитов
+          COMMITS=$(echo "$COMMITS" | sed '/^$/d')
 
           if [ -z "$COMMITS" ]; then
             echo "No commits found!"
@@ -52,7 +56,6 @@ jobs:
           fi
 
           DELIM="EOF_$(date +%s%N)"
-
           {
             echo "commits<<$DELIM"
             printf "%s\n" "$COMMITS"
@@ -67,12 +70,14 @@ jobs:
         run: |
           set -e
 
-          COMMITS="${{ steps.commits.outputs.commits }}"
-
+          # Читаем список коммитов из предыдущего шага
+          RAW_COMMITS="${{ steps.commits.outputs.commits }}"
+          
           CHANGELOG=""
           COUNT=0
 
-          printf "%s" "$COMMITS" | while IFS= read -r HASH; do
+          # Используем "Here-string" <<< чтобы избежать subshell (пайпа)
+          while IFS= read -r HASH; do
             [ -z "$HASH" ] && continue
 
             SHORT=$(git rev-parse --short "$HASH")
@@ -95,8 +100,9 @@ jobs:
             CHANGELOG+="${EMOJI} \`${SHORT}\` ${TITLE}"$'\n'
             COUNT=$((COUNT + 1))
 
-          done
+          done <<< "$RAW_COMMITS"
 
+          # Записываем результат
           {
             echo "entries<<EOF"
             printf "%s" "$CHANGELOG"
@@ -116,31 +122,33 @@ jobs:
         run: |
           set -e
 
+          # Discord лимит на описание в эмбеде - 4096, но лучше слать частями по 2000
           MAX=2000
           CHUNKS=()
           CUR=""
 
+          # Читаем построчно ENTRIES и делим на части
           while IFS= read -r line; do
             if [ $(( ${#CUR} + ${#line} + 1 )) -gt $MAX ]; then
               CHUNKS+=("$CUR")
               CUR="$line"
             else
-              CUR+=$'\n'"$line"
+              [ -z "$CUR" ] && CUR="$line" || CUR+=$'\n'"$line"
             fi
           done <<< "$ENTRIES"
-
           [ -n "$CUR" ] && CHUNKS+=("$CUR")
 
           EMBEDS="[]"
+          TOTAL=${#CHUNKS[@]}
 
           for i in "${!CHUNKS[@]}"; do
             PART=$((i+1))
-            TOTAL=${#CHUNKS[@]}
-
+            
+            # Собираем JSON массив эмбедов с помощью jq
             EMBEDS=$(jq -n \
               --arg title "📢 $TITLE (Part $PART/$TOTAL)" \
               --arg desc "${CHUNKS[$i]}" \
-              --arg footer "Commits: $COUNT" \
+              --arg footer "Total commits: $COUNT" \
               --argjson prev "$EMBEDS" \
               '
               $prev + [{
@@ -152,19 +160,19 @@ jobs:
               ')
           done
 
+          # Формируем финальный PAYLOAD
           PAYLOAD=$(jq -n --argjson embeds "$EMBEDS" '{embeds: $embeds}')
-
           echo "$PAYLOAD" > payload.json
 
+          # Отправка
           HTTP=$(curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
             "$WEBHOOK")
 
-          echo "HTTP: $HTTP"
-          cat response.txt
-
-          if [ "$HTTP" -ne 204 ]; then
-            echo "Discord webhook failed"
+          echo "HTTP Response: $HTTP"
+          if [ "$HTTP" -lt 200 ] || [ "$HTTP" -gt 299 ]; then
+            echo "Error details:"
+            cat response.txt
             exit 1
           fi
