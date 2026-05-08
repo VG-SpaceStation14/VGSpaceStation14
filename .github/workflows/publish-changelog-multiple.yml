@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       commit_range:
-        description: 'Commit range (e.g., "abc123..def456") or comma-separated SHAs (e.g., "abc123,def456,ghi789")'
+        description: 'Commit range (e.g., "abc123..def456") or comma-separated SHAs'
         required: true
         type: string
         default: 'HEAD~3..HEAD'
@@ -25,58 +25,58 @@ jobs:
         with:
           fetch-depth: 0
 
+      # -----------------------------
+      # COLLECT COMMITS SAFELY
+      # -----------------------------
       - name: Get commit list
         id: commits
         run: |
           set -e
-          
+
           INPUT="${{ github.event.inputs.commit_range }}"
-          
-          # Function to get commits between two SHAs
-          get_commits_in_range() {
-            git rev-list --reverse "$1"
-          }
-          
-          # Check if input is a range (contains ..)
+          COMMITS=""
+
           if [[ "$INPUT" == *".."* ]]; then
             COMMITS=$(git rev-list --reverse "$INPUT")
           else
-            # Split by comma and get each commit
             IFS=',' read -ra SHAS <<< "$INPUT"
-            COMMITS=""
             for sha in "${SHAS[@]}"; do
-              sha=$(echo "$sha" | xargs) # trim whitespace
-              COMMITS="$COMMITS$(git rev-parse $sha)\n"
+              sha=$(echo "$sha" | xargs)
+              COMMITS+=$(git rev-parse "$sha")
+              COMMITS+=$'\n'
             done
-            COMMITS=$(echo -e "$COMMITS" | grep -v '^$')
           fi
-          
+
           if [ -z "$COMMITS" ]; then
             echo "No commits found!"
             exit 1
           fi
-          
-          # Store commits as multiline output
+
           {
             echo "commits<<EOF"
-            echo "$COMMITS"
+            printf "%s" "$COMMITS"
             echo "EOF"
           } >> $GITHUB_OUTPUT
 
+      # -----------------------------
+      # BUILD CHANGELOG
+      # -----------------------------
       - name: Process commits and build changelog
         id: changelog
         run: |
-          CHANGELOG_ENTRIES=""
+          set -e
+
+          COMMITS="${{ steps.commits.outputs.commits }}"
+
+          CHANGELOG=""
           COUNT=0
-          
-          while IFS= read -r FULL_HASH; do
+
+          printf "%s" "$COMMITS" | while IFS= read -r FULL_HASH; do
             [ -z "$FULL_HASH" ] && continue
-            
-            SHORT_HASH=$(git rev-parse --short $FULL_HASH)
-            TITLE=$(git log -1 --format=%s $FULL_HASH)
-            AUTHOR=$(git log -1 --format=%an $FULL_HASH)
-            
-            # Detect emoji based on prefix
+
+            SHORT_HASH=$(git rev-parse --short "$FULL_HASH")
+            TITLE=$(git log -1 --format=%s "$FULL_HASH")
+
             case "$TITLE" in
               *"[FIX]"*) EMOJI="🩹" ;;
               *"[ADD]"*) EMOJI="✨" ;;
@@ -90,119 +90,82 @@ jobs:
               *"[TEST]"*) EMOJI="🧪" ;;
               *) EMOJI="📝" ;;
             esac
-            
-            # Add to changelog
-            CHANGELOG_ENTRIES="${CHANGELOG_ENTRIES}${EMOJI} \`${SHORT_HASH}\` ${TITLE}\n"
+
+            CHANGELOG+="${EMOJI} \`${SHORT_HASH}\` ${TITLE}"$'\n'
             COUNT=$((COUNT + 1))
-            
-          done <<< "${{ steps.commits.outputs.commits }}"
-          
-          # Trim trailing newline
-          CHANGELOG_ENTRIES=$(echo -e "$CHANGELOG_ENTRIES" | sed '/^$/d')
-          
+
+          done
+
           {
             echo "entries<<EOF"
-            echo -e "$CHANGELOG_ENTRIES"
+            printf "%s" "$CHANGELOG"
             echo "EOF"
             echo "count=$COUNT"
           } >> $GITHUB_OUTPUT
 
+      # -----------------------------
+      # SEND TO DISCORD
+      # -----------------------------
       - name: Send to Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
           TITLE: ${{ github.event.inputs.title }}
+          ENTRIES: ${{ steps.changelog.outputs.entries }}
           COUNT: ${{ steps.changelog.outputs.count }}
         run: |
-          # Read entries from the output file instead of variable expansion
-          ENTRIES="${{ steps.changelog.outputs.entries }}"
-          
-          # Save entries to a temp file to handle multiline properly
-          echo "$ENTRIES" > /tmp/changelog_entries.txt
-          
-          # Discord limits
-          MAX_DESC_LENGTH=2000
-          MAX_EMBEDS=10
-          
-          # Split entries into chunks that fit within Discord limits
-          CURRENT_CHUNK=""
+          set -e
+
+          MAX_DESC=2000
           CHUNKS=()
-          TOTAL_ENTRIES=0
-          
+          CURRENT=""
+
           while IFS= read -r line; do
-            # Calculate length if we add this line + newline
-            LINE_LEN=${#line}
-            CURRENT_LEN=${#CURRENT_CHUNK}
-            
-            if [ $((CURRENT_LEN + LINE_LEN + 1)) -gt $MAX_DESC_LENGTH ] && [ -n "$CURRENT_CHUNK" ]; then
-              # Store current chunk and start new one
-              CHUNKS+=("$CURRENT_CHUNK")
-              CURRENT_CHUNK="$line"
+            if [ $(( ${#CURRENT} + ${#line} + 1 )) -gt $MAX_DESC ]; then
+              CHUNKS+=("$CURRENT")
+              CURRENT="$line"
             else
-              # Add to current chunk
-              if [ -z "$CURRENT_CHUNK" ]; then
-                CURRENT_CHUNK="$line"
-              else
-                CURRENT_CHUNK="${CURRENT_CHUNK}\n${line}"
-              fi
+              CURRENT+=$'\n'"$line"
             fi
-            TOTAL_ENTRIES=$((TOTAL_ENTRIES + 1))
-          done < /tmp/changelog_entries.txt
-          
-          # Add the last chunk if not empty
-          if [ -n "$CURRENT_CHUNK" ]; then
-            CHUNKS+=("$CURRENT_CHUNK")
-          fi
-          
-          # Build payload with multiple embeds if needed
-          PAYLOAD_EMBEDS=""
-          CHUNK_COUNT=${#CHUNKS[@]}
-          
+          done <<< "$ENTRIES"
+
+          [ -n "$CURRENT" ] && CHUNKS+=("$CURRENT")
+
+          EMBEDS="[]"
+
           for i in "${!CHUNKS[@]}"; do
             CHUNK="${CHUNKS[$i]}"
-            # Escape for JSON using jq
-            ESCAPED_DESCRIPTION=$(echo -e "$CHUNK" | jq -R -s '.')
-            
-            if [ $CHUNK_COUNT -eq 1 ]; then
-              TITLE_TEXT="$TITLE"
-            else
-              TITLE_TEXT="$TITLE (Part $((i+1))/$CHUNK_COUNT)"
-            fi
-            
-            ESCAPED_TITLE=$(echo "$TITLE_TEXT" | jq -R -s '.')
-            
-            PAYLOAD_EMBEDS="${PAYLOAD_EMBEDS}{
-              \"title\": \"📢 \" + $ESCAPED_TITLE,
-              \"color\": 5814783,
-              \"description\": $ESCAPED_DESCRIPTION,
-              \"footer\": {
-                \"text\": \"Commits: $TOTAL_ENTRIES (Part $((i+1))/$CHUNK_COUNT)\"
-              }
-            },"
+            PART=$((i+1))
+            TOTAL=${#CHUNKS[@]}
+
+            EMBEDS=$(jq -n \
+              --arg title "📢 $TITLE (Part $PART/$TOTAL)" \
+              --arg desc "$CHUNK" \
+              --arg footer "Commits: $COUNT" \
+              --argjson prev "$EMBEDS" \
+              '
+              $prev + [{
+                title: $title,
+                color: 5814783,
+                description: $desc,
+                footer: { text: $footer }
+              }]
+              ')
           done
-          
-          # Remove trailing comma
-          PAYLOAD_EMBEDS=${PAYLOAD_EMBEDS%,}
-          
-          # Create final payload
-          cat > payload.json << EOF
-          {
-            "embeds": [$PAYLOAD_EMBEDS]
-          }
-          EOF
-          
-          echo "Sending payload with ${#CHUNKS[@]} embed(s):"
-          cat payload.json | jq '.embeds[] | {title: .title, desc_length: (.description | length)}'
-          
+
+          PAYLOAD=$(jq -n --argjson embeds "$EMBEDS" '{embeds: $embeds}')
+
+          echo "$PAYLOAD" > payload.json
+
+          echo "Sending to Discord..."
           HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
             "$DISCORD_WEBHOOK")
-          
+
           echo "HTTP Code: $HTTP_CODE"
-          echo "Discord response:"
           cat response.txt
-          
+
           if [ "$HTTP_CODE" -ne 204 ]; then
-            echo "Error sending to Discord"
+            echo "Failed to send webhook"
             exit 1
           fi
