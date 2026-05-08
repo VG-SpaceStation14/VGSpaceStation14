@@ -187,6 +187,7 @@
   - type: Posing
   - type: SoftWalk
   - type: FootprintEmitter # VG-Tweak
+  - type: RetroMonitorView # VG-Tweak
 
 - type: entity
   save: false

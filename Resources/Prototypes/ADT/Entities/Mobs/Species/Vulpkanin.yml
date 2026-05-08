@@ -235,6 +235,7 @@
     - type: Mood
       alertSet: VulpkaninMoodAlerts
     - type: AutoWagging
+    - type: DogVision
     # VG-Tweak End
 
 - type: entity

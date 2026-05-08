@@ -1,0 +1,32 @@
+- type: shader
+  id: UltraVision
+  kind: source
+  path: "/Textures/_VG/Shaders/ultravision.swsl"
+
+- type: shader
+  id: DogVision
+  kind: source
+  path: "/Textures/_VG/Shaders/dogvision.swsl"
+
+- type: shader
+  id: crt_vhs
+  kind: source
+  path: "/Textures/_VG/Shaders/crt_vhs.swsl"
+
+- type: shader
+  id: Grain
+  kind: source
+  path: "/Textures/_VG/Shaders/grain.swsl"
+  params:
+    strength: 40.0
+
+- type: shader
+  id: Vignette
+  kind: source
+  path: "/Textures/_VG/Shaders/vignette.swsl"
+
+- type: shader
+  id: LightingOverlay
+  kind: source
+  path: "/Textures/_VG/Shaders/light.swsl"
+
