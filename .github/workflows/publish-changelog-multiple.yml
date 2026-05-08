@@ -113,8 +113,11 @@ jobs:
           TITLE: ${{ github.event.inputs.title }}
           COUNT: ${{ steps.changelog.outputs.count }}
         run: |
-          # Read entries file to avoid escaping issues
+          # Read entries from the output file instead of variable expansion
           ENTRIES="${{ steps.changelog.outputs.entries }}"
+          
+          # Save entries to a temp file to handle multiline properly
+          echo "$ENTRIES" > /tmp/changelog_entries.txt
           
           # Discord limits
           MAX_DESC_LENGTH=2000
@@ -126,8 +129,6 @@ jobs:
           TOTAL_ENTRIES=0
           
           while IFS= read -r line; do
-            [ -z "$line" ] && continue
-            
             # Calculate length if we add this line + newline
             LINE_LEN=${#line}
             CURRENT_LEN=${#CURRENT_CHUNK}
@@ -145,7 +146,7 @@ jobs:
               fi
             fi
             TOTAL_ENTRIES=$((TOTAL_ENTRIES + 1))
-          done <<< "$ENTRIES"
+          done < /tmp/changelog_entries.txt
           
           # Add the last chunk if not empty
           if [ -n "$CURRENT_CHUNK" ]; then
