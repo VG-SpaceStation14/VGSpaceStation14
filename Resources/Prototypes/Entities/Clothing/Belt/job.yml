@@ -45,7 +45,7 @@
       - GasAnalyzer
       - HandLabeler
   - type: ItemMapper
-    sprite: &BeltOverlay Clothing/Belt/belt_overlay.rsi
+    sprite: &BeltOverlay /Textures/Clothing/Belt/belt_overlay.rsi
     mapLayers:
       drill:
         whitelist:

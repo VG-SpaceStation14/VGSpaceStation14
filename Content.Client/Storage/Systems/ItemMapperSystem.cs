@@ -5,6 +5,8 @@ using Content.Shared.Sprite; // VG-Tweak
 using Robust.Client.GameObjects;
 using Robust.Shared.Containers; // VG-Tweak
 using Robust.Shared.Utility;
+using Robust.Client.ResourceManagement; // VG-Tweak
+using Robust.Client.Graphics; // VG-Tweak
 
 namespace Content.Client.Storage.Systems;
 
@@ -12,6 +14,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!; // Кэш ресурсов для проверки RSI
 
     public override void Initialize()
     {
@@ -76,8 +79,11 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             _sprite.LayerSetVisible((uid, spriteComponent), sprite, false);
         }
 
-        CreateCustomLayer(uid, spriteComponent, component, "cutters_handle");
-        CreateCustomLayer(uid, spriteComponent, component, "screwdriver");
+        if (HasState(component.RSIPath!.Value, "cutters_handle"))
+            CreateCustomLayer(uid, spriteComponent, component, "cutters_handle");
+
+        if (HasState(component.RSIPath!.Value, "screwdriver"))
+            CreateCustomLayer(uid, spriteComponent, component, "screwdriver");
     }
     // VG-Tweak End
 
@@ -99,6 +105,15 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
     }
     // VG-Tweak End
 
+    private bool HasState(ResPath rsiPath, string state)
+    {
+        if (_resourceCache.TryGetResource<RSIResource>(rsiPath, out var rsiResource))
+        {
+            return rsiResource.RSI.TryGetState(state, out _);
+        }
+        return false;
+    }
+
     // VG-Tweak Start
     private void EnableLayers(
         EntityUid uid,
@@ -118,15 +133,20 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         foreach (var layerName in component.SpriteLayers)
         {
             var show = wrapper.QueuedEntities.Contains(layerName);
-
             _sprite.LayerSetVisible((uid, spriteComponent), layerName, show);
         }
 
-        _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", false);
-        _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", Color.White);
+        if (_sprite.LayerExists((uid, spriteComponent), "cutters_handle"))
+        {
+            _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", false);
+            _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", Color.White);
+        }
 
-        _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", false);
-        _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", Color.White);
+        if (_sprite.LayerExists((uid, spriteComponent), "screwdriver"))
+        {
+            _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", false);
+            _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", Color.White);
+        }
 
         if (!TryComp(uid, out ContainerManagerComponent? containers))
             return;
@@ -147,13 +167,13 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             var color = data.Color ?? Color.White;
             var proto = MetaData(entity).EntityPrototype?.ID ?? "";
 
-            if (proto == "Wirecutter")
+            if (proto == "Wirecutter" && _sprite.LayerExists((uid, spriteComponent), "cutters_handle"))
             {
                 _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", true);
                 _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", color);
             }
 
-            if (proto == "Screwdriver")
+            if (proto == "Screwdriver" && _sprite.LayerExists((uid, spriteComponent), "screwdriver"))
             {
                 _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", true);
                 _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", color);
