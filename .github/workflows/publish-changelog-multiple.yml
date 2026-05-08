@@ -4,29 +4,28 @@ on:
   workflow_dispatch:
     inputs:
       commit_range:
-        description: 'Commit range (e.g., "abc123..def456") or comma-separated SHAs'
+        description: 'Commit range (e.g. abc..def) or comma-separated SHAs'
         required: true
         type: string
         default: 'HEAD~3..HEAD'
       title:
-        description: 'Changelog title (optional)'
+        description: 'Changelog title'
         required: false
         type: string
         default: 'New Changelog'
 
 jobs:
   publish:
-    name: Publish Changelog to Discord
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # -----------------------------
-      # COLLECT COMMITS SAFELY
+      # GET COMMITS (SAFE OUTPUT)
       # -----------------------------
       - name: Get commit list
         id: commits
@@ -37,7 +36,7 @@ jobs:
           COMMITS=""
 
           if [[ "$INPUT" == *".."* ]]; then
-            COMMITS=$(git rev-list --reverse "$INPUT")
+            COMMITS=$(git rev-list --reverse "$INPUT" || true)
           else
             IFS=',' read -ra SHAS <<< "$INPUT"
             for sha in "${SHAS[@]}"; do
@@ -52,16 +51,18 @@ jobs:
             exit 1
           fi
 
+          DELIM="EOF_$(date +%s%N)"
+
           {
-            echo "commits<<EOF"
-            printf "%s" "$COMMITS"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+            echo "commits<<$DELIM"
+            printf "%s\n" "$COMMITS"
+            echo "$DELIM"
+          } >> "$GITHUB_OUTPUT"
 
       # -----------------------------
       # BUILD CHANGELOG
       # -----------------------------
-      - name: Process commits and build changelog
+      - name: Build changelog
         id: changelog
         run: |
           set -e
@@ -71,11 +72,11 @@ jobs:
           CHANGELOG=""
           COUNT=0
 
-          printf "%s" "$COMMITS" | while IFS= read -r FULL_HASH; do
-            [ -z "$FULL_HASH" ] && continue
+          printf "%s" "$COMMITS" | while IFS= read -r HASH; do
+            [ -z "$HASH" ] && continue
 
-            SHORT_HASH=$(git rev-parse --short "$FULL_HASH")
-            TITLE=$(git log -1 --format=%s "$FULL_HASH")
+            SHORT=$(git rev-parse --short "$HASH")
+            TITLE=$(git log -1 --format=%s "$HASH")
 
             case "$TITLE" in
               *"[FIX]"*) EMOJI="🩹" ;;
@@ -91,7 +92,7 @@ jobs:
               *) EMOJI="📝" ;;
             esac
 
-            CHANGELOG+="${EMOJI} \`${SHORT_HASH}\` ${TITLE}"$'\n'
+            CHANGELOG+="${EMOJI} \`${SHORT}\` ${TITLE}"$'\n'
             COUNT=$((COUNT + 1))
 
           done
@@ -101,45 +102,44 @@ jobs:
             printf "%s" "$CHANGELOG"
             echo "EOF"
             echo "count=$COUNT"
-          } >> $GITHUB_OUTPUT
+          } >> "$GITHUB_OUTPUT"
 
       # -----------------------------
       # SEND TO DISCORD
       # -----------------------------
       - name: Send to Discord
         env:
-          DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
+          WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
           TITLE: ${{ github.event.inputs.title }}
           ENTRIES: ${{ steps.changelog.outputs.entries }}
           COUNT: ${{ steps.changelog.outputs.count }}
         run: |
           set -e
 
-          MAX_DESC=2000
+          MAX=2000
           CHUNKS=()
-          CURRENT=""
+          CUR=""
 
           while IFS= read -r line; do
-            if [ $(( ${#CURRENT} + ${#line} + 1 )) -gt $MAX_DESC ]; then
-              CHUNKS+=("$CURRENT")
-              CURRENT="$line"
+            if [ $(( ${#CUR} + ${#line} + 1 )) -gt $MAX ]; then
+              CHUNKS+=("$CUR")
+              CUR="$line"
             else
-              CURRENT+=$'\n'"$line"
+              CUR+=$'\n'"$line"
             fi
           done <<< "$ENTRIES"
 
-          [ -n "$CURRENT" ] && CHUNKS+=("$CURRENT")
+          [ -n "$CUR" ] && CHUNKS+=("$CUR")
 
           EMBEDS="[]"
 
           for i in "${!CHUNKS[@]}"; do
-            CHUNK="${CHUNKS[$i]}"
             PART=$((i+1))
             TOTAL=${#CHUNKS[@]}
 
             EMBEDS=$(jq -n \
               --arg title "📢 $TITLE (Part $PART/$TOTAL)" \
-              --arg desc "$CHUNK" \
+              --arg desc "${CHUNKS[$i]}" \
               --arg footer "Commits: $COUNT" \
               --argjson prev "$EMBEDS" \
               '
@@ -156,16 +156,15 @@ jobs:
 
           echo "$PAYLOAD" > payload.json
 
-          echo "Sending to Discord..."
-          HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
+          HTTP=$(curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -d @payload.json \
-            "$DISCORD_WEBHOOK")
+            "$WEBHOOK")
 
-          echo "HTTP Code: $HTTP_CODE"
+          echo "HTTP: $HTTP"
           cat response.txt
 
-          if [ "$HTTP_CODE" -ne 204 ]; then
-            echo "Failed to send webhook"
+          if [ "$HTTP" -ne 204 ]; then
+            echo "Discord webhook failed"
             exit 1
           fi
