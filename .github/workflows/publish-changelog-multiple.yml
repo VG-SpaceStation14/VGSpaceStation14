@@ -111,43 +111,86 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.CHANGELOG_DISCORD_WEBHOOK }}
           TITLE: ${{ github.event.inputs.title }}
-          ENTRIES: ${{ steps.changelog.outputs.entries }}
           COUNT: ${{ steps.changelog.outputs.count }}
         run: |
-          export LANG=C.UTF-8
-          export LC_ALL=C.UTF-8
+          # Read entries file to avoid escaping issues
+          ENTRIES="${{ steps.changelog.outputs.entries }}"
           
-          # Escape for JSON
-          ESCAPED_TITLE=$(echo "$TITLE" | jq -R -s '.')
+          # Discord limits
+          MAX_DESC_LENGTH=2000
+          MAX_EMBEDS=10
           
-          # Create entries array and build description
-          DESCRIPTION=""
+          # Split entries into chunks that fit within Discord limits
+          CURRENT_CHUNK=""
+          CHUNKS=()
+          TOTAL_ENTRIES=0
+          
           while IFS= read -r line; do
             [ -z "$line" ] && continue
-            ESCAPED_LINE=$(echo "$line" | jq -R -s '.')
-            DESCRIPTION="${DESCRIPTION}${ESCAPED_LINE}\\n"
+            
+            # Calculate length if we add this line + newline
+            LINE_LEN=${#line}
+            CURRENT_LEN=${#CURRENT_CHUNK}
+            
+            if [ $((CURRENT_LEN + LINE_LEN + 1)) -gt $MAX_DESC_LENGTH ] && [ -n "$CURRENT_CHUNK" ]; then
+              # Store current chunk and start new one
+              CHUNKS+=("$CURRENT_CHUNK")
+              CURRENT_CHUNK="$line"
+            else
+              # Add to current chunk
+              if [ -z "$CURRENT_CHUNK" ]; then
+                CURRENT_CHUNK="$line"
+              else
+                CURRENT_CHUNK="${CURRENT_CHUNK}\n${line}"
+              fi
+            fi
+            TOTAL_ENTRIES=$((TOTAL_ENTRIES + 1))
           done <<< "$ENTRIES"
           
-          # Remove trailing \n
-          DESCRIPTION=$(echo -e "$DESCRIPTION" | sed 's/\\n$//')
+          # Add the last chunk if not empty
+          if [ -n "$CURRENT_CHUNK" ]; then
+            CHUNKS+=("$CURRENT_CHUNK")
+          fi
           
-          jq -n \
-            --arg title "$TITLE" \
-            --arg description "$DESCRIPTION" \
-            --arg count "$COUNT" \
-            '{
-              embeds: [{
-                title: ("📢 " + $title),
-                color: 5814783,
-                description: $description,
-                footer: {
-                  text: ("Total commits: " + $count)
-                }
-              }]
-            }' > payload.json
+          # Build payload with multiple embeds if needed
+          PAYLOAD_EMBEDS=""
+          CHUNK_COUNT=${#CHUNKS[@]}
           
-          echo "Sending payload:"
-          cat payload.json
+          for i in "${!CHUNKS[@]}"; do
+            CHUNK="${CHUNKS[$i]}"
+            # Escape for JSON using jq
+            ESCAPED_DESCRIPTION=$(echo -e "$CHUNK" | jq -R -s '.')
+            
+            if [ $CHUNK_COUNT -eq 1 ]; then
+              TITLE_TEXT="$TITLE"
+            else
+              TITLE_TEXT="$TITLE (Part $((i+1))/$CHUNK_COUNT)"
+            fi
+            
+            ESCAPED_TITLE=$(echo "$TITLE_TEXT" | jq -R -s '.')
+            
+            PAYLOAD_EMBEDS="${PAYLOAD_EMBEDS}{
+              \"title\": \"📢 \" + $ESCAPED_TITLE,
+              \"color\": 5814783,
+              \"description\": $ESCAPED_DESCRIPTION,
+              \"footer\": {
+                \"text\": \"Commits: $TOTAL_ENTRIES (Part $((i+1))/$CHUNK_COUNT)\"
+              }
+            },"
+          done
+          
+          # Remove trailing comma
+          PAYLOAD_EMBEDS=${PAYLOAD_EMBEDS%,}
+          
+          # Create final payload
+          cat > payload.json << EOF
+          {
+            "embeds": [$PAYLOAD_EMBEDS]
+          }
+          EOF
+          
+          echo "Sending payload with ${#CHUNKS[@]} embed(s):"
+          cat payload.json | jq '.embeds[] | {title: .title, desc_length: (.description | length)}'
           
           HTTP_CODE=$(curl -s -o response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
