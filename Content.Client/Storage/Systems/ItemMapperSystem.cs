@@ -3,10 +3,11 @@ using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Sprite; // VG-Tweak
 using Robust.Client.GameObjects;
-using Robust.Shared.Containers; // VG-Tweak
-using Robust.Shared.Utility;
-using Robust.Client.ResourceManagement; // VG-Tweak
+using Robust.Shared.Containers;
+using Robust.Shared.Utility; // VG-Tweak
+using Robust.Client.ResourceManagement;
 using Robust.Client.Graphics; // VG-Tweak
+using Robust.Shared.Timing; // VG-Tweak
 
 namespace Content.Client.Storage.Systems;
 
@@ -14,7 +15,10 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!; // VG-Tweak
+    [Dependency] private readonly IGameTiming _timing = default!; // VG-Tweak
+
+    private float _nextRefresh; // VG-Tweak
 
     public override void Initialize()
     {
@@ -23,6 +27,35 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         SubscribeLocalEvent<ItemMapperComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<ItemMapperComponent, AppearanceChangeEvent>(OnAppearance);
     }
+
+    // VG-Tweak Start
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        if (_timing.CurTime.TotalSeconds < _nextRefresh)
+            return;
+
+        _nextRefresh = (float)_timing.CurTime.TotalSeconds + 3f;
+
+        var query = EntityQueryEnumerator<ItemMapperComponent, SpriteComponent, AppearanceComponent>();
+
+        while (query.MoveNext(out var uid, out var mapper, out var sprite, out var appearance))
+        {
+            try
+            {
+                if (mapper.SpriteLayers.Count == 0)
+                    InitLayers(uid, mapper, sprite, appearance);
+
+                EnableLayers(uid, mapper, sprite, appearance);
+            }
+            catch
+            {
+
+            }
+        }
+    }
+    // VG-Tweak End
 
     private void OnStartup(EntityUid uid, ItemMapperComponent component, ComponentStartup args)
     {
@@ -33,7 +66,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
 
         if (component.RSIPath != null)
         {
-            component.RSIPath = FixPath(component.RSIPath.Value);
+            component.RSIPath = FixPath(component.RSIPath.Value); // VG-Tweak
         }
     }
 
@@ -50,6 +83,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         EnableLayers(uid, component, spriteComponent, args.Component);
     }
 
+    // VG-Tweak Start
     private void InitLayers(
         EntityUid uid,
         ItemMapperComponent component,
@@ -69,29 +103,57 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         }
 
         var rsi = component.RSIPath.Value;
-        component.SpriteLayers.AddRange(wrapper.QueuedEntities);
 
-        foreach (var sprite in component.SpriteLayers)
+        foreach (var sprite in wrapper.QueuedEntities)
         {
+            if (component.SpriteLayers.Contains(sprite))
+                continue;
+
+            component.SpriteLayers.Add(sprite);
+
+            if (_sprite.LayerExists((uid, spriteComponent), sprite))
+                continue;
+
             _sprite.LayerMapReserve((uid, spriteComponent), sprite);
-            _sprite.LayerSetSprite((uid, spriteComponent), sprite, new SpriteSpecifier.Rsi(rsi, sprite));
+            _sprite.LayerSetSprite(
+                (uid, spriteComponent),
+                sprite,
+                new SpriteSpecifier.Rsi(rsi, sprite));
+
             _sprite.LayerSetVisible((uid, spriteComponent), sprite, false);
         }
 
-        if (HasState(rsi, "cutters_handle"))
+        if (HasState(rsi, "cutters_handle") &&
+            !_sprite.LayerExists((uid, spriteComponent), "cutters_handle"))
+        {
             CreateCustomLayer(uid, spriteComponent, rsi, "cutters_handle");
+        }
 
-        if (HasState(rsi, "screwdriver"))
+        if (HasState(rsi, "screwdriver") &&
+            !_sprite.LayerExists((uid, spriteComponent), "screwdriver"))
+        {
             CreateCustomLayer(uid, spriteComponent, rsi, "screwdriver");
+        }
     }
+    // VG-Tweak End
 
-    private void CreateCustomLayer(EntityUid uid, SpriteComponent sprite, ResPath rsi, string layer)
+    private void CreateCustomLayer(
+        EntityUid uid,
+        SpriteComponent sprite,
+        ResPath rsi,
+        string layer)
     {
         _sprite.LayerMapReserve((uid, sprite), layer);
-        _sprite.LayerSetSprite((uid, sprite), layer, new SpriteSpecifier.Rsi(rsi, layer));
+
+        _sprite.LayerSetSprite(
+            (uid, sprite),
+            layer,
+            new SpriteSpecifier.Rsi(rsi, layer));
+
         _sprite.LayerSetVisible((uid, sprite), layer, false);
     }
 
+    // VG-Tweak Start
     private void EnableLayers(
         EntityUid uid,
         ItemMapperComponent component,
@@ -110,11 +172,18 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         foreach (var layerName in component.SpriteLayers)
         {
             var show = wrapper.QueuedEntities.Contains(layerName);
-            _sprite.LayerSetVisible((uid, spriteComponent), layerName, show);
+
+            if (_sprite.LayerExists((uid, spriteComponent), layerName))
+            {
+                _sprite.LayerSetVisible((uid, spriteComponent), layerName, show);
+            }
         }
 
-        bool hasCutters = _sprite.LayerExists((uid, spriteComponent), "cutters_handle");
-        bool hasScrewdriver = _sprite.LayerExists((uid, spriteComponent), "screwdriver");
+        bool hasCutters =
+            _sprite.LayerExists((uid, spriteComponent), "cutters_handle");
+
+        bool hasScrewdriver =
+            _sprite.LayerExists((uid, spriteComponent), "screwdriver");
 
         if (hasCutters)
         {
@@ -128,8 +197,10 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", Color.White);
         }
 
-        if (!TryComp(uid, out ContainerManagerComponent? containers) ||
-            !containers.TryGetContainer("storagebase", out var container))
+        if (!TryComp(uid, out ContainerManagerComponent? containers))
+            return;
+
+        if (!containers.TryGetContainer("storagebase", out var container))
             return;
 
         foreach (var entity in container.ContainedEntities)
@@ -137,7 +208,9 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             if (!TryComp(entity, out RandomSpriteComponent? randomSprite))
                 continue;
 
-            if (!randomSprite.Selected.TryGetValue("enum.DamageStateVisualLayers.Base", out var data))
+            if (!randomSprite.Selected.TryGetValue(
+                    "enum.DamageStateVisualLayers.Base",
+                    out var data))
                 continue;
 
             var color = data.Color ?? Color.White;
@@ -156,14 +229,19 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             }
         }
     }
+    
 
     private bool HasState(ResPath rsiPath, string state)
     {
         var fixedPath = FixPath(rsiPath);
-        if (_resourceCache.TryGetResource<RSIResource>(fixedPath, out var rsiResource))
+
+        if (_resourceCache.TryGetResource<RSIResource>(
+                fixedPath,
+                out var rsiResource))
         {
             return rsiResource.RSI.TryGetState(state, out _);
         }
+
         return false;
     }
 
@@ -174,11 +252,13 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         if (!pathString.StartsWith("/"))
             pathString = "/" + pathString;
 
-        if (!pathString.StartsWith("/Textures") && !pathString.StartsWith("/Icons"))
+        if (!pathString.StartsWith("/Textures") &&
+            !pathString.StartsWith("/Icons"))
         {
             return new ResPath("/Textures" + pathString);
         }
 
         return new ResPath(pathString);
     }
+    // VG-Tweak End
 }
