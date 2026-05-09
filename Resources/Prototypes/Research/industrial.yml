@@ -229,12 +229,13 @@
     state: handdrill
   discipline: Industrial
   tier: 2
-  cost: 15000 # ADT-Tweak 12500 -> 15000
+  cost: 20000 # VG-Tweak 15000 -> 20000
   recipeUnlocks:
     - OreBagOfHolding
     - MiningDrillDiamond
     - AdvancedMineralScannerEmpty
     - BorgModuleAdvancedMining
+    - NFEnergyPickaxe # VG-Twek
   # ADT Research Console Rework start
   position: 4,-1
   requiredTech:
