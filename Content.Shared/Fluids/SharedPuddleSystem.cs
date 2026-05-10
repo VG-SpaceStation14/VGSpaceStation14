@@ -23,6 +23,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Robust.Shared.Physics.Components;
 
 namespace Content.Shared.Fluids;
 
@@ -320,6 +321,9 @@ public abstract partial class SharedPuddleSystem : EntitySystem
 
     private void UpdateSlow(EntityUid uid, Solution solution)
     {
+        if (!HasComp<PhysicsComponent>(uid))
+            return;
+
         var maxViscosity = 0f;
         foreach (var (reagent, _) in solution.Contents)
         {
