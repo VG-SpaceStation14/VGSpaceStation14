@@ -29,7 +29,7 @@ public sealed class GrainOverlay : Overlay
         _shader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
 
         args.WorldHandle.UseShader(_shader);
-        args.WorldHandle.DrawRect(args.WorldBounds, Color.White);
+        args.WorldHandle.DrawRect(args.WorldBounds, Color.White.WithAlpha(0.4f));
         args.WorldHandle.UseShader(null);
     }
 }
