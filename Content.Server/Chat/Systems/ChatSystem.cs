@@ -454,7 +454,7 @@ public sealed partial class ChatSystem : SharedChatSystem
         if (ContainsAny(sender, "NT", "NT"))
             return (DefaultAnnouncementIconPath, "Captain");
 
-        if (ContainsAny(sender, "station", "станция"))
+        if (ContainsAny(sender, "station", "станции"))
             return (DefaultAnnouncementIconPath, "Captain");
 
         if (TryGetAnnouncementIconByJobTitle(sender, out var icon))
