@@ -6,6 +6,7 @@ using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
 using Robust.Client.State;
+using Content.Shared.Heretic;
 
 namespace Content.Client._VG.Arrival;
 
@@ -37,7 +38,7 @@ public sealed class VGArrivalSystem : EntitySystem
 
         var currentState = _stateManager.CurrentState;
         var isInLobby = currentState?.GetType().Name == "LobbyState";
-        
+    
         if (isInLobby)
         {
             if (!_wasInLobby)
@@ -48,7 +49,7 @@ public sealed class VGArrivalSystem : EntitySystem
             _wasInLobby = true;
             return;
         }
-        
+    
         _wasInLobby = false;
 
         var session = _player.LocalSession;
@@ -74,6 +75,9 @@ public sealed class VGArrivalSystem : EntitySystem
             return;
 
         if (!HasComp<HumanoidAppearanceComponent>(currentEntity))
+            return;
+
+        if (HasComp<HereticComponent>(currentEntity))
             return;
 
         _shown = true;
