@@ -81,7 +81,7 @@
       netsync: false
       noRot: true
       drawdepth: Mobs
-      scale: 0.95, 0.95
+      scale: 0.90, 0.90
       layers:
       - map: [ "enum.HumanoidVisualLayers.Chest" ]
       - map: [ "enum.HumanoidVisualLayers.HeadTop" ]
@@ -210,9 +210,9 @@
         Canilunzt: Speak
     - type: SizeAttributeWhitelist # Frontier
       tall: true
-      tallscale: 1
+      tallscale: 0.93
       short: true
-      shortscale: 0.9
+      shortscale: 0.87
     - type: Tag
       tags:
       - CanPilot
