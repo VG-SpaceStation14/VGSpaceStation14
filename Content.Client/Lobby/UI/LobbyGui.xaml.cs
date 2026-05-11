@@ -20,6 +20,7 @@ namespace Content.Client.Lobby.UI
         private float _updateTimer;
         private static readonly Color ColorNonSponsor = Color.FromHex("#272727");
         private SponsorInfoWindow? _sponsorWindow;
+        private LobbyGuiState _currentState = LobbyGuiState.Default;
         // VG-Tweak End
 
         public LobbyGui()
@@ -29,8 +30,6 @@ namespace Content.Client.Lobby.UI
 
             SetAnchorPreset(MainContainer, LayoutPreset.Wide);
             SetAnchorPreset(Background, LayoutPreset.Wide);
-            SetAnchorPreset(ShowInterfaceContainer, LayoutPreset.Wide); // ADT-Tweak
-            SetAnchorPreset(ShowInterface, LayoutPreset.BottomLeft); // ADT-Tweak
             SetAnchorPreset(CharacterSetupState, LayoutPreset.Wide);
 
             LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
@@ -38,10 +37,14 @@ namespace Content.Client.Lobby.UI
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
             
-            // ADT-Tweak Start
-            HideInterface.OnPressed += _ => SwitchState(LobbyGuiState.ScreenSaver);
-            ShowInterface.OnPressed += _ => SwitchState(LobbyGuiState.Default);
-            // ADT-Tweak End
+            // VG-Tweak: HideInterface toggles the ScreenSaver mode
+            HideInterface.OnPressed += _ => 
+            {
+                if (_currentState == LobbyGuiState.ScreenSaver)
+                    SwitchState(LobbyGuiState.Default);
+                else
+                    SwitchState(LobbyGuiState.ScreenSaver);
+            };
 
             CollapseButton.OnPressed += _ => TogglePanel(false);
             ExpandButton.OnPressed += _ => TogglePanel(true);
@@ -129,10 +132,16 @@ namespace Content.Client.Lobby.UI
 
         public void SwitchState(LobbyGuiState state)
         {
+            _currentState = state; // VG-Tweak
             DefaultState.Visible = false;
             CharacterSetupState.Visible = false;
-            ShowInterfaceContainer.Visible = false; // ADT-Tweak
             MainContainer.Visible = true;
+
+            // VG-Tweak: reset visibility of components
+            MenuControls.Visible = true;
+            ChatContainer.Visible = true;
+            MusicContainer.Visible = true;
+            TopPanel.Visible = true;
 
             switch (state)
             {
@@ -147,9 +156,11 @@ namespace Content.Client.Lobby.UI
                     UserInterfaceManager.GetUIController<LobbyUIController>().ReloadCharacterSetup();
                     break;
 
-                case LobbyGuiState.ScreenSaver: // ADT-Tweak
-                    ShowInterfaceContainer.Visible = true;
-                    MainContainer.Visible = false;
+                case LobbyGuiState.ScreenSaver: // ADT-Tweak & VG-Tweak logic
+                    MenuControls.Visible = false;
+                    ChatContainer.Visible = false;
+                    MusicContainer.Visible = false;
+                    // TopPanel remains visible
                     break;
             }
         }
