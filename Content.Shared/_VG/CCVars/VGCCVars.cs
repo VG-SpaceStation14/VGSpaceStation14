@@ -33,5 +33,5 @@ public sealed class VGCCVars
         CVarDef.Create("vg.light_bloom_cone_enable", false, CVar.CLIENT | CVar.ARCHIVE);
 
     public static readonly CVarDef<float> LightBloomStrength =
-        CVarDef.Create("vg.light_bloom_strength", 0.5f, CVar.CLIENT | CVar.ARCHIVE);
+        CVarDef.Create("vg.light_bloom_strength", 0.1f, CVar.CLIENT | CVar.ARCHIVE);
 }
