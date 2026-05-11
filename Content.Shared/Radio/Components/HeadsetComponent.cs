@@ -18,4 +18,3 @@ public sealed partial class HeadsetComponent : Component
     [DataField, AutoNetworkedField]
     public SlotFlags RequiredSlot = SlotFlags.EARS;
 }
-

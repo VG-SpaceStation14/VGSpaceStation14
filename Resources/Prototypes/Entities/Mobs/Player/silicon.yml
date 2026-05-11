@@ -29,6 +29,8 @@
     - Supply
   - type: IgnoreUIRange
   - type: StationAiHeld
+  - type: RadioJobIconOverride # ADT-Tweak
+    iconId: JobIconStationAi
   - type: StationAiOverlay
   - type: ShowElectrocutionHUD
   - type: ActionGrant
@@ -90,6 +92,7 @@
     startPowerCorruptionAtCharIdx: 4
     maxPowerCorruptionAtCharIdx: 20
   - type: ShowMindShieldIcons # ADT start
+
 
 - type: entity
   id: AiHeldIntellicard
