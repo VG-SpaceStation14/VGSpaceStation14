@@ -1,9 +1,9 @@
 - type: entity
   id: BigGlassAirlockBase
   parent: AirlockGlass
-  name: большой стеклянный шлюз
-  description: Это с виду обычный шлюз... Но очень широкий
-  suffix: Шлюз на 3 тайла
+  name: big glass airlock
+  description: It looks like a regular airlock... But it's very wide.
+  suffix: 3 tiles wide airlock
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
@@ -26,7 +26,7 @@
 - type: entity
   id: BigExternalAirlockGlass
   parent: [BigGlassAirlockBase, AirlockExternalGlass]
-  name: большой стеклянный экстренный шлюз
+  name: big external glass airlock
   components:
   - type: Sprite
     sprite: _VG/Structures/Doors/Airlocks/Glass/big_external_glass_lua.rsi
@@ -34,7 +34,7 @@
 - type: entity
   id: BigMedicalAirlockGlass
   parent: [BigGlassAirlockBase, AirlockGlass]
-  name: большой стеклянный медицинский шлюз
+  name: big medical glass airlock
   components:
   - type: Sprite
     sprite: _VG/Structures/Doors/Airlocks/Glass/big_medical_glass_lua.rsi
@@ -42,7 +42,7 @@
 - type: entity
   id: BigAirlockGlass
   parent: [BigGlassAirlockBase, AirlockGlass]
-  name: большой стеклянный шлюз
+  name: big glass airlock
   components:
   - type: Sprite
     sprite: _VG/Structures/Doors/Airlocks/Glass/big_glass_lua.rsi
@@ -50,9 +50,9 @@
 - type: entity
   id: MediumGlassAirlockBase
   parent: AirlockGlass
-  name: средний стеклянный шлюз
-  description: Это с виду обычный шлюз... Но очень широкий
-  suffix: Шлюз на 2 тайла
+  name: medium glass airlock
+  description: It looks like a regular airlock... But it's quite wide.
+  suffix: 2 tiles wide airlock
   categories: [ HideSpawnMenu ]
   components:
   - type: Transform
@@ -75,7 +75,36 @@
 - type: entity
   id: MediumMedicalAirlockGlass
   parent: [MediumGlassAirlockBase, AirlockGlass]
-  name: средний стеклянный медицинский шлюз
+  name: medium medical glass airlock
   components:
   - type: Sprite
     sprite: _VG/Structures/Doors/Airlocks/Glass/medium_medical_glass_lua.rsi
+
+- type: entity
+  id: AirlockGlassDouble
+  parent: AirlockGlass
+  name: double glass airlock
+  description: It opens, it closes, it maybe crushes you, and it's bigger than normal.
+  components:
+  - type: Sprite
+    sprite: _VG/Structures/Doors/Airlocks/Glass/double_glass_airlock.rsi
+    snapCardinals: false
+    offset: 0.5,0
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.49,-0.49,1.49,0.49" # don't want this colliding with walls or they won't close
+        density: 100
+        mask:
+        - FullTileMask
+        layer: #removed opaque from the layer, allowing lasers to pass through glass airlocks
+        - GlassAirlockLayer
+#  - type: PaintableAirlock # Прототип сырой, требуется переработка в будущем
+#    group: Glass
+#    department: null
+#  - type: Rotatable
+#  rotateWhileAnchored: false
+#  - type: Transform
+#  noRot: false

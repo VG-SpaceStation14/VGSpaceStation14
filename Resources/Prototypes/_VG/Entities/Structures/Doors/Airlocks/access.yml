@@ -1,0 +1,17 @@
+- type: entity
+  parent: MediumMedicalAirlockGlass
+  id: MediumMedicalAirlockGlassLocked
+  suffix: Medical, Locked, Medium
+  components:
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronicsMedical ]
+
+- type: entity
+  parent: BigMedicalAirlockGlass
+  id: BigMedicalAirlockGlassLocked
+  suffix: Medical, Locked, Big
+  components:
+  - type: ContainerFill
+    containers:
+      board: [ DoorElectronicsMedical ]
