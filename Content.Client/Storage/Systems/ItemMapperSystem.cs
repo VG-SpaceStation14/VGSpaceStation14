@@ -18,8 +18,6 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
     [Dependency] private readonly IResourceCache _resourceCache = default!; // VG-Tweak
     [Dependency] private readonly IGameTiming _timing = default!; // VG-Tweak
 
-    private float _nextRefresh; // VG-Tweak
-
     public override void Initialize()
     {
         base.Initialize();
@@ -28,34 +26,25 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
         SubscribeLocalEvent<ItemMapperComponent, AppearanceChangeEvent>(OnAppearance);
     }
 
-    // VG-Tweak Start
+    // VG-Tweak-Fix Start
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        if (_timing.CurTime.TotalSeconds < _nextRefresh)
-            return;
-
-        _nextRefresh = (float)_timing.CurTime.TotalSeconds + 3f;
-
         var query = EntityQueryEnumerator<ItemMapperComponent, SpriteComponent, AppearanceComponent>();
-
         while (query.MoveNext(out var uid, out var mapper, out var sprite, out var appearance))
         {
-            try
+            if (mapper.SpriteLayers.Count == 0)
             {
-                if (mapper.SpriteLayers.Count == 0)
-                    InitLayers(uid, mapper, sprite, appearance);
-
+                InitLayers(uid, mapper, sprite, appearance);
                 EnableLayers(uid, mapper, sprite, appearance);
+                continue;
             }
-            catch
-            {
 
-            }
+            UpdateToolLayers(uid, mapper, sprite);
         }
     }
-    // VG-Tweak End
+    // VG-Tweak-Fix End
 
     private void OnStartup(EntityUid uid, ItemMapperComponent component, ComponentStartup args)
     {
@@ -179,23 +168,23 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             }
         }
 
-        bool hasCutters =
-            _sprite.LayerExists((uid, spriteComponent), "cutters_handle");
+        UpdateToolLayers(uid, component, spriteComponent); // VG-Tweak-Fix
+    }
 
-        bool hasScrewdriver =
-            _sprite.LayerExists((uid, spriteComponent), "screwdriver");
+    // VG-Tweak-Fix Start
+    /// <summary>
+    /// Вынесено в отдельный метод для вызова из Update и EnableLayers
+    /// </summary>
+    private void UpdateToolLayers(EntityUid uid, ItemMapperComponent component, SpriteComponent spriteComponent)
+    {
+        bool hasCutters = _sprite.LayerExists((uid, spriteComponent), "cutters_handle");
+        bool hasScrewdriver = _sprite.LayerExists((uid, spriteComponent), "screwdriver");
 
-        if (hasCutters)
-        {
-            _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", false);
-            _sprite.LayerSetColor((uid, spriteComponent), "cutters_handle", Color.White);
-        }
+        if (!hasCutters && !hasScrewdriver)
+            return;
 
-        if (hasScrewdriver)
-        {
-            _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", false);
-            _sprite.LayerSetColor((uid, spriteComponent), "screwdriver", Color.White);
-        }
+        if (hasCutters) _sprite.LayerSetVisible((uid, spriteComponent), "cutters_handle", false);
+        if (hasScrewdriver) _sprite.LayerSetVisible((uid, spriteComponent), "screwdriver", false);
 
         if (!TryComp(uid, out ContainerManagerComponent? containers))
             return;
@@ -208,9 +197,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             if (!TryComp(entity, out RandomSpriteComponent? randomSprite))
                 continue;
 
-            if (!randomSprite.Selected.TryGetValue(
-                    "enum.DamageStateVisualLayers.Base",
-                    out var data))
+            if (!randomSprite.Selected.TryGetValue("enum.DamageStateVisualLayers.Base", out var data))
                 continue;
 
             var color = data.Color ?? Color.White;
@@ -229,7 +216,7 @@ public sealed class ItemMapperSystem : SharedItemMapperSystem
             }
         }
     }
-    
+    // VG-Tweak-Fix End
 
     private bool HasState(ResPath rsiPath, string state)
     {
