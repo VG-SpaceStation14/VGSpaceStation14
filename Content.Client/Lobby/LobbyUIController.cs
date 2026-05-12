@@ -144,6 +144,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     private void PreferencesDataLoaded()
     {
         PreviewPanel?.SetLoaded(true);
+        PreviewPanel?.UpdateCharacterSelector();
 
         if (_stateManager.CurrentState is not LobbyState)
             return;
@@ -201,6 +202,8 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         var dummy = LoadProfileEntity(humanoid, null, true);
         PreviewPanel.SetSprite(dummy);
         PreviewPanel.SetSummaryText(humanoid.Summary);
+
+        PreviewPanel.UpdateCharacterSelector();
     }
 
     private void RefreshProfileEditor()
@@ -312,6 +315,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         {
             _preferencesManager.SelectCharacter(args);
             ReloadCharacterSetup();
+            PreviewPanel?.UpdateCharacterSelector();
         };
 
         _characterSetup.DeleteCharacter += args =>
@@ -328,6 +332,8 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                 // Only need to reload character pickers
                 _characterSetup?.ReloadCharacterPickers();
             }
+
+            PreviewPanel?.UpdateCharacterSelector();
         };
 
         if (_stateManager.CurrentState is LobbyState lobby)

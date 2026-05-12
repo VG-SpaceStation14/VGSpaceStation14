@@ -5,7 +5,7 @@ using Robust.Client.Console;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Timing;
-using Content.Client._VG.Sponsors; // VG-Tweak
+using Content.Client._VG.Sponsors;
 
 namespace Content.Client.Lobby.UI
 {
@@ -14,14 +14,20 @@ namespace Content.Client.Lobby.UI
     {
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
         [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
+        [Dependency] private readonly IGameTiming _gameTiming = default!;
         
-        // VG-Tweak Start
         [Dependency] private readonly SponsorsManager _sponsorsManager = default!;
         private float _updateTimer;
         private static readonly Color ColorNonSponsor = Color.FromHex("#272727");
         private SponsorInfoWindow? _sponsorWindow;
         private LobbyGuiState _currentState = LobbyGuiState.Default;
-        // VG-Tweak End
+
+        private bool _animating = false;
+        private float _animStartTime;
+        private float _animDuration = 0.3f;
+        private Thickness _menuStartMargin, _chatStartMargin, _musicStartMargin;
+        private Thickness _menuTargetMargin, _chatTargetMargin, _musicTargetMargin;
+        private LobbyGuiState _targetState;
 
         public LobbyGui()
         {
@@ -37,7 +43,6 @@ namespace Content.Client.Lobby.UI
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
             
-            // VG-Tweak: HideInterface toggles the ScreenSaver mode
             HideInterface.OnPressed += _ => 
             {
                 if (_currentState == LobbyGuiState.ScreenSaver)
@@ -51,26 +56,20 @@ namespace Content.Client.Lobby.UI
             
             CharacterSetup.OnPressed += _ => 
             {
-                // VG-Tweak Start
                 if (ReadyButton.Pressed)
                 {
                     _consoleHost.ExecuteCommand("toggleready False");
                 }
-                // VG-Tweak End
-
                 SwitchState(LobbyGuiState.CharacterSetup);
             };
 
-            // VG-Tweak Start
             if (SponsorInfoButton != null)
             {
                 SponsorInfoButton.OnPressed += _ => OnSponsorButtonPressed();
                 UpdateSponsorButton();
             }
-            // VG-Tweak End
         }
 
-        // VG-Tweak Start
         private void OnSponsorButtonPressed()
         {
             if (_sponsorWindow != null)
@@ -79,7 +78,6 @@ namespace Content.Client.Lobby.UI
                 _sponsorWindow = null;
                 return;
             }
-            
             _sponsorWindow = _uiManager.CreateWindow<SponsorInfoWindow>();
             _sponsorWindow.OnClose += () => _sponsorWindow = null;
             _sponsorWindow.OpenCentered();
@@ -89,13 +87,11 @@ namespace Content.Client.Lobby.UI
         {
             base.FrameUpdate(args);
 
-            // VG-Tweak Start
             if (!StartTime.Visible)
                 StartTime.Visible = true;
 
             if (string.IsNullOrEmpty(StartTime.Text))
                 StartTime.Text = "Раунд уже в процессе";
-            // VG-Tweak End
 
             _updateTimer += args.DeltaSeconds;
             if (_updateTimer > 5.0f)
@@ -103,6 +99,32 @@ namespace Content.Client.Lobby.UI
                 _updateTimer = 0;
                 UpdateSponsorButton();
             }
+
+            if (_animating)
+            {
+                float elapsed = (float)(_gameTiming.CurTime.TotalSeconds - _animStartTime);
+                float progress = Math.Clamp(elapsed / _animDuration, 0f, 1f);
+
+                MenuControls.Margin = InterpolateMargin(_menuStartMargin, _menuTargetMargin, progress);
+                ChatContainer.Margin = InterpolateMargin(_chatStartMargin, _chatTargetMargin, progress);
+                MusicContainer.Margin = InterpolateMargin(_musicStartMargin, _musicTargetMargin, progress);
+
+                if (progress >= 1f)
+                {
+                    _animating = false;
+                    _currentState = _targetState;
+                    ApplyFinalState();
+                }
+            }
+        }
+
+        private Thickness InterpolateMargin(Thickness a, Thickness b, float t)
+        {
+            return new Thickness(
+                a.Left + (b.Left - a.Left) * t,
+                a.Top + (b.Top - a.Top) * t,
+                a.Right + (b.Right - a.Right) * t,
+                a.Bottom + (b.Bottom - a.Bottom) * t);
         }
 
         private void UpdateSponsorButton()
@@ -110,7 +132,6 @@ namespace Content.Client.Lobby.UI
             if (SponsorInfoButton == null) return;
 
             var hasSponsor = _sponsorsManager.TryGetInfo(out var sponsorInfo);
-            
             if (hasSponsor && sponsorInfo != null)
             {
                 if (!string.IsNullOrEmpty(sponsorInfo.OOCColor))
@@ -128,39 +149,96 @@ namespace Content.Client.Lobby.UI
             }
             SponsorInfoButton.Visible = true;
         }
-        // VG-Tweak End
 
         public void SwitchState(LobbyGuiState state)
         {
-            _currentState = state; // VG-Tweak
+            if (_currentState == state && !_animating)
+                return;
+
+            if (_animating)
+            {
+                MenuControls.Margin = _menuTargetMargin;
+                ChatContainer.Margin = _chatTargetMargin;
+                MusicContainer.Margin = _musicTargetMargin;
+                _currentState = _targetState;
+                ApplyFinalState();
+                _animating = false;
+            }
+
+            if (state == LobbyGuiState.CharacterSetup)
+            {
+                _currentState = state;
+                ApplyFinalState();
+                return;
+            }
+
+            bool fromDefaultToSaver = (_currentState == LobbyGuiState.Default && state == LobbyGuiState.ScreenSaver);
+            bool fromSaverToDefault = (_currentState == LobbyGuiState.ScreenSaver && state == LobbyGuiState.Default);
+
+            if (fromDefaultToSaver || fromSaverToDefault)
+            {
+                _targetState = state;
+                _animating = true;
+                _animStartTime = (float)_gameTiming.CurTime.TotalSeconds;
+
+                MenuControls.Visible = true;
+                ChatContainer.Visible = true;
+                MusicContainer.Visible = true;
+
+                _menuStartMargin = MenuControls.Margin;
+                _chatStartMargin = ChatContainer.Margin;
+                _musicStartMargin = MusicContainer.Margin;
+
+                if (state == LobbyGuiState.ScreenSaver)
+                {
+                    float menuWidth = MenuControls.Size.X;
+                    float chatWidth = ChatContainer.Size.X;
+                    float musicWidth = MusicContainer.Size.X;
+
+                    _menuTargetMargin = new Thickness(-menuWidth, _menuStartMargin.Top, _menuStartMargin.Right, _menuStartMargin.Bottom);
+                    _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, -chatWidth, _chatStartMargin.Bottom);
+                    _musicTargetMargin = new Thickness(-musicWidth, _musicStartMargin.Top, _musicStartMargin.Right, _musicStartMargin.Bottom);
+                }
+                else
+                {
+                    _menuTargetMargin = new Thickness(25, _menuStartMargin.Top, _menuStartMargin.Right, _menuStartMargin.Bottom);
+                    _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, 25, _chatStartMargin.Bottom);
+                    _musicTargetMargin = new Thickness(25, _musicStartMargin.Top, _musicStartMargin.Right, _musicStartMargin.Bottom);
+                }
+            }
+            else
+            {
+                _currentState = state;
+                ApplyFinalState();
+            }
+        }
+
+        private void ApplyFinalState()
+        {
             DefaultState.Visible = false;
             CharacterSetupState.Visible = false;
             MainContainer.Visible = true;
 
-            // VG-Tweak: reset visibility of components
-            MenuControls.Visible = true;
-            ChatContainer.Visible = true;
-            MusicContainer.Visible = true;
-            TopPanel.Visible = true;
-
-            switch (state)
+            switch (_currentState)
             {
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
                     RightSide.Visible = true;
+                    MenuControls.Margin = new Thickness(25, MenuControls.Margin.Top, MenuControls.Margin.Right, 45);
+                    ChatContainer.Margin = new Thickness(ChatContainer.Margin.Left, 68, 25, 25);
+                    MusicContainer.Margin = new Thickness(25, 15, MusicContainer.Margin.Right, MusicContainer.Margin.Bottom);
                     break;
                     
                 case LobbyGuiState.CharacterSetup:
                     CharacterSetupState.Visible = true;
-                    MainContainer.Visible = false; // VG-Tweak
+                    MainContainer.Visible = false;
                     UserInterfaceManager.GetUIController<LobbyUIController>().ReloadCharacterSetup();
                     break;
 
-                case LobbyGuiState.ScreenSaver: // ADT-Tweak & VG-Tweak logic
+                case LobbyGuiState.ScreenSaver:
                     MenuControls.Visible = false;
                     ChatContainer.Visible = false;
                     MusicContainer.Visible = false;
-                    // TopPanel remains visible
                     break;
             }
         }
@@ -175,7 +253,7 @@ namespace Content.Client.Lobby.UI
         {
             Default,
             CharacterSetup,
-            ScreenSaver, // ADT-Tweak
+            ScreenSaver,
         }
     }
 }
