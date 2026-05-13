@@ -16,7 +16,10 @@ public sealed class OptionButtonSheetlet<T> : Sheetlet<T> where T : PalettedStyl
 
         var invertedTriangleTex =
             sheet.GetTextureOr(iconCfg.InvertedTriangleIconPath, NanotrasenStylesheet.TextureRoot);
-
+        
+        // Закругленный стиль для OptionButton
+        var roundedOptionsBackground = new StyleBoxFlat(sheet.PrimaryPalette.Background);
+        
         return
         [
             E<TextureRect>()
@@ -25,7 +28,7 @@ public sealed class OptionButtonSheetlet<T> : Sheetlet<T> where T : PalettedStyl
             E<Label>().Class(OptionButton.StyleClassOptionButton).AlignMode(Label.AlignMode.Center),
             E<PanelContainer>()
                 .Class(OptionButton.StyleClassOptionsBackground)
-                .Panel(new StyleBoxFlat(sheet.PrimaryPalette.Background)),
+                .Panel(roundedOptionsBackground),
         ];
     }
 }

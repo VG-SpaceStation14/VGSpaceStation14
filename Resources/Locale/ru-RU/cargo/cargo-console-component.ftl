@@ -1,6 +1,8 @@
 ## UI
 
 cargo-console-menu-title = Консоль заказа грузов
+cargo-console-menu-flavor-left = Закажите ещё больше коробок с пиццей, чем обычно!
+cargo-console-menu-flavor-right = v2.1
 cargo-console-menu-account-name-label = Аккаунт:{ " " }
 cargo-console-menu-account-name-none-text = Нет
 cargo-console-menu-account-name-format = [bold][color={ $color }]{ $name }[/color][/bold] [font="Monospace"]\[{ $code }\][/font]

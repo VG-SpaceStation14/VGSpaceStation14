@@ -34,4 +34,7 @@ public sealed class VGCCVars
 
     public static readonly CVarDef<float> LightBloomStrength =
         CVarDef.Create("vg.light_bloom_strength", 0.1f, CVar.CLIENT | CVar.ARCHIVE);
+
+    public static readonly CVarDef<bool> CharacterSetupNewWindowEnabled =
+        CVarDef.Create("vg.character_setup_new_window", false, CVar.CLIENT | CVar.ARCHIVE);
 }

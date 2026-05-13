@@ -17,6 +17,7 @@ using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
 using Content.Shared.Silicons.StationAi;
 using Content.Shared.Traits;
+using Content.Shared._VG;
 using Robust.Client.GameObjects;
 using Robust.Client.Player;
 using Robust.Client.ResourceManagement;
@@ -51,17 +52,10 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
     private CharacterSetupGuiSavePanel? _savePanel;
+    private CharacterSetupWindow? _setupWindow;
 
-    /// <summary>
-    /// This is the characher preview panel in the chat. This should only update if their character updates.
-    /// </summary>
     private LobbyCharacterPreviewPanel? PreviewPanel => GetLobbyPreview();
-
-    /// <summary>
-    /// This is the modified profile currently being edited.
-    /// </summary>
     private HumanoidCharacterProfile? EditedProfile => _profileEditor?.Profile;
-
     private int? EditedSlot => _profileEditor?.CharacterSlot;
 
     public override void Initialize()
@@ -78,7 +72,6 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         _configurationManager.OnValueChanged(CCVars.GameRoleTimers, _ => RefreshProfileEditor());
         _configurationManager.OnValueChanged(CCVars.GameRoleLoadoutTimers, _ => RefreshProfileEditor());
-
         _configurationManager.OnValueChanged(CCVars.GameRoleWhitelist, _ => RefreshProfileEditor());
     }
 
@@ -132,12 +125,11 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             {
                 _profileEditor.RefreshTraits();
             }
-            // ADT Languages start
+
             if (obj.WasModified<LanguagePrototype>())
             {
                 _profileEditor.RefreshLanguages();
             }
-            // ADT Languages end
         }
     }
 
@@ -161,35 +153,31 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     public void OnStateExited(LobbyState state)
     {
         PreviewPanel?.SetLoaded(false);
+        CleanupNewWindow();
+        CloseCharacterSetupOld();
         _profileEditor?.Dispose();
         _characterSetup?.Dispose();
-
         _characterSetup = null;
         _profileEditor = null;
     }
 
-    /// <summary>
-    /// Reloads every single character setup control.
-    /// </summary>
     public void ReloadCharacterSetup()
     {
         RefreshLobbyPreview();
-        var (characterGui, profileEditor) = EnsureGui();
-        characterGui.ReloadCharacterPickers();
-        profileEditor.SetProfile(
-            (HumanoidCharacterProfile?) _preferencesManager.Preferences?.SelectedCharacter,
-            _preferencesManager.Preferences?.SelectedCharacterIndex);
+        if (_profileEditor != null)
+        {
+            _profileEditor.SetProfile(
+                (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter,
+                _preferencesManager.Preferences?.SelectedCharacterIndex);
+        }
+        _characterSetup?.ReloadCharacterPickers();
     }
 
-    /// <summary>
-    /// Refreshes the character preview in the lobby chat.
-    /// </summary>
     private void RefreshLobbyPreview()
     {
         if (PreviewPanel == null)
             return;
 
-        // Get selected character, load it, then set it
         var character = _preferencesManager.Preferences?.SelectedCharacter;
 
         if (character is not HumanoidCharacterProfile humanoid)
@@ -229,54 +217,49 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         ReloadCharacterSetup();
     }
 
-    private void CloseProfileEditor()
+    private void SaveProfileNew(HumanoidProfileEditor editor)
     {
-        if (_profileEditor == null)
+        if (editor.Profile == null || editor.CharacterSlot == null)
             return;
 
-        _profileEditor.SetProfile(null, null);
-        _profileEditor.Visible = false;
+        _preferencesManager.UpdateCharacter(editor.Profile, editor.CharacterSlot.Value);
+        ReloadCharacterSetup();
+    }
 
-        if (_stateManager.CurrentState is LobbyState lobbyGui)
+    public void OpenCharacterSetup()
+    {
+        bool newWindowEnabled = _configurationManager.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
+        if (newWindowEnabled)
+            OpenCharacterSetupNewWindow();
+        else
+            OpenCharacterSetupOld();
+    }
+
+    private void OpenCharacterSetupOld()
+    {
+        if (_stateManager.CurrentState is LobbyState lobby)
         {
-            lobbyGui.SwitchState(LobbyGui.LobbyGuiState.Default);
+            EnsureOldGui();
+            lobby.SwitchState(LobbyGui.LobbyGuiState.CharacterSetup);
         }
     }
 
-    private void OpenSavePanel()
+    public void CloseCharacterSetupOld()
     {
-        if (_savePanel is { IsOpen: true })
-            return;
-
-        _savePanel = new CharacterSetupGuiSavePanel();
-
-        _savePanel.SaveButton.OnPressed += _ =>
+        if (_characterSetup != null)
         {
-            SaveProfile();
-
-            _savePanel.Close();
-
-            CloseProfileEditor();
-        };
-
-        _savePanel.NoSaveButton.OnPressed += _ =>
-        {
-            _savePanel.Close();
-
-            CloseProfileEditor();
-        };
-
-        _savePanel.OpenCentered();
+            _characterSetup.Orphan();
+            _characterSetup.Dispose();
+            _characterSetup = null;
+        }
+        _profileEditor?.Dispose();
+        _profileEditor = null;
     }
 
-    private (CharacterSetupGui, HumanoidProfileEditor) EnsureGui()
+    private void EnsureOldGui()
     {
         if (_characterSetup != null && _profileEditor != null)
-        {
-            _characterSetup.Visible = true;
-            _profileEditor.Visible = true;
-            return (_characterSetup, _profileEditor);
-        }
+            return;
 
         _profileEditor = new HumanoidProfileEditor(
             _preferencesManager,
@@ -289,7 +272,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             _resourceCache,
             _requirements,
             _markings,
-            _factory);  // ADT SAI Custom
+            _factory);
 
         _profileEditor.OnOpenGuidebook += _guide.OpenHelp;
 
@@ -297,19 +280,17 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         _characterSetup.CloseButton.OnPressed += _ =>
         {
-            // Open the save panel if we have unsaved changes.
             if (_profileEditor.Profile != null && _profileEditor.IsDirty)
-            {
-                OpenSavePanel();
-
-                return;
-            }
-
-            // Reset sliders etc.
-            CloseProfileEditor();
+                OpenSavePanelForOldMode();
+            else
+                CloseCharacterSetupOldAndReturn();
         };
 
-        _profileEditor.Save += SaveProfile;
+        _profileEditor.Save += () =>
+        {
+            SaveProfile();
+            CloseCharacterSetupOldAndReturn();
+        };
 
         _characterSetup.SelectCharacter += args =>
         {
@@ -322,14 +303,12 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         {
             _preferencesManager.DeleteCharacter(args);
 
-            // Reload everything
             if (EditedSlot == args)
             {
                 ReloadCharacterSetup();
             }
             else
             {
-                // Only need to reload character pickers
                 _characterSetup?.ReloadCharacterPickers();
             }
 
@@ -341,14 +320,178 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             lobby.Lobby?.CharacterSetupState.AddChild(_characterSetup);
         }
 
-        return (_characterSetup, _profileEditor);
+        _profileEditor.SetProfile(
+            (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter,
+            _preferencesManager.Preferences?.SelectedCharacterIndex);
+
+        _characterSetup.ReloadCharacterPickers();
     }
 
-    #region Helpers
+    private void CloseCharacterSetupOldAndReturn()
+    {
+        if (_stateManager.CurrentState is LobbyState lobby)
+        {
+            lobby.SwitchState(LobbyGui.LobbyGuiState.Default);
+        }
+    }
 
-    /// <summary>
-    /// Applies the highest priority job's clothes to the dummy.
-    /// </summary>
+    private void OpenSavePanelForOldMode()
+    {
+        if (_savePanel is { IsOpen: true })
+            return;
+
+        _savePanel = new CharacterSetupGuiSavePanel();
+
+        _savePanel.SaveButton.OnPressed += _ =>
+        {
+            SaveProfile();
+            _savePanel.Close();
+            CloseCharacterSetupOldAndReturn();
+        };
+
+        _savePanel.NoSaveButton.OnPressed += _ =>
+        {
+            _savePanel.Close();
+            CloseCharacterSetupOldAndReturn();
+        };
+
+        _savePanel.CancelButton.OnPressed += _ =>
+        {
+            _savePanel.Close();
+        };
+
+        _savePanel.OpenCentered();
+    }
+
+    public void OpenCharacterSetupNewWindow()
+    {
+        if (_setupWindow != null && _setupWindow.IsOpen)
+        {
+            _setupWindow.MoveToFront();
+            return;
+        }
+
+        var profileEditor = new HumanoidProfileEditor(
+            _preferencesManager,
+            _configurationManager,
+            EntityManager,
+            _dialogManager,
+            LogManager,
+            _playerManager,
+            _prototypeManager,
+            _resourceCache,
+            _requirements,
+            _markings,
+            _factory);
+
+        profileEditor.OnOpenGuidebook += _guide.OpenHelp;
+
+        var characterSetup = new CharacterSetupGui(profileEditor);
+
+        characterSetup.CloseButton.OnPressed += _ =>
+        {
+            if (profileEditor.Profile != null && profileEditor.IsDirty)
+                OpenSavePanelForNewWindow(profileEditor, characterSetup);
+            else
+            {
+                _setupWindow?.Close();
+                CleanupNewWindow();
+            }
+        };
+
+        profileEditor.Save += () =>
+        {
+            SaveProfileNew(profileEditor);
+            _setupWindow?.Close();
+            CleanupNewWindow();
+        };
+
+        characterSetup.SelectCharacter += args =>
+        {
+            _preferencesManager.SelectCharacter(args);
+            ReloadCharacterSetup();
+            PreviewPanel?.UpdateCharacterSelector();
+        };
+
+        characterSetup.DeleteCharacter += args =>
+        {
+            _preferencesManager.DeleteCharacter(args);
+
+            if (EditedSlot == args)
+            {
+                ReloadCharacterSetup();
+            }
+            else
+            {
+                characterSetup.ReloadCharacterPickers();
+            }
+
+            PreviewPanel?.UpdateCharacterSelector();
+        };
+
+        _setupWindow = new CharacterSetupWindow(characterSetup);
+        _setupWindow.OnClose += () =>
+        {
+            if (profileEditor.Profile != null && profileEditor.IsDirty)
+                OpenSavePanelForNewWindow(profileEditor, characterSetup);
+            else
+                CleanupNewWindow();
+        };
+
+        _setupWindow.OpenCentered();
+
+        profileEditor.SetProfile(
+            (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter,
+            _preferencesManager.Preferences?.SelectedCharacterIndex);
+
+        characterSetup.ReloadCharacterPickers();
+    }
+
+    private void CloseCharacterSetupNewWindow()
+    {
+        _setupWindow?.Close();
+        CleanupNewWindow();
+    }
+
+    private void CleanupNewWindow()
+    {
+        if (_setupWindow != null)
+        {
+            _setupWindow.Dispose();
+            _setupWindow = null;
+        }
+    }
+
+    private void OpenSavePanelForNewWindow(HumanoidProfileEditor editor, CharacterSetupGui gui)
+    {
+        if (_savePanel is { IsOpen: true })
+            return;
+
+        _savePanel = new CharacterSetupGuiSavePanel();
+
+        _savePanel.SaveButton.OnPressed += _ =>
+        {
+            SaveProfileNew(editor);
+            _savePanel.Close();
+            _setupWindow?.Close();
+            CleanupNewWindow();
+        };
+
+        _savePanel.NoSaveButton.OnPressed += _ =>
+        {
+            _savePanel.Close();
+            _setupWindow?.Close();
+            CleanupNewWindow();
+        };
+
+        _savePanel.CancelButton.OnPressed += _ =>
+        {
+            _savePanel.Close();
+        };
+
+        _savePanel.OpenCentered();
+    }
+
     public void GiveDummyJobClothesLoadout(EntityUid dummy, JobPrototype? jobProto, HumanoidCharacterProfile profile)
     {
         var job = jobProto ?? GetPreferredJob(profile);
@@ -361,13 +504,9 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         }
     }
 
-    /// <summary>
-    /// Gets the highest priority job for the profile.
-    /// </summary>
     public JobPrototype GetPreferredJob(HumanoidCharacterProfile profile)
     {
         var highPriorityJob = profile.JobPriorities.FirstOrDefault(p => p.Value == JobPriority.High).Key;
-        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract (what is resharper smoking?)
         return _prototypeManager.Index<JobPrototype>(highPriorityJob.Id ?? SharedGameTicker.FallbackOverflowJob);
     }
 
@@ -387,18 +526,14 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             }
         }
 
-        _spawn.ApplyLoadoutExtras(uid, roleLoadout);    // ADT SAI Custom
+        _spawn.ApplyLoadoutExtras(uid, roleLoadout);
     }
 
-    /// <summary>
-    /// Applies the specified job's clothes to the dummy.
-    /// </summary>
     public void GiveDummyJobClothes(EntityUid dummy, HumanoidCharacterProfile profile, JobPrototype job)
     {
         if (!_inventory.TryGetSlots(dummy, out var slots))
             return;
 
-        // Apply loadout
         if (profile.Loadouts.TryGetValue(job.ID, out var jobLoadout))
         {
             foreach (var loadouts in jobLoadout.SelectedLoadouts.Values)
@@ -408,10 +543,8 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                     if (!_prototypeManager.Resolve(loadout.Prototype, out var loadoutProto))
                         continue;
 
-                    // TODO: Need some way to apply starting gear to an entity and replace existing stuff coz holy fucking shit dude.
                     foreach (var slot in slots)
                     {
-                        // Try startinggear first
                         if (_prototypeManager.Resolve(loadoutProto.StartingGear, out var loadoutGear))
                         {
                             var itemType = ((IEquipmentLoadout) loadoutGear).GetGear(slot.Name);
@@ -467,9 +600,6 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         }
     }
 
-    /// <summary>
-    /// Loads the profile onto a dummy entity.
-    /// </summary>
     public EntityUid LoadProfileEntity(HumanoidCharacterProfile? humanoid, JobPrototype? job, bool jobClothes)
     {
         EntityUid dummyEnt;
@@ -484,18 +614,14 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         if (previewEntity != null)
         {
-            // Special type like borg or AI, do not spawn a human just spawn the entity.
             dummyEnt = EntityManager.SpawnEntity(previewEntity, MapCoordinates.Nullspace);
 
-            // ADT SAI Custom start
-            // Applying loadout extras to dummy
             if (_prototypeManager.HasIndex<RoleLoadoutPrototype>(LoadoutSystem.GetJobPrototype(job?.ID)))
             {
                 var loadout = humanoid?.GetLoadoutOrDefault(LoadoutSystem.GetJobPrototype(job?.ID), _playerManager.LocalSession, humanoid.Species, EntityManager, _prototypeManager);
                 if (loadout != null)
                     _spawn.ApplyLoadoutExtras(dummyEnt, loadout);
             }
-            // ADT SAI Custom end
 
             return dummyEnt;
         }
@@ -526,6 +652,4 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         return dummyEnt;
     }
-
-    #endregion
 }

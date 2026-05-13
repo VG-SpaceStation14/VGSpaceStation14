@@ -5,6 +5,7 @@ using Content.Client.UserInterface.Controls;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Utility;
 using static Content.Client.Stylesheets.StylesheetHelpers;
 
 namespace Content.Client.Stylesheets.Sheetlets;
@@ -17,26 +18,26 @@ public sealed class MonotoneButtonSheetlet<T> : Sheetlet<T> where T : IButtonCon
         // Monotone (unfilled)
         var monotoneButton = new StyleBoxTexture
         {
-            Texture = sheet.GetTextureOr(sheet.MonotoneBaseButtonPath, NanotrasenStylesheet.TextureRoot)
+            Texture = sheet.GetTextureOr(new ResPath("/Textures/Interface/Nano/Monotone/monotone_button.svg.96dpi.png"), NanotrasenStylesheet.TextureRoot)
         };
-        monotoneButton.SetPatchMargin(StyleBox.Margin.All, 11);
+        monotoneButton.SetPatchMargin(StyleBox.Margin.All, 5);
         monotoneButton.SetPadding(StyleBox.Margin.All, 1);
         monotoneButton.SetContentMarginOverride(StyleBox.Margin.Vertical, 2);
         monotoneButton.SetContentMarginOverride(StyleBox.Margin.Horizontal, 14);
 
         var monotoneButtonOpenLeft = new StyleBoxTexture(monotoneButton)
         {
-            Texture = sheet.GetTextureOr(sheet.MonotoneOpenLeftButtonPath, NanotrasenStylesheet.TextureRoot)
+            Texture = sheet.GetTextureOr(new ResPath("/Textures/Interface/Nano/Monotone/monotone_button_open_left.svg.96dpi.png"), NanotrasenStylesheet.TextureRoot)
         };
 
         var monotoneButtonOpenRight = new StyleBoxTexture(monotoneButton)
         {
-            Texture = sheet.GetTextureOr(sheet.MonotoneOpenRightButtonPath, NanotrasenStylesheet.TextureRoot)
+            Texture = sheet.GetTextureOr(new ResPath("/Textures/Interface/Nano/Monotone/monotone_button_open_right.svg.96dpi.png"), NanotrasenStylesheet.TextureRoot)
         };
 
         var monotoneButtonOpenBoth = new StyleBoxTexture(monotoneButton)
         {
-            Texture = sheet.GetTextureOr(sheet.MonotoneOpenBothButtonPath, NanotrasenStylesheet.TextureRoot)
+            Texture = sheet.GetTextureOr(new ResPath("/Textures/Interface/Nano/Monotone/monotone_button_open_both.svg.96dpi.png"), NanotrasenStylesheet.TextureRoot)
         };
 
         // Monotone (filled)
@@ -63,7 +64,6 @@ public sealed class MonotoneButtonSheetlet<T> : Sheetlet<T> where T : IButtonCon
             Texture = new AtlasTexture(buttonTex, UIBox2.FromDimensions(new Vector2(10, 0), new Vector2(3, 24))),
         };
         monotoneFilledButtonOpenBoth.SetPatchMargin(StyleBox.Margin.Horizontal, 0);
-
 
         return
         [

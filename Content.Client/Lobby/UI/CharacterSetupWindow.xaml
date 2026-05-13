@@ -1,0 +1,8 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               x:Class="Content.Client.Lobby.UI.CharacterSetupWindow"
+               Title="{Loc 'character-setup-gui-character-setup-label'}"
+               MinSize="1400 820"
+               Resizable="True">
+    <!-- Всё добавляется в коде -->
+</DefaultWindow>

@@ -15,13 +15,14 @@ namespace Content.Client.Lobby.UI
         [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
         [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
         [Dependency] private readonly IGameTiming _gameTiming = default!;
-        
         [Dependency] private readonly SponsorsManager _sponsorsManager = default!;
+
         private float _updateTimer;
         private static readonly Color ColorNonSponsor = Color.FromHex("#272727");
         private SponsorInfoWindow? _sponsorWindow;
         private LobbyGuiState _currentState = LobbyGuiState.Default;
 
+        // Animation fields
         private bool _animating = false;
         private float _animStartTime;
         private float _animDuration = 0.3f;
@@ -42,8 +43,8 @@ namespace Content.Client.Lobby.UI
 
             LeaveButton.OnPressed += _ => _consoleHost.ExecuteCommand("disconnect");
             OptionsButton.OnPressed += _ => UserInterfaceManager.GetUIController<OptionsUIController>().ToggleWindow();
-            
-            HideInterface.OnPressed += _ => 
+
+            HideInterface.OnPressed += _ =>
             {
                 if (_currentState == LobbyGuiState.ScreenSaver)
                     SwitchState(LobbyGuiState.Default);
@@ -53,14 +54,13 @@ namespace Content.Client.Lobby.UI
 
             CollapseButton.OnPressed += _ => TogglePanel(false);
             ExpandButton.OnPressed += _ => TogglePanel(true);
-            
-            CharacterSetup.OnPressed += _ => 
+
+            CharacterSetup.OnPressed += _ =>
             {
                 if (ReadyButton.Pressed)
-                {
                     _consoleHost.ExecuteCommand("toggleready False");
-                }
-                SwitchState(LobbyGuiState.CharacterSetup);
+
+                UserInterfaceManager.GetUIController<LobbyUIController>().OpenCharacterSetup();
             };
 
             if (SponsorInfoButton != null)
@@ -78,6 +78,7 @@ namespace Content.Client.Lobby.UI
                 _sponsorWindow = null;
                 return;
             }
+
             _sponsorWindow = _uiManager.CreateWindow<SponsorInfoWindow>();
             _sponsorWindow.OnClose += () => _sponsorWindow = null;
             _sponsorWindow.OpenCentered();
@@ -100,6 +101,7 @@ namespace Content.Client.Lobby.UI
                 UpdateSponsorButton();
             }
 
+            // Animation update
             if (_animating)
             {
                 float elapsed = (float)(_gameTiming.CurTime.TotalSeconds - _animStartTime);
@@ -132,13 +134,14 @@ namespace Content.Client.Lobby.UI
             if (SponsorInfoButton == null) return;
 
             var hasSponsor = _sponsorsManager.TryGetInfo(out var sponsorInfo);
+
             if (hasSponsor && sponsorInfo != null)
             {
                 if (!string.IsNullOrEmpty(sponsorInfo.OOCColor))
                     SponsorInfoButton.ModulateSelfOverride = Color.FromHex(sponsorInfo.OOCColor);
                 else
                     SponsorInfoButton.ModulateSelfOverride = Color.White;
-                
+
                 var tierValue = sponsorInfo.Tier ?? 0;
                 SponsorInfoButton.Text = Loc.GetString("ui-lobby-sponsor-button-level", ("sponsorTier", tierValue));
             }
@@ -155,6 +158,7 @@ namespace Content.Client.Lobby.UI
             if (_currentState == state && !_animating)
                 return;
 
+            // Если сейчас анимация, прерываем её мгновенным завершением предыдущей
             if (_animating)
             {
                 MenuControls.Margin = _menuTargetMargin;
@@ -165,6 +169,7 @@ namespace Content.Client.Lobby.UI
                 _animating = false;
             }
 
+            // Мгновенный переход для CharacterSetup
             if (state == LobbyGuiState.CharacterSetup)
             {
                 _currentState = state;
@@ -172,6 +177,7 @@ namespace Content.Client.Lobby.UI
                 return;
             }
 
+            // Анимация только для переходов Default ↔ ScreenSaver
             bool fromDefaultToSaver = (_currentState == LobbyGuiState.Default && state == LobbyGuiState.ScreenSaver);
             bool fromSaverToDefault = (_currentState == LobbyGuiState.ScreenSaver && state == LobbyGuiState.Default);
 
@@ -181,6 +187,7 @@ namespace Content.Client.Lobby.UI
                 _animating = true;
                 _animStartTime = (float)_gameTiming.CurTime.TotalSeconds;
 
+                // Гарантируем видимость для получения размеров
                 MenuControls.Visible = true;
                 ChatContainer.Visible = true;
                 MusicContainer.Visible = true;
@@ -199,7 +206,7 @@ namespace Content.Client.Lobby.UI
                     _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, -chatWidth, _chatStartMargin.Bottom);
                     _musicTargetMargin = new Thickness(-musicWidth, _musicStartMargin.Top, _musicStartMargin.Right, _musicStartMargin.Bottom);
                 }
-                else
+                else // Default
                 {
                     _menuTargetMargin = new Thickness(25, _menuStartMargin.Top, _menuStartMargin.Right, _menuStartMargin.Bottom);
                     _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, 25, _chatStartMargin.Bottom);
@@ -208,6 +215,7 @@ namespace Content.Client.Lobby.UI
             }
             else
             {
+                // Любой другой переход – мгновенно (например, из CharacterSetup в Default)
                 _currentState = state;
                 ApplyFinalState();
             }
@@ -224,11 +232,12 @@ namespace Content.Client.Lobby.UI
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
                     RightSide.Visible = true;
+                    // Восстанавливаем исходные отступы
                     MenuControls.Margin = new Thickness(25, MenuControls.Margin.Top, MenuControls.Margin.Right, 45);
                     ChatContainer.Margin = new Thickness(ChatContainer.Margin.Left, 68, 25, 25);
                     MusicContainer.Margin = new Thickness(25, 15, MusicContainer.Margin.Right, MusicContainer.Margin.Bottom);
                     break;
-                    
+
                 case LobbyGuiState.CharacterSetup:
                     CharacterSetupState.Visible = true;
                     MainContainer.Visible = false;

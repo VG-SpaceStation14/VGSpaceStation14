@@ -2,8 +2,8 @@
     xmlns="https://spacestation14.io"
     xmlns:controls="clr-namespace:Content.Client.ADT.MiningShop"
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
-    MinSize="520 615"
-    SetSize="520 615"
+    MinSize="575 615"
+    SetSize="575 615"
     Resizable="True">
     <BoxContainer Orientation="Vertical" SeparationOverride="4" Margin="8">
         
