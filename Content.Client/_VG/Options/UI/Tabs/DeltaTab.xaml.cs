@@ -25,6 +25,10 @@ public sealed partial class DeltaTab : Control
         DisableBloomCheckBox.OnToggled += OnCheckBoxToggled;
         DisableBloomCheckBox.Pressed = _cfg.GetCVar(VGCCVars.NoBloomPostProcessing);
 
+        // New character window
+        NewCharacterWindowCheckBox.OnToggled += OnCheckBoxToggled;
+        NewCharacterWindowCheckBox.Pressed = _cfg.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
+
         ApplyButton.OnPressed += OnApplyButtonPressed;
         UpdateApplyButton();
     }
@@ -38,6 +42,7 @@ public sealed partial class DeltaTab : Control
     {
         _cfg.SetCVar(VGCCVars.NoVisionFilters, DisableFiltersCheckBox.Pressed);
         _cfg.SetCVar(VGCCVars.NoBloomPostProcessing, DisableBloomCheckBox.Pressed);
+        _cfg.SetCVar(VGCCVars.CharacterSetupNewWindowEnabled, NewCharacterWindowCheckBox.Pressed);
 
         _cfg.SaveToFile();
         UpdateApplyButton();
@@ -47,7 +52,8 @@ public sealed partial class DeltaTab : Control
     {
         var isNoVisionFiltersSame = DisableFiltersCheckBox.Pressed == _cfg.GetCVar(VGCCVars.NoVisionFilters);
         var isNoBloomSame = DisableBloomCheckBox.Pressed == _cfg.GetCVar(VGCCVars.NoBloomPostProcessing);
+        var isNewCharWindowSame = NewCharacterWindowCheckBox.Pressed == _cfg.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
 
-        ApplyButton.Disabled = isNoVisionFiltersSame && isNoBloomSame;
+        ApplyButton.Disabled = isNoVisionFiltersSame && isNoBloomSame && isNewCharWindowSame;
     }
 }

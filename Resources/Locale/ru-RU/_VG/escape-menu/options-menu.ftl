@@ -3,3 +3,5 @@ ui-options-general-forknotice = Примечание: Эти настройки 
 
 ui-options-no-filters = Отключить фильтр зрения видов
 ui-options-no-bloom = Отключить эффекты свячения
+
+ui-options-new-character-window = Новое окно создания персонажа

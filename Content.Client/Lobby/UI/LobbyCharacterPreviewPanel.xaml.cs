@@ -444,6 +444,8 @@ public sealed partial class LobbyCharacterPreviewPanel : Control
         if (slot < 0) return;
         _preferencesManager.SelectCharacter(slot);
         UpdateCharacterSelector();
+
+        _controller.UpdateOpenCharacterSetupWindow(); // VG-Tweak
     }
 
     private void CleanupLeftDummy()

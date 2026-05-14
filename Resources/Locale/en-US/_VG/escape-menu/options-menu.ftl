@@ -3,3 +3,5 @@ ui-options-general-forknotice = Note: These settings are fork-specific and might
 
 ui-options-no-filters = Disable species vision filters
 ui-options-no-bloom = Disable bloom
+
+ui-options-new-character-window = New character creation window

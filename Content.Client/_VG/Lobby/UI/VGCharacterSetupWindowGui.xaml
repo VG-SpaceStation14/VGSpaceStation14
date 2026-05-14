@@ -1,0 +1,67 @@
+<Control xmlns="https://spacestation14.io"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+         x:Class="Content.Client._VG.Lobby.UI.VGCharacterSetupWindowGui"
+         VerticalExpand="True">
+    <BoxContainer Orientation="Horizontal" SeparationOverride="12" Margin="8" VerticalExpand="True">
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <BoxContainer Orientation="Vertical" SeparationOverride="8" MinSize="240 0">
+            <!-- Тёмная панель имени -->
+            <PanelContainer StyleClasses="BackgroundDark">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1A1A1A"
+                                           ContentMarginLeftOverride="6"
+                                           ContentMarginTopOverride="6"
+                                           ContentMarginRightOverride="6"
+                                           ContentMarginBottomOverride="6" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical">
+                    <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+                        <Label Text="{Loc 'humanoid-profile-editor-name-label'}" VerticalAlignment="Center" />
+                        <LineEdit Name="NameEdit" HorizontalExpand="True" VerticalAlignment="Center" Margin="5 0 0 0" />
+                    </BoxContainer>
+                    <BoxContainer Orientation="Horizontal" Margin="0 4">
+                        <Button Name="NameRandomize" Text="{Loc 'humanoid-profile-editor-name-random-button'}" HorizontalExpand="True" />
+                    </BoxContainer>
+                    <RichTextLabel Name="WarningLabel" MaxWidth="425" Margin="0 4" />
+                    <Button Name="RandomizeEverythingButton" HorizontalExpand="True"
+                            Text="{Loc 'humanoid-profile-editor-randomize-everything-button'}" />
+                </BoxContainer>
+            </PanelContainer>
+            <!-- Превью -->
+            <PanelContainer Name="PreviewPanel" MinSize="220 340" StyleClasses="AngleRect">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#000000"
+                                           BorderColor="#FFFFFF"
+                                           BorderThickness="3"
+                                           ContentMarginLeftOverride="4"
+                                           ContentMarginTopOverride="4"
+                                           ContentMarginRightOverride="4"
+                                           ContentMarginBottomOverride="4" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <SpriteView Name="PreviewSprite" Scale="5 5" OverrideDirection="South"
+                                HorizontalAlignment="Center" SetSize="180 180" />
+                    <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5">
+                        <Button Name="RotateLeft" Text="◀" StyleClasses="OpenRight" />
+                        <Button Name="RotateRight" Text="▶" StyleClasses="OpenLeft" />
+                    </BoxContainer>
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <BoxContainer Orientation="Vertical" SeparationOverride="8" HorizontalExpand="True" VerticalExpand="True">
+            <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                <Button Name="SaveButton" Text="Сохранить" StyleClasses="ButtonBig" />
+                <Button Name="ResetButton" Text="Сброс" StyleClasses="ButtonBig" />
+                <Button Name="ImportButton" Text="Импорт" StyleClasses="ButtonBig" />
+                <Button Name="ExportButton" Text="Экспорт" StyleClasses="ButtonBig" />
+                <Control HorizontalExpand="True" />
+                <Button Name="CreateCharacterButton" Text="+" MinSize="32 0" StyleClasses="OpenRight" />
+                <OptionButton Name="CharacterSelector" MinSize="160 0" StyleClasses="OpenBoth" />
+                <Button Name="DeleteCharacterButton" Text="×" MinSize="32 0" StyleClasses="OpenLeft" />
+            </BoxContainer>
+            <Control Name="EditorContainer" HorizontalExpand="True" VerticalExpand="True" />
+        </BoxContainer>
+    </BoxContainer>
+</Control>

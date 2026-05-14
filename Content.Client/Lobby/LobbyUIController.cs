@@ -17,7 +17,7 @@ using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
 using Content.Shared.Silicons.StationAi;
 using Content.Shared.Traits;
-using Content.Shared._VG;
+using Content.Shared._VG; // VG-Tweak
 using Robust.Client.GameObjects;
 using Robust.Client.Player;
 using Robust.Client.ResourceManagement;
@@ -28,6 +28,7 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using VGLobby = Content.Client._VG.Lobby.UI; // VG-Tweak
 
 namespace Content.Client.Lobby;
 
@@ -52,7 +53,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
     private CharacterSetupGuiSavePanel? _savePanel;
-    private CharacterSetupWindow? _setupWindow;
+    private VGLobby.VGCharacterSetupWindow? _setupWindow; // VG-Tweak
 
     private LobbyCharacterPreviewPanel? PreviewPanel => GetLobbyPreview();
     private HumanoidCharacterProfile? EditedProfile => _profileEditor?.Profile;
@@ -138,9 +139,17 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         PreviewPanel?.SetLoaded(true);
         PreviewPanel?.UpdateCharacterSelector();
 
-        if (_stateManager.CurrentState is not LobbyState)
-            return;
+        // VG-Tweak Start
+        if (_setupWindow is { IsOpen: true } && _setupWindow.Contents.GetChild(0) is VGLobby.VGCharacterSetupWindowGui gui)
+        {
+            gui.UpdateProfileEditor();
+            gui.UpdatePreview();
+            gui.UpdateNameField();
+            gui.ReloadCharacterPickers();
+        }
+        // VG-Tweak End
 
+        if (_stateManager.CurrentState is not LobbyState) return;
         ReloadCharacterSetup();
     }
 
@@ -153,7 +162,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     public void OnStateExited(LobbyState state)
     {
         PreviewPanel?.SetLoaded(false);
-        CleanupNewWindow();
+        CleanupNewWindow(); // VG-Tweak
         CloseCharacterSetupOld();
         _profileEditor?.Dispose();
         _characterSetup?.Dispose();
@@ -171,6 +180,16 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                 _preferencesManager.Preferences?.SelectedCharacterIndex);
         }
         _characterSetup?.ReloadCharacterPickers();
+
+        // VG-Tweak Start: Обновление открытого окна при переключении извне
+        if (_setupWindow is { IsOpen: true } && _setupWindow.Contents.GetChild(0) is VGLobby.VGCharacterSetupWindowGui gui)
+        {
+            gui.UpdateProfileEditor();
+            gui.UpdatePreview();
+            gui.UpdateNameField();
+            gui.ReloadCharacterPickers();
+        }
+        // VG-Tweak End
     }
 
     private void RefreshLobbyPreview()
@@ -217,6 +236,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         ReloadCharacterSetup();
     }
 
+    // VG-Tweak Start
     private void SaveProfileNew(HumanoidProfileEditor editor)
     {
         if (editor.Profile == null || editor.CharacterSlot == null)
@@ -225,7 +245,9 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         _preferencesManager.UpdateCharacter(editor.Profile, editor.CharacterSlot.Value);
         ReloadCharacterSetup();
     }
+    // VG-Tweak End
 
+    // VG-Tweak Start
     public void OpenCharacterSetup()
     {
         bool newWindowEnabled = _configurationManager.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
@@ -234,6 +256,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         else
             OpenCharacterSetupOld();
     }
+    // VG-Tweak End
 
     private void OpenCharacterSetupOld()
     {
@@ -363,6 +386,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         _savePanel.OpenCentered();
     }
 
+    // VG-Tweak Start
     public void OpenCharacterSetupNewWindow()
     {
         if (_setupWindow != null && _setupWindow.IsOpen)
@@ -386,17 +410,19 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         profileEditor.OnOpenGuidebook += _guide.OpenHelp;
 
-        var characterSetup = new CharacterSetupGui(profileEditor);
+        var windowGui = new VGLobby.VGCharacterSetupWindowGui(profileEditor);
 
-        characterSetup.CloseButton.OnPressed += _ =>
+        windowGui.SelectCharacter += args =>
         {
-            if (profileEditor.Profile != null && profileEditor.IsDirty)
-                OpenSavePanelForNewWindow(profileEditor, characterSetup);
-            else
-            {
-                _setupWindow?.Close();
-                CleanupNewWindow();
-            }
+            _preferencesManager.SelectCharacter(args);
+            ReloadCharacterSetup();
+            PreviewPanel?.UpdateCharacterSelector();
+        };
+
+        windowGui.DeleteCharacter += args =>
+        {
+            _preferencesManager.DeleteCharacter(args);
+            PreviewPanel?.UpdateCharacterSelector();
         };
 
         profileEditor.Save += () =>
@@ -406,36 +432,20 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             CleanupNewWindow();
         };
 
-        characterSetup.SelectCharacter += args =>
-        {
-            _preferencesManager.SelectCharacter(args);
-            ReloadCharacterSetup();
-            PreviewPanel?.UpdateCharacterSelector();
-        };
+        _setupWindow = new VGLobby.VGCharacterSetupWindow(windowGui);
 
-        characterSetup.DeleteCharacter += args =>
-        {
-            _preferencesManager.DeleteCharacter(args);
-
-            if (EditedSlot == args)
-            {
-                ReloadCharacterSetup();
-            }
-            else
-            {
-                characterSetup.ReloadCharacterPickers();
-            }
-
-            PreviewPanel?.UpdateCharacterSelector();
-        };
-
-        _setupWindow = new CharacterSetupWindow(characterSetup);
-        _setupWindow.OnClose += () =>
+        _setupWindow.ClosingRequested += args =>
         {
             if (profileEditor.Profile != null && profileEditor.IsDirty)
-                OpenSavePanelForNewWindow(profileEditor, characterSetup);
-            else
-                CleanupNewWindow();
+            {
+                args.Cancel = true;
+                OpenSavePanelForNewWindow(profileEditor, windowGui);
+            }
+        };
+
+        _setupWindow.OnClose += () =>
+        {
+            CleanupNewWindow();
         };
 
         _setupWindow.OpenCentered();
@@ -444,7 +454,9 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter,
             _preferencesManager.Preferences?.SelectedCharacterIndex);
 
-        characterSetup.ReloadCharacterPickers();
+        windowGui.UpdatePreview();
+        windowGui.UpdateNameField();
+        windowGui.ReloadCharacterPickers();
     }
 
     private void CloseCharacterSetupNewWindow()
@@ -462,10 +474,9 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         }
     }
 
-    private void OpenSavePanelForNewWindow(HumanoidProfileEditor editor, CharacterSetupGui gui)
+    private void OpenSavePanelForNewWindow(HumanoidProfileEditor editor, VGLobby.VGCharacterSetupWindowGui gui)
     {
-        if (_savePanel is { IsOpen: true })
-            return;
+        if (_savePanel is { IsOpen: true }) return;
 
         _savePanel = new CharacterSetupGuiSavePanel();
 
@@ -479,6 +490,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         _savePanel.NoSaveButton.OnPressed += _ =>
         {
+            editor.ResetToDefault();
             _savePanel.Close();
             _setupWindow?.Close();
             CleanupNewWindow();
@@ -491,6 +503,21 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
 
         _savePanel.OpenCentered();
     }
+
+    /// <summary>
+    /// Обновляет открытое окно создания персонажа (если оно есть) при смене выбранного персонажа извне.
+    /// </summary>
+    public void UpdateOpenCharacterSetupWindow()
+    {
+        if (_setupWindow is { IsOpen: true } && _setupWindow.Contents.GetChild(0) is VGLobby.VGCharacterSetupWindowGui gui)
+        {
+            gui.UpdateProfileEditor();
+            gui.UpdatePreview();
+            gui.UpdateNameField();
+            gui.ReloadCharacterPickers();
+        }
+    }
+    // VG-Tweak End
 
     public void GiveDummyJobClothesLoadout(EntityUid dummy, JobPrototype? jobProto, HumanoidCharacterProfile profile)
     {
