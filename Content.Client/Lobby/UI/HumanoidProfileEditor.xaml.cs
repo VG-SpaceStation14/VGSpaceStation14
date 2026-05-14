@@ -91,6 +91,8 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public event Action? Save;
 
+        public event Action? ProfileChanged; // VG-Tweak
+
         /// <summary>
         /// Entity used for the profile editor preview
         /// </summary>
@@ -905,6 +907,7 @@ namespace Content.Client.Lobby.UI
 
             // TODO: Check if profile matches default.
             IsDirty = true;
+            ProfileChanged?.Invoke(); // VG-Tweak
         }
 
         /// <summary>
@@ -1545,6 +1548,16 @@ namespace Content.Client.Lobby.UI
             Profile = Profile?.WithSpawnPriorityPreference(newSpawnPriority);
             SetDirty();
         }
+
+        // VG-Tweak Start
+        public void SetPdaWallpaperPath(string? path)
+        {
+            if (Profile == null)
+                return;
+            Profile = Profile.WithPdaWallpaperPath(path);
+            SetDirty();
+        }
+        // VG-Tweak End
 
         public bool IsDirty
         {

@@ -442,10 +442,9 @@ public sealed partial class LobbyCharacterPreviewPanel : Control
     private void OnCharacterButtonPressed(int slot)
     {
         if (slot < 0) return;
-        _preferencesManager.SelectCharacter(slot);
-        UpdateCharacterSelector();
 
-        _controller.UpdateOpenCharacterSetupWindow(); // VG-Tweak
+        // VG-Tweak
+        _controller.RequestCharacterSwitch(slot);
     }
 
     private void CleanupLeftDummy()

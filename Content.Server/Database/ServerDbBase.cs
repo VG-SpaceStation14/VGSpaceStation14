@@ -313,8 +313,9 @@ namespace Content.Server.Database
                 new BarkData(profile.BarkProto, profile.BarkPitch, profile.LowBarkVar, profile.HighBarkVar),
                 languages.ToHashSet(),
                 profile.OOCNotes,
-                profile.HeadshotUrl
+                profile.HeadshotUrl,
                 // ADT end
+                profile.PdaWallpaperPath // VG-Tweak
             );
         }
 
@@ -417,6 +418,7 @@ namespace Content.Server.Database
             profile.OOCNotes = humanoid.OOCNotes;
             profile.HeadshotUrl = humanoid.HeadshotUrl;
             // ADT end
+            profile.PdaWallpaperPath = humanoid.PdaWallpaperPath; // VG-Tweak
 
             return profile;
         }

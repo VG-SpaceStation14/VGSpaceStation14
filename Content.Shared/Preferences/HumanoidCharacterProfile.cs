@@ -131,6 +131,11 @@ namespace Content.Shared.Preferences
         [DataField]
         private HashSet<ProtoId<LanguagePrototype>> _languages = new();
 
+        // VG-Tweak Start
+        [DataField]
+        public string? PdaWallpaperPath { get; set; }
+        // VG-Tweak End
+
         public IReadOnlySet<ProtoId<LanguagePrototype>> Languages => _languages;
         // ADT Languages end
 
@@ -174,7 +179,8 @@ namespace Content.Shared.Preferences
             BarkData bark,
             HashSet<ProtoId<LanguagePrototype>> languages,
             string oocNotes,
-            string headshotUrl
+            string headshotUrl,
+            string? pdaWallpaperPath // VG-Tweak
             )
             //ADT-tweak-end
         {
@@ -198,6 +204,7 @@ namespace Content.Shared.Preferences
             OOCNotes = oocNotes;
             HeadshotUrl = headshotUrl;
             // ADT end
+            PdaWallpaperPath = pdaWallpaperPath; // VG-Tweak
 
             var hasHighPrority = false;
             foreach (var (key, value) in _jobPriorities)
@@ -234,7 +241,8 @@ namespace Content.Shared.Preferences
                 other.Bark,
                 other._languages,
                 other.OOCNotes,
-                other.HeadshotUrl
+                other.HeadshotUrl,
+                other.PdaWallpaperPath // VG-Tweak
                 )
                 // ADT end
         {
@@ -352,6 +360,12 @@ namespace Content.Shared.Preferences
             return new(this) { HeadshotUrl = headshotUrl };
         }
         //ADT-tweak-end
+        // VG-Tweak Start
+        public HumanoidCharacterProfile WithPdaWallpaperPath(string? path)
+        {
+            return new(this) { PdaWallpaperPath = path };
+        }
+        // VG-Tweak End
         public HumanoidCharacterProfile WithAge(int age)
         {
             return new(this) { Age = age };
@@ -595,6 +609,7 @@ namespace Content.Shared.Preferences
             if (HeadshotUrl != other.HeadshotUrl) return false;
             if (!Bark.MemberwiseEquals(other.Bark)) return false;
             // ADT-tweak-end
+            if (PdaWallpaperPath != other.PdaWallpaperPath) return false; // VG-Tweak
             return Appearance.MemberwiseEquals(other.Appearance);
         }
 
@@ -931,6 +946,7 @@ namespace Content.Shared.Preferences
             hashCode.Add(OOCNotes);
             hashCode.Add(HeadshotUrl);
             //ADT-tweak-end
+            hashCode.Add(PdaWallpaperPath); // VG-Tweak
             hashCode.Add(FlavorText);
             hashCode.Add(Species);
             hashCode.Add(Age);

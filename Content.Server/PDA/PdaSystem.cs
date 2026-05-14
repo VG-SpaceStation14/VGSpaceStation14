@@ -22,6 +22,12 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
+using Robust.Shared.GameObjects;
+using Content.Shared.Preferences;
+using Content.Server.Preferences;
+using Content.Server.Preferences.Managers;
+using Content.Shared.Inventory.Events;
+using Robust.Shared.Timing;
 
 namespace Content.Server.PDA
 {
@@ -37,6 +43,9 @@ namespace Content.Server.PDA
         [Dependency] private readonly UnpoweredFlashlightSystem _unpoweredFlashlight = default!;
         [Dependency] private readonly ContainerSystem _containerSystem = default!;
         [Dependency] private readonly IdCardSystem _idCard = default!;
+        // VG-Tweak Start
+        [Dependency] private readonly IServerPreferencesManager _prefsManager = default!;
+        // VG-Tweak End
 
         public override void Initialize()
         {
@@ -58,12 +67,46 @@ namespace Content.Server.PDA
 
             SubscribeLocalEvent<PdaComponent, CartridgeLoaderNotificationSentEvent>(OnNotification);
 
+            SubscribeLocalEvent<PdaComponent, MapInitEvent>(OnPdaMapInit); // VG-Tweak
+
             SubscribeLocalEvent<StationRenamedEvent>(OnStationRenamed);
             SubscribeLocalEvent<EntityRenamedEvent>(OnEntityRenamed, after: new[] { typeof(IdCardSystem) });
             SubscribeLocalEvent<AlertLevelChangedEvent>(OnAlertLevelChanged);
             SubscribeLocalEvent<PdaComponent, InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent>>(ChameleonControllerOutfitItemSelected);
             SubscribeLocalEvent<PdaComponent, PdaSetWallpaperMessage>(OnUiMessage);
         }
+
+        // VG-Tweak Start
+        private void OnPdaMapInit(EntityUid uid, PdaComponent pda, MapInitEvent args)
+        {
+            // Запускаем таймер с небольшой задержкой, чтобы контейнер точно был готов
+            Timer.Spawn(TimeSpan.FromMilliseconds(500), () =>
+            {
+                // Проверяем, что PDA всё ещё существует и не удалено
+                if (!EntityManager.EntityExists(uid))
+                    return;
+
+                // Ищем контейнер, в котором лежит PDA (обычно слот игрока)
+                if (!_containerSystem.TryGetContainingContainer(uid, out var container))
+                    return;
+
+                if (!TryComp(container.Owner, out ActorComponent? actor))
+                    return;
+
+                var prefs = _prefsManager.GetPreferences(actor.PlayerSession.UserId);
+                var selectedIndex = prefs.SelectedCharacterIndex;
+                if (prefs.Characters.TryGetValue(selectedIndex, out var profile) && profile is HumanoidCharacterProfile humanoid)
+                {
+                    if (!string.IsNullOrEmpty(humanoid.PdaWallpaperPath))
+                    {
+                        pda.WallpaperPath = humanoid.PdaWallpaperPath;
+                        Dirty(uid, pda);
+                        UpdatePdaUi(uid, pda);
+                    }
+                }
+            });
+        }
+        // VG-Tweak End
 
         private void ChameleonControllerOutfitItemSelected(Entity<PdaComponent> ent, ref InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent> args)
         {

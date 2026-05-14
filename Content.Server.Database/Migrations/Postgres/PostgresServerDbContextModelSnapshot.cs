@@ -1008,6 +1008,10 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("text")
                         .HasColumnName("headshot_url");
 
+                    b.Property<string>("PdaWallpaperPath")
+                        .HasColumnType("text")
+                        .HasColumnName("pda_wallpaper_path");
+
                     b.Property<float>("HighBarkVar")
                         .HasColumnType("real")
                         .HasColumnName("high_bark_var");

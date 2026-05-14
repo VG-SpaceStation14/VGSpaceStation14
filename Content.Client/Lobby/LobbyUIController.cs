@@ -54,6 +54,8 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     private HumanoidProfileEditor? _profileEditor;
     private CharacterSetupGuiSavePanel? _savePanel;
     private VGLobby.VGCharacterSetupWindow? _setupWindow; // VG-Tweak
+    private bool _savePanelRequested; // VG-Tweak
+    private int? _pendingSelectSlot; // VG-Tweak
 
     private LobbyCharacterPreviewPanel? PreviewPanel => GetLobbyPreview();
     private HumanoidCharacterProfile? EditedProfile => _profileEditor?.Profile;
@@ -243,6 +245,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             return;
 
         _preferencesManager.UpdateCharacter(editor.Profile, editor.CharacterSlot.Value);
+        editor.IsDirty = false;
         ReloadCharacterSetup();
     }
     // VG-Tweak End
@@ -428,8 +431,13 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         profileEditor.Save += () =>
         {
             SaveProfileNew(profileEditor);
-            _setupWindow?.Close();
-            CleanupNewWindow();
+        };
+
+        profileEditor.ProfileChanged += () =>
+        {
+            RefreshLobbyPreview();
+            PreviewPanel?.UpdateCharacterSelector();
+            windowGui.UpdatePreviewInstant();
         };
 
         _setupWindow = new VGLobby.VGCharacterSetupWindow(windowGui);
@@ -457,6 +465,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         windowGui.UpdatePreview();
         windowGui.UpdateNameField();
         windowGui.ReloadCharacterPickers();
+        windowGui.UpdatePdaWallpaperSelection();
     }
 
     private void CloseCharacterSetupNewWindow()
@@ -474,31 +483,85 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         }
     }
 
+    public void RequestCharacterSwitch(int slot)
+    {
+        if (_setupWindow is not { IsOpen: true } ||
+            _setupWindow.Contents.GetChild(0) is not VGLobby.VGCharacterSetupWindowGui gui)
+        {
+            _preferencesManager.SelectCharacter(slot);
+            UpdateOpenCharacterSetupWindow();
+            PreviewPanel?.UpdateCharacterSelector();
+            return;
+        }
+
+        var editor = gui.GetProfileEditor();
+        if (editor == null || !editor.IsDirty)
+        {
+            _preferencesManager.SelectCharacter(slot);
+            UpdateOpenCharacterSetupWindow();
+            PreviewPanel?.UpdateCharacterSelector();
+            return;
+        }
+
+        _pendingSelectSlot = slot;
+        OpenSavePanelForNewWindow(editor, gui);
+    }
+
     private void OpenSavePanelForNewWindow(HumanoidProfileEditor editor, VGLobby.VGCharacterSetupWindowGui gui)
     {
-        if (_savePanel is { IsOpen: true }) return;
+        if (_savePanel is { IsOpen: true } || _savePanelRequested)
+            return;
 
+        _savePanelRequested = true;
         _savePanel = new CharacterSetupGuiSavePanel();
 
         _savePanel.SaveButton.OnPressed += _ =>
         {
             SaveProfileNew(editor);
             _savePanel.Close();
-            _setupWindow?.Close();
-            CleanupNewWindow();
+
+            if (_pendingSelectSlot.HasValue)
+            {
+                var slot = _pendingSelectSlot.Value;
+                _pendingSelectSlot = null;
+                _preferencesManager.SelectCharacter(slot);
+                UpdateOpenCharacterSetupWindow();
+                PreviewPanel?.UpdateCharacterSelector();
+            }
+            else
+            {
+                _setupWindow?.Close();
+                CleanupNewWindow();
+            }
+            _savePanelRequested = false;
         };
 
         _savePanel.NoSaveButton.OnPressed += _ =>
         {
             editor.ResetToDefault();
             _savePanel.Close();
-            _setupWindow?.Close();
-            CleanupNewWindow();
+
+            if (_pendingSelectSlot.HasValue)
+            {
+                var slot = _pendingSelectSlot.Value;
+                _pendingSelectSlot = null;
+                _preferencesManager.SelectCharacter(slot);
+                UpdateOpenCharacterSetupWindow();
+                PreviewPanel?.UpdateCharacterSelector();
+            }
+            else
+            {
+                _setupWindow?.Close();
+                CleanupNewWindow();
+            }
+            _savePanelRequested = false;
         };
 
         _savePanel.CancelButton.OnPressed += _ =>
         {
             _savePanel.Close();
+            _pendingSelectSlot = null;
+            _savePanelRequested = false;
         };
 
         _savePanel.OpenCentered();

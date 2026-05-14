@@ -28,7 +28,34 @@
                             Text="{Loc 'humanoid-profile-editor-randomize-everything-button'}" />
                 </BoxContainer>
             </PanelContainer>
-            <!-- Превью -->
+
+            <!-- Панель кнопок кастомизации (тёмный фон, слева кнопка КПК) -->
+            <PanelContainer StyleClasses="BackgroundDark">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1A1A1A"
+                                           ContentMarginLeftOverride="6"
+                                           ContentMarginTopOverride="4"
+                                           ContentMarginRightOverride="6"
+                                           ContentMarginBottomOverride="4" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Horizontal">
+                    <PanelContainer>
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#2D2D2D"
+                                                   ContentMarginLeftOverride="4"
+                                                   ContentMarginTopOverride="4"
+                                                   ContentMarginRightOverride="4"
+                                                   ContentMarginBottomOverride="4" />
+                        </PanelContainer.PanelOverride>
+                        <TextureButton Name="PdaWallpaperButton"
+                                       SetSize="55 55"
+                                       HorizontalAlignment="Left"
+                                       ToolTip="{Loc 'pda-wallpaper-title'}" />
+                    </PanelContainer>
+                </BoxContainer>
+            </PanelContainer>
+
+            <!-- Превью (чёрная панель, размер не меняется) -->
             <PanelContainer Name="PreviewPanel" MinSize="220 340" StyleClasses="AngleRect">
                 <PanelContainer.PanelOverride>
                     <graphics:StyleBoxFlat BackgroundColor="#000000"
@@ -39,16 +66,44 @@
                                            ContentMarginRightOverride="4"
                                            ContentMarginBottomOverride="4" />
                 </PanelContainer.PanelOverride>
-                <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <SpriteView Name="PreviewSprite" Scale="5 5" OverrideDirection="South"
-                                HorizontalAlignment="Center" SetSize="180 180" />
-                    <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5">
-                        <Button Name="RotateLeft" Text="◀" StyleClasses="OpenRight" />
-                        <Button Name="RotateRight" Text="▶" StyleClasses="OpenLeft" />
+                <BoxContainer Name="PreviewContainer" Orientation="Vertical"
+                              HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Персонаж (по умолчанию) -->
+                    <BoxContainer Name="CharacterPreviewContent" Orientation="Vertical"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <SpriteView Name="PreviewSprite" Scale="5 5" OverrideDirection="South"
+                                    HorizontalAlignment="Center" SetSize="180 180" />
+                        <BoxContainer Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5">
+                            <Button Name="RotateLeft" Text="◀" StyleClasses="OpenRight" />
+                            <Button Name="RotateRight" Text="▶" StyleClasses="OpenLeft" />
+                        </BoxContainer>
                     </BoxContainer>
+                    <!-- Превью КПК (скрыто) -->
+                    <PanelContainer Name="PdaPreviewContent" Visible="False" MinSize="200 280"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#25252a" />
+                        </PanelContainer.PanelOverride>
+                    </PanelContainer>
+                </BoxContainer>
+            </PanelContainer>
+
+            <!-- Панель выбора обоев КПК -->
+            <PanelContainer Name="PdaWallpaperPanel" StyleClasses="BackgroundDark" Visible="False">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1A1A1A"
+                                           ContentMarginLeftOverride="6"
+                                           ContentMarginTopOverride="6"
+                                           ContentMarginRightOverride="6"
+                                           ContentMarginBottomOverride="6" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical">
+                    <Label Text="{Loc 'pda-wallpaper-title'}" Margin="0 0 0 4" />
+                    <OptionButton Name="PdaWallpaperDropdown" MinWidth="200" HorizontalExpand="True" />
                 </BoxContainer>
             </PanelContainer>
         </BoxContainer>
+
         <!-- ПРАВАЯ КОЛОНКА -->
         <BoxContainer Orientation="Vertical" SeparationOverride="8" HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Orientation="Horizontal" SeparationOverride="4">

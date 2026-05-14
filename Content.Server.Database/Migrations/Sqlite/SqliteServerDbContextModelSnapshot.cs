@@ -951,6 +951,10 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("headshot_url");
 
+                    b.Property<string>("PdaWallpaperPath")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("pda_wallpaper_path");
+
                     b.Property<float>("HighBarkVar")
                         .HasColumnType("REAL")
                         .HasColumnName("high_bark_var");
