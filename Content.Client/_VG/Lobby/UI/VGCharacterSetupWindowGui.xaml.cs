@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Content.Client.Lobby;
@@ -47,6 +48,9 @@ namespace Content.Client._VG.Lobby.UI
         private const float FadePdaImageDuration = 0.3f;
         private StyleBox? _oldPdaStyle;
         private StyleBox? _newPdaStyle;
+
+        private List<(string path, TextureButton button, PanelContainer highlight)> _wallpaperButtons = new();
+        private string? _currentWallpaperPath;
 
         public event Action<int>? SelectCharacter;
         public event Action<int>? DeleteCharacter;
@@ -214,31 +218,103 @@ namespace Content.Client._VG.Lobby.UI
 
         private void InitPdaWallpaper()
         {
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-none"));
-            PdaWallpaperDropdown.SetItemMetadata(0, string.Empty);
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-space"));
-            PdaWallpaperDropdown.SetItemMetadata(1, "/Textures/_VG/PDA/Wallpapers/space1.png");
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-space2"));
-            PdaWallpaperDropdown.SetItemMetadata(2, "/Textures/_VG/PDA/Wallpapers/space2.png");
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-blackhole"));
-            PdaWallpaperDropdown.SetItemMetadata(3, "/Textures/_VG/PDA/Wallpapers/blackhole.png");
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-forest"));
-            PdaWallpaperDropdown.SetItemMetadata(4, "/Textures/_VG/PDA/Wallpapers/forest.png");
-            PdaWallpaperDropdown.AddItem(Loc.GetString("pda-wallpaper-smile"));
-            PdaWallpaperDropdown.SetItemMetadata(5, "/Textures/_VG/PDA/Wallpapers/smile.png");
-
-            PdaWallpaperDropdown.OnItemSelected += args =>
+            var wallpapers = new[]
             {
-                PdaWallpaperDropdown.SelectId(args.Id);
-                var path = args.Button.GetItemMetadata(args.Id) as string;
-                _profileEditor.SetPdaWallpaperPath(string.IsNullOrEmpty(path) ? null : path);
-                UpdatePdaPreviewImage(path); // анимация, если панель открыта
+                ("/Textures/_VG/PDA/Wallpapers/space1.png", Loc.GetString("pda-wallpaper-space")),
+            ("/Textures/_VG/PDA/Wallpapers/space2.png", Loc.GetString("pda-wallpaper-space2")),
+                ("/Textures/_VG/PDA/Wallpapers/blackhole.png", Loc.GetString("pda-wallpaper-blackhole")),
+                ("/Textures/_VG/PDA/Wallpapers/forest.png", Loc.GetString("pda-wallpaper-forest")),
+                ("/Textures/_VG/PDA/Wallpapers/smile.png", Loc.GetString("pda-wallpaper-smile")),
             };
+
+            foreach (var (path, name) in wallpapers)
+            {
+                var highlight = new PanelContainer
+                {
+                    SetSize = new Vector2(84, 134),
+                    Margin = new Thickness(0, 0, 4, 0), // отступ справа для визуального разделения
+                    PanelOverride = new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.Transparent,
+                        ContentMarginLeftOverride = 2,
+                        ContentMarginTopOverride = 2,
+                        ContentMarginRightOverride = 2,
+                        ContentMarginBottomOverride = 2
+                    }
+                };
+
+                var textureButton = new TextureButton
+                {
+                    SetSize = new Vector2(95, 130),
+                    ToolTip = name,
+                    HorizontalAlignment = HAlignment.Center,
+                    VerticalAlignment = VAlignment.Center
+                };
+
+                if (_resourceCache.TryGetResource<TextureResource>(new ResPath(path), out var texRes))
+                {
+                    textureButton.TextureNormal = texRes;
+                }
+
+                textureButton.OnPressed += _ =>
+                {
+                    SelectWallpaper(path);
+                };
+
+                highlight.AddChild(textureButton);
+                PdaWallpaperButtons.AddChild(highlight);
+                _wallpaperButtons.Add((path, textureButton, highlight));
+            }
 
             PdaWallpaperButton.OnPressed += _ =>
             {
                 TogglePdaPreview();
             };
+        }
+
+        private void SelectWallpaper(string path)
+        {
+            if (_currentWallpaperPath == path)
+            {
+                _currentWallpaperPath = null;
+            }
+            else
+            {
+                _currentWallpaperPath = path;
+            }
+
+            _profileEditor.SetPdaWallpaperPath(_currentWallpaperPath);
+            UpdatePdaPreviewImage(_currentWallpaperPath, true);
+            UpdateWallpaperButtonHighlight();
+        }
+
+        private void UpdateWallpaperButtonHighlight()
+        {
+            foreach (var (path, _, highlight) in _wallpaperButtons)
+            {
+                if (path == _currentWallpaperPath)
+                {
+                    highlight.PanelOverride = new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.FromHex("#505050"),
+                        ContentMarginLeftOverride = 2,
+                        ContentMarginTopOverride = 2,
+                        ContentMarginRightOverride = 2,
+                        ContentMarginBottomOverride = 2
+                    };
+                }
+                else
+                {
+                    highlight.PanelOverride = new StyleBoxFlat
+                    {
+                        BackgroundColor = Color.Transparent,
+                        ContentMarginLeftOverride = 2,
+                        ContentMarginTopOverride = 2,
+                        ContentMarginRightOverride = 2,
+                        ContentMarginBottomOverride = 2
+                    };
+                }
+            }
         }
 
         private void TogglePdaPreview()
@@ -256,7 +332,7 @@ namespace Content.Client._VG.Lobby.UI
                     BuildPdaPreviewFrame();
                 PdaPreviewContent.Visible = true;
                 PdaPreviewContent.ModulateSelfOverride = Color.White.WithAlpha(0f);
-                UpdatePdaPreviewImage(_profileEditor.Profile?.PdaWallpaperPath, false); // без анимации
+                UpdatePdaPreviewImage(_currentWallpaperPath, false);
             }
 
             _fadingPda = true;
@@ -341,18 +417,10 @@ namespace Content.Client._VG.Lobby.UI
 
         public void UpdatePdaWallpaperSelection()
         {
-            var currentPath = _profileEditor.Profile?.PdaWallpaperPath;
-            for (int i = 0; i < PdaWallpaperDropdown.ItemCount; i++)
-            {
-                var meta = PdaWallpaperDropdown.GetItemMetadata(i) as string;
-                if (meta == currentPath || (string.IsNullOrEmpty(meta) && string.IsNullOrEmpty(currentPath)))
-                {
-                    PdaWallpaperDropdown.SelectId(i);
-                    break;
-                }
-            }
-            bool animate = _pdaPreviewActive;
-            UpdatePdaPreviewImage(currentPath, animate);
+            _currentWallpaperPath = _profileEditor.Profile?.PdaWallpaperPath;
+            UpdateWallpaperButtonHighlight();
+            if (_pdaPreviewActive)
+                UpdatePdaPreviewImage(_currentWallpaperPath, false);
         }
 
         private void InsertOriginalButton(Button? originalButton, Button ourButton)

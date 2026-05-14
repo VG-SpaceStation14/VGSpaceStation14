@@ -68,7 +68,6 @@
                 </PanelContainer.PanelOverride>
                 <BoxContainer Name="PreviewContainer" Orientation="Vertical"
                               HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <!-- Персонаж (по умолчанию) -->
                     <BoxContainer Name="CharacterPreviewContent" Orientation="Vertical"
                                   HorizontalAlignment="Center" VerticalAlignment="Center">
                         <SpriteView Name="PreviewSprite" Scale="5 5" OverrideDirection="South"
@@ -78,7 +77,6 @@
                             <Button Name="RotateRight" Text="▶" StyleClasses="OpenLeft" />
                         </BoxContainer>
                     </BoxContainer>
-                    <!-- Превью КПК (скрыто) -->
                     <PanelContainer Name="PdaPreviewContent" Visible="False" MinSize="200 280"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                         <PanelContainer.PanelOverride>
@@ -88,7 +86,7 @@
                 </BoxContainer>
             </PanelContainer>
 
-            <!-- Панель выбора обоев КПК -->
+            <!-- Панель выбора обоев КПК (горизонтальный скролл) -->
             <PanelContainer Name="PdaWallpaperPanel" StyleClasses="BackgroundDark" Visible="False">
                 <PanelContainer.PanelOverride>
                     <graphics:StyleBoxFlat BackgroundColor="#1A1A1A"
@@ -99,7 +97,9 @@
                 </PanelContainer.PanelOverride>
                 <BoxContainer Orientation="Vertical">
                     <Label Text="{Loc 'pda-wallpaper-title'}" Margin="0 0 0 4" />
-                    <OptionButton Name="PdaWallpaperDropdown" MinWidth="200" HorizontalExpand="True" />
+                    <ScrollContainer HScrollEnabled="True" VScrollEnabled="False" MinHeight="140">
+                        <BoxContainer Name="PdaWallpaperButtons" Orientation="Horizontal" SeparationOverride="6" />
+                    </ScrollContainer>
                 </BoxContainer>
             </PanelContainer>
         </BoxContainer>

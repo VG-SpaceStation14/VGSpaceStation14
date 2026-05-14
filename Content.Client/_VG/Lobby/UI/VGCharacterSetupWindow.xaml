@@ -2,7 +2,7 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                x:Class="Content.Client._VG.Lobby.UI.VGCharacterSetupWindow"
                Title="{Loc 'character-setup-gui-character-setup-label'}"
-               MinSize="900 600"
+               MinSize="1400 860"
                Resizable="True">
     <!-- Содержимое добавляется в коде -->
 </DefaultWindow>
