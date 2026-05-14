@@ -22,12 +22,12 @@ public sealed class RetroMonitorOverlaySystem : EntitySystem
         SubscribeLocalEvent<RetroMonitorViewComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<RetroMonitorViewComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        Subs.CVar(_cfg, VGCCVars.NoVisionFilters, OnNoVisionFiltersChanged);
+        Subs.CVar(_cfg, VGCCVars.VisionFiltersEnabled, OnVisionFiltersEnabledChanged);
     }
 
     private void OnPlayerAttached(Entity<RetroMonitorViewComponent> ent, ref LocalPlayerAttachedEvent args)
     {
-        if (!_cfg.GetCVar(VGCCVars.NoVisionFilters))
+        if (_cfg.GetCVar(VGCCVars.VisionFiltersEnabled))
         {
             _overlayManager.AddOverlay(_overlay);
 
@@ -44,19 +44,19 @@ public sealed class RetroMonitorOverlaySystem : EntitySystem
         _vignette.AddOverlay();
     }
 
-    private void OnNoVisionFiltersChanged(bool enabled)
+    private void OnVisionFiltersEnabledChanged(bool enabled)
     {
         if (enabled)
-        {
-            _overlayManager.RemoveOverlay(_overlay);
-            _grain.AddOverlay();
-            _vignette.AddOverlay();
-        }
-        else
         {
             _overlayManager.AddOverlay(_overlay);
             _grain.RemoveOverlay();
             _vignette.RemoveOverlay();
+        }
+        else
+        {
+            _overlayManager.RemoveOverlay(_overlay);
+            _grain.AddOverlay();
+            _vignette.AddOverlay();
         }
     }
 }

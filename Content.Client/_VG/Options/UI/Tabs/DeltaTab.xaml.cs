@@ -17,15 +17,12 @@ public sealed partial class DeltaTab : Control
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
 
-        // Vision filters
         DisableFiltersCheckBox.OnToggled += OnCheckBoxToggled;
-        DisableFiltersCheckBox.Pressed = _cfg.GetCVar(VGCCVars.NoVisionFilters);
+        DisableFiltersCheckBox.Pressed = _cfg.GetCVar(VGCCVars.VisionFiltersEnabled);
 
-        // Bloom post-processing
         DisableBloomCheckBox.OnToggled += OnCheckBoxToggled;
-        DisableBloomCheckBox.Pressed = _cfg.GetCVar(VGCCVars.NoBloomPostProcessing);
+        DisableBloomCheckBox.Pressed = _cfg.GetCVar(VGCCVars.BloomEnabled);
 
-        // New character window
         NewCharacterWindowCheckBox.OnToggled += OnCheckBoxToggled;
         NewCharacterWindowCheckBox.Pressed = _cfg.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
 
@@ -40,8 +37,8 @@ public sealed partial class DeltaTab : Control
 
     private void OnApplyButtonPressed(BaseButton.ButtonEventArgs args)
     {
-        _cfg.SetCVar(VGCCVars.NoVisionFilters, DisableFiltersCheckBox.Pressed);
-        _cfg.SetCVar(VGCCVars.NoBloomPostProcessing, DisableBloomCheckBox.Pressed);
+        _cfg.SetCVar(VGCCVars.VisionFiltersEnabled, DisableFiltersCheckBox.Pressed);
+        _cfg.SetCVar(VGCCVars.BloomEnabled, DisableBloomCheckBox.Pressed);
         _cfg.SetCVar(VGCCVars.CharacterSetupNewWindowEnabled, NewCharacterWindowCheckBox.Pressed);
 
         _cfg.SaveToFile();
@@ -50,10 +47,10 @@ public sealed partial class DeltaTab : Control
 
     private void UpdateApplyButton()
     {
-        var isNoVisionFiltersSame = DisableFiltersCheckBox.Pressed == _cfg.GetCVar(VGCCVars.NoVisionFilters);
-        var isNoBloomSame = DisableBloomCheckBox.Pressed == _cfg.GetCVar(VGCCVars.NoBloomPostProcessing);
+        var isVisionSame = DisableFiltersCheckBox.Pressed == _cfg.GetCVar(VGCCVars.VisionFiltersEnabled);
+        var isBloomSame = DisableBloomCheckBox.Pressed == _cfg.GetCVar(VGCCVars.BloomEnabled);
         var isNewCharWindowSame = NewCharacterWindowCheckBox.Pressed == _cfg.GetCVar(VGCCVars.CharacterSetupNewWindowEnabled);
 
-        ApplyButton.Disabled = isNoVisionFiltersSame && isNoBloomSame && isNewCharWindowSame;
+        ApplyButton.Disabled = isVisionSame && isBloomSame && isNewCharWindowSame;
     }
 }

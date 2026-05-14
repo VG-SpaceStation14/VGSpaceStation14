@@ -23,14 +23,14 @@ public sealed partial class UltraVisionSystem : EntitySystem
         SubscribeLocalEvent<UltraVisionComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<UltraVisionComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        Subs.CVar(_cfg, VGCCVars.NoVisionFilters, OnNoVisionFiltersChanged);
+        Subs.CVar(_cfg, VGCCVars.VisionFiltersEnabled, OnVisionFiltersEnabledChanged);
 
         _overlay = new();
     }
 
     private void OnUltraVisionInit(EntityUid uid, UltraVisionComponent component, ComponentInit args)
     {
-        if (uid == _playerMan.LocalEntity && !_cfg.GetCVar(VGCCVars.NoVisionFilters))
+        if (uid == _playerMan.LocalEntity && _cfg.GetCVar(VGCCVars.VisionFiltersEnabled))
             _overlayMan.AddOverlay(_overlay);
     }
 
@@ -42,7 +42,7 @@ public sealed partial class UltraVisionSystem : EntitySystem
 
     private void OnPlayerAttached(EntityUid uid, UltraVisionComponent component, LocalPlayerAttachedEvent args)
     {
-        if (!_cfg.GetCVar(VGCCVars.NoVisionFilters))
+        if (_cfg.GetCVar(VGCCVars.VisionFiltersEnabled))
             _overlayMan.AddOverlay(_overlay);
     }
 
@@ -51,11 +51,11 @@ public sealed partial class UltraVisionSystem : EntitySystem
         _overlayMan.RemoveOverlay(_overlay);
     }
 
-    private void OnNoVisionFiltersChanged(bool enabled)
+    private void OnVisionFiltersEnabledChanged(bool enabled)
     {
         if (enabled)
-            _overlayMan.RemoveOverlay(_overlay);
-        else
             _overlayMan.AddOverlay(_overlay);
+        else
+            _overlayMan.RemoveOverlay(_overlay);
     }
 }

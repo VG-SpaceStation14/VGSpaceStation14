@@ -11,12 +11,12 @@
             <Label Text="{Loc 'ui-options-general-accessibility'}"
                    FontColorOverride="{xNamespace:Static s:StyleNano.NanoGold}"
                    StyleClasses="LabelKeyText"/>
-            <CheckBox Name="DisableFiltersCheckBox" Text="{Loc 'ui-options-no-filters'}" />
+            <CheckBox Name="DisableFiltersCheckBox" Text="{Loc 'ui-options-filters'}" />
             
             <Label Text="{Loc 'ui-options-quality-label'}"
                    FontColorOverride="{xNamespace:Static s:StyleNano.NanoGold}"
                    StyleClasses="LabelKeyText"/>
-            <CheckBox Name="DisableBloomCheckBox" Text="{Loc 'ui-options-no-bloom'}" />
+            <CheckBox Name="DisableBloomCheckBox" Text="{Loc 'ui-options-bloom'}" />
 
             <Label Text="{Loc 'ui-options-interface-label'}"
                    FontColorOverride="{xNamespace:Static s:StyleNano.NanoGold}"

@@ -23,14 +23,14 @@ public sealed partial class DogVisionSystem : EntitySystem
         SubscribeLocalEvent<DogVisionComponent, LocalPlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<DogVisionComponent, LocalPlayerDetachedEvent>(OnPlayerDetached);
 
-        Subs.CVar(_cfg, VGCCVars.NoVisionFilters, OnNoVisionFiltersChanged);
+        Subs.CVar(_cfg, VGCCVars.VisionFiltersEnabled, OnVisionFiltersEnabledChanged);
 
         _overlay = new();
     }
 
     private void OnDogVisionInit(EntityUid uid, DogVisionComponent component, ComponentInit args)
     {
-        if (uid == _playerMan.LocalEntity && !_cfg.GetCVar(VGCCVars.NoVisionFilters))
+        if (uid == _playerMan.LocalEntity && _cfg.GetCVar(VGCCVars.VisionFiltersEnabled))
             _overlayMan.AddOverlay(_overlay);
     }
 
@@ -42,7 +42,7 @@ public sealed partial class DogVisionSystem : EntitySystem
 
     private void OnPlayerAttached(EntityUid uid, DogVisionComponent component, LocalPlayerAttachedEvent args)
     {
-        if (!_cfg.GetCVar(VGCCVars.NoVisionFilters))
+        if (_cfg.GetCVar(VGCCVars.VisionFiltersEnabled))
             _overlayMan.AddOverlay(_overlay);
     }
 
@@ -51,11 +51,11 @@ public sealed partial class DogVisionSystem : EntitySystem
         _overlayMan.RemoveOverlay(_overlay);
     }
 
-    private void OnNoVisionFiltersChanged(bool enabled)
+    private void OnVisionFiltersEnabledChanged(bool enabled)
     {
         if (enabled)
-            _overlayMan.RemoveOverlay(_overlay);
-        else
             _overlayMan.AddOverlay(_overlay);
+        else
+            _overlayMan.RemoveOverlay(_overlay);
     }
 }

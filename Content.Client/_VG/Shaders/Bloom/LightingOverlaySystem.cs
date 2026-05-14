@@ -25,9 +25,8 @@ public sealed class LightingOverlaySystem : EntitySystem
 
     private static readonly ProtoId<ShaderPrototype> Shader = "LightingOverlay";
 
-    private bool _allEnabled;
+    private bool _bloomEnabled;
     private bool _coneEnabled;
-    private bool _bloomDisabled;
 
     private float _strength;
 
@@ -46,10 +45,9 @@ public sealed class LightingOverlaySystem : EntitySystem
         _eyeQuery = GetEntityQuery<EyeComponent>();
 
         _configSub = _cfg.SubscribeMultiple()
-            .OnValueChanged(VGCCVars.LightBloomEnable, OnAllEnabledChanged, true)
+            .OnValueChanged(VGCCVars.BloomEnabled, OnBloomEnabledChanged, true)
             .OnValueChanged(VGCCVars.LightBloomConeEnable, OnConeEnabledChanged, true)
-            .OnValueChanged(VGCCVars.LightBloomStrength, OnStrengthChanged, true)
-            .OnValueChanged(VGCCVars.NoBloomPostProcessing, OnNoBloomChanged, true);
+            .OnValueChanged(VGCCVars.LightBloomStrength, OnStrengthChanged, true);
     }
 
     public override void FrameUpdate(float frameTime)
@@ -59,7 +57,7 @@ public sealed class LightingOverlaySystem : EntitySystem
         if (_player.LocalEntity == null)
             return;
 
-        if (!_allEnabled || _bloomDisabled)
+        if (!_bloomEnabled)
             return;
 
         _entities.Clear();
@@ -92,9 +90,9 @@ public sealed class LightingOverlaySystem : EntitySystem
         _configSub.Dispose();
     }
 
-    private void OnAllEnabledChanged(bool value)
+    private void OnBloomEnabledChanged(bool value)
     {
-        _allEnabled = value;
+        _bloomEnabled = value;
         UpdateOverlays();
     }
 
@@ -111,17 +109,11 @@ public sealed class LightingOverlaySystem : EntitySystem
         _cone.Strength = _strength;
         _point.Strength = _strength;
     }
-    
-    private void OnNoBloomChanged(bool value)
-    {
-        _bloomDisabled = value;
-        UpdateOverlays();
-    }
 
     private void UpdateOverlays()
     {
-        var shouldEnableCone = _allEnabled && _coneEnabled && !_bloomDisabled;
-        var shouldEnablePoint = _allEnabled && !_bloomDisabled;
+        var shouldEnableCone = _bloomEnabled && _coneEnabled;
+        var shouldEnablePoint = _bloomEnabled;
 
         _cone.Enabled = shouldEnableCone;
         _point.Enabled = shouldEnablePoint;
