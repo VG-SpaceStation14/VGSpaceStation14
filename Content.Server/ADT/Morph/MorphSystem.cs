@@ -122,8 +122,8 @@ public sealed class MorphSystem : SharedMorphSystem
     
     private void OnInit(EntityUid uid, MorphComponent component, MapInitEvent args)
     {
-        component.Container = container.EnsureContainer<Container>(uid, component.ContainerId);
-        component.MimicryContainer = container.EnsureContainer<Container>(uid, component.MimicryContainerId);
+        component.Container = _container.EnsureContainer<Container>(uid, component.ContainerId);
+        component.MimicryContainer = _container.EnsureContainer<Container>(uid, component.MimicryContainerId);
         
         _actions.AddAction(uid, ref component.DevourActionEntity, component.DevourAction);
         _actions.AddAction(uid, ref component.MemoryActionEntity, component.MemoryAction);
