@@ -307,14 +307,6 @@ public sealed class ADTCCVars
     public static readonly CVarDef<bool> EnableChatJobIcons =
         CVarDef.Create("adt.chat_job_icons_enabled", true, CVar.CLIENTONLY | CVar.ARCHIVE);
 
-    /// <summary>
-    /// Client-side setting to toggle job icons in chat.
-    /// Icons are only shown if both server and client allow them.
-    /// </summary>
-    public static readonly CVarDef<bool> EnableChatJobIcons =
-        CVarDef.Create("adt.chat_job_icons_enabled", true, CVar.CLIENTONLY | CVar.ARCHIVE);
-
-
     /*
     * Headshot
     */
