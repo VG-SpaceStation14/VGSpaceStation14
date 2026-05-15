@@ -12,11 +12,11 @@
                        Margin="8 0 0 0" VAlign="Center"
                        StyleClasses="LabelHeadingBigger" />
 
-                <Button Name="StatsButton" HorizontalExpand="True"
+                <Button Name="StatsButton" Access="Public" HorizontalExpand="True"
                         Text="{Loc 'character-setup-gui-character-setup-stats-button'}"
                         StyleClasses="ButtonBig"
                         HorizontalAlignment="Right" />
-                <cc:CommandButton Name="AdminRemarksButton"
+                <cc:CommandButton Name="AdminRemarksButton" Access="Public"
                                   Command="adminremarks"
                                   Text="{Loc 'character-setup-gui-character-setup-adminremarks-button'}"
                                   StyleClasses="ButtonBig" />

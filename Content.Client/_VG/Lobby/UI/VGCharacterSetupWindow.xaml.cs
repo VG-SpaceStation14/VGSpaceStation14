@@ -16,7 +16,7 @@ public sealed partial class VGCharacterSetupWindow : DefaultWindow
     {
         RobustXamlLoader.Load(this);
         Contents.AddChild(content);
-        SetSize = new Vector2(1400, 860);
+        SetSize = new Vector2(1450, 860);
     }
 
     public override void Close()

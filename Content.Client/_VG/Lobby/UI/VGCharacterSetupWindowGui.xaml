@@ -107,11 +107,20 @@
         <!-- ПРАВАЯ КОЛОНКА -->
         <BoxContainer Orientation="Vertical" SeparationOverride="8" HorizontalExpand="True" VerticalExpand="True">
             <BoxContainer Orientation="Horizontal" SeparationOverride="4">
-                <Button Name="SaveButton" Text="Сохранить" StyleClasses="ButtonBig" />
-                <Button Name="ResetButton" Text="Сброс" StyleClasses="ButtonBig" />
-                <Button Name="ImportButton" Text="Импорт" StyleClasses="ButtonBig" />
-                <Button Name="ExportButton" Text="Экспорт" StyleClasses="ButtonBig" />
+                <Button Name="SaveButton" Text="{Loc 'humanoid-profile-editor-save-button'}" StyleClasses="ButtonBig" />
+                <Button Name="ResetButton" Text="{Loc 'humanoid-profile-editor-reset-button'}" StyleClasses="ButtonBig" />
+                <Button Name="ImportButton" Text="{Loc 'humanoid-profile-editor-import-button'}" StyleClasses="ButtonBig" />
+                <Button Name="ExportButton" Text="{Loc 'humanoid-profile-editor-export-button'}" StyleClasses="ButtonBig" />
+                
+                <Control MinSize="10 0" />
+                
+                <Button Name="StatsButton" Text="{Loc 'character-setup-gui-character-setup-stats-button'}" />
+                <Button Name="AdminRemarksButton" Text="{Loc 'character-setup-gui-character-setup-adminremarks-button'}" />
+                
+                <Control MinSize="5 0" />
+                
                 <Control HorizontalExpand="True" />
+                
                 <Button Name="CreateCharacterButton" Text="+" MinSize="32 0" StyleClasses="OpenRight" />
                 <OptionButton Name="CharacterSelector" MinSize="160 0" StyleClasses="OpenBoth" />
                 <Button Name="DeleteCharacterButton" Text="×" MinSize="32 0" StyleClasses="OpenLeft" />
