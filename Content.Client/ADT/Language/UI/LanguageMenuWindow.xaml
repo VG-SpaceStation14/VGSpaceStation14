@@ -1,21 +1,40 @@
-<!--Original window taken from https://github.com/new-frontiers-14/frontier-station-14/pull/671-->
 <ui:FancyWindow xmlns="https://spacestation14.io"
-               xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
-               Title="a"
-               SetSize="400 450"
-               MaxSize="600 850">
-    <BoxContainer Orientation="Vertical" SeparationOverride="4" MinWidth="150">
-        <PanelContainer Name="CurrentLanguageContainer" Access="Public" StyleClasses="PdaBorderRect"
-            Margin="5">
-            <Label Name="CurrentLanguageLabel" Access="Public" Text="Current Language:" HorizontalExpand="True"></Label>
+                xmlns:ui="clr-namespace:Content.Client.UserInterface.Controls"
+                Title="{Loc 'language-menu-window-title'}"
+                SetSize="450 500"
+                MinSize="350 400">
+
+    <BoxContainer Orientation="Vertical" SeparationOverride="8" Margin="8">
+
+        <!-- Заголовок: текущий язык и количество известных языков -->
+        <PanelContainer StyleClasses="LanguagesHeaderPanel">
+            <BoxContainer Orientation="Vertical" Margin="12 10">
+                <BoxContainer Orientation="Horizontal" Margin="0 0 0 8">
+                    <Label Name="CurrentLanguageLabel"
+                           StyleClasses="LanguagesTitleLabel"/>
+                    <Control HorizontalExpand="True"/>
+                    <Label Name="LanguagesCountLabel"
+                           StyleClasses="LanguagesStatLabel"/>
+                </BoxContainer>
+            </BoxContainer>
         </PanelContainer>
 
-        <ui:HLine></ui:HLine>
+        <!-- Поиск -->
+        <PanelContainer StyleClasses="LanguagesSearchBar">
+            <LineEdit Name="SearchBar"
+                      PlaceHolder="{Loc 'language-menu-search-placeholder'}"
+                      StyleClasses="LanguagesSearchInput"
+                      Margin="10 8"/>
+        </PanelContainer>
 
-        <ScrollContainer HorizontalExpand="True" VerticalExpand="True" HScrollEnabled="False" VScrollEnabled="True" MinHeight="50">
-            <BoxContainer Name="OptionsList" Access="Public" HorizontalExpand="True" SeparationOverride="2" Orientation="Vertical">
-                <!-- The rest here is generated programmatically -->
-            </BoxContainer>
+        <!-- Список языков -->
+        <ScrollContainer HorizontalExpand="True" VerticalExpand="True" HScrollEnabled="False">
+            <BoxContainer Name="OptionsList" Orientation="Vertical" SeparationOverride="4" Margin="0 0 4 0"/>
         </ScrollContainer>
+
+        <!-- Футер -->
+        <PanelContainer StyleClasses="LanguagesFooterPanel">
+            <Label Text="{Loc 'language-menu-footer-hint'}" StyleClasses="LanguagesFooterText" Margin="10 6"/>
+        </PanelContainer>
     </BoxContainer>
 </ui:FancyWindow>

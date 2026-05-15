@@ -479,6 +479,7 @@ namespace Content.Client.Lobby.UI
             // ADT Languages start
             #region Languages
             RefreshLanguages();
+            LanguagesSearchBar.OnTextChanged += OnLanguagesSearchTextChanged;
             #endregion Languages
             // ADT Languages end
             #region Jobs

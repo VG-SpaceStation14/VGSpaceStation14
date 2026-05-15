@@ -1,31 +1,40 @@
-<Control
-    xmlns="https://spacestation14.io"
-    Margin="5">
-    <PanelContainer Name="Wrapper"
-        StyleClasses="PdaBorderRect">
-        <BoxContainer Orientation="Vertical">
-            <BoxContainer
-                Orientation="Horizontal"
+<PanelContainer xmlns="https://spacestation14.io"
+                Name="LanguagePanel"
+                StyleClasses="LanguagesEntryPanel"
                 HorizontalExpand="True"
-                SeparationOverride="2"
-                Margin="4">
-                <Label Name="Name"
-                    MinWidth="50"
-                    HorizontalExpand="True"/>
-                <Button Name="SelectButton"
-                    Text = "{Loc 'language-choose-button'}"
+                Margin="0 0 0 4">
+
+    <BoxContainer Orientation="Vertical"
+                  HorizontalExpand="True"
+                  Margin="10 8">
+
+        <!-- Верхняя строка: название языка и кнопка выбора -->
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True">
+            <Label Name="NameLabel"
+                   StyleClasses="LanguagesEntryNameLabel"
+                   HorizontalExpand="True"/>
+            <Button Name="SelectButton"
+                    StyleClasses="LanguagesEntryButton"
+                    Text="{Loc 'language-choose-button'}"
                     Access="Public"/>
-            </BoxContainer>
-            <Collapsible
-                Orientation="Vertical"
-                HorizontalExpand="True">
-                <CollapsibleHeading Title="{Loc 'language-menu-description-header'}" />
-                <CollapsibleBody
-                    HorizontalExpand="True"
-                    Margin="4">
-                    <RichTextLabel Name="Description" MaxWidth="700" />
-                </CollapsibleBody>
-            </Collapsible>
         </BoxContainer>
-    </PanelContainer>
-</Control>
+
+        <!-- Кнопка раскрытия описания -->
+        <Button Name="ExpandButton"
+                StyleClasses="LanguagesEntryExpandButton"
+                Text="▼ Показать описание"
+                Margin="0 4 0 0"
+                HorizontalAlignment="Left"/>
+
+        <!-- Панель с описанием (сворачивается) -->
+        <PanelContainer Name="DescriptionPanel"
+                        StyleClasses="LanguagesEntryDescriptionPanel"
+                        Visible="False"
+                        Margin="0 4 0 0">
+            <RichTextLabel Name="DescriptionLabel"
+                           StyleClasses="LanguagesEntryDescriptionLabel"
+                           MaxWidth="1100"
+                           HorizontalAlignment="Left"/>
+        </PanelContainer>
+    </BoxContainer>
+</PanelContainer>
