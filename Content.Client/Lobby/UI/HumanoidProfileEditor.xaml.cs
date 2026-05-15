@@ -1,8 +1,10 @@
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using Content.Client.ADT.Lobby.UI;
 using Content.Client._VG.Sponsors;
+using Content.Client.ADT.Traits.UI;
 using Content.Client.Guidebook;
 using System.Reflection;
 using Content.Client.Humanoid;
@@ -38,6 +40,8 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Client.Utility;
 using Robust.Shared.Configuration;
+using Robust.Shared.Timing;
+using Timer = Robust.Shared.Timing.Timer;
 using Robust.Shared.ContentPack;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
@@ -349,8 +353,9 @@ namespace Content.Client.Lobby.UI
             {
                 if (Profile is null)
                     return;
+                var hairColorList = new List<Robust.Shared.Maths.Color>(newColor.marking.MarkingColors); // ADT-tweak
                 Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithHairColor(newColor.marking.MarkingColors[0]));
+                    Profile.Appearance.WithHairColor(hairColorList));// ADT-tweak
                 UpdateCMarkingsHair();
                 ReloadPreview();
             };
@@ -507,6 +512,7 @@ namespace Content.Client.Lobby.UI
             Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
 
             RefreshTraits();
+            Traits.OnTraitsChanged += OnTraitsSelectionChanged; // ADT-Tweak new Traits
 
             /*TabContainer.SetTabTitle(5, Loc.GetString("humanoid-profile-editor-traits-tab")); // Corvax-TTS-Edit
             Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
@@ -672,121 +678,49 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public void RefreshTraits()
         {
-            TraitsList.RemoveAllChildren();
-
-            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().Where(t => !t.Quirk).OrderBy(t => Loc.GetString(t.Name)).ToList();
-            /*TabContainer.SetTabTitle(4, Loc.GetString("humanoid-profile-editor-traits-tab"));   // ADT Languages tweak
-            Вынесено в HumanoidProfileEditor в регионе InvokeRefresh, чтобы не накладывало названия друг на друга*/
-
-            if (traits.Count < 1)
+            if (Profile != null)
+            // ADT-Tweak start new Traits
             {
-                TraitsList.AddChild(new Label
+                var selectedTraits = new HashSet<ProtoId<TraitPrototype>>(Profile.TraitPreferences.Count);
+                foreach (var traitId in Profile.TraitPreferences)
                 {
-                    Text = Loc.GetString("humanoid-profile-editor-no-traits"),
-                    FontColorOverride = Color.Gray,
-                });
-                return;
-            }
+                    if (_prototypeManager.HasIndex(traitId))
+                    {
+                        selectedTraits.Add(new ProtoId<TraitPrototype>(traitId));
+                    }
+                }
 
-            // Setup model
-            Dictionary<string, List<string>> traitGroups = new();
-            List<string> defaultTraits = new();
-            traitGroups.Add(TraitCategoryPrototype.Default, defaultTraits);
+                Traits.SetSelectedTraits(selectedTraits, Profile);
+                Traits.UpdateRequirements(Profile, jobId: null);
+            }
+            else
+            {
+                Traits.SetSelectedTraits(new HashSet<ProtoId<TraitPrototype>>(), Profile);
+            }
+        }
+
+        /// <summary>
+        /// Called when trait selection changes in the TraitsTab.
+        /// Updates the profile with the new trait selection.
+        /// </summary>
+        private void OnTraitsSelectionChanged(HashSet<ProtoId<TraitPrototype>> traits)
+        {
+            if (Profile is null)
+                return;
+
+            // Remove all existing traits - iterate directly over readonly collection
+            foreach (var existingTrait in Profile.TraitPreferences)
+            {
+                Profile = Profile.WithoutTraitPreference(existingTrait, _prototypeManager);
+            }
 
             foreach (var trait in traits)
+            // ADT-Tweak end new Traits
             {
-                if (trait.Category == null)
-                {
-                    defaultTraits.Add(trait.ID);
-                    continue;
-                }
-
-                if (!_prototypeManager.HasIndex(trait.Category))
-                    continue;
-
-                if (trait.SponsorOnly && !IoCManager.Resolve<SponsorsManager>().TryGetInfo(out var sponsor))
-                    continue;
-                var group = traitGroups.GetOrNew(trait.Category);
-                group.Add(trait.ID);
+                Profile = Profile.WithTraitPreference(trait.Id, _prototypeManager);
             }
 
-            // Create UI view from model
-            foreach (var (categoryId, categoryTraits) in traitGroups)
-            {
-                TraitCategoryPrototype? category = null;
-
-                if (categoryId != TraitCategoryPrototype.Default)
-                {
-                    category = _prototypeManager.Index<TraitCategoryPrototype>(categoryId);
-                    // Label
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString(category.Name),
-                        Margin = new Thickness(0, 10, 0, 0),
-                        StyleClasses = { StyleClass.LabelHeading },
-                    });
-                }
-
-                List<TraitPreferenceSelector?> selectors = new();
-                var selectionCount = 0;
-
-                foreach (var traitProto in categoryTraits)
-                {
-                    var trait = _prototypeManager.Index<TraitPrototype>(traitProto);
-                    // ADT Trait species blacklist start
-                    if (Profile != null && trait.SpeciesBlacklist.Contains(Profile.Species))
-                    {
-                        Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        continue;
-                    }
-                    // ADT Trait species blacklist end
-                    var selector = new TraitPreferenceSelector(trait);
-
-                    selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
-                    if (selector.Preference)
-                        selectionCount += trait.Cost;
-
-                    selector.PreferenceChanged += preference =>
-                    {
-                        if (preference)
-                        {
-                            Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
-                        }
-                        else
-                        {
-                            Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        }
-
-                        SetDirty();
-                        RefreshTraits(); // If too many traits are selected, they will be reset to the real value.
-                    };
-                    selectors.Add(selector);
-                }
-
-                // Selection counter
-                if (category is { MaxTraitPoints: >= 0 })
-                {
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString("humanoid-profile-editor-trait-count-hint", ("current", selectionCount), ("max", category.MaxTraitPoints)),
-                        FontColorOverride = Color.Gray
-                    });
-                }
-
-                foreach (var selector in selectors)
-                {
-                    if (selector == null)
-                        continue;
-
-                    if (category is { MaxTraitPoints: >= 0 } &&
-                        selector.Cost + selectionCount > category.MaxTraitPoints)
-                    {
-                        selector.Checkbox.Label.FontColorOverride = Color.Red;
-                    }
-
-                    TraitsList.AddChild(selector);
-                }
-            }
+            SetDirty();
         }
 
         /// <summary>
@@ -1339,13 +1273,65 @@ namespace Content.Client.Lobby.UI
         }
 
         //ADT-tweak-start: Юрл для хэдшота
-        private void OnHeadshotUrlChange(string content)
+        private CancellationTokenSource? _headshotRequestCts;
+        private string? _lastHeadshotUrl;
+
+        private async void OnHeadshotUrlChange(string content)
         {
             if (Profile is null)
                 return;
 
-            Profile = Profile.WithHeadshotUrl(content);
+            var url = content.Trim();
+
+            if (url == _lastHeadshotUrl)
+                return;
+
+            _lastHeadshotUrl = url;
+
+            Profile = Profile.WithHeadshotUrl(url);
             SetDirty();
+
+            // Отменяем предыдущий запрос
+            _headshotRequestCts?.Cancel();
+            _headshotRequestCts?.Dispose();
+            _headshotRequestCts = null;
+
+            _headshotRequestCts = new CancellationTokenSource();
+
+            var cts = _headshotRequestCts.Token;
+
+            try
+            {
+                // Debounce: ждём 500мс перед запросом
+                await Timer.Delay(500, cts);
+                OnHeadshotPreviewRequestedDelayed(url);
+            }
+            catch (OperationCanceledException)
+            {
+                // Запрос отменён — это нормально
+            }
+        }
+
+        private void OnHeadshotPreviewRequestedDelayed(string url)
+        {
+            if (Profile is null)
+                return;
+
+            if (!_entManager.EntityExists(PreviewDummy))
+                return;
+
+            var flavor = _entManager.EnsureComponent<CharacterFlavorComponent>(PreviewDummy);
+            flavor.FlavorText = Profile.FlavorText ?? string.Empty;
+            flavor.HeadshotUrl = url;
+
+            var controller = UserInterfaceManager.GetUIController<CharacterFlavorUiController>();
+            controller.OpenPreviewMenu(PreviewDummy);
+
+            // Попросить сервер скачать и прислать картинку для предпросмотра хэдшота.
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                _entManager.System<CharecterFlavorSystem>().RequestHeadshotPreview(url);
+            }
         }
 
         private void OnFlavorPreviewRequested()
@@ -1431,6 +1417,9 @@ namespace Content.Client.Lobby.UI
 
             _loadoutWindow?.Dispose();
             _loadoutWindow = null;
+
+            _headshotRequestCts?.Cancel();
+            _headshotRequestCts = null;
         }
 
         protected override void EnteredTree()
@@ -1738,7 +1727,7 @@ namespace Content.Client.Lobby.UI
             }
             var hairMarking = Profile.Appearance.HairStyleId == HairStyles.DefaultHairStyle
                 ? new List<Marking>()
-                : new() { new(Profile.Appearance.HairStyleId, new List<Color>() { Profile.Appearance.HairColor }) };
+                : new() { new(Profile.Appearance.HairStyleId, Profile.Appearance.HairColor) }; // ADT-tweak
 
             var facialHairMarking = Profile.Appearance.FacialHairStyleId == HairStyles.DefaultFacialHairStyle
                 ? new List<Marking>()
@@ -1762,26 +1751,28 @@ namespace Content.Client.Lobby.UI
             }
 
             // hair color
-            Color? hairColor = null;
+            List<Color>? hairColor = null;
             if ( Profile.Appearance.HairStyleId != HairStyles.DefaultHairStyle &&
                 _markingManager.Markings.TryGetValue(Profile.Appearance.HairStyleId, out var hairProto)
             )
             {
                 if (_markingManager.CanBeApplied(Profile.Species, Profile.Sex, hairProto, _prototypeManager))
                 {
-                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.Hair, out var _, _prototypeManager))
+                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.Hair, out var hairAlpha, _prototypeManager))
                     {
-                        hairColor = Profile.Appearance.SkinColor;
+                        hairColor = new List<Color> { Profile.Appearance.SkinColor.WithAlpha(hairAlpha) };
+                        if (Profile.Appearance.HairColor.Count > 1)
+                            hairColor.AddRange(Profile.Appearance.HairColor.Skip(1));
                     }
                     else
                     {
-                        hairColor = Profile.Appearance.HairColor;
+                        hairColor = Profile.Appearance.HairColor.ToList();
                     }
                 }
             }
             if (hairColor != null)
             {
-                Markings.HairMarking = new (Profile.Appearance.HairStyleId, new List<Color>() { hairColor.Value });
+                Markings.HairMarking = new (Profile.Appearance.HairStyleId, hairColor);
             }
             else
             {
@@ -1803,7 +1794,7 @@ namespace Content.Client.Lobby.UI
             {
                 if (_markingManager.CanBeApplied(Profile.Species, Profile.Sex, facialHairProto, _prototypeManager))
                 {
-                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.Hair, out var _, _prototypeManager))
+                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.FacialHair, out var _, _prototypeManager))
                     {
                         facialHairColor = Profile.Appearance.SkinColor;
                     }

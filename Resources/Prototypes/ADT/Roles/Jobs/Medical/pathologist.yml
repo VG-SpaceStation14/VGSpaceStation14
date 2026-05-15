@@ -25,6 +25,7 @@
     id: ADTPathologistPDA
     ears: ClothingHeadsetMedical
     belt: BoxFolderClipboard
+    pocket1: ADTRubberStampPathologist
 
 - type: chameleonOutfit
   id: ADTPathologistChameleonOutfit
