@@ -392,6 +392,8 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
     // VG-Tweak Start
     public void OpenCharacterSetupNewWindow()
     {
+        _savePanelRequested = false;
+
         if (_setupWindow != null && _setupWindow.IsOpen)
         {
             _setupWindow.MoveToFront();
@@ -481,6 +483,7 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
             _setupWindow.Dispose();
             _setupWindow = null;
         }
+        _savePanelRequested = false;
     }
 
     public void RequestCharacterSwitch(int slot)
@@ -515,6 +518,12 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         _savePanelRequested = true;
         _savePanel = new CharacterSetupGuiSavePanel();
 
+        _savePanel.OnClose += () =>
+        {
+            _savePanelRequested = false;
+            _pendingSelectSlot = null;
+        };
+
         _savePanel.SaveButton.OnPressed += _ =>
         {
             SaveProfileNew(editor);
@@ -533,7 +542,6 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                 _setupWindow?.Close();
                 CleanupNewWindow();
             }
-            _savePanelRequested = false;
         };
 
         _savePanel.NoSaveButton.OnPressed += _ =>
@@ -554,14 +562,12 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
                 _setupWindow?.Close();
                 CleanupNewWindow();
             }
-            _savePanelRequested = false;
         };
 
         _savePanel.CancelButton.OnPressed += _ =>
         {
             _savePanel.Close();
             _pendingSelectSlot = null;
-            _savePanelRequested = false;
         };
 
         _savePanel.OpenCentered();
