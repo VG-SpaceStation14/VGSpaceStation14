@@ -68,7 +68,7 @@
 
             <PanelContainer Name="RightSide" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True" HorizontalExpand="True" Modulate="#FFFFFFD0">
                 <BoxContainer Orientation="Vertical" Margin="12" HorizontalExpand="True" VerticalExpand="True">
-                    <Label Text="ЧАТ" FontColorOverride="Cyan" StyleClasses="LabelSubtext" Margin="0 0 0 4" />
+                    <controls:NanoHeading Text="{Loc 'ui-lobby-chat-title'}" Margin="0 0 0 4" />
                     <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" HorizontalExpand="True" />
                 </BoxContainer>
             </PanelContainer>
