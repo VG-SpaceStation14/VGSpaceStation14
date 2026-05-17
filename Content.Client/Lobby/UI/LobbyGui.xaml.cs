@@ -158,7 +158,6 @@ namespace Content.Client.Lobby.UI
             if (_currentState == state && !_animating)
                 return;
 
-            // Если сейчас анимация, прерываем её мгновенным завершением предыдущей
             if (_animating)
             {
                 MenuControls.Margin = _menuTargetMargin;
@@ -169,7 +168,6 @@ namespace Content.Client.Lobby.UI
                 _animating = false;
             }
 
-            // Мгновенный переход для CharacterSetup
             if (state == LobbyGuiState.CharacterSetup)
             {
                 _currentState = state;
@@ -177,7 +175,6 @@ namespace Content.Client.Lobby.UI
                 return;
             }
 
-            // Анимация только для переходов Default ↔ ScreenSaver
             bool fromDefaultToSaver = (_currentState == LobbyGuiState.Default && state == LobbyGuiState.ScreenSaver);
             bool fromSaverToDefault = (_currentState == LobbyGuiState.ScreenSaver && state == LobbyGuiState.Default);
 
@@ -187,7 +184,6 @@ namespace Content.Client.Lobby.UI
                 _animating = true;
                 _animStartTime = (float)_gameTiming.CurTime.TotalSeconds;
 
-                // Гарантируем видимость для получения размеров
                 MenuControls.Visible = true;
                 ChatContainer.Visible = true;
                 MusicContainer.Visible = true;
@@ -206,7 +202,7 @@ namespace Content.Client.Lobby.UI
                     _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, -chatWidth, _chatStartMargin.Bottom);
                     _musicTargetMargin = new Thickness(-musicWidth, _musicStartMargin.Top, _musicStartMargin.Right, _musicStartMargin.Bottom);
                 }
-                else // Default
+                else
                 {
                     _menuTargetMargin = new Thickness(25, _menuStartMargin.Top, _menuStartMargin.Right, _menuStartMargin.Bottom);
                     _chatTargetMargin = new Thickness(_chatStartMargin.Left, _chatStartMargin.Top, 25, _chatStartMargin.Bottom);
@@ -215,7 +211,6 @@ namespace Content.Client.Lobby.UI
             }
             else
             {
-                // Любой другой переход – мгновенно (например, из CharacterSetup в Default)
                 _currentState = state;
                 ApplyFinalState();
             }
@@ -232,7 +227,6 @@ namespace Content.Client.Lobby.UI
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
                     RightSide.Visible = true;
-                    // Восстанавливаем исходные отступы
                     MenuControls.Margin = new Thickness(25, MenuControls.Margin.Top, MenuControls.Margin.Right, 45);
                     ChatContainer.Margin = new Thickness(ChatContainer.Margin.Left, 68, 25, 25);
                     MusicContainer.Margin = new Thickness(25, 15, MusicContainer.Margin.Right, MusicContainer.Margin.Bottom);

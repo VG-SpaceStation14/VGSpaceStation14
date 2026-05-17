@@ -46,7 +46,7 @@
                     </controls:StripeBack>
                     <BoxContainer Orientation="Vertical" Margin="0 12" SeparationOverride="6" HorizontalExpand="True">
                         <Button Name="ReadyButton" Access="Public" ToggleMode="True" Text="ПРИСОЕДИНИТЬСЯ" HorizontalExpand="True" MinHeight="40" StyleClasses="ButtonBig" />
-                        <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" MinHeight="32" />
+                        <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" MinHeight="32" WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
                         <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
                         <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" MinHeight="32" />
                         <Button Name="CharacterSetup" Access="Public" Text="Персонаж" HorizontalExpand="True" MinHeight="32" />
