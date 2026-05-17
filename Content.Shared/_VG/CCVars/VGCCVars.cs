@@ -33,4 +33,7 @@ public sealed class VGCCVars
 
     public static readonly CVarDef<bool> CharacterSetupNewWindowEnabled =
         CVarDef.Create("vg.character_setup_new_window", true, CVar.CLIENT | CVar.ARCHIVE);
+    
+    public static readonly CVarDef<float> VolumetricLightStrength =
+    CVarDef.Create("vg.volumetric_light_strength", 0.007f, CVar.CLIENT | CVar.ARCHIVE);
 }

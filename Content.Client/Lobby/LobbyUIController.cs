@@ -315,7 +315,6 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         _profileEditor.Save += () =>
         {
             SaveProfile();
-            CloseCharacterSetupOldAndReturn();
         };
 
         _characterSetup.SelectCharacter += args =>
