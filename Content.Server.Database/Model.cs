@@ -440,7 +440,7 @@ namespace Content.Server.Database
         public string OOCNotes { get; set; } = null!;
         public string HeadshotUrl { get; set; } = null!;
         //ADT-tweak-end
-        public string? PdaWallpaperPath { get; set; } // VG-Tweak
+        public string? PdaWallpaperPath { get; set; } = null!; // VG-Tweak
         public int Age { get; set; }
         public string Sex { get; set; } = null!;
         public string Gender { get; set; } = null!;
