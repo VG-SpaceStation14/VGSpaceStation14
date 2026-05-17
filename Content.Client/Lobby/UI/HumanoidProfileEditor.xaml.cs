@@ -2003,5 +2003,23 @@ namespace Content.Client.Lobby.UI
             return Color.FromHsv(hsv);
         }
         // ADT Species Window end
+
+        // VG-Tweak Start
+        /// <summary>
+        /// Публичная обёртка для вызова импорта профиля.
+        /// </summary>
+        public void TriggerImport()
+        {
+            ImportProfile();
+        }
+
+        /// <summary>
+        /// Публичная обёртка для вызова экспорта профиля.
+        /// </summary>
+        public void TriggerExport()
+        {
+            ExportProfile();
+        }
+        // VG-Tweak End 
     }
 }

@@ -72,8 +72,9 @@ namespace Content.Client._VG.Lobby.UI
 
             InsertOriginalButton(_profileEditor.SaveButton, SaveButton);
             InsertOriginalButton(_profileEditor.ResetButton, ResetButton);
-            InsertOriginalButton(_profileEditor.ImportButton, ImportButton);
-            InsertOriginalButton(_profileEditor.ExportButton, ExportButton);
+            // Импорт и экспорт через прямые вызовы
+            ImportButton.OnPressed += _ => _profileEditor.TriggerImport();
+            ExportButton.OnPressed += _ => _profileEditor.TriggerExport();
 
             // Кнопки статистики и админ-заметок
             StatsButton.OnPressed += _ =>
