@@ -117,12 +117,12 @@
                 <Button Name="StatsButton" Text="{Loc 'character-setup-gui-character-setup-stats-button'}" />
                 <Button Name="AdminRemarksButton" Text="{Loc 'character-setup-gui-character-setup-adminremarks-button'}" />
                 
-                <Control MinSize="5 0" />
+                <Control MinSize="10 0" />
                 
                 <Control HorizontalExpand="True" />
                 
                 <Button Name="CreateCharacterButton" Text="+" MinSize="32 0" StyleClasses="OpenRight" />
-                <OptionButton Name="CharacterSelector" MinSize="160 0" StyleClasses="OpenBoth" />
+                <OptionButton Name="CharacterSelector" HorizontalExpand="True" MinSize="100 0" StyleClasses="OpenBoth" />
                 <Button Name="DeleteCharacterButton" Text="×" MinSize="32 0" StyleClasses="OpenLeft" />
             </BoxContainer>
             <Control Name="EditorContainer" HorizontalExpand="True" VerticalExpand="True" />
