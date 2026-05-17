@@ -70,13 +70,18 @@ namespace Content.Client._VG.Lobby.UI
                 EditorContainer.AddChild(_profileEditor.TabContainer);
             }
 
+            var originalNameEdit = _profileEditor.NameEdit;
+            if (originalNameEdit != null)
+            {
+                originalNameEdit.Orphan();
+                NameEditContainer.AddChild(originalNameEdit);
+            }
+
             InsertOriginalButton(_profileEditor.SaveButton, SaveButton);
             InsertOriginalButton(_profileEditor.ResetButton, ResetButton);
-            // Импорт и экспорт через прямые вызовы
             ImportButton.OnPressed += _ => _profileEditor.TriggerImport();
             ExportButton.OnPressed += _ => _profileEditor.TriggerExport();
 
-            // Кнопки статистики и админ-заметок
             StatsButton.OnPressed += _ =>
             {
                 new PlaytimeStatsWindow().OpenCentered();
@@ -93,13 +98,11 @@ namespace Content.Client._VG.Lobby.UI
                 _profileEditor.NameRandomize.OnPressed += _ =>
                 {
                     UpdatePreviewInstant();
-                    UpdateNameField();
                 };
             if (_profileEditor.RandomizeEverythingButton != null)
                 _profileEditor.RandomizeEverythingButton.OnPressed += _ =>
                 {
                     UpdatePreviewInstant();
-                    UpdateNameField();
                 };
 
             _profileEditor.ProfileChanged += () => UpdatePreviewInstant();
@@ -110,21 +113,6 @@ namespace Content.Client._VG.Lobby.UI
             var warningMsg = new FormattedMessage();
             warningMsg.AddMarkup($"[color=red]{Loc.GetString("humanoid-profile-editor-naming-rules-warning")}[/color]");
             WarningLabel.SetMessage(warningMsg);
-
-            if (_profileEditor.NameEdit != null)
-            {
-                NameEdit.Text = _profileEditor.NameEdit.Text ?? "";
-                _profileEditor.NameEdit.OnTextChanged += args =>
-                {
-                    if (NameEdit.Text != args.Text)
-                        NameEdit.Text = args.Text;
-                };
-                NameEdit.OnTextChanged += args =>
-                {
-                    if (_profileEditor.NameEdit.Text != args.Text)
-                        _profileEditor.NameEdit.Text = args.Text;
-                };
-            }
 
             CreateCharacterButton.OnPressed += _ =>
             {
@@ -150,7 +138,6 @@ namespace Content.Client._VG.Lobby.UI
                 SelectCharacter?.Invoke(newSlot);
                 UpdateProfileEditor();
                 UpdatePreview();
-                UpdateNameField();
                 ReloadCharacterList();
                 UpdatePdaWallpaperSelection();
             };
@@ -163,7 +150,6 @@ namespace Content.Client._VG.Lobby.UI
                 SelectCharacter?.Invoke(slot);
                 UpdateProfileEditor();
                 UpdatePreview();
-                UpdateNameField();
                 ReloadCharacterList();
                 UpdatePdaWallpaperSelection();
             };
@@ -188,7 +174,6 @@ namespace Content.Client._VG.Lobby.UI
                 DeleteCharacter?.Invoke(selectedSlot.Value);
                 UpdateProfileEditor();
                 UpdatePreview();
-                UpdateNameField();
                 ReloadCharacterList();
                 UpdatePdaWallpaperSelection();
             };
@@ -606,8 +591,7 @@ namespace Content.Client._VG.Lobby.UI
 
         public void UpdateNameField()
         {
-            if (_profileEditor.NameEdit != null)
-                NameEdit.Text = _profileEditor.NameEdit.Text ?? "";
+            // Поле имени теперь оригинальное, обновляется автоматически
         }
 
         public HumanoidProfileEditor GetProfileEditor()

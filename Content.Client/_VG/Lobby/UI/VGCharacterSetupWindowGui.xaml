@@ -18,7 +18,7 @@
                 <BoxContainer Orientation="Vertical">
                     <BoxContainer Orientation="Horizontal" VerticalExpand="True">
                         <Label Text="{Loc 'humanoid-profile-editor-name-label'}" VerticalAlignment="Center" />
-                        <LineEdit Name="NameEdit" HorizontalExpand="True" VerticalAlignment="Center" Margin="5 0 0 0" />
+                        <Control Name="NameEditContainer" HorizontalExpand="True" VerticalAlignment="Center" Margin="5 0 0 0" />
                     </BoxContainer>
                     <BoxContainer Orientation="Horizontal" Margin="0 4">
                         <Button Name="NameRandomize" Text="{Loc 'humanoid-profile-editor-name-random-button'}" HorizontalExpand="True" />
