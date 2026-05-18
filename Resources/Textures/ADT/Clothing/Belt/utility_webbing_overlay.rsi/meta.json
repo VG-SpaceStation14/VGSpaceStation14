@@ -11,7 +11,13 @@
       "name": "crowbar"
     },
     {
+      "name": "crowbar_red"
+    },
+    {
       "name": "cutters"
+    },
+    {
+      "name": "cutters_handle"
     },
     {
       "name": "geiger_counter"
@@ -21,6 +27,9 @@
     },
     {
       "name": "screwdriver"
+    },
+    {
+      "name": "screwdriver_nuke"
     },
     {
       "name": "wrench"

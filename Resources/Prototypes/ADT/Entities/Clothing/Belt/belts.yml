@@ -308,11 +308,16 @@
         whitelist:
           tags:
           - Crowbar
+      # VG-Tweak Start
+      crowbar_red: 
+        whitelist:
+          tags:
           - CrowbarRed
-      screwdriver:
+      screwdriver_nuke:
         whitelist:
           tags:
           - Screwdriver
+      # VG-Tweak End
       wrench:
         whitelist:
           tags:
