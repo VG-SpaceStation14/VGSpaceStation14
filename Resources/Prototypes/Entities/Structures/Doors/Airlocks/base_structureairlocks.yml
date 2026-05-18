@@ -75,11 +75,11 @@
       types:
         Blunt: 15
     openSound:
-      path: /Audio/_VG/Machines/airlock_open.ogg
+      path: /Audio/_VG/Machines/airlock_open.ogg # VG-Tweak
     closeSound:
-      path: /Audio/_VG/Machines/airlock_close.ogg
+      path: /Audio/_VG/Machines/airlock_close.ogg # VG-Tweak
     denySound:
-      path: /Audio/_VG/Machines/airlock_deny.ogg
+      path: /Audio/Machines/airlock_deny.ogg
   - type: ContainerContainer
     containers:
       board: !type:Container
