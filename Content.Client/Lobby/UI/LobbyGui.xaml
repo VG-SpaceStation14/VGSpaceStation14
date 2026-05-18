@@ -12,8 +12,6 @@
 
     <Control Access="Public" Visible="False" Name="CharacterSetupState" VerticalExpand="True" HorizontalExpand="True" />
 
-    <!-- VG-Tweak: Removed ShowInterfaceContainer since HideInterface is now a toggle -->
-
     <Control Name="MainContainer" Access="Public" VerticalExpand="True" HorizontalExpand="True">
         
         <controls:StripeBack Name="TopPanel" Access="Public" Modulate="#FFFFFFD0" VerticalAlignment="Top">
@@ -50,6 +48,15 @@
                         <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
                         <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" MinHeight="32" />
                         <Button Name="CharacterSetup" Access="Public" Text="Персонаж" HorizontalExpand="True" MinHeight="32" />
+                        <!-- VG-Tweak: Admin buttons -->
+                        <BoxContainer Name="AdminButtons" Orientation="Vertical" SeparationOverride="4" Visible="False">
+                            <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
+                            <Label Text="Администрирование" StyleClasses="LabelSubText" HorizontalAlignment="Center" Margin="0 2" />
+                            <Button Name="StartRoundButton" Access="Public" Text="Начать раунд" HorizontalExpand="True" MinHeight="28" />
+                            <Button Name="DelayStartButton" Access="Public" Text="Пауза в лобби" HorizontalExpand="True" MinHeight="28" />
+                            <Button Name="SendLobbyMessageButton" Access="Public" Text="Сообщение в лобби" HorizontalExpand="True" MinHeight="28" />
+                        </BoxContainer>
+                        <!-- VG-Tweak end -->
                         <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
                         <Button Name="OptionsButton" Access="Public" Text="Настройки" HorizontalExpand="True" MinHeight="32" />
                         <Button Name="LeaveButton" Access="Public" Text="Выйти" HorizontalExpand="True" MinHeight="32" StyleClasses="Caution" />
@@ -74,6 +81,20 @@
             </PanelContainer>
         </BoxContainer>
 
+        <Control Name="VGMessageContainer" 
+                 HorizontalAlignment="Left" 
+                 VerticalAlignment="Bottom" 
+                 Margin="425 0 0 45" 
+                 MinSize="800 50"
+                 MaxSize="800 50"
+                 MouseFilter="Ignore" />
+
+        <Control Name="CenterMessageContainer"
+            Access="Public"
+            HorizontalExpand="True"
+            VerticalExpand="True"
+            Margin="420 80 500 120" Visible="False" />
+
         <BoxContainer Name="VoteContainer" Access="Public" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25 75" Orientation="Vertical" MouseFilter="Ignore" />
 
         <BoxContainer Name="MusicContainer" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalExpand="True" Margin="25 15">
@@ -89,7 +110,6 @@
             <info:DevInfoBanner Name="DevInfoBanner" Access="Public" />
             <BoxContainer Name="BottomColumnsContainer" Access="Public" />
             <PanelContainer Name="CenterPanel" Access="Public" />
-            <!-- VG-Tweak: Stubs for removed elements to prevent build errors if referenced elsewhere -->
             <Control Name="ShowInterfaceContainer" />
             <Button Name="ShowInterface" />
         </Control>

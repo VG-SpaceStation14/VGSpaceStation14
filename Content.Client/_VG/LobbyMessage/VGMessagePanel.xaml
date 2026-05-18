@@ -1,0 +1,17 @@
+<Control xmlns="https://spacestation14.io"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         x:Class="Content.Client._VG.LobbyMessage.VGMessagePanel">
+
+    <PanelContainer Name="Background"
+                    StyleClasses="BackgroundPanel"
+                    Modulate="#FFFFFFD0"
+                    MinSize="800 50"
+                    Visible="False">
+
+        <RichTextLabel Name="MessageLabel"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       MaxWidth="750" />
+                       
+    </PanelContainer>
+</Control>
