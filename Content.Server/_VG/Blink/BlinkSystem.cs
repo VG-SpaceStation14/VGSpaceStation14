@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Shared._VG.Blink;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
@@ -20,6 +21,8 @@ public sealed class BlinkSystem : EntitySystem
 
     private const float DefaultMaxHp = 100f;
 
+    private readonly Dictionary<EntityUid, bool> _wasSleeping = new();
+
     public override void Initialize()
     {
         base.Initialize();
@@ -29,21 +32,7 @@ public sealed class BlinkSystem : EntitySystem
 
     private void OnMobStateChanged(EntityUid uid, BlinkComponent blink, MobStateChangedEvent args)
     {
-        switch (args.NewMobState)
-        {
-            case MobState.Alive:
-                SetEyesClosed(uid, blink, false);
-                ScheduleNextBlink(uid, blink, 0f);
-                break;
-            case MobState.Critical:
-                SetEyesClosed(uid, blink, true);
-                blink.NextBlinkTime = TimeSpan.MaxValue;
-                break;
-            case MobState.Dead:
-                SetEyesClosed(uid, blink, false);
-                blink.NextBlinkTime = TimeSpan.MaxValue;
-                break;
-        }
+        ApplyMobState(uid, blink, args.NewMobState);
     }
 
     public override void Update(float frameTime)
@@ -55,6 +44,17 @@ public sealed class BlinkSystem : EntitySystem
         while (query.MoveNext(out var uid, out var blink, out var mobState))
         {
             if (mobState.CurrentState != MobState.Alive)
+                continue;
+
+            // Отслеживаем изменение состояния сна
+            bool sleeping = HasComp<SleepingComponent>(uid);
+            if (sleeping != _wasSleeping.GetValueOrDefault(uid))
+            {
+                OnSleepChanged(uid, blink, sleeping);
+                _wasSleeping[uid] = sleeping;
+            }
+
+            if (sleeping)
                 continue;
 
             float intensity = GetBlinkIntensity(uid, blink);
@@ -86,6 +86,7 @@ public sealed class BlinkSystem : EntitySystem
     {
         if (!args.DamageIncreased || args.DamageDelta == null) return;
         if (!TryComp<MobStateComponent>(uid, out var mobState) || mobState.CurrentState != MobState.Alive) return;
+        if (HasComp<SleepingComponent>(uid)) return;
 
         float damage = (float) args.DamageDelta.GetTotal();
         if (damage < blink.ReflexBlinkDamageThreshold || !_random.Prob(blink.ReflexBlinkChance)) return;
@@ -161,5 +162,41 @@ public sealed class BlinkSystem : EntitySystem
     {
         if (!TryComp<StaminaComponent>(uid, out var stamina) || stamina.CritThreshold <= 0f) return 0f;
         return Math.Clamp(stamina.StaminaDamage / stamina.CritThreshold, 0f, 1f);
+    }
+
+    private void ApplyMobState(EntityUid uid, BlinkComponent blink, MobState state)
+    {
+        switch (state)
+        {
+            case MobState.Alive:
+                SetEyesClosed(uid, blink, false);
+                ScheduleNextBlink(uid, blink, 0f);
+                break;
+            case MobState.Critical:
+                SetEyesClosed(uid, blink, true);
+                blink.NextBlinkTime = TimeSpan.MaxValue;
+                blink.BlinkEndTime = TimeSpan.MaxValue;
+                break;
+            case MobState.Dead:
+                SetEyesClosed(uid, blink, false);
+                blink.NextBlinkTime = TimeSpan.MaxValue;
+                blink.BlinkEndTime = TimeSpan.MaxValue;
+                break;
+        }
+    }
+
+    private void OnSleepChanged(EntityUid uid, BlinkComponent blink, bool sleeping)
+    {
+        if (sleeping)
+        {
+            SetEyesClosed(uid, blink, true);
+            blink.NextBlinkTime = TimeSpan.MaxValue;
+            blink.BlinkEndTime = TimeSpan.MaxValue;
+        }
+        else
+        {
+            if (TryComp<MobStateComponent>(uid, out var mobState))
+                ApplyMobState(uid, blink, mobState.CurrentState);
+        }
     }
 }
