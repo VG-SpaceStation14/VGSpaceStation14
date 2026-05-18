@@ -26,6 +26,7 @@ public sealed class DoAfterOverlay : Overlay
     private readonly SpriteSystem _sprite;
 
     private readonly Texture _barTexture;
+    private readonly SpriteSpecifier _cogTexture; // VG-Tweak
     private readonly ShaderInstance _unshadedShader;
 
     /// <summary>
@@ -51,6 +52,7 @@ public sealed class DoAfterOverlay : Overlay
         _sprite = _entManager.System<SpriteSystem>();
         var sprite = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/progress_bar.rsi"), "icon");
         _barTexture = _entManager.EntitySysManager.GetEntitySystem<SpriteSystem>().Frame0(sprite);
+        _cogTexture = new SpriteSpecifier.Rsi(new("/Textures/_VG/Interface/Misc/progress_cog.rsi"), "cog"); // VG-Tweak Start
 
         _unshadedShader = protoManager.Index(UnshadedShader).Instance();
     }
@@ -113,7 +115,9 @@ public sealed class DoAfterOverlay : Overlay
                 var alpha = 1f;
                 if (doAfter.Args.Hidden || isInContainer)
                 {
-                    if (uid != localEnt)
+                    // VG-Tweak - Show doAfter progress bar to another entity
+                    var showTo = doAfter.Args.ShowTo ?? uid;
+                    if (localEnt != showTo)
                         continue;
 
                     // Hints to the local player that this do-after is not visible to other players.
@@ -128,6 +132,16 @@ public sealed class DoAfterOverlay : Overlay
                 // Offset by the texture size for every do_after we have.
                 var position = new Vector2(-_barTexture.Width / 2f / EyeManager.PixelsPerMeter,
                     yOffset / scale + offset / EyeManager.PixelsPerMeter * scale);
+
+                // VG-Tweak Start
+                if (uid != localEnt)
+                {
+                    var cogFrame = _sprite.GetFrame(_cogTexture, curTime);
+                    handle.DrawTexture(cogFrame, position);
+                    offset += _barTexture.Height / scale;
+                    continue;
+                }
+                // VG-Tweak End
 
                 // Draw the underlying bar texture
                 handle.DrawTexture(_barTexture, position);
@@ -154,7 +168,7 @@ public sealed class DoAfterOverlay : Overlay
                 var xProgress = (EndX - StartX) * elapsedRatio + StartX;
                 var box = new Box2(new Vector2(StartX, 3f) / EyeManager.PixelsPerMeter, new Vector2(xProgress, 4f) / EyeManager.PixelsPerMeter);
                 box = box.Translated(position);
-                handle.DrawRect(box, color);
+                handle.DrawRect(box, doAfter.Args.ColorOverride ?? color); // VG-Tweak
                 offset += _barTexture.Height / scale;
             }
         }
