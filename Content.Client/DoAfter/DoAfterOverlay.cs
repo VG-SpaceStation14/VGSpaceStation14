@@ -26,7 +26,9 @@ public sealed class DoAfterOverlay : Overlay
     private readonly SpriteSystem _sprite;
 
     private readonly Texture _barTexture;
-    private readonly SpriteSpecifier _cogTexture; // VG-Tweak
+    // VG-Tweak Start
+    private readonly SpriteSpecifier _cogTexture;
+    // VG-Tweak End
     private readonly ShaderInstance _unshadedShader;
 
     /// <summary>
@@ -52,7 +54,7 @@ public sealed class DoAfterOverlay : Overlay
         _sprite = _entManager.System<SpriteSystem>();
         var sprite = new SpriteSpecifier.Rsi(new("/Textures/Interface/Misc/progress_bar.rsi"), "icon");
         _barTexture = _entManager.EntitySysManager.GetEntitySystem<SpriteSystem>().Frame0(sprite);
-        _cogTexture = new SpriteSpecifier.Rsi(new("/Textures/_VG/Interface/Misc/progress_cog.rsi"), "cog"); // VG-Tweak Start
+        _cogTexture = new SpriteSpecifier.Rsi(new("/Textures/_VG/Interface/Misc/progress_cog.rsi"), "cog"); // VG-Tweak
 
         _unshadedShader = protoManager.Index(UnshadedShader).Instance();
     }
@@ -115,9 +117,7 @@ public sealed class DoAfterOverlay : Overlay
                 var alpha = 1f;
                 if (doAfter.Args.Hidden || isInContainer)
                 {
-                    // VG-Tweak - Show doAfter progress bar to another entity
-                    var showTo = doAfter.Args.ShowTo ?? uid;
-                    if (localEnt != showTo)
+                    if (uid != localEnt)
                         continue;
 
                     // Hints to the local player that this do-after is not visible to other players.
@@ -168,7 +168,7 @@ public sealed class DoAfterOverlay : Overlay
                 var xProgress = (EndX - StartX) * elapsedRatio + StartX;
                 var box = new Box2(new Vector2(StartX, 3f) / EyeManager.PixelsPerMeter, new Vector2(xProgress, 4f) / EyeManager.PixelsPerMeter);
                 box = box.Translated(position);
-                handle.DrawRect(box, doAfter.Args.ColorOverride ?? color); // VG-Tweak
+                handle.DrawRect(box, color);
                 offset += _barTexture.Height / scale;
             }
         }
