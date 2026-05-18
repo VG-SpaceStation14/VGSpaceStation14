@@ -3,6 +3,7 @@ using Content.Server.Wagging;
 using Content.Shared._VG.Mood;
 using Content.Server._VG.Mood;
 using Content.Shared._VG.Wagging;
+using Content.Shared.Bed.Sleep;
 using Content.Shared.Wagging;
 using Content.Shared.Toggleable;
 using Robust.Shared.Player;
@@ -19,6 +20,8 @@ public sealed class AutoWaggingSystem : EntitySystem
 
     private const float CheckInterval = 3.0f;
 
+    private readonly Dictionary<EntityUid, bool> _wasSleeping = new();
+
     public override void Initialize()
     {
         base.Initialize();
@@ -30,12 +33,20 @@ public sealed class AutoWaggingSystem : EntitySystem
     private void OnStartup(EntityUid uid, AutoWaggingComponent component, ComponentStartup args)
     {
         component.NextCheckTime = _timing.CurTime + TimeSpan.FromSeconds(CheckInterval);
+        _wasSleeping[uid] = HasComp<SleepingComponent>(uid);
     }
 
     private void OnToggleAction(EntityUid uid, AutoWaggingComponent component, ToggleActionEvent args)
     {
         if (args.Handled)
             return;
+
+        if (!component.AutoWaggingEnabled && HasComp<SleepingComponent>(uid))
+        {
+            _popup.PopupEntity(Loc.GetString("auto-wagging-cant-sleeping"), uid, uid, PopupType.Medium);
+            args.Handled = true;
+            return;
+        }
 
         component.AutoWaggingEnabled = !component.AutoWaggingEnabled;
 
@@ -74,6 +85,13 @@ public sealed class AutoWaggingSystem : EntitySystem
 
         while (query.MoveNext(out var uid, out var comp))
         {
+            bool sleeping = HasComp<SleepingComponent>(uid);
+            if (sleeping != _wasSleeping.GetValueOrDefault(uid))
+            {
+                OnSleepChanged(uid, sleeping);
+                _wasSleeping[uid] = sleeping;
+            }
+
             if (currentTime >= comp.NextCheckTime)
             {
                 comp.NextCheckTime = currentTime + TimeSpan.FromSeconds(CheckInterval);
@@ -85,6 +103,9 @@ public sealed class AutoWaggingSystem : EntitySystem
     private void CheckAndUpdateWagging(EntityUid uid, AutoWaggingComponent comp)
     {
         if (!comp.AutoWaggingEnabled)
+            return;
+
+        if (HasComp<SleepingComponent>(uid))
             return;
 
         if (!TryComp<WaggingComponent>(uid, out var wagging))
@@ -103,6 +124,20 @@ public sealed class AutoWaggingSystem : EntitySystem
         else if (!shouldWag && comp.DisableWhenBelow && wagging.Wagging)
         {
             _wagging.TryToggleWagging(uid, wagging);
+        }
+    }
+
+    private void OnSleepChanged(EntityUid uid, bool sleeping)
+    {
+        if (sleeping)
+        {
+            if (TryComp<WaggingComponent>(uid, out var wagging) && wagging.Wagging)
+                _wagging.TryToggleWagging(uid, wagging);
+        }
+        else
+        {
+            if (TryComp<AutoWaggingComponent>(uid, out var autoWag))
+                CheckAndUpdateWagging(uid, autoWag);
         }
     }
 }
