@@ -107,6 +107,8 @@
     usesApcPower: true
   - type: WiresPanel
   - type: WiresPanelSecurity
+  - type: WeldingSparksAnimation # VG-Tweak
+    startingOffset: 0, 0.5
   
   # VG-Tweak Start - Панель проводов требует навык взлома
   - type: WiresPanelSkillRequired

@@ -97,6 +97,10 @@
     useSound:
       collection: Welder
     qualities: Welding
+  # VG-Tweak Start
+  - type: WeldingSparks
+  - type: WeldingSound
+  # VG-Tweak End
   - type: Welder
   - type: PointLight
     enabled: false
@@ -188,6 +192,8 @@
         Quantity: 1
   - type: RequiresEyeProtection
     statusEffectTime: 5 # less harmful; sunglasses can block it
+  - type: WeldingSparks # VG-Tweak
+    effect: EffectWeldingSparksExp
 
 - type: entity
   name: emergency welding tool
