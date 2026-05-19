@@ -1,5 +1,4 @@
 # Base
-
 - type: entity
   parent: BaseItem
   id: BaseToolSurgery
@@ -14,7 +13,6 @@
   - type: SurgeryTool
 
 # Cautery
-
 - type: entity
   name: cautery
   id: Cautery
@@ -22,10 +20,10 @@
   description: A surgical tool used to cauterize open wounds.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/cautery.rsi
     state: cautery
   - type: Item
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/cautery.rsi
     storedRotation: 90
   - type: MeleeWeapon
     damage:
@@ -35,9 +33,9 @@
       path: /Audio/Effects/lightburn.ogg
   - type: SurgeryTool
     startSound:
-      path: /Audio/_VG/Medical/Surgery/cautery1.ogg
+      path: /Audio/Medical/Surgery/cautery1.ogg
     endSound:
-      path: /Audio/_VG/Medical/Surgery/cautery2.ogg
+      path: /Audio/Medical/Surgery/cautery2.ogg
   - type: Cautery
   - type: Tag
     tags:
@@ -45,7 +43,6 @@
     - Cautery
 
 # Drill
-
 - type: entity
   name: drill
   id: Drill
@@ -53,10 +50,10 @@
   description: A surgical drill for making holes into hard material.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/drill.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/drill.rsi
     state: drill
   - type: Item
-    sprite: Objects/Specific/Medical/Surgery/drill.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/drill.rsi
     shape:
     - 0,0,1,0
     - 1,1,1,1
@@ -78,7 +75,6 @@
     - Drill
 
 # Scalpel
-
 - type: entity
   name: scalpel
   id: Scalpel
@@ -95,10 +91,10 @@
     types:
       - Knife
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/scalpel.rsi
     state: scalpel
   - type: Item
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/scalpel.rsi
     storedRotation: 90
   - type: MeleeWeapon
     wideAnimationRotation: 90
@@ -111,9 +107,9 @@
       path: /Audio/Weapons/bladeslice.ogg
   - type: SurgeryTool
     startSound:
-      path: /Audio/_VG/Medical/Surgery/scalpel1.ogg
+      path: /Audio/Medical/Surgery/scalpel1.ogg
     endSound:
-      path: /Audio/_VG/Medical/Surgery/scalpel2.ogg
+      path: /Audio/Medical/Surgery/scalpel2.ogg
   - type: Scalpel
   - type: Tag
     tags:
@@ -127,8 +123,11 @@
   description: A pointy piece of glass, abraded to an edge and wrapped in tape for a handle.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
     state: shiv
   - type: Item
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    storedRotation: 90
     heldPrefix: shiv
 
 - type: entity
@@ -138,8 +137,11 @@
   description: Made of more expensive materials, sharper and generally more reliable.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
     state: advanced
   - type: Item
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    storedRotation: 90
     heldPrefix: advanced
   - type: MeleeWeapon
     damage:
@@ -152,11 +154,14 @@
   name: laser scalpel
   id: ScalpelLaser
   parent: Scalpel
-  description: A scalpel which uses a directed laser to slice instead of a blade.
+  description: A scalpel which uses a directed laser to slice instead of a blade, for more precise surgery while also cauterizing as it cuts.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
     state: laser
   - type: Item
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    storedRotation: 90
     heldPrefix: laser
   - type: Scalpel
     speed: 1.5
@@ -164,9 +169,9 @@
     tags:
     - SurgeryTool
     - ScalpelLaser
+  # TODO: prevent bleeding from incisions
 
 # Retractor
-
 - type: entity
   name: retractor
   id: Retractor
@@ -174,16 +179,16 @@
   description: A surgical tool used to hold open incisions.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/retractor.rsi
     state: retractor
   - type: Item
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/retractor.rsi
     storedRotation: 90
   - type: SurgeryTool
     startSound:
-      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+      path: /Audio/Medical/Surgery/retractor1.ogg
     endSound:
-      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
+      path: /Audio/Medical/Surgery/retractor2.ogg
   - type: Retractor
   - type: Tag
     tags:
@@ -191,7 +196,6 @@
     - Retractor
 
 # Hemostat
-
 - type: entity
   name: hemostat
   id: Hemostat
@@ -199,17 +203,17 @@
   description: A surgical tool used to compress blood vessels to prevent bleeding.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/hemostat.rsi
     state: hemostat
   - type: Item
     heldPrefix: hemostat
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/hemostat.rsi
     storedRotation: 90
   - type: SurgeryTool
     startSound:
-      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+      path: /Audio/Medical/Surgery/retractor1.ogg
     endSound:
-      path: /Audio/_VG/Medical/Surgery/hemostat1.ogg
+      path: /Audio/Medical/Surgery/hemostat1.ogg
   - type: Hemostat
   - type: Tweezers
   - type: Tending
@@ -219,7 +223,6 @@
     - Hemostat
 
 # Bone setter
-
 - type: entity
   parent: BaseToolSurgery
   id: BoneSetter
@@ -238,7 +241,6 @@
     - BoneSetter
 
 # Bone Gel
-
 - type: entity
   parent: BaseToolSurgery
   id: BoneGel
@@ -246,12 +248,11 @@
   description: A container for bone gel that often needs to be refilled from a specialized machine.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/bone_gel.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/bone-gel.rsi
     state: bone-gel
   - type: BoneGel
 
 # Saws
-
 - type: entity
   name: metal saw
   id: Saw
@@ -290,6 +291,7 @@
   description: A wicked serrated blade made of whatever nasty sharp things you could find.
   components:
   - type: Sprite
+    sprite: _VG/Objects/Specific/Medical/Surgery/saw.rsi
     state: improv
   - type: Item
     size: Small
@@ -314,12 +316,11 @@
   description: For heavy duty cutting.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
-    state: electric
+    sprite: _VG/Objects/Specific/Medical/Surgery/circular-saw.rsi
+    state: circular-saw
   - type: Item
     size: Normal
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
-    heldPrefix: electric
+    sprite: _VG/Objects/Specific/Medical/Surgery/circular-saw.rsi
   - type: MeleeWeapon
     damage:
       groups:
@@ -341,11 +342,15 @@
   name: advanced circular saw
   id: SawAdvanced
   parent: [ SawElectric, BaseSyndicateContraband ]
-  description: Interdyne's state-of-the-art surgical saw.
+  description: Interdyne's state-of-the-art surgical saw. Guaranteed to stay spotless and sterile, no matter how messy the job.
   components:
   - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/saw.rsi
     state: advanced
   - type: Item
+    size: Normal
+    sprite: Objects/Specific/Medical/Surgery/saw.rsi
+    storedRotation: 90
     heldPrefix: advanced
   - type: MeleeWeapon
     attackRate: 1.5
@@ -354,4 +359,150 @@
       - Sawing
     speedModifier: 2.0
   - type: BoneSaw
+    speed: 2
+
+# _VG Advanced Tools
+- type: entity
+  name: searing tool
+  id: EnergyCautery
+  parent: Cautery
+  description: A cautery with an energy tip, also serves as a drill in its powered state.
+  components:
+  - type: Sprite
+    sprite: _VG/Objects/Specific/Medical/Surgery/e-cautery.rsi
+    state: e-cautery-on
+  - type: Item
+    sprite: _VG/Objects/Specific/Medical/Surgery/e-cautery.rsi
+    inhandVisuals:
+      left:
+      - state: inhand-left-on
+      right:
+      - state: inhand-right-on
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/cautery1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/cautery2.ogg
+  - type: MeleeWeapon
+    damage:
+      types:
+        Piercing: 10
+        Heat: 1
+  - type: Cautery
+    speed: 1.5
+  - type: Drill
+    speed: 1.5
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - EnergyCautery
+
+- type: entity
+  name: energy scalpel
+  id: EnergyScalpel
+  parent: Scalpel
+  description: A scalpel which uses an energy blade, also serves as a saw in its powered state.
+  components:
+  - type: Sprite
+    sprite: _VG/Objects/Specific/Medical/Surgery/e-scalpel.rsi
+    state: e-scalpel-on
+  - type: Item
+    sprite: _VG/Objects/Specific/Medical/Surgery/e-scalpel.rsi
+    inhandVisuals:
+      left:
+      - state: inhand-left-on
+      right:
+      - state: inhand-right-on
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/scalpel2.ogg
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 10
+        Heat: 1
+  - type: Scalpel
+    speed: 1.5
+  - type: BoneSaw
+    speed: 1.5
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - EnergyScalpel
+
+- type: entity
+  name: mechanical pinches
+  id: AdvancedRetractor
+  parent: Retractor
+  description: A retractor with mechanical pinches, also serves as a hemostat in its powered state.
+  components:
+  - type: Sprite
+    sprite: _VG/Objects/Specific/Medical/Surgery/adv-retractor.rsi
+    state: adv-retractor-on
+  - type: Item
+    sprite: _VG/Objects/Specific/Medical/Surgery/adv-retractor.rsi
+    inhandVisuals:
+      left:
+      - state: inhand-left-on
+      right:
+      - state: inhand-right-on
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
+    endSound:
+      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
+  - type: MeleeWeapon
+    damage:
+      types:
+        Slash: 6.5
+        Heat: 1
+  - type: Hemostat
+    speed: 1.5
+  - type: Retractor
+    speed: 1.5
+  - type: Tweezers
+    speed: 1.5
+  - type: Tending
+    speed: 1.5
+  - type: BoneSetter
+    speed: 1.5
+  - type: Tag
+    tags:
+    - SurgeryTool
+    - AdvancedRetractor
+
+- type: entity
+  name: medical multitool
+  id: OmnimedTool
+  parent: BaseToolSurgery
+  components:
+  - type: Sprite
+    sprite: _VG/Objects/Specific/Medical/Surgery/omnimed.rsi
+    state: omnimed
+  - type: Item
+    sprite: _VG/Objects/Specific/Medical/Surgery/omnimed.rsi
+  - type: SurgeryTool
+    startSound:
+      path: /Audio/_VG/Medical/Surgery/saw.ogg
+  - type: Hemostat
+    speed: 2
+  - type: Scalpel
+    speed: 2
+  - type: Drill
+    speed: 2
+  - type: BoneSetter
+    speed: 2
+  - type: Retractor
+    speed: 2
+  - type: Cautery
+    speed: 2
+  - type: BoneGel
+    speed: 2
+  - type: BoneSaw
+    speed: 2
+  - type: Tweezers
+    speed: 2
+  - type: Tending
     speed: 2

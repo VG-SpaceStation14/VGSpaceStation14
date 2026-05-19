@@ -110,6 +110,13 @@
     speechSounds: Slime
   - type: TypingIndicator
     proto: slime
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
   # ADT tweak start
   - type: LanguageSpeaker
     languages:

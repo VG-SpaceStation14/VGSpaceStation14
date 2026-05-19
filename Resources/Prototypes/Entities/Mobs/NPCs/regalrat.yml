@@ -138,6 +138,13 @@
   - type: Sharp
   - type: TTS # Corvax-TTS
     voice: dude
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End 
   - type: GrabProtection #ADT tweak
 
 - type: entity
@@ -219,6 +226,13 @@
     - map: [ "enum.DamageStateVisualLayers.BaseUnshaded"]
       state: eyes
       shader: unshaded
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
 
   - type: SpriteMovement
     movementLayers:

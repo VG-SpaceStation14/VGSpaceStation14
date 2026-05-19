@@ -1,0 +1,59 @@
+- type: technology
+  id: VGAdvancedSurgery
+  name: research-technology-vg-advanced-surgery
+  icon:
+    sprite: _VG/Objects/Specific/Medical/Surgery/scalpel.rsi
+    state: scalpel
+  discipline: Biochemical
+  tier: 2
+  cost: 10000
+  recipeUnlocks:
+  - EnergyCautery
+  - EnergyScalpel
+  - AdvancedRetractor
+  - BorgModuleSurgery
+  - BorgModuleAdvancedSurgery
+  position: 5,1
+  requiredTech:
+  - ADTIndustrialMedicine
+
+- type: technology
+  id: VGOmnimedTool
+  name: research-technology-vg-omnimed-tool
+  icon:
+    sprite: _VG/Objects/Specific/Medical/Surgery/omnimed.rsi
+    state: omnimed
+  discipline: Biochemical
+  tier: 3
+  cost: 15000
+  recipeUnlocks:
+  - OmnimedTool
+  position: 6,1
+  requiredTech:
+  - VGAdvancedSurgery
+
+- type: technology
+  id: VGSyntheticOrgans
+  name: research-technology-vg-synthetic-organs
+  icon:
+    sprite: Mobs/Species/Human/organs.rsi
+    state: heart-on
+  discipline: Biochemical
+  tier: 3
+  cost: 20000
+  recipeUnlocks:
+  - SynthLiver
+  - SynthHeart
+  - SynthLungs
+  - SynthEyes
+  - SynthLeftLeg
+  - SynthRightLeg
+  - SynthLeftFoot
+  - SynthRightFoot
+  - SynthLeftArm
+  - SynthRightArm
+  - SynthLeftHand
+  - SynthRightHand
+  position: 2,2
+  requiredTech:
+  - ADTCloning

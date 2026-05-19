@@ -87,6 +87,15 @@
       interactFailureString: petting-failure-carp
       interactFailureSound:
         path: /Audio/Effects/bite.ogg
+    # VG-Tweak Start
+    - type: Body
+      prototype: Carp
+    - type: SurgeryTarget
+    - type: UserInterface
+      interfaces:
+        enum.SurgeryUIKey.Key:
+          type: SurgeryBui
+    # VG-Tweak End
     - type: CollectiveMindRank
       rankName: collective-mind-carp-rank
     # ADT-tweak-end
@@ -289,6 +298,13 @@
         GalacticCommon: Speak
         CarpCollectiveMind: Speak
     # ADT-tweak-end
+    # VG-Tweak Start
+    - type: SurgeryTarget
+    - type: UserInterface
+      interfaces:
+        enum.SurgeryUIKey.Key:
+          type: SurgeryBui
+    # VG-Tweak End
 
 - type: entity
   id: MobSharkSalvage

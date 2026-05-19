@@ -1,0 +1,16 @@
+﻿- type: latheRecipePack
+  id: AdvancedSurgeryBorg
+  recipes:
+    - BorgModuleSurgery
+    - BorgModuleAdvancedSurgery
+
+- type: latheRecipePack
+  id: CyberneticEnhancementsDynamic
+  recipes:
+    - JawsOfLifeLeftArm
+    - JawsOfLifeRightArm
+    - SpeedLeftLeg
+    - SpeedRightLeg
+    - BasicCyberneticEyes
+    - SecurityCyberneticEyes
+    - MedicalCyberneticEyes

@@ -642,6 +642,8 @@
     interfaces:
       enum.StrippingUiKey.Key:
         type: StrippableBoundUserInterface
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui # VG-Tweak
   - type: SupermatterIgnore # ADT-Tweak
   - type: InventorySlots
   - type: Inventory
@@ -673,6 +675,7 @@
           32:
             sprite: Mobs/Animals/mothroach/displacement.rsi
             state: neck
+  - type: SurgeryTarget # VG-Tweak
 
 # Note that the mallard duck is actually a male drake mallard, with the brown duck being the female variant of the same species, however ss14 lacks sex specific textures
 # The white duck is more akin to a pekin or call duck.
@@ -749,6 +752,13 @@
   - type: NpcFactionMember
     factions:
     - Passive
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
   - type: HTN # ADT tweak
     rootTask: # ADT tweak
       task: RuminantCompound # ADT tweak
@@ -968,6 +978,13 @@
     - Passive
   - type: Body
     prototype: AnimalRuminant
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface 
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
   - type: HTN
     rootTask:
       task: RuminantCompound
@@ -1044,6 +1061,13 @@
       task: RuminantCompound
   - type: Body
     prototype: AnimalHemocyanin
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
 
 - type: entity
   name: goat
@@ -1161,6 +1185,13 @@
       Goat: Speak
       GalacticCommon: Understand
       # End ADT tweak
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
 
 # Note that we gotta make this bitch vomit someday when you feed it anthrax or sumthin. Needs to be a small item thief too and aggressive if attacked.
 - type: entity
@@ -1395,6 +1426,13 @@
   - type: Inventory
     templateId: monkey
     speciesId: monkey
+  # VG-Tweak Start
+  - type: SurgeryTarget 
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
   - type: Deathgasp
     prototype: MonkeyDeathgasp
   - type: Cuffable
@@ -1939,6 +1977,13 @@
       Taco: RatTaco
       Burger: RatBurger
       Skewer: RatSkewer
+# VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+# VG-Tweak End
 # ADT-Tweak-start
   - type: LanguageSpeaker
     languages:
@@ -2625,6 +2670,13 @@
       groups:
         Brute: -0.07
         Burn: -0.07
+  # VG-Tweak Start
+  - type: SurgeryTarget
+  - type: UserInterface
+    interfaces:
+      enum.SurgeryUIKey.Key:
+        type: SurgeryBui
+  # VG-Tweak End
 
 - type: entity
   parent: MobSpiderBase

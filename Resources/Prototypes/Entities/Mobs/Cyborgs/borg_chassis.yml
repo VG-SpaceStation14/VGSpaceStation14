@@ -89,6 +89,7 @@
   components:
   - type: BorgSwitchableType
     selectedBorgType: medical
+  - type: SurgeryTarget # VG-Tweak
   - type: TTS # Corvax-TTS
     voice: fact_core
   #Start ADT Tweak
