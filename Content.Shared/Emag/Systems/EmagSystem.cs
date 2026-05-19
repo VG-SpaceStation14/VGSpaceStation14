@@ -9,6 +9,7 @@ using Content.Shared.Popups;
 using Content.Shared.Tag;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Serialization;
+using Content.Shared._VG.Effects; // VG-Tweak
 
 namespace Content.Shared.Emag.Systems;
 
@@ -25,6 +26,7 @@ public sealed class EmagSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
 
     public override void Initialize()
     {
@@ -79,6 +81,7 @@ public sealed class EmagSystem : EntitySystem
         _popup.PopupPredicted(Loc.GetString("emag-success", ("target", Identity.Entity(target, EntityManager))), user, user, PopupType.Medium);
 
         _audio.PlayPredicted(ent.Comp.EmagSound, ent, ent);
+        _sparks.DoSparks(Transform(target).Coordinates); // VG-Tweak
 
         _adminLogger.Add(LogType.Emag, LogImpact.High, $"{ToPrettyString(user):player} emagged {ToPrettyString(target):target} with flag(s): {typeToUse}");
 

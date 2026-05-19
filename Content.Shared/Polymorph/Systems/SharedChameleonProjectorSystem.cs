@@ -16,6 +16,7 @@ using Robust.Shared.Toolshed.TypeParsers;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Stunnable;
+using Content.Shared._VG.Effects; // VG-Tweak
 
 namespace Content.Shared.Polymorph.Systems;
 
@@ -36,6 +37,7 @@ public abstract class SharedChameleonProjectorSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
     public override void Initialize()
     {
         base.Initialize();
@@ -245,6 +247,7 @@ public abstract class SharedChameleonProjectorSystem : EntitySystem
         CopyComp<ItemComponent>((disguise, comp));
 
         _appearance.CopyData(entity, disguise);
+        _sparks.DoSparks(Transform(user).Coordinates); // VG-Tweak
     }
 
     /// <summary>
@@ -267,6 +270,7 @@ public abstract class SharedChameleonProjectorSystem : EntitySystem
 
         Del(ent.Comp.Disguise);
         RemComp<ChameleonDisguisedComponent>(ent);
+        _sparks.DoSparks(Transform(ent).Coordinates); // VG-Tweak
         return true;
     }
 

@@ -29,6 +29,7 @@ using Robust.Shared.Physics.Events;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Content.Shared._VG.Effects; // VG-Tweak
 using PullableComponent = Content.Shared.Movement.Pulling.Components.PullableComponent;
 using PullerComponent = Content.Shared.Movement.Pulling.Components.PullerComponent;
 
@@ -54,6 +55,7 @@ public sealed class ElectrocutionSystem : SharedElectrocutionSystem
     [Dependency] private readonly TagSystem _tag = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
 
     private static readonly ProtoId<StatusEffectPrototype> StatusKeyIn = "Electrocution";
     private static readonly ProtoId<DamageTypePrototype> DamageType = "Shock";
@@ -402,6 +404,7 @@ public sealed class ElectrocutionSystem : SharedElectrocutionSystem
 
 
         // TODO: Sparks here.
+        _sparks.DoSparks(Transform(uid).Coordinates); // VG-Tweak
 
         if (shockDamage is { } dmg)
         {

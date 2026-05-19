@@ -8,6 +8,7 @@ using Content.Shared.Ninja.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Power.Components;
 using Robust.Shared.Audio.Systems;
+using Content.Shared._VG.Effects; // VG-Tweak
 
 namespace Content.Server.Ninja.Systems;
 
@@ -20,6 +21,7 @@ public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
 
     public override void Initialize()
     {
@@ -101,7 +103,7 @@ public sealed class BatteryDrainerSystem : SharedBatteryDrainerSystem
         var output = input * comp.DrainEfficiency;
         _battery.SetCharge((comp.BatteryUid.Value, battery), battery.CurrentCharge + output);
         // TODO: create effect message or something
-        Spawn("EffectSparks", Transform(target).Coordinates);
+        _sparks.DoSparks(Transform(target).Coordinates); // VG-Tweak
         _audio.PlayPvs(comp.SparkSound, target);
         _popup.PopupEntity(Loc.GetString("battery-drainer-success", ("battery", target)), uid, uid);
 

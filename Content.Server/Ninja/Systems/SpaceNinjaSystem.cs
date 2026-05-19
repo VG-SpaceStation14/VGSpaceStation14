@@ -15,6 +15,7 @@ using Content.Shared.Power.Components;
 using Content.Shared.Popups;
 using Content.Shared.Rounding;
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared._VG.Effects; // VG-Tweak
 
 namespace Content.Server.Ninja.Systems;
 
@@ -28,6 +29,7 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
     [Dependency] private readonly CodeConditionSystem _codeCondition = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
 
     public override void Initialize()
     {
@@ -137,16 +139,19 @@ public sealed class SpaceNinjaSystem : SharedSpaceNinjaSystem
             : Loc.GetString("ninja-research-steal-success", ("count", gained), ("server", args.Target));
 
         Popup.PopupEntity(str, uid, uid, PopupType.Medium);
+        _sparks.DoSparks(Transform(args.Target).Coordinates); // VG-Tweak
     }
 
     private void OnThreatCalledIn(Entity<SpaceNinjaComponent> ent, ref ThreatCalledInEvent args)
     {
         _codeCondition.SetCompleted(ent.Owner, ent.Comp.TerrorObjective);
+        _sparks.DoSparks(Transform(args.Target).Coordinates); // VG-Tweak
     }
 
     private void OnCriminalRecordsHacked(Entity<SpaceNinjaComponent> ent, ref CriminalRecordsHackedEvent args)
     {
         _codeCondition.SetCompleted(ent.Owner, ent.Comp.MassArrestObjective);
+        _sparks.DoSparks(Transform(args.Target).Coordinates); // VG-Tweak
     }
 
     /// <summary>

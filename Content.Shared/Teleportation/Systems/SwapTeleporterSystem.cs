@@ -12,6 +12,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Timing;
+using Content.Shared._VG.Effects; // VG-Tweak
 
 namespace Content.Shared.Teleportation.Systems;
 
@@ -28,6 +29,7 @@ public sealed class SwapTeleporterSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly EntityWhitelistSystem _whitelistSystem = default!;
+    [Dependency] private readonly SparksSystem _sparks = default!; // VG-Tweak
 
     private EntityQuery<TransformComponent> _xformQuery;
 
@@ -172,6 +174,11 @@ public sealed class SwapTeleporterSystem : EntitySystem
             otherTeleEnt,
             PopupType.MediumCaution);
         _transform.SwapPositions(teleEnt, otherTeleEnt);
+
+        // VG-Tweak Start
+        _sparks.DoSparks(Transform(teleEnt).Coordinates);
+        _sparks.DoSparks(Transform(otherTeleEnt).Coordinates);
+        // VG-Tweak End
     }
 
     /// <summary>
