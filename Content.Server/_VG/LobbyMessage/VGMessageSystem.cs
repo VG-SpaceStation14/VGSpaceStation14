@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Shared.GameTicking;
 using Content.Shared._VG.LobbyMessage;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
@@ -15,20 +16,25 @@ public sealed class VGMessageSystem : EntitySystem
 
     private static readonly SoundSpecifier MessageSound = new SoundPathSpecifier("/Audio/Voice/Moth/moth_scream.ogg");
 
-    /// <summary>
-    /// Текущее сообщение лобби (null или пустая строка — сообщения нет).
-    /// </summary>
     private string? _currentMessage;
 
     public override void Initialize()
     {
         base.Initialize();
         _netManager.RegisterNetMessage<MsgVGMessageRequest>(OnRequest, NetMessageAccept.Server);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
     }
 
-    /// <summary>
-    /// Устанавливает новое сообщение, рассылает его всем игрокам и проигрывает звук.
-    /// </summary>
+    private void OnRoundRestart(RoundRestartCleanupEvent ev)
+    {
+        _currentMessage = null;
+        var clearEv = new VGMessageEvent(string.Empty);
+        foreach (var session in _playerManager.Sessions)
+        {
+            RaiseNetworkEvent(clearEv, session);
+        }
+    }
+
     public void SendMessage(string? text)
     {
         _currentMessage = string.IsNullOrWhiteSpace(text) ? null : text;
@@ -37,23 +43,16 @@ public sealed class VGMessageSystem : EntitySystem
         foreach (var session in _playerManager.Sessions)
         {
             RaiseNetworkEvent(ev, session);
-        
             if (!string.IsNullOrWhiteSpace(text))
                 _audio.PlayGlobal(MessageSound, session);
         }
     }
 
-    /// <summary>
-    /// Обработчик запроса от клиента — отправляет текущее сообщение обратно.
-    /// </summary>
     private void OnRequest(MsgVGMessageRequest message)
     {
-        if (message.MsgChannel == null)
-            return;
-
+        if (message.MsgChannel == null) return;
         var session = _playerManager.GetSessionByChannel(message.MsgChannel);
-        if (session == null)
-            return;
+        if (session == null) return;
 
         var ev = new VGMessageEvent(_currentMessage ?? string.Empty);
         RaiseNetworkEvent(ev, session);
