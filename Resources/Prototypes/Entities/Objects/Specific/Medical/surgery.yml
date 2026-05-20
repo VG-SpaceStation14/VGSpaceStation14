@@ -33,9 +33,9 @@
       path: /Audio/Effects/lightburn.ogg
   - type: SurgeryTool
     startSound:
-      path: /Audio/Medical/Surgery/cautery1.ogg
+      path: /Audio/_VG/Medical/Surgery/cautery1.ogg
     endSound:
-      path: /Audio/Medical/Surgery/cautery2.ogg
+      path: /Audio/_VG/Medical/Surgery/cautery2.ogg
   - type: Cautery
   - type: Tag
     tags:
@@ -107,9 +107,9 @@
       path: /Audio/Weapons/bladeslice.ogg
   - type: SurgeryTool
     startSound:
-      path: /Audio/Medical/Surgery/scalpel1.ogg
+      path: /Audio/_VG/Medical/Surgery/scalpel1.ogg
     endSound:
-      path: /Audio/Medical/Surgery/scalpel2.ogg
+      path: /Audio/_VG/Medical/Surgery/scalpel2.ogg
   - type: Scalpel
   - type: Tag
     tags:
@@ -186,9 +186,9 @@
     storedRotation: 90
   - type: SurgeryTool
     startSound:
-      path: /Audio/Medical/Surgery/retractor1.ogg
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
     endSound:
-      path: /Audio/Medical/Surgery/retractor2.ogg
+      path: /Audio/_VG/Medical/Surgery/retractor2.ogg
   - type: Retractor
   - type: Tag
     tags:
@@ -211,9 +211,9 @@
     storedRotation: 90
   - type: SurgeryTool
     startSound:
-      path: /Audio/Medical/Surgery/retractor1.ogg
+      path: /Audio/_VG/Medical/Surgery/retractor1.ogg
     endSound:
-      path: /Audio/Medical/Surgery/hemostat1.ogg
+      path: /Audio/_VG/Medical/Surgery/hemostat1.ogg
   - type: Hemostat
   - type: Tweezers
   - type: Tending
