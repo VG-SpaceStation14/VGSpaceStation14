@@ -111,49 +111,102 @@ namespace Content.Server.Hands.Systems
         }
 
         // start-_VG: surgery
-        private void TryAddHand(Entity<HandsComponent> entity, Entity<BodyPartComponent> part, string slot)
+        private string GetSlotForHand(BodyPartComponent handComp)
         {
-            if (part.Comp is null
-                || part.Comp.PartType != BodyPartType.Hand)
-                return;
-
-            var location = part.Comp.Symmetry switch
+            return handComp.Symmetry switch
             {
-                BodyPartSymmetry.None => HandLocation.Middle,
-                BodyPartSymmetry.Left => HandLocation.Left,
-                BodyPartSymmetry.Right => HandLocation.Right,
-                _ => throw new ArgumentOutOfRangeException(nameof(part.Comp.Symmetry))
+                BodyPartSymmetry.Left => "left hand",
+                BodyPartSymmetry.Right => "right hand",
+                _ => "hand"
             };
+        }
 
-            if (part.Comp.Enabled
-                && _bodySystem.TryGetParentBodyPart(part, out var _, out var parentPartComp)
-                && parentPartComp.Enabled)
-                AddHand(entity.Owner, slot, location);
+        private void RemoveHandsForPartAndDescendants(EntityUid owner, Entity<BodyPartComponent> part)
+        {
+            if (part.Comp.PartType == BodyPartType.Hand)
+            {
+                var slot = GetSlotForHand(part.Comp);
+                if (!string.IsNullOrEmpty(slot))
+                    RemoveHand(owner, slot);
+            }
+            foreach (var (childId, childComp) in _bodySystem.GetBodyPartChildren(part))
+            {
+                if (childComp.PartType == BodyPartType.Hand)
+                {
+                    var slot = GetSlotForHand(childComp);
+                    if (!string.IsNullOrEmpty(slot))
+                        RemoveHand(owner, slot);
+                }
+            }
+        }
+
+        private void AddHandsForPartAndDescendants(Entity<HandsComponent> entity, Entity<BodyPartComponent> part)
+        {
+            if (part.Comp.PartType == BodyPartType.Hand && part.Comp.Enabled)
+            {
+                if (_bodySystem.TryGetParentBodyPart(part, out var parentUid, out var parentComp) && parentComp.Enabled)
+                {
+                    var location = part.Comp.Symmetry switch
+                    {
+                        BodyPartSymmetry.None => HandLocation.Middle,
+                        BodyPartSymmetry.Left => HandLocation.Left,
+                        BodyPartSymmetry.Right => HandLocation.Right,
+                        _ => HandLocation.Middle
+                    };
+                    var slot = GetSlotForHand(part.Comp);
+                    if (!string.IsNullOrEmpty(slot) && !TryGetHand(entity.AsNullable(), slot, out _))
+                        AddHand(entity.Owner, slot, location);
+                }
+            }
+            foreach (var (childId, childComp) in _bodySystem.GetBodyPartChildren(part))
+            {
+                if (childComp.PartType != BodyPartType.Hand)
+                    continue;
+                if (!childComp.Enabled)
+                    continue;
+                if (!_bodySystem.TryGetParentBodyPart(childId, out var parentUid, out var parentComp) || !parentComp.Enabled)
+                    continue;
+                var location = childComp.Symmetry switch
+                {
+                    BodyPartSymmetry.None => HandLocation.Middle,
+                    BodyPartSymmetry.Left => HandLocation.Left,
+                    BodyPartSymmetry.Right => HandLocation.Right,
+                    _ => HandLocation.Middle
+                };
+                var slot = GetSlotForHand(childComp);
+                if (string.IsNullOrEmpty(slot))
+                    continue;
+                if (!TryGetHand(entity.AsNullable(), slot, out _))
+                    AddHand(entity.Owner, slot, location);
+            }
         }
 
         private void HandleBodyPartAdded(Entity<HandsComponent> ent, ref Content.Shared.Body.Part.BodyPartAddedEvent args)
         {
-            TryAddHand(ent, args.Part, args.Slot);
+            if (args.Part.Comp is null)
+                return;
+            AddHandsForPartAndDescendants(ent, args.Part);
         }
 
         private void HandleBodyPartRemoved(Entity<HandsComponent> entity, ref Content.Shared.Body.Part.BodyPartRemovedEvent args)
         {
-            if (args.Part.Comp is null || args.Part.Comp.PartType != BodyPartType.Hand)
+            if (args.Part.Comp is null)
                 return;
-            RemoveHand(entity.Owner, args.Slot);
+            RemoveHandsForPartAndDescendants(entity.Owner, args.Part);
         }
 
-        private void HandleBodyPartEnabled(Entity<HandsComponent> entity, ref BodyPartEnabledEvent args) =>
-            TryAddHand(entity, args.Part, SharedBodySystem.GetPartSlotContainerId(args.Part.Comp.ParentSlot?.Id ?? string.Empty));
+        private void HandleBodyPartEnabled(Entity<HandsComponent> entity, ref BodyPartEnabledEvent args)
+        {
+            if (args.Part.Comp is null)
+                return;
+            AddHandsForPartAndDescendants(entity, args.Part);
+        }
 
         private void HandleBodyPartDisabled(Entity<HandsComponent> entity, ref BodyPartDisabledEvent args)
         {
-            if (TerminatingOrDeleted(entity.Owner)
-                || args.Part.Comp is null
-                || args.Part.Comp.PartType != BodyPartType.Hand)
+            if (TerminatingOrDeleted(entity.Owner) || args.Part.Comp is null)
                 return;
-
-            RemoveHand(entity.Owner, SharedBodySystem.GetPartSlotContainerId(args.Part.Comp.ParentSlot?.Id ?? string.Empty));
+            RemoveHandsForPartAndDescendants(entity.Owner, args.Part);
         }
         // end-_VG: surgery
 

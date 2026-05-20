@@ -40,6 +40,8 @@ namespace Content.Client.Hands.Systems
         public event Action<string, EntityUid>? OnPlayerItemRemoved;
         public event Action<string>? OnPlayerHandBlocked;
         public event Action<string>? OnPlayerHandUnblocked;
+        public event Action<Entity<HandsComponent>, string, HandLocation>? OnPlayerAddHand; // VG-Tweak
+        public event Action<Entity<HandsComponent>, string>? OnPlayerRemoveHand; // VG-Tweak
 
         public override void Initialize()
         {
@@ -69,12 +71,15 @@ namespace Content.Client.Hands.Systems
             foreach (var handId in oldHands)
             {
                 RemoveHand(ent.AsNullable(), handId);
+                OnPlayerRemoveHand?.Invoke(ent, handId); // VG-Tweak
             }
 
             foreach (var handId in state.SortedHands.Intersect(newHands))
             {
                 AddHand(ent.AsNullable(), handId, state.Hands[handId]);
+                OnPlayerAddHand?.Invoke(ent, handId, state.Hands[handId].Location); // VG-Tweak
             }
+            
             ent.Comp.SortedHands = new (state.SortedHands);
 
             SetActiveHand(ent.AsNullable(), state.ActiveHandId);
