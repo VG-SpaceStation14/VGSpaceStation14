@@ -36,6 +36,10 @@
   - Drill
   - Saw
   - Hemostat
+  # VG-Tweak Start
+  - BoneSetter
+  - BoneGel
+  # VG-Tweak End
 
 - type: latheRecipePack
   id: MedicalStatic

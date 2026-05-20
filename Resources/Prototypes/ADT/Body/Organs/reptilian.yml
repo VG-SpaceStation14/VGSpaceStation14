@@ -4,6 +4,11 @@
   name: heart
   categories: [ HideSpawnMenu ]
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Sprite
     state: heart-on
   - type: Metabolizer
@@ -22,7 +27,11 @@
   components:
   - type: Sprite
     state: liver
-  - type: Organ
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ 
+    slotId: liver
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 1
     metabolizerTypes: [ Reptilian ]

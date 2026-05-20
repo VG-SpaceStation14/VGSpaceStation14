@@ -67,7 +67,12 @@
       - id: Drill
       - id: Saw
       - id: Hemostat
-      - id: ClothingMaskSterile
+      # VG-Tweak Start
+      - id: BoneSetter
+      - id: BoneGel
+      - id: BoxLatexGloves
+      - id: BoxSterileMask
+      # VG-Tweak End
 
 - type: entity
   id: CrateMedicalScrubs

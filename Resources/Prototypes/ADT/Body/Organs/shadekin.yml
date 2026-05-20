@@ -7,7 +7,9 @@
   - type: Sprite
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi
     state: lung
+  - type: Lung # VG-Tweak
   - type: Organ
+    slotId: lungs # VG-Tweak
   - type: Metabolizer
     removeEmpty: true
     solutionOnBody: false
@@ -70,6 +72,7 @@
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi
     state: stomach
   - type: Organ
+    slotId: stomach # VG-Tweak
   - type: SolutionContainerManager
     solutions:
       stomach:
@@ -102,7 +105,11 @@
   - type: Sprite
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi
     state: liver
-  - type: Organ
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ 
+    slotId: liver
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 1
     metabolizerTypes: [ Shadekin ]
@@ -124,7 +131,11 @@
   - type: Sprite
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi
     state: heart-on
+  # VG-Tweak Start
+  - type: Heart
   - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 2
     metabolizerTypes: [ Shadekin ]
@@ -166,6 +177,11 @@
   name: eyes
   description: Weren't they a different color?..
   components:
+  # VG-Tweak Start
+  - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
   - type: Sprite
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi
     layers:

@@ -9,9 +9,9 @@
   - type: BodyPart
   - type: SurgeryTool
     startSound:
-      path: /Audio/Medical/Surgery/organ1.ogg
+      path: /Audio/_VG/Medical/Surgery/organ1.ogg
     endSound:
-      path: /Audio/Medical/Surgery/organ2.ogg
+      path: /Audio/_VG/Medical/Surgery/organ2.ogg
   - type: ContainerContainer
     containers:
       bodypart: !type:Container

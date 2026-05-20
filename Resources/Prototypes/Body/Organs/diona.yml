@@ -85,6 +85,8 @@
   components:
   - type: Sprite
     state: stomach
+  - type: Organ # VG-Tweak 
+    slotId: stomach
   - type: SolutionContainerManager
     solutions:
       stomach:
@@ -127,6 +129,8 @@
     size: Small
     heldPrefix: lungs
   - type: Lung
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Metabolizer
     removeEmpty: true
     solutionOnBody: false

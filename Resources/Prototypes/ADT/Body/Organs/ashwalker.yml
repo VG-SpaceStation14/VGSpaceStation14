@@ -6,4 +6,6 @@
   components:
   - type: Lung
     saturationLoss: 0.5
+  - type: Organ # VG-Tweak
+    slotId: lungs
   # TODO SHITMED: add AshStormImmune when transplanted

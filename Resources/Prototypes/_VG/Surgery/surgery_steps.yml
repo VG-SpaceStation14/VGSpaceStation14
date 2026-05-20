@@ -160,7 +160,7 @@
     - type: RibcageSawed
     duration: 2
   - type: Sprite
-    sprite: _VG/Objects/Specific/Medical/Surgery/bone_gel.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/bone-gel.rsi
     state: bone-gel
 
 - type: entity

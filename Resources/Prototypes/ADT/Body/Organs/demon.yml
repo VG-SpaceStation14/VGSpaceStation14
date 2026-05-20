@@ -3,6 +3,9 @@
   parent: OrganAnimalStomach
   categories: [ HideSpawnMenu ]
   components:
+  - type: Organ
+    slotId: stomach # VG-Tweak
+  - type: Stomach # VG-Tweak
   - type: SolutionContainerManager
     solutions:
       stomach:
@@ -15,6 +18,11 @@
   id: ADTOrganDemonHeart
   parent: OrganAnimalHeart
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 2
     metabolizerTypes: [ Demon ]

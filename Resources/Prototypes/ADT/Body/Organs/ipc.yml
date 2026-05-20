@@ -28,6 +28,7 @@
   - type: Sprite
     state: brain
   - type: Organ
+    slotId: brain # VG-Tweak
   - type: Input
     context: "ghost"
   - type: InputMover
@@ -47,7 +48,11 @@
     layers:
       - state: eyeball-l
       - state: eyeball-r
+  # VG-Tweak Start
   - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
 
 - type: entity
   id: ADTOrganIPCTongue

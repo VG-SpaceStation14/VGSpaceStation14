@@ -79,7 +79,7 @@
   description: For when you want to turn someone into a Space John's.
   components:
   - type: Sprite
-    sprite: _CorvaxNext/Mobs/Species/Misc/Pizza/parts.rsi
+    sprite: _VG/Mobs/Species/Misc/Pizza/parts.rsi
     state: "l_arm"
 
 - type: entity
@@ -89,5 +89,5 @@
   description: For when you want to turn someone into a Space John's.
   components:
   - type: Sprite
-    sprite: _CorvaxNext/Mobs/Species/Misc/Pizza/parts.rsi
+    sprite: _VG/Mobs/Species/Misc/Pizza/parts.rsi
     state: "r_arm"

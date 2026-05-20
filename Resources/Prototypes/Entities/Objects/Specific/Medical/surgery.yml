@@ -230,10 +230,10 @@
   description: Used for setting bones back into place.
   components:
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/bonesetter.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/bonesetter.rsi
     state: bonesetter
   - type: Item
-    sprite: Objects/Specific/Medical/Surgery/bonesetter.rsi
+    sprite: _VG/Objects/Specific/Medical/Surgery/bonesetter.rsi
   - type: BoneSetter
   - type: Tag
     tags:

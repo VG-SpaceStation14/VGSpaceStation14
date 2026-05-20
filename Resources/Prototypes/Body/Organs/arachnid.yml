@@ -74,6 +74,8 @@
       - state: lung-l
       - state: lung-r
   - type: Lung
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Metabolizer
     updateInterval: 1.5
     removeEmpty: true
@@ -111,6 +113,11 @@
   components:
   - type: Sprite
     state: heart-on
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Item
     size: Small
     heldPrefix: heart
@@ -139,6 +146,11 @@
   - type: Item
     size: Small
     heldPrefix: liver
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ
+    slotId: liver
+  # VG-Tweak End
   - type: Sprite
     state: liver
   - type: Metabolizer # The liver metabolizes certain chemicals only, like alcohol.

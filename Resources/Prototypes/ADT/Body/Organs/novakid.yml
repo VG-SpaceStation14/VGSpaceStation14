@@ -4,6 +4,8 @@
   suffix: "novakid"
   categories: [ HideSpawnMenu ]
   components:
+    - type: Organ
+      slotId: stomach # VG-Tweak
     - type: Sprite
       sprite: Mobs/Species/Human/organs.rsi
       state: stomach
@@ -37,6 +39,8 @@
   suffix: "novakid"
   categories: [ HideSpawnMenu ]
   components:
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Sprite
     sprite: Mobs/Species/Human/organs.rsi
     state: lung-l
@@ -78,6 +82,11 @@
   suffix: "novakid"
   categories: [ HideSpawnMenu ]
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Sprite
     sprite: Mobs/Species/Human/organs.rsi
     state: heart-on
@@ -123,7 +132,11 @@
   - type: Sprite
     state: liver
     sprite: ADT/Mobs/Species/Shadekin/organs.rsi #Don't mention it. Just for... being
-  - type: Organ
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ 
+    slotId: liver
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 1
     metabolizerTypes: [ Novakid ]

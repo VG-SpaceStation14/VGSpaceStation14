@@ -3,6 +3,8 @@
   parent: OrganAnimalStomach
   categories: [ HideSpawnMenu ]
   components:
+    - type: Organ
+      slotId: stomach # VG-Tweak
     - type: Stomach
     - type: SolutionContainerManager
       solutions:
@@ -30,7 +32,11 @@
   components:
   - type: Sprite
     state: liver
-  - type: Organ
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ 
+    slotId: liver
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 1
     metabolizerTypes: [ Vulpkanin ]
@@ -42,6 +48,11 @@
   id: ADTOrganVulpkaninHeart
   parent: OrganAnimalHeart
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Metabolizer
     maxReagents: 2
     metabolizerTypes: [ Vulpkanin, Animal ]

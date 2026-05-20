@@ -41,9 +41,10 @@
   name: brain
   description: "The source of incredible, unending intelligence. Honk."
   components:
+  - type: Organ
+    slotId: brain # VG-Tweak
   - type: Sprite
     state: brain
-  - type: Organ
   - type: Input
     context: "ghost"
   - type: Brain
@@ -84,6 +85,11 @@
   name: eyes
   description: "I see you!"
   components:
+  # VG-Tweak Start
+  - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
   - type: Sprite
     layers:
       - state: eyeball-l
@@ -130,6 +136,7 @@
   components:
   - type: Sprite
     state: ears
+  - type: Ears # VG-Tweak
 
 - type: entity
   id: OrganHumanLungs
@@ -145,6 +152,8 @@
     size: Small
     heldPrefix: lungs
   - type: Lung
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Metabolizer
     removeEmpty: true
     solutionOnBody: false
@@ -179,6 +188,11 @@
   name: heart
   description: "I feel bad for the heartless bastard who lost this."
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Sprite
     state: heart-on
   # The heart 'metabolizes' medicines and poisons that aren't filtered out by other organs.
@@ -221,6 +235,8 @@
         - ReagentId: UncookedAnimalProteins
           Quantity: 5
   - type: Stomach
+  - type: Organ # VG-Tweak
+    slotId: stomach
   # The stomach metabolizes stuff like foods and drinks.
   # TODO: Have it work off of the ent's solution container, and move this
   # to intestines instead.
@@ -244,6 +260,11 @@
   name: liver
   description: "Pairing suggestion: chianti and fava beans."
   components:
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ
+    slotId: liver
+  # VG-Tweak End
   - type: Sprite
     state: liver
   - type: Item
