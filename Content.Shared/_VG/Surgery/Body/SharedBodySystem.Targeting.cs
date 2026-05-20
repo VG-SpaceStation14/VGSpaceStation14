@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text; // VF-Tweak
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Damage;
@@ -37,6 +38,12 @@ public partial class SharedBodySystem
 
     private const double IntegrityJobTime = 0.005;
     private readonly JobQueue _integrityJobQueue = new(IntegrityJobTime);
+
+    // VG-Tweak Start - Healing popup settings
+    private const float HealingPopupThreshold = 2f;
+    private readonly Dictionary<EntityUid, TimeSpan> _lastHealingPopupTime = new();
+    // VG-Tweak End
+
     public sealed class IntegrityJob : Job<object>
     {
         private readonly SharedBodySystem _self;
@@ -228,6 +235,27 @@ public partial class SharedBodySystem
         return landed;
     }
 
+    // VG-Tweak Start - Helper method for localized part names
+    private string GetLocalizedPartName(TargetBodyPart part)
+    {
+        return part switch
+        {
+            TargetBodyPart.Head => Loc.GetString("body-part-head"),
+            TargetBodyPart.Torso => Loc.GetString("body-part-torso"),
+            TargetBodyPart.Groin => Loc.GetString("body-part-groin"),
+            TargetBodyPart.LeftArm => Loc.GetString("body-part-left-arm"),
+            TargetBodyPart.LeftHand => Loc.GetString("body-part-left-hand"),
+            TargetBodyPart.RightArm => Loc.GetString("body-part-right-arm"),
+            TargetBodyPart.RightHand => Loc.GetString("body-part-right-hand"),
+            TargetBodyPart.LeftLeg => Loc.GetString("body-part-left-leg"),
+            TargetBodyPart.LeftFoot => Loc.GetString("body-part-left-foot"),
+            TargetBodyPart.RightLeg => Loc.GetString("body-part-right-leg"),
+            TargetBodyPart.RightFoot => Loc.GetString("body-part-right-foot"),
+            _ => Loc.GetString("body-part-unknown")
+        };
+    }
+    // VG-Tweak End
+
     private void OnDamageChanged(Entity<BodyPartComponent> partEnt, ref DamageChangedEvent args)
     {
         if (!TryComp<DamageableComponent>(partEnt, out var damageable))
@@ -236,6 +264,29 @@ public partial class SharedBodySystem
         var severed = false;
         var partIdSlot = GetParentPartAndSlotOrNull(partEnt)?.Slot;
         var delta = args.DamageDelta;
+
+        // VG-Tweak Start - Healing popup notification
+        if (delta != null && delta.GetTotal() < 0 && partEnt.Comp.Body != null)
+        {
+            var healAmount = -delta.GetTotal();
+            if (healAmount > HealingPopupThreshold)
+            {
+                var targetPart = GetTargetBodyPart(partEnt);
+                if (targetPart != null)
+                {
+                    var patient = partEnt.Comp.Body.Value;
+                    var now = _timing.CurTime;
+                    if (!_lastHealingPopupTime.TryGetValue(patient, out var lastTime) || (now - lastTime) > TimeSpan.FromSeconds(2))
+                    {
+                        var partName = GetLocalizedPartName(targetPart.Value);
+                        var message = Loc.GetString("healing-part-message", ("part", partName));
+                        _popup.PopupEntity(message, patient, patient);
+                        _lastHealingPopupTime[patient] = now;
+                    }
+                }
+            }
+        }
+        // VG-Tweak End
 
         if (args.CanSever
             && partEnt.Comp.CanSever
@@ -435,6 +486,7 @@ public partial class SharedBodySystem
             BodyPartType.Hand => 0.7f, // 70% damage
             BodyPartType.Leg => 0.7f, // 70% damage
             BodyPartType.Foot => 0.7f, // 70% damage
+            _ => 1.0f
         };
     }
 
@@ -443,8 +495,6 @@ public partial class SharedBodySystem
     /// </summary>
     public static TargetIntegrity GetIntegrityThreshold(BodyPartComponent component, float integrity, bool severed)
     {
-        var enabled = component.Enabled;
-
         if (severed)
             return TargetIntegrity.Severed;
         else if (!component.Enabled)

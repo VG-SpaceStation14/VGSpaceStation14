@@ -26,3 +26,18 @@ health-examinable-bleeding = кровотечение
 # Комбинации (если несколько проблем)
 health-examinable-status-and = { $first }, { $second }
 health-examinable-status-multi = { $first }, { $second }, { $third }
+
+body-part-head = голову
+body-part-torso = торс
+body-part-groin = пах
+body-part-left-arm = левую руку
+body-part-left-hand = левую кисть
+body-part-right-arm = правую руку
+body-part-right-hand = правую кисть
+body-part-left-leg = левую ногу
+body-part-left-foot = левую стопу
+body-part-right-leg = правую ногу
+body-part-right-foot = правую стопу
+body-part-unknown = неизвестную часть
+
+healing-part-message = Лечит: { $part }
