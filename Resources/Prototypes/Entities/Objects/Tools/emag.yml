@@ -8,10 +8,10 @@
   - type: Emag
     emagType: All # ADT-Tweak - ревёртаю нахуй емаг.
   - type: Sprite
-    sprite: Objects/Tools/emag.rsi
+    sprite: _VG/Objects/Tools/emag.rsi # VG-Tweak
     state: icon
   - type: Item
-    sprite: Objects/Tools/emag.rsi
+    sprite: _VG/Objects/Tools/emag.rsi # VG-Tweak
     storedRotation: -90
 
 - type: entity
