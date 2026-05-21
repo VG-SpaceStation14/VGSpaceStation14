@@ -283,6 +283,7 @@
       sprite: Structures/Storage/Crates/secure.rsi
     - type: Sprite
       sprite: Structures/Storage/Crates/secure.rsi
+    - type: BindableLock # VG-Tweak
 
 - type: entity
   parent: CrateBaseSecure

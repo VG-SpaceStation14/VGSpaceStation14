@@ -12,6 +12,7 @@
     stateBaseClosed: generic
     stateDoorOpen: generic_open4
     stateDoorClosed: generic_door_sec
+  - type: BindableLock # VG-Tweak
 
 # Bar
 - type: entity
