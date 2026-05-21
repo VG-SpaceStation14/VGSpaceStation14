@@ -6,4 +6,3 @@ personal-locker-access = Персональный доступ
 examine-bindable-lock-bound = [color=#7CB342]Замок привязан к ID-карте.[/color]
 bindable-lock-not-owner = Вы не являетесь владельцем этого замка.
 bindable-lock-unbound = Привязка замка снята.
-personal-locker-access = Персональный доступ

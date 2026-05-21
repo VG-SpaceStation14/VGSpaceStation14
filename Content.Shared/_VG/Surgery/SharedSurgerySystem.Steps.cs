@@ -417,7 +417,11 @@ public abstract partial class SharedSurgerySystem
 
         var ev = new AmputateAttemptEvent(args.Part);
         RaiseLocalEvent(args.Part, ref ev);
-        _hands.TryPickupAnyHand(args.User, args.Part);
+
+        if (!_hands.TryPickupAnyHand(args.User, args.Part))
+        {
+            _transform.DropNextTo(args.Part, args.Body);
+        }
     }
 
     private void OnRemovePartCheck(Entity<SurgeryRemovePartStepComponent> ent, ref SurgeryStepCompleteCheckEvent args)
