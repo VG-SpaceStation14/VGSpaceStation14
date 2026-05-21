@@ -28,17 +28,8 @@ public sealed class BindableLockSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (!component.CanBind)
-            return;
-
         if (!TryComp<AccessReaderComponent>(uid, out var accessReader))
             return;
-
-        if (accessReader.AccessLists.Count > 0 || accessReader.AccessKeys.Count > 0)
-        {
-            _popup.PopupEntity(Loc.GetString("bindable-lock-already-configured"), uid, args.User);
-            return;
-        }
 
         var used = args.Used;
 
@@ -53,21 +44,46 @@ public sealed class BindableLockSystem : EntitySystem
                 key = pdaKeyStorage.Key;
         }
 
-        if (key == null)
+        if (component.CanBind)
         {
-            _popup.PopupEntity(Loc.GetString("bindable-lock-no-key"), uid, args.User);
+            if (accessReader.AccessLists.Count > 0 || accessReader.AccessKeys.Count > 0)
+            {
+                _popup.PopupEntity(Loc.GetString("bindable-lock-already-configured"), uid, args.User);
+                return;
+            }
+
+            if (key == null)
+            {
+                _popup.PopupEntity(Loc.GetString("bindable-lock-no-key"), uid, args.User);
+                return;
+            }
+
+            _accessReader.TrySetAccesses((uid, accessReader),
+                new List<HashSet<ProtoId<AccessLevelPrototype>>> { new() { PersonalLockerTag } });
+
+            _accessReader.AddAccessKey((uid, accessReader), key.Value);
+
+            component.CanBind = false;
+            Dirty(uid, component);
+
+            _popup.PopupEntity(Loc.GetString("bindable-lock-bound"), uid, args.User);
+            args.Handled = true;
             return;
         }
 
-        _accessReader.TrySetAccesses((uid, accessReader),
-            new List<HashSet<ProtoId<AccessLevelPrototype>>> { new() { PersonalLockerTag } });
+        if (key == null || !_accessReader.AreStationRecordKeysAllowed(new HashSet<StationRecordKey> { key.Value }, accessReader))
+        {
+            _popup.PopupEntity(Loc.GetString("bindable-lock-not-owner"), uid, args.User);
+            return;
+        }
 
-        _accessReader.AddAccessKey((uid, accessReader), key.Value);
+        _accessReader.TryClearAccesses((uid, accessReader));
+        _accessReader.ClearAccessKeys((uid, accessReader));
 
-        component.CanBind = false;
+        component.CanBind = true;
         Dirty(uid, component);
 
-        _popup.PopupEntity(Loc.GetString("bindable-lock-bound"), uid, args.User);
+        _popup.PopupEntity(Loc.GetString("bindable-lock-unbound"), uid, args.User);
         args.Handled = true;
     }
 }
