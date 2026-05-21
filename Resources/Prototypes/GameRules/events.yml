@@ -423,18 +423,21 @@
     endAnnouncement: station-event-power-grid-check-end-announcement
     duration: 60
     maxDuration: 120
-    # ADT Start
+    # VG-Tweak Start
     startAudio:
-      # path: /Audio/Announcements/power_off.ogg
-      # params:
-      #   volume: -4
-      collection: ADTPowerOff
+      path: /Audio/Announcements/power_off.ogg
+      params:
+        volume: -2
+      #collection: ADTPowerOff # VG-Tweak
   - type: PowerGridCheckRule
     endSound:
-      collection: ADTPowerOn
+      path: /Audio/Announcements/power_on.ogg
+      params:
+        volume: -2
+      #collection: ADTPowerOn # VG-Tweak
   - type: GameRule
     delay: null
-    # ADT End
+    # VG-Tweak End
 
 - type: entity
   parent: BaseGameRule

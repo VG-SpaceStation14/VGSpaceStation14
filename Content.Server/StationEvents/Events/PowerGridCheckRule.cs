@@ -4,113 +4,136 @@ using Content.Server.Power.EntitySystems;
 using Content.Server.StationEvents.Components;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Station.Components;
+using Content.Shared._VG.Effects; // VG-Tweak
 using JetBrains.Annotations;
 using Robust.Shared.Audio;
 using Robust.Shared.Player;
+using Robust.Shared.Random; // VG-Tweak
 using Robust.Shared.Utility;
 using Timer = Robust.Shared.Timing.Timer;
 
-namespace Content.Server.StationEvents.Events
+namespace Content.Server.StationEvents.Events;
+
+[UsedImplicitly]
+public sealed class PowerGridCheckRule : StationEventSystem<PowerGridCheckRuleComponent>
 {
-    [UsedImplicitly]
-    public sealed class PowerGridCheckRule : StationEventSystem<PowerGridCheckRuleComponent>
+    [Dependency] private readonly ApcSystem _apcSystem = default!;
+    // VG-Tweak Start
+    [Dependency] private readonly SparksSystem _sparks = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+
+    private const float SparkChanceOff = 0.3f;
+    private const float SparkChanceOn = 0.2f;
+    private const float PowerOnDelay = 0.1f;
+    private const float InitialDelay = 2.0f;
+    // VG-Tweak End
+
+    protected override void Started(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
     {
-        [Dependency] private readonly ApcSystem _apcSystem = default!;
+        base.Started(uid, component, gameRule, args);
 
-        protected override void Started(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
+        if (!TryGetRandomStation(out var chosenStation))
+            return;
+
+        component.AffectedStation = chosenStation.Value;
+
+        var query = AllEntityQuery<ApcComponent, TransformComponent>();
+        while (query.MoveNext(out var apcUid, out var apc, out var transform))
         {
-            base.Started(uid, component, gameRule, args);
-
-            if (!TryGetRandomStation(out var chosenStation))
-                return;
-
-            component.AffectedStation = chosenStation.Value;
-
-            var query = AllEntityQuery<ApcComponent, TransformComponent>();
-            while (query.MoveNext(out var apcUid ,out var apc, out var transform))
-            {
-                if (apc.MainBreakerEnabled && CompOrNull<StationMemberComponent>(transform.GridUid)?.Station == chosenStation)
-                    component.Powered.Add(apcUid);
-            }
-
-            DisableApc(component.Powered, component);  // ADT Tweak
-
-            RobustRandom.Shuffle(component.Powered);
-
-            component.NumberPerSecond = Math.Max(1, (int)(component.Powered.Count / component.SecondsUntilOff)); // Number of APCs to turn off every second. At least one.
+            if (apc.MainBreakerEnabled && CompOrNull<StationMemberComponent>(transform.GridUid)?.Station == chosenStation)
+                component.Powered.Add(apcUid);
         }
 
-        // ADT: достаточно сильно поменял эту функцию, потому считайте что она фулл наша
-        protected override void Ended(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+        RobustRandom.Shuffle(component.Powered); // VG-Tweak
+
+        component.NumberPerSecond = Math.Max(1, (int)(component.Powered.Count / component.SecondsUntilOff));
+    }
+
+    protected override void Ended(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, GameRuleEndedEvent args)
+    {
+        base.Ended(uid, component, gameRule, args);
+
+        component.AnnounceCancelToken?.Cancel();
+        component.AnnounceCancelToken = new CancellationTokenSource();
+
+        // VG-Tweak Start
+        Audio.PlayGlobal(component.EndSound ?? new SoundPathSpecifier("/Audio/Announcements/power_on.ogg"), Filter.Broadcast(), true);
+        
+        var count = component.Unpowered.Count;
+        
+        for (var i = 0; i < count; i++)
         {
-            base.Ended(uid, component, gameRule, args);
-
-            // Can't use the default EndAudio
-            component.AnnounceCancelToken?.Cancel();
-            component.AnnounceCancelToken = new CancellationTokenSource();
-            Audio.PlayGlobal(component.EndSound ?? new SoundPathSpecifier("/Audio/Announcements/power_on.ogg"), Filter.Broadcast(), true);
-            Timer.Spawn(TimeSpan.FromSeconds(2), () =>
+            var entity = component.Unpowered[i];
+            var index = i;
+            
+            Timer.Spawn(TimeSpan.FromSeconds(InitialDelay + index * PowerOnDelay), () =>
             {
-                foreach (var entity in component.Unpowered)
-                {
-                    if (Deleted(entity))
-                        continue;
+                if (Deleted(entity))
+                    return;
 
-                    if (TryComp(entity, out ApcComponent? apcComponent))
+                if (TryComp(entity, out ApcComponent? apcComponent))
+                {
+                    if (!apcComponent.MainBreakerEnabled)
                     {
-                        if (!apcComponent.MainBreakerEnabled)
-                            _apcSystem.ApcToggleBreaker(entity, apcComponent);
+                        _apcSystem.ApcToggleBreaker(entity, apcComponent);
+
+                        if (_random.Prob(SparkChanceOn))
+                        {
+                            var xform = Transform(entity);
+                            _sparks.DoSparks(xform.Coordinates, minSparks: 2, maxSparks: 4, 
+                                minVelocity: 0.5f, maxVelocity: 2f, playSound: true);
+                        }
                     }
                 }
-
-                component.Unpowered.Clear();
             }, component.AnnounceCancelToken.Token);
         }
-
-        protected override void ActiveTick(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, float frameTime)
+        
+        Timer.Spawn(TimeSpan.FromSeconds(InitialDelay + count * PowerOnDelay + 0.5), () =>
         {
-            base.ActiveTick(uid, component, gameRule, frameTime);
+            component.Unpowered.Clear();
+        }, component.AnnounceCancelToken.Token);
+        // VG-Tweak End
+    }
 
-            var updates = 0;
-            component.FrameTimeAccumulator += frameTime;
-            if (component.FrameTimeAccumulator > component.UpdateRate)
-            {
-                updates = (int) (component.FrameTimeAccumulator / component.UpdateRate);
-                component.FrameTimeAccumulator -= component.UpdateRate * updates;
-            }
+    protected override void ActiveTick(EntityUid uid, PowerGridCheckRuleComponent component, GameRuleComponent gameRule, float frameTime)
+    {
+        base.ActiveTick(uid, component, gameRule, frameTime);
 
-            for (var i = 0; i < updates; i++)
-            {
-                if (component.Powered.Count == 0)
-                    break;
-
-                var selected = component.Powered.Pop();
-                if (Deleted(selected))
-                    continue;
-                if (TryComp<ApcComponent>(selected, out var apcComponent))
-                {
-                    if (apcComponent.MainBreakerEnabled)
-                        _apcSystem.ApcToggleBreaker(selected, apcComponent);
-                }
-                component.Unpowered.Add(selected);
-            }
+        var updates = 0;
+        component.FrameTimeAccumulator += frameTime;
+        if (component.FrameTimeAccumulator > component.UpdateRate)
+        {
+            updates = (int)(component.FrameTimeAccumulator / component.UpdateRate);
+            component.FrameTimeAccumulator -= component.UpdateRate * updates;
         }
 
-        // ADT Start
-        private void DisableApc(List<EntityUid> list, PowerGridCheckRuleComponent component)
+        for (var i = 0; i < updates; i++)
         {
-            foreach (var item in list)
+            if (component.Powered.Count == 0)
+                break;
+
+            var selected = component.Powered.Pop();
+            if (Deleted(selected))
+                continue;
+                
+            if (TryComp<ApcComponent>(selected, out var apcComponent))
             {
-                if (Deleted(item))
-                    continue;
-                if (TryComp<ApcComponent>(item, out var apcComponent))
+                if (apcComponent.MainBreakerEnabled)
                 {
-                    if (apcComponent.MainBreakerEnabled)
-                        _apcSystem.ApcToggleBreaker(item, apcComponent);
+                    _apcSystem.ApcToggleBreaker(selected, apcComponent);
+
+                    // VG-Tweak Start
+                    if (_random.Prob(SparkChanceOff))
+                    {
+                        var xform = Transform(selected);
+                        _sparks.DoSparks(xform.Coordinates, minSparks: 3, maxSparks: 6, 
+                            minVelocity: 1f, maxVelocity: 3f, playSound: true);
+                    }
+                    // VG-Tweak End
                 }
-                component.Unpowered.Add(item);
             }
+            
+            component.Unpowered.Add(selected);
         }
-        // ADT End
     }
 }
