@@ -204,21 +204,45 @@ public abstract partial class SharedHandsSystem : EntitySystem
     }
 
     //TODO: Actually shows all items/clothing/etc.
+    // VG-Tweak Start
     private void HandleExamined(EntityUid examinedUid, HandsComponent handsComp, ExaminedEvent args)
     {
+        var selfAware = args.Examiner == examinedUid;
+
         var heldItemNames = EnumerateHeld((examinedUid, handsComp))
             .Where(entity => !HasComp<VirtualItemComponent>(entity))
             .Select(item => FormattedMessage.EscapeText(Identity.Name(item, EntityManager)))
             .Select(itemName => Loc.GetString("comp-hands-examine-wrapper", ("item", itemName)))
             .ToList();
 
-        var locKey = heldItemNames.Count != 0 ? "comp-hands-examine" : "comp-hands-examine-empty";
-        var locUser = ("user", Identity.Entity(examinedUid, EntityManager));
-        var locItems = ("items", ContentLocalizationManager.FormatList(heldItemNames));
-
         using (args.PushGroup(nameof(HandsComponent)))
         {
-            args.PushMarkup(Loc.GetString(locKey, locUser, locItems));
+            if (selfAware)
+            {
+                if (heldItemNames.Count != 0)
+                {
+                    var items = ContentLocalizationManager.FormatList(heldItemNames);
+                    args.PushMarkup(Loc.GetString("comp-hands-examine-selfaware", ("items", items)));
+                }
+                else
+                {
+                    args.PushMarkup(Loc.GetString("comp-hands-examine-empty-selfaware"));
+                }
+            }
+            else
+            {
+                var user = Identity.Entity(examinedUid, EntityManager);
+                if (heldItemNames.Count != 0)
+                {
+                    var items = ContentLocalizationManager.FormatList(heldItemNames);
+                    args.PushMarkup(Loc.GetString("comp-hands-examine", ("user", user), ("items", items)));
+                }
+                else
+                {
+                    args.PushMarkup(Loc.GetString("comp-hands-examine-empty", ("user", user)));
+                }
+            }
         }
     }
+    // VG-Tweak End
 }

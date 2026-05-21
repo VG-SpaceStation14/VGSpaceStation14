@@ -5,3 +5,6 @@ comp-hands-examine = { CAPITALIZE(SUBJECT($user)) } держит { $items }.
 comp-hands-examine-empty = { CAPITALIZE(SUBJECT($user)) } ничего не держит.
 comp-hands-examine-wrapper = [color=paleturquoise]{ $item }[/color]
 hands-system-blocked-by = Руки заняты
+
+comp-hands-examine-selfaware = Вы держите { $items }.
+comp-hands-examine-empty-selfaware = Вы ничего не держите.

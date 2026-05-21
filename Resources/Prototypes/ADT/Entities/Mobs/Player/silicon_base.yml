@@ -390,3 +390,4 @@
         - SeeingStatic
     - type: Blindable
     - type: SpeechBarks
+    - type: ExaminableCharacter # VG-Tweak

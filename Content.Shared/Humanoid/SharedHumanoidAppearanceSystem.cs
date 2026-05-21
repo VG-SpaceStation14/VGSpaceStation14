@@ -120,14 +120,29 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         LoadProfile(uid, startingSet.Profile, humanoid);
     }
 
+    // VG-Tweak Start
     private void OnExamined(EntityUid uid, HumanoidAppearanceComponent component, ExaminedEvent args)
     {
-        var identity = Identity.Entity(uid, EntityManager);
-        var species = GetSpeciesRepresentation(component.Species).ToLower();
-        var age = GetAgeRepresentation(component.Species, component.Age);
+        var selfAware = args.Examiner == uid;
+        string species = GetSpeciesRepresentation(component.Species).ToLower();
+        string age = GetAgeRepresentation(component.Species, component.Age);
 
-        args.PushText(Loc.GetString("humanoid-appearance-component-examine", ("user", identity), ("age", age), ("species", species)));
+        if (selfAware)
+        {
+            args.PushText(Loc.GetString("humanoid-appearance-component-examine-selfaware",
+                ("age", age),
+                ("species", species)));
+        }
+        else
+        {
+            var identity = Identity.Entity(uid, EntityManager);
+            args.PushText(Loc.GetString("humanoid-appearance-component-examine",
+                ("user", identity),
+                ("age", age),
+                ("species", species)));
+        }
     }
+    // VG-Tweak End
 
     /// <summary>
     ///     Toggles a humanoid's sprite layer visibility.
