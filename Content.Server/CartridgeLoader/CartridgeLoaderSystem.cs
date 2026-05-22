@@ -31,6 +31,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         SubscribeLocalEvent<CartridgeLoaderComponent, CartridgeUiMessage>(OnUiMessage);
     }
 
+    /// <summary>
+    /// Returns a list of all installed programs.
+    /// </summary>
     public IReadOnlyList<EntityUid> GetInstalled(EntityUid uid, ContainerManagerComponent? comp = null)
     {
         if (_containerSystem.TryGetContainer(uid, InstalledContainerId, out var container, comp))
@@ -39,6 +42,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         return Array.Empty<EntityUid>();
     }
 
+    /// <summary>
+    /// Tries to get a program of the given type.
+    /// </summary>
     public bool TryGetProgram<T>(
         EntityUid uid,
         [NotNullWhen(true)] out EntityUid? programUid,
@@ -72,6 +78,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         return true;
     }
 
+    /// <summary>
+    /// Tries to get a program uid of the given type.
+    /// </summary>
     public bool TryGetProgram<T>(
         EntityUid uid,
         [NotNullWhen(true)] out EntityUid? programUid,
@@ -82,6 +91,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         return TryGetProgram<T>(uid, out programUid, out _, installedOnly, loader, containerManager);
     }
 
+    /// <summary>
+    /// Checks whether a program of the given type exists.
+    /// </summary>
     public bool HasProgram<T>(
         EntityUid uid,
         bool installedOnly = false,
@@ -113,7 +125,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Updates the programs ui state
+    /// Updates the programs ui state.
     /// </summary>
     /// <param name="loaderUid">The cartridge loaders entity uid</param>
     /// <param name="state">The programs ui state. Programs should use their own ui state class inheriting from <see cref="BoundUserInterfaceState"/></param>
@@ -133,7 +145,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Returns a list of all installed programs and the inserted cartridge if it isn't already installed
+    /// Returns a list of all installed programs and the inserted cartridge if it isn't already installed.
     /// </summary>
     /// <param name="uid">The cartridge loaders uid</param>
     /// <param name="loader">The cartridge loader component</param>
@@ -154,7 +166,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Installs a cartridge by spawning an invisible version of the cartridges prototype into the cartridge loaders program container program container
+    /// Installs a cartridge by spawning an invisible version of the cartridges prototype into the cartridge loaders program container program container.
     /// </summary>
     /// <param name="loaderUid">The cartridge loader uid</param>
     /// <param name="cartridgeUid">The uid of the cartridge to be installed</param>
@@ -183,7 +195,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Installs a program by its prototype
+    /// Installs a program by its prototype.
     /// </summary>
     /// <param name="loaderUid">The cartridge loader uid</param>
     /// <param name="prototype">The prototype name</param>
@@ -222,7 +234,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Uninstalls a program using its uid
+    /// Uninstalls a program using its uid.
     /// </summary>
     /// <param name="loaderUid">The cartridge loader uid</param>
     /// <param name="programUid">The uid of the program to be uninstalled</param>
@@ -240,7 +252,13 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
             cartridge.LoaderUid = null;
 
         if (loader.ActiveProgram == programUid)
+        {
             loader.ActiveProgram = null;
+            // VG-Tweak Start: уведомляем ПДА об изменении активного картриджа
+            var ev = new CartridgeLoaderActiveCartridgeChangedEvent(null);
+            RaiseLocalEvent(loaderUid, ev);
+            // VG-Tweak End
+        }
 
         loader.BackgroundPrograms.Remove(programUid);
         QueueDel(programUid);
@@ -267,6 +285,11 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 
         loader.ActiveProgram = programUid;
         UpdateUserInterfaceState(loaderUid, loader);
+        
+        // VG-Tweak Start: уведомляем ПДА об изменении активного картриджа
+        var ev = new CartridgeLoaderActiveCartridgeChangedEvent(programUid);
+        RaiseLocalEvent(loaderUid, ev);
+        // VG-Tweak End
     }
 
     /// <summary>
@@ -285,10 +308,15 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 
         loader.ActiveProgram = default;
         UpdateUserInterfaceState(loaderUid, loader);
+        
+        // VG-Tweak Start: уведомляем ПДА об изменении активного картриджа
+        var ev = new CartridgeLoaderActiveCartridgeChangedEvent(null);
+        RaiseLocalEvent(loaderUid, ev);
+        // VG-Tweak End
     }
 
     /// <summary>
-    /// Registers the given program as a running in the background. Programs running in the background will receive certain events like device net packets but not ui messages
+    /// Registers the given program as a running in the background. Programs running in the background will receive certain events like device net packets but not ui messages.
     /// </summary>
     /// <remarks>
     /// Programs wanting to use this functionality will have to provide a way to register and unregister themselves as background programs through their ui fragment.
@@ -308,7 +336,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Unregisters the given program as running in the background
+    /// Unregisters the given program as running in the background.
     /// </summary>
     public void UnregisterBackgroundProgram(EntityUid loaderUid, EntityUid cartridgeUid, CartridgeLoaderComponent? loader = default!)
     {
@@ -324,6 +352,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         loader.BackgroundPrograms.Remove(cartridgeUid);
     }
 
+    /// <summary>
+    /// Sends a notification through the PDA.
+    /// </summary>
     public void SendNotification(EntityUid loaderUid, string header, string message, CartridgeLoaderComponent? loader = default!)
     {
         if (!Resolve(loaderUid, ref loader))
@@ -359,6 +390,10 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         {
             loader.ActiveProgram = default;
             deactivate = true;
+            // VG-Tweak Start: уведомляем ПДА об изменении активного картриджа
+            var ev = new CartridgeLoaderActiveCartridgeChangedEvent(null);
+            RaiseLocalEvent(uid, ev);
+            // VG-Tweak End
         }
 
         if (deactivate)
@@ -374,7 +409,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Installs programs from the list of preinstalled programs
+    /// Installs programs from the list of preinstalled programs.
     /// </summary>
     private void OnMapInit(EntityUid uid, CartridgeLoaderComponent component, MapInitEvent args)
     {
@@ -395,6 +430,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
         RelayEvent(component, new CartridgeDeviceNetPacketEvent(uid, args));
     }
 
+    /// <summary>
+    /// Handles UI messages from the cartridge loader itself (activating/deactivating/installing/uninstalling programs).
+    /// </summary>
     private void OnLoaderUiMessage(EntityUid loaderUid, CartridgeLoaderComponent component, CartridgeLoaderUiMessage message)
     {
         var cartridge = GetEntity(message.CartridgeUid);
@@ -423,7 +461,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
     }
 
     /// <summary>
-    /// Relays ui messages meant for cartridges to the currently active cartridge
+    /// Relays ui messages meant for cartridges to the currently active cartridge.
     /// </summary>
     private void OnUiMessage(EntityUid uid, CartridgeLoaderComponent component, CartridgeUiMessage args)
     {
@@ -437,9 +475,9 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 
     /// <summary>
     /// Relays events to the currently active program and and programs running in the background.
-    /// Skips background programs if "skipBackgroundPrograms" is set to true
+    /// Skips background programs if "skipBackgroundPrograms" is set to true.
     /// </summary>
-    /// <param name="loader">The cartritge loader component</param>
+    /// <param name="loader">The cartridge loader component</param>
     /// <param name="args">The event to be relayed</param>
     /// <param name="skipBackgroundPrograms">Whether to skip relaying the event to programs running in the background</param>
     private void RelayEvent<TEvent>(CartridgeLoaderComponent loader, TEvent args, bool skipBackgroundPrograms = false) where TEvent : notnull
@@ -452,7 +490,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 
         foreach (var program in loader.BackgroundPrograms)
         {
-            //Prevent programs registered as running in the background receiving events twice if they are active
+            // Prevent programs registered as running in the background receiving events twice if they are active
             if (loader.ActiveProgram.HasValue && loader.ActiveProgram.Value.Equals(program))
                 continue;
 
@@ -462,7 +500,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 
     /// <summary>
     /// Shortcut for updating the loaders user interface state without passing in a subtype of <see cref="CartridgeLoaderUiState"/>
-    /// like the <see cref="PDA.PdaSystem"/> does when updating its ui state
+    /// like the <see cref="PDA.PdaSystem"/> does when updating its ui state.
     /// </summary>
     /// <seealso cref="PDA.PdaSystem.UpdatePdaUserInterface"/>
     private void UpdateUserInterfaceState(EntityUid loaderUid, CartridgeLoaderComponent loader)
@@ -483,7 +521,7 @@ public sealed class CartridgeLoaderSystem : SharedCartridgeLoaderSystem
 }
 
 /// <summary>
-/// Gets sent to running programs when the cartridge loader receives a device net package
+/// Gets sent to running programs when the cartridge loader receives a device net package.
 /// </summary>
 /// <seealso cref="DeviceNetworkPacketEvent"/>
 public sealed class CartridgeDeviceNetPacketEvent : EntityEventArgs
@@ -499,7 +537,7 @@ public sealed class CartridgeDeviceNetPacketEvent : EntityEventArgs
 }
 
 /// <summary>
-/// Gets sent to running programs when the cartridge loader receives an after interact event
+/// Gets sent to running programs when the cartridge loader receives an after interact event.
 /// </summary>
 /// <seealso cref="AfterInteractEvent"/>
 public sealed class CartridgeAfterInteractEvent : EntityEventArgs

@@ -39,12 +39,16 @@ namespace Content.Shared.PDA
         [DataField]
         public Color WallpaperColor = Color.White;
 
-        // VG-Boot
         [DataField, AutoNetworkedField]
         public bool Booted;
 
-        // VG-Wallpaper
         [DataField, AutoNetworkedField]
         public string? WallpaperPath;
+
+        [DataField, AutoNetworkedField]
+        public bool Powered = false;
+
+        [DataField, AutoNetworkedField]
+        public string? ScreenOverlay = "off";
     }
 }

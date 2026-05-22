@@ -31,6 +31,7 @@ namespace Content.Client.PDA
         public event Action<EntityUid>? OnInstallButtonPressed;
         public event Action<Color>? OnWallpaperColorSelected;
         public event Action<string?>? OnWallpaperPathSelected; // VG-Wallpaper
+        public event Action? OnPowerToggled; // VG-Tweak
 
         public const int HomeView = 0;
         public const int ProgramListView = 1;
@@ -68,6 +69,9 @@ namespace Content.Client.PDA
             EjectIdButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/Interface/eject.png"));
             EjectPaiButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/Interface/pai.png"));
             ProgramCloseButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/Interface/Nano/cross.svg.png"));
+            PowerButton.IconTexture = new SpriteSpecifier.Texture(new("/Textures/_VG/Interface/power.png")); // VG-Tweak
+
+            PowerButton.OnToggled += _ => OnPowerToggled?.Invoke(); // VG-Tweak
 
             var popupsystem = _entMan.System<SharedPopupSystem>();
             
@@ -307,6 +311,7 @@ namespace Content.Client.PDA
         public void UpdateState(PdaUpdateState state)
         {
             FlashLightToggleButton.IsActive = state.FlashlightEnabled;
+            PowerButton.IsActive = state.Powered; // VG-Tweak
 
             var effectiveWallpaperColor = state.HasWallpaperColor
                 ? state.WallpaperColor

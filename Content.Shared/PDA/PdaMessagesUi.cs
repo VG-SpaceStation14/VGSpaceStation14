@@ -42,11 +42,7 @@ public sealed class PdaRequestUpdateInterfaceMessage : BoundUserInterfaceMessage
 public sealed class PdaSetWallpaperColorMessage : BoundUserInterfaceMessage
 {
     public Color Color;
-
-    public PdaSetWallpaperColorMessage(Color color)
-    {
-        Color = color;
-    }
+    public PdaSetWallpaperColorMessage(Color color) => Color = color;
 }
 
 [Serializable, NetSerializable]
@@ -55,14 +51,15 @@ public sealed class PdaBootFinishedMessage : BoundUserInterfaceMessage
     public PdaBootFinishedMessage() { }
 }
 
-// VG-Wallpaper
 [Serializable, NetSerializable]
 public sealed class PdaSetWallpaperMessage : BoundUserInterfaceMessage
 {
     public string? Path;
+    public PdaSetWallpaperMessage(string? path) => Path = path;
+}
 
-    public PdaSetWallpaperMessage(string? path)
-    {
-        Path = path;
-    }
+[Serializable, NetSerializable]
+public sealed class PdaTogglePowerMessage : BoundUserInterfaceMessage
+{
+    public PdaTogglePowerMessage() { }
 }

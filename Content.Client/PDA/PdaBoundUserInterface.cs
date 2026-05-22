@@ -12,11 +12,9 @@ namespace Content.Client.PDA
     public sealed class PdaBoundUserInterface : CartridgeLoaderBoundUserInterface
     {
         private readonly PdaSystem _pdaSystem;
-
-        [ViewVariables]
         private PdaMenu? _menu;
-
         private bool _bootFinishedSent;
+        private bool _hasReceivedInitialState;
 
         public PdaBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
         {
@@ -25,77 +23,50 @@ namespace Content.Client.PDA
 
         protected override void Open()
         {
+            // Если старое меню существует, но закрыто – удаляем его, чтобы создать новое
+            if (_menu != null && !_menu.IsOpen)
+            {
+                _menu.Dispose();
+                _menu = null;
+            }
+
             base.Open();
 
             if (_menu == null)
                 CreateMenu();
 
             _bootFinishedSent = false;
+            _hasReceivedInitialState = false;
         }
 
         private void CreateMenu()
         {
             _menu = this.CreateWindowCenteredLeft<PdaMenu>();
 
-            _menu.FlashLightToggleButton.OnToggled += _ =>
-            {
-                SendMessage(new PdaToggleFlashlightMessage());
-            };
-
-            _menu.EjectIdButton.OnPressed += _ =>
-            {
-                SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaIdSlotId));
-            };
-
-            _menu.EjectPenButton.OnPressed += _ =>
-            {
-                SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaPenSlotId));
-            };
-
-            _menu.EjectPaiButton.OnPressed += _ =>
-            {
-                SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaPaiSlotId));
-            };
-
-            _menu.ActivateMusicButton.OnPressed += _ =>
-            {
-                SendMessage(new PdaShowMusicMessage());
-            };
-
-            _menu.AccessRingtoneButton.OnPressed += _ =>
-            {
-                SendMessage(new PdaShowRingtoneMessage());
-            };
-
-            _menu.ShowUplinkButton.OnPressed += _ =>
-            {
-                SendMessage(new PdaShowUplinkMessage());
-            };
-
-            _menu.LockUplinkButton.OnPressed += _ =>
-            {
-                SendMessage(new PdaLockUplinkMessage());
-            };
-
-            _menu.OnWallpaperColorSelected += color =>
-            {
-                SendMessage(new PdaSetWallpaperColorMessage(color));
-            };
-
+            _menu.FlashLightToggleButton.OnToggled += _ => SendMessage(new PdaToggleFlashlightMessage());
+            _menu.EjectIdButton.OnPressed += _ => SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaIdSlotId));
+            _menu.EjectPenButton.OnPressed += _ => SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaPenSlotId));
+            _menu.EjectPaiButton.OnPressed += _ => SendPredictedMessage(new ItemSlotButtonPressedEvent(PdaComponent.PdaPaiSlotId));
+            _menu.ActivateMusicButton.OnPressed += _ => SendMessage(new PdaShowMusicMessage());
+            _menu.AccessRingtoneButton.OnPressed += _ => SendMessage(new PdaShowRingtoneMessage());
+            _menu.ShowUplinkButton.OnPressed += _ => SendMessage(new PdaShowUplinkMessage());
+            _menu.LockUplinkButton.OnPressed += _ => SendMessage(new PdaLockUplinkMessage());
+            _menu.OnWallpaperColorSelected += color => SendMessage(new PdaSetWallpaperColorMessage(color));
             _menu.OnProgramItemPressed += ActivateCartridge;
             _menu.OnInstallButtonPressed += InstallCartridge;
             _menu.OnUninstallButtonPressed += UninstallCartridge;
             _menu.ProgramCloseButton.OnPressed += _ => DeactivateActiveCartridge();
+            _menu.OnPowerToggled += () => SendMessage(new PdaTogglePowerMessage());
 
             var borderColorComponent = GetBorderColorComponent();
-            if (borderColorComponent == null)
-                return;
-
-            _menu.BorderColor = borderColorComponent.BorderColor;
-            _menu.AccentHColor = borderColorComponent.AccentHColor;
-            _menu.AccentVColor = borderColorComponent.AccentVColor;
-            _menu.DefaultWallpaperColor = GetDefaultWallpaperColor(borderColorComponent);
-            _menu.OnWallpaperPathSelected += path => SendMessage(new PdaSetWallpaperMessage(path));
+            if (borderColorComponent != null)
+            {
+                _menu.BorderColor = borderColorComponent.BorderColor;
+                _menu.AccentHColor = borderColorComponent.AccentHColor;
+                _menu.AccentVColor = borderColorComponent.AccentVColor;
+                _menu.DefaultWallpaperColor = GetDefaultWallpaperColor(borderColorComponent);
+                _menu.OnWallpaperPathSelected += path => SendMessage(new PdaSetWallpaperMessage(path));
+            }
         }
 
         protected override void UpdateState(BoundUserInterfaceState state)
@@ -106,14 +77,20 @@ namespace Content.Client.PDA
                 return;
 
             if (_menu == null)
-            {
-                _pdaSystem.Log.Error("PDA state received before menu was created.");
-                return;
-            }
+                return; // Окно закрыто, игнорируем обновления
 
             _menu.UpdateState(updateState);
 
-            if (!updateState.Booted && !_bootFinishedSent)
+            // Закрываем окно, если ПДА выключен, но только после получения начального состояния
+            if (!updateState.Powered && _menu.IsOpen && _hasReceivedInitialState)
+            {
+                _menu.Close();
+                _menu = null; // Сбрасываем, чтобы при следующем открытии создать новый экземпляр
+                return;
+            }
+            _hasReceivedInitialState = true;
+
+            if (!updateState.Booted && !_bootFinishedSent && _menu.IsOpen)
             {
                 _menu.ShowBootScreen(true);
                 _bootFinishedSent = true;
@@ -153,23 +130,13 @@ namespace Content.Client.PDA
             _menu?.UpdateAvailablePrograms(programs);
         }
 
-        private PdaBorderColorComponent? GetBorderColorComponent()
-        {
-            return EntMan.GetComponentOrNull<PdaBorderColorComponent>(Owner);
-        }
+        private PdaBorderColorComponent? GetBorderColorComponent() => EntMan.GetComponentOrNull<PdaBorderColorComponent>(Owner);
 
         private static Color GetDefaultWallpaperColor(PdaBorderColorComponent borderColor)
         {
-            var source = borderColor.AccentVColor
-                ?? borderColor.AccentHColor
-                ?? borderColor.BorderColor;
-
+            var source = borderColor.AccentVColor ?? borderColor.AccentHColor ?? borderColor.BorderColor;
             var color = Color.FromHex(source, Color.FromHex("#25252a"));
-            return new Color(
-                color.R * 0.24f,
-                color.G * 0.24f,
-                color.B * 0.24f,
-                1f);
+            return new Color(color.R * 0.24f, color.G * 0.24f, color.B * 0.24f, 1f);
         }
     }
 }

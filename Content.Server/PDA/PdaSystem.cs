@@ -12,6 +12,7 @@ using Content.Shared.CartridgeLoader;
 using Content.Shared.Chat;
 using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.Implants;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Light;
 using Content.Shared.Light.EntitySystems;
@@ -22,7 +23,6 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
-using Robust.Shared.GameObjects;
 using Content.Shared.Preferences;
 using Content.Server.Preferences;
 using Content.Server.Preferences.Managers;
@@ -74,6 +74,12 @@ namespace Content.Server.PDA
             SubscribeLocalEvent<AlertLevelChangedEvent>(OnAlertLevelChanged);
             SubscribeLocalEvent<PdaComponent, InventoryRelayedEvent<ChameleonControllerOutfitSelectedEvent>>(ChameleonControllerOutfitItemSelected);
             SubscribeLocalEvent<PdaComponent, PdaSetWallpaperMessage>(OnUiMessage);
+
+            // VG-Power Start
+            SubscribeLocalEvent<PdaComponent, PdaTogglePowerMessage>(OnTogglePower);
+            SubscribeLocalEvent<PdaComponent, UseInHandEvent>(OnUseInHand);
+            SubscribeLocalEvent<PdaComponent, CartridgeLoaderActiveCartridgeChangedEvent>(OnActiveCartridgeChanged);
+            // VG-Power End
         }
 
         // VG-Tweak Start
@@ -137,6 +143,14 @@ namespace Content.Server.PDA
         {
             base.OnComponentInit(uid, pda, args);
 
+            // VG-Power Start: начальное состояние – выключен
+            pda.Powered = false;
+            pda.Booted = false;
+            pda.ScreenOverlay = "off";
+            Dirty(uid, pda);
+            UpdatePdaAppearance(uid, pda);
+            // VG-Power End
+
             if (!HasComp<UserInterfaceComponent>(uid))
                 return;
 
@@ -190,7 +204,7 @@ namespace Content.Server.PDA
 
         private void UpdateAllPdaUisOnStation()
         {
-            var query = AllEntityQuery<PdaComponent>();
+            var query = EntityQueryEnumerator<PdaComponent>();
             while (query.MoveNext(out var ent, out var comp))
             {
                 UpdatePdaUi(ent, comp);
@@ -260,7 +274,9 @@ namespace Content.Server.PDA
                 pda.HasWallpaperColor,
                 pda.WallpaperColor,
                 pda.Booted, // VG-Boot
-                pda.WallpaperPath); 
+                pda.WallpaperPath, // VG-Wallpaper
+                pda.Powered, // VG-Power
+                pda.ScreenOverlay); // VG-Power
 
             _ui.SetUiState(uid, PdaUiKey.Key, state);
         }
@@ -270,7 +286,34 @@ namespace Content.Server.PDA
             if (!PdaUiKey.Key.Equals(args.UiKey))
                 return;
 
-            UpdatePdaUi(ent.Owner, ent.Comp);
+            // VG-Power Start: при открытии включаем, если выключен, и уведомляем картридж
+            bool wasPowered = ent.Comp.Powered;
+
+            if (!ent.Comp.Powered)
+            {
+                ent.Comp.Powered = true;
+                UpdateOverlayFromPoweredAndCartridge(ent.Owner, ent.Comp);
+                Dirty(ent.Owner, ent.Comp);
+                UpdatePdaAppearance(ent.Owner, ent.Comp);
+                UpdatePdaUi(ent.Owner, ent.Comp);
+            }
+            else
+            {
+                UpdateOverlayFromPoweredAndCartridge(ent.Owner, ent.Comp);
+                Dirty(ent.Owner, ent.Comp);
+                UpdatePdaAppearance(ent.Owner, ent.Comp);
+                UpdatePdaUi(ent.Owner, ent.Comp);
+            }
+
+            // Если ПДА был выключен и включился – уведомляем активный картридж об обновлении UI
+            if (!wasPowered && ent.Comp.Powered)
+            {
+                if (TryComp(ent.Owner, out CartridgeLoaderComponent? loader) && loader.ActiveProgram != null)
+                {
+                    RaiseLocalEvent(loader.ActiveProgram.Value, new CartridgeUiReadyEvent(ent.Owner));
+                }
+            }
+            // VG-Power End
         }
 
         private void OnUiMessage(EntityUid uid, PdaComponent pda, PdaRequestUpdateInterfaceMessage msg)
@@ -287,7 +330,7 @@ namespace Content.Server.PDA
                 return;
 
             pda.WallpaperPath = msg.Path;
-            EntityManager.Dirty(uid, pda);
+            Dirty(uid, pda);
             UpdatePdaUi(uid, pda);
         }
 
@@ -358,12 +401,64 @@ namespace Content.Server.PDA
                 return;
 
             pda.Booted = true;
-            EntityManager.Dirty(uid, pda);
+            Dirty(uid, pda);
 
             _ringer.RingerPlayRingtone(uid);
 
             UpdatePdaUi(uid, pda);
         }
+
+        // VG-Power Start
+        private void UpdateOverlayFromPoweredAndCartridge(EntityUid uid, PdaComponent pda)
+        {
+            if (!pda.Powered)
+            {
+                pda.ScreenOverlay = "off";
+                return;
+            }
+
+            if (TryComp(uid, out CartridgeLoaderComponent? loader) && loader.ActiveProgram != null &&
+                TryComp(loader.ActiveProgram, out CartridgeComponent? cart) && !string.IsNullOrEmpty(cart.ScreenOverlay))
+            {
+                pda.ScreenOverlay = cart.ScreenOverlay;
+            }
+            else
+            {
+                pda.ScreenOverlay = "on";
+            }
+        }
+
+        private void OnTogglePower(EntityUid uid, PdaComponent pda, PdaTogglePowerMessage msg)
+        {
+            if (!PdaUiKey.Key.Equals(msg.UiKey))
+                return;
+
+            pda.Powered = !pda.Powered;
+            UpdateOverlayFromPoweredAndCartridge(uid, pda);
+            Dirty(uid, pda);
+            UpdatePdaAppearance(uid, pda);
+            UpdatePdaUi(uid, pda);
+
+            if (!pda.Powered && TryComp<ActorComponent>(msg.Actor, out var actor))
+                _ui.CloseUi(uid, PdaUiKey.Key, actor.PlayerSession);
+        }
+
+        private void OnUseInHand(EntityUid uid, PdaComponent pda, UseInHandEvent args)
+        {
+            // Пусто – ActivatableUI сам откроет окно
+        }
+
+        private void OnActiveCartridgeChanged(EntityUid uid, PdaComponent pda, CartridgeLoaderActiveCartridgeChangedEvent args)
+        {
+            if (!pda.Powered)
+                return;
+
+            UpdateOverlayFromPoweredAndCartridge(uid, pda);
+            Dirty(uid, pda);
+            UpdatePdaAppearance(uid, pda);
+            UpdatePdaUi(uid, pda);
+        }
+        // VG-Power End
 
         private bool IsUnlocked(EntityUid uid)
         {
@@ -397,6 +492,15 @@ namespace Content.Server.PDA
             }
 
             return address;
+        }
+
+        private void UpdatePdaAppearance(EntityUid uid, PdaComponent pda)
+        {
+            Appearance.SetData(uid, PdaVisuals.IdCardInserted, pda.ContainedId != null);
+            if (!string.IsNullOrEmpty(pda.ScreenOverlay))
+                Appearance.SetData(uid, PdaVisuals.ScreenOverlay, pda.ScreenOverlay);
+            else
+                Appearance.SetData(uid, PdaVisuals.ScreenOverlay, "off");
         }
     }
 }

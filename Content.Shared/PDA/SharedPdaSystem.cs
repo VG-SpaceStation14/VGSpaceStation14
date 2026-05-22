@@ -12,15 +12,13 @@ namespace Content.Shared.PDA
         public override void Initialize()
         {
             base.Initialize();
-
             SubscribeLocalEvent<PdaComponent, ComponentInit>(OnComponentInit);
             SubscribeLocalEvent<PdaComponent, ComponentRemove>(OnComponentRemove);
-
             SubscribeLocalEvent<PdaComponent, EntInsertedIntoContainerMessage>(OnItemInserted);
             SubscribeLocalEvent<PdaComponent, EntRemovedFromContainerMessage>(OnItemRemoved);
-
             SubscribeLocalEvent<PdaComponent, GetAdditionalAccessEvent>(OnGetAdditionalAccess);
         }
+
         protected virtual void OnComponentInit(EntityUid uid, PdaComponent pda, ComponentInit args)
         {
             if (pda.IdCard != null)
@@ -29,6 +27,9 @@ namespace Content.Shared.PDA
             ItemSlotsSystem.AddItemSlot(uid, PdaComponent.PdaIdSlotId, pda.IdSlot);
             ItemSlotsSystem.AddItemSlot(uid, PdaComponent.PdaPenSlotId, pda.PenSlot);
             ItemSlotsSystem.AddItemSlot(uid, PdaComponent.PdaPaiSlotId, pda.PaiSlot);
+
+            if (string.IsNullOrEmpty(pda.ScreenOverlay))
+                pda.ScreenOverlay = "off";
 
             UpdatePdaAppearance(uid, pda);
         }
@@ -44,7 +45,6 @@ namespace Content.Shared.PDA
         {
             if (args.Container.ID == PdaComponent.PdaIdSlotId)
                 pda.ContainedId = args.Entity;
-
             UpdatePdaAppearance(uid, pda);
         }
 
@@ -52,7 +52,6 @@ namespace Content.Shared.PDA
         {
             if (args.Container.ID == pda.IdSlot.ID)
                 pda.ContainedId = null;
-
             UpdatePdaAppearance(uid, pda);
         }
 
@@ -62,15 +61,15 @@ namespace Content.Shared.PDA
                 args.Entities.Add(id);
         }
 
-        private void UpdatePdaAppearance(EntityUid uid, PdaComponent pda)
+        protected virtual void UpdatePdaAppearance(EntityUid uid, PdaComponent pda)
         {
             Appearance.SetData(uid, PdaVisuals.IdCardInserted, pda.ContainedId != null);
+            if (!string.IsNullOrEmpty(pda.ScreenOverlay))
+                Appearance.SetData(uid, PdaVisuals.ScreenOverlay, pda.ScreenOverlay);
+            else
+                Appearance.SetData(uid, PdaVisuals.ScreenOverlay, "off");
         }
 
-        public virtual void UpdatePdaUi(EntityUid uid, PdaComponent? pda = null)
-        {
-            // This does nothing yet while I finish up PDA prediction
-            // Overriden by the server
-        }
+        public virtual void UpdatePdaUi(EntityUid uid, PdaComponent? pda = null) { }
     }
 }

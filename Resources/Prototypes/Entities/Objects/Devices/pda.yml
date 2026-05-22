@@ -7,26 +7,33 @@
   components:
   - type: Appearance
     appearanceDataInit:
-     enum.PdaVisuals.PdaType:
-       !type:String
-       pda
+      enum.PdaVisuals.PdaType:
+        !type:String
+        pda
   - type: Sprite
     sprite: _VG/Objects/Devices/pda.rsi
     layers:
-    - map: [ "enum.PdaVisualLayers.Base" ]
+    - map: [ "PdaVisualLayers.Base" ]
       state: "pda"
     - state: "light_overlay"
-      map: [ "enum.PdaVisualLayers.Flashlight" ]
+      map: [ "PdaVisualLayers.Flashlight" ]
       shader: "unshaded"
       visible: false
     - state: "id_inserted"
-      map: [ "enum.PdaVisualLayers.IdLight" ]
+      map: [ "PdaVisualLayers.IdLight" ]
       shader: "unshaded"
       visible: false
+    - sprite: _VG/Objects/Devices/pda_overlays.rsi
+      state: "off"
+      map: [ "PdaVisualLayers.ScreenOverlay" ]
+      shader: "unshaded"
+      visible: true
   - type: Icon
     sprite: _VG/Objects/Devices/pda.rsi
     state: pda
   - type: Pda
+    powered: true
+    screenOverlay: "off"
     paiSlot:
       priority: -2
       whitelist:
@@ -84,9 +91,9 @@
       - NotekeeperCartridge
       - NanoTaskCartridge
       - NewsReaderCartridge
-      - NanoChatCartridge # ADT-tweak: Наночат
-      - ADTWalletCartridge # ADT-Economy
-      - NavigatorCartridge # VG-Tweak
+      - NanoChatCartridge
+      - ADTWalletCartridge
+      - NavigatorCartridge
     cartridgeSlot:
       priority: -1
       name: device-pda-slot-component-slot-name-cartridge
@@ -95,7 +102,7 @@
       whitelist:
         components:
           - Cartridge
-    diskSpace: 8 # ADT tweak
+    diskSpace: 8
   - type: ActivatableUI
     key: enum.PdaUiKey.Key
     singleUser: true
@@ -112,7 +119,7 @@
       enum.HealthAnalyzerUiKey.Key:
         type: HealthAnalyzerBoundUserInterface
       enum.PlantAnalyzerUiKey.Key:
-        type: PlantAnalyzerBoundUserInterface #VG-Add
+        type: PlantAnalyzerBoundUserInterface
   - type: Tag
     tags:
     - DoorBumpOpener
@@ -130,7 +137,7 @@
     proto: robot
   - type: Speech
     speechVerb: Robotic
-  - type: RetroMonitorView # VG-Tweak
+  - type: RetroMonitorView
 
 - type: entity
   parent: BasePDA

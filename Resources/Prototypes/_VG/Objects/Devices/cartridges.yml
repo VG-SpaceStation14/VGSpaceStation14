@@ -14,6 +14,7 @@
     ui: !type:NavigatorUi
   - type: Cartridge
     programName: navigator-program-name
+    screenOverlay: "blue"
     icon:
       sprite: Structures/Wallmounts/signs.rsi
       state: space

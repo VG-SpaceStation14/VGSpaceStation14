@@ -11,20 +11,28 @@ public sealed class PdaVisualizerSystem : VisualizerSystem<PdaVisualsComponent>
         if (args.Sprite == null)
             return;
 
+        const int baseLayer = 0;
+        const int flashlightLayer = 1;
+        const int idLightLayer = 2;
+        const int overlayLayer = 3;
+
         if (AppearanceSystem.TryGetData<string>(uid, PdaVisuals.PdaType, out var pdaType, args.Component))
-            SpriteSystem.LayerSetRsiState((uid, args.Sprite), PdaVisualLayers.Base, pdaType);
+            args.Sprite.LayerSetState(baseLayer, pdaType);
 
         if (AppearanceSystem.TryGetData<bool>(uid, UnpoweredFlashlightVisuals.LightOn, out var isFlashlightOn, args.Component))
-            SpriteSystem.LayerSetVisible((uid, args.Sprite), PdaVisualLayers.Flashlight, isFlashlightOn);
+            args.Sprite.LayerSetVisible(flashlightLayer, isFlashlightOn);
 
         if (AppearanceSystem.TryGetData<bool>(uid, PdaVisuals.IdCardInserted, out var isCardInserted, args.Component))
-            SpriteSystem.LayerSetVisible((uid, args.Sprite), PdaVisualLayers.IdLight, isCardInserted);
-    }
+            args.Sprite.LayerSetVisible(idLightLayer, isCardInserted);
 
-    public enum PdaVisualLayers : byte
-    {
-        Base,
-        Flashlight,
-        IdLight
+        if (AppearanceSystem.TryGetData<string>(uid, PdaVisuals.ScreenOverlay, out var overlay, args.Component))
+        {
+            args.Sprite.LayerSetState(overlayLayer, overlay);
+            args.Sprite.LayerSetVisible(overlayLayer, true);
+        }
+        else
+        {
+            args.Sprite.LayerSetVisible(overlayLayer, false);
+        }
     }
 }
