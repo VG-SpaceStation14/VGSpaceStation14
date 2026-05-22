@@ -3,5 +3,6 @@
   name: trait-incognito-name
   description: trait-incognito-desc
   category: account
+  cost: 0
   components:
     - type: SetIncognito
