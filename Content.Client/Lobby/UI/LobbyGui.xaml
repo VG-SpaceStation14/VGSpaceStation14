@@ -30,64 +30,64 @@
             </PanelContainer>
         </controls:StripeBack>
 
-        <BoxContainer Name="MenuControls" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="25 25 25 45" SeparationOverride="12" MinWidth="380">
-            <PanelContainer Name="LeftSide" Access="Public" Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel">
-                <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" MinHeight="200" />
-            </PanelContainer>
+        <BoxContainer Name="MainHorizontalLayout" Orientation="Horizontal" VerticalExpand="True" SeparationOverride="15">
+            <BoxContainer Name="MenuControls" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="25 25 0 45" SeparationOverride="12" MinWidth="380">
+                <PanelContainer Name="LeftSide" Access="Public" Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel">
+                    <lobbyUi:LobbyCharacterPreviewPanel Name="CharacterPreview" Access="Public" MinHeight="200" />
+                </PanelContainer>
 
-            <PanelContainer Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel">
-                <BoxContainer Orientation="Vertical" SeparationOverride="0">
-                    <controls:StripeBack Modulate="#FFFFFFD0" HorizontalExpand="True">
-                        <PanelContainer StyleClasses="BackgroundPanel" MinHeight="34" HorizontalExpand="True">
-                            <Label Name="StartTime" Access="Public" StyleClasses="LabelBig" Align="Center" VerticalAlignment="Center" Margin="5" />
-                        </PanelContainer>
-                    </controls:StripeBack>
-                    <BoxContainer Orientation="Vertical" Margin="0 12" SeparationOverride="6" HorizontalExpand="True">
-                        <Button Name="ReadyButton" Access="Public" ToggleMode="True" Text="ПРИСОЕДИНИТЬСЯ" HorizontalExpand="True" MinHeight="40" StyleClasses="ButtonBig" />
-                        <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" MinHeight="32" WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
-                        <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
-                        <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" MinHeight="32" />
-                        <Button Name="CharacterSetup" Access="Public" Text="Персонаж" HorizontalExpand="True" MinHeight="32" />
-                        <!-- VG-Tweak: Admin buttons -->
-                        <BoxContainer Name="AdminButtons" Orientation="Vertical" SeparationOverride="4" Visible="False">
+                <PanelContainer Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel">
+                    <BoxContainer Orientation="Vertical" SeparationOverride="0">
+                        <controls:StripeBack Modulate="#FFFFFFD0" HorizontalExpand="True">
+                            <PanelContainer StyleClasses="BackgroundPanel" MinHeight="34" HorizontalExpand="True">
+                                <Label Name="StartTime" Access="Public" StyleClasses="LabelBig" Align="Center" VerticalAlignment="Center" Margin="5" />
+                            </PanelContainer>
+                        </controls:StripeBack>
+                        <BoxContainer Orientation="Vertical" Margin="0 12" SeparationOverride="6" HorizontalExpand="True">
+                            <Button Name="ReadyButton" Access="Public" ToggleMode="True" Text="ПРИСОЕДИНИТЬСЯ" HorizontalExpand="True" MinHeight="40" StyleClasses="ButtonBig" />
+                            <cc:UICommandButton Command="observe" Name="ObserveButton" Access="Public" Text="Наблюдать" HorizontalExpand="True" MinHeight="32" WindowType="{x:Type lobbyUi:ObserveWarningWindow}" />
                             <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
-                            <Label Text="Администрирование" StyleClasses="LabelSubText" HorizontalAlignment="Center" Margin="0 2" />
-                            <Button Name="StartRoundButton" Access="Public" Text="Начать раунд" HorizontalExpand="True" MinHeight="28" />
-                            <Button Name="DelayStartButton" Access="Public" Text="Пауза в лобби" HorizontalExpand="True" MinHeight="28" />
-                            <Button Name="SendLobbyMessageButton" Access="Public" Text="Сообщение в лобби" HorizontalExpand="True" MinHeight="28" />
+                            <Button Name="SponsorInfoButton" Access="Public" StyleClasses="Caution" HorizontalExpand="True" MinHeight="32" />
+                            <Button Name="CharacterSetup" Access="Public" Text="Персонаж" HorizontalExpand="True" MinHeight="32" />
+                            <!-- VG-Tweak: Admin buttons -->
+                            <BoxContainer Name="AdminButtons" Orientation="Vertical" SeparationOverride="4" Visible="False">
+                                <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
+                                <Label Text="Администрирование" StyleClasses="LabelSubText" HorizontalAlignment="Center" Margin="0 2" />
+                                <Button Name="StartRoundButton" Access="Public" Text="Начать раунд" HorizontalExpand="True" MinHeight="28" />
+                                <Button Name="DelayStartButton" Access="Public" Text="Пауза в лобби" HorizontalExpand="True" MinHeight="28" />
+                                <Button Name="SendLobbyMessageButton" Access="Public" Text="Сообщение в лобби" HorizontalExpand="True" MinHeight="28" />
+                            </BoxContainer>
+                            <!-- VG-Tweak end -->
+                            <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
+                            <Button Name="OptionsButton" Access="Public" Text="Настройки" HorizontalExpand="True" MinHeight="32" />
+                            <Button Name="LeaveButton" Access="Public" Text="Выйти" HorizontalExpand="True" MinHeight="32" StyleClasses="Caution" />
                         </BoxContainer>
-                        <!-- VG-Tweak end -->
-                        <controls:HLine Thickness="1" Margin="2 4" Modulate="#FFFFFF30" />
-                        <Button Name="OptionsButton" Access="Public" Text="Настройки" HorizontalExpand="True" MinHeight="32" />
-                        <Button Name="LeaveButton" Access="Public" Text="Выйти" HorizontalExpand="True" MinHeight="32" StyleClasses="Caution" />
                     </BoxContainer>
-                </BoxContainer>
-            </PanelContainer>
+                </PanelContainer>
+            </BoxContainer>
+
+            <Control Name="VGMessageContainer" 
+                     VerticalAlignment="Bottom" 
+                     Margin="0 0 0 45"
+                     MinHeight="50"
+                     HorizontalExpand="True" />
+
+            <BoxContainer Name="ChatContainer" Orientation="Vertical" HorizontalAlignment="Right" VerticalExpand="True" Margin="0 68 25 25" MinWidth="450" SeparationOverride="12">
+                <PanelContainer Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel" MinHeight="140" HorizontalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="12" Name="DefaultState" Access="Public" MaxWidth="450" HorizontalExpand="True" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <info:ServerInfo Name="ServerInfo" Access="Public" HorizontalExpand="True" />
+                        <Label Name="StatusLabel" Access="Public" Margin="0 4 0 0" />
+                    </BoxContainer>
+                </PanelContainer>
+
+                <PanelContainer Name="RightSide" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True" HorizontalExpand="True" Modulate="#FFFFFFD0">
+                    <BoxContainer Orientation="Vertical" Margin="12" HorizontalExpand="True" VerticalExpand="True">
+                        <controls:NanoHeading Text="{Loc 'ui-lobby-chat-title'}" Margin="0 0 0 4" />
+                        <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" HorizontalExpand="True" />
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
         </BoxContainer>
-
-        <BoxContainer Name="ChatContainer" Orientation="Vertical" HorizontalAlignment="Right" VerticalExpand="True" Margin="25 68 25 25" MinWidth="450" SeparationOverride="12">
-            <PanelContainer Modulate="#FFFFFFD0" StyleClasses="BackgroundPanel" MinHeight="140" HorizontalExpand="True">
-                <BoxContainer Orientation="Vertical" Margin="12" Name="DefaultState" Access="Public" MaxWidth="450" HorizontalExpand="True" VerticalAlignment="Top" HorizontalAlignment="Left">
-                    <info:ServerInfo Name="ServerInfo" Access="Public" HorizontalExpand="True" />
-                    <Label Name="StatusLabel" Access="Public" Margin="0 4 0 0" />
-                </BoxContainer>
-            </PanelContainer>
-
-            <PanelContainer Name="RightSide" Access="Public" StyleClasses="BackgroundPanel" VerticalExpand="True" HorizontalExpand="True" Modulate="#FFFFFFD0">
-                <BoxContainer Orientation="Vertical" Margin="12" HorizontalExpand="True" VerticalExpand="True">
-                    <controls:NanoHeading Text="{Loc 'ui-lobby-chat-title'}" Margin="0 0 0 4" />
-                    <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" HorizontalExpand="True" />
-                </BoxContainer>
-            </PanelContainer>
-        </BoxContainer>
-
-        <Control Name="VGMessageContainer" 
-                 HorizontalAlignment="Left" 
-                 VerticalAlignment="Bottom" 
-                 Margin="425 0 0 45" 
-                 MinSize="800 50"
-                 MaxSize="800 50"
-                 MouseFilter="Ignore" />
 
         <Control Name="CenterMessageContainer"
             Access="Public"
