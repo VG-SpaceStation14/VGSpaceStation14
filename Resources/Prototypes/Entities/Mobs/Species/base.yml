@@ -257,6 +257,7 @@
   - type: Targeting # VG-Tweak
   - type: Blink # VG-Tweak
   - type: ExaminableCharacter # VG-Tweak
+  - type: HealthExaminablePart # VG-Tweak
   - type: Barotrauma
     damage:
       types:
