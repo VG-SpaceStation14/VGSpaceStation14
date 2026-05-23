@@ -1,6 +1,7 @@
 using Content.Shared._VG;
 using Content.Shared._VG.Examine;
 using Content.Shared.Examine;
+using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
 using Robust.Shared.Configuration;
 using Robust.Shared.Player;
@@ -11,6 +12,7 @@ public sealed class ExaminableCharacterSystem : EntitySystem
 {
     [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly INetConfigurationManager _netConfig = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     public override void Initialize()
     {
@@ -38,8 +40,8 @@ public sealed class ExaminableCharacterSystem : EntitySystem
         }
         else
         {
-            var meta = MetaData(uid);
-            nameLine = Loc.GetString("examine-name", ("name", meta.EntityName));
+            var identity = Identity.Entity(uid, _entityManager);
+            nameLine = Loc.GetString("examine-name", ("name", identity));
         }
         args.PushMarkup($"[font size=11]{nameLine}[/font]", 15);
 
@@ -48,22 +50,58 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             : Loc.GetString("examine-can-see", ("ent", uid));
         args.PushMarkup($"[font size=10]{canSee}[/font]", 14);
 
-        var slotLabels = new Dictionary<string, string>
+        bool hasOuter = _inventory.TryGetSlotEntity(uid, "outerClothing", out _);
+        bool hasHelmet = _inventory.TryGetSlotEntity(uid, "head", out _);
+
+        var alwaysShowSlots = new Dictionary<string, string>
         {
-            { "head", "head" }, { "eyes", "eyes" }, { "mask", "mask" }, { "neck", "neck" },
-            { "ears", "ears" }, { "jumpsuit", "jumpsuit" }, { "outerClothing", "outer" },
-            { "back", "back" }, { "gloves", "gloves" }, { "belt", "belt" }, { "id", "id" },
-            { "shoes", "shoes" }, { "suitstorage", "suitstorage" }
+            { "head", "head" },
+            { "eyes", "eyes" },
+            { "mask", "mask" },
+            { "neck", "neck" },
+            { "back", "back" },
+            { "suitstorage", "suitstorage" }
+        };
+
+        var hiddenIfOuterSlots = new Dictionary<string, string>
+        {
+            { "jumpsuit", "jumpsuit" },
+            { "gloves", "gloves" },
+            { "belt", "belt" },
+            { "id", "id" },
+            { "shoes", "shoes" }
         };
 
         int priority = 13;
         bool hasAnyItem = false;
 
-        foreach (var slot in slotLabels)
+        if (hasOuter && _inventory.TryGetSlotEntity(uid, "outerClothing", out var outerItem) &&
+            TryComp<MetaDataComponent>(outerItem, out var outerMeta))
         {
-            if (!_inventory.TryGetSlotEntity(uid, slot.Key, out var item))
+            hasAnyItem = true;
+            var locKey = selfAware ? "outer-examine-selfaware" : "outer-examine";
+            var line = Loc.GetString(locKey, ("item", outerMeta.EntityName));
+            args.PushMarkup($"[font size=10]{line}[/font]", priority);
+            priority--;
+        }
+
+        if (hasHelmet && _inventory.TryGetSlotEntity(uid, "head", out var helmetItem) &&
+            TryComp<MetaDataComponent>(helmetItem, out var helmetMeta))
+        {
+            hasAnyItem = true;
+            var locKey = selfAware ? "head-examine-selfaware" : "head-examine";
+            var line = Loc.GetString(locKey, ("item", helmetMeta.EntityName));
+            args.PushMarkup($"[font size=10]{line}[/font]", priority);
+            priority--;
+        }
+
+        foreach (var slot in alwaysShowSlots)
+        {
+            if (slot.Key == "head")
                 continue;
 
+            if (!_inventory.TryGetSlotEntity(uid, slot.Key, out var item))
+                continue;
             if (!TryComp<MetaDataComponent>(item, out var meta))
                 continue;
 
@@ -75,6 +113,39 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             var line = Loc.GetString(locKey, ("item", meta.EntityName));
             args.PushMarkup($"[font size=10]{line}[/font]", priority);
             priority--;
+        }
+
+        if (!hasHelmet)
+        {
+            if (_inventory.TryGetSlotEntity(uid, "ears", out var earsItem) &&
+                TryComp<MetaDataComponent>(earsItem, out var earsMeta))
+            {
+                hasAnyItem = true;
+                var locKey = selfAware ? "ears-examine-selfaware" : "ears-examine";
+                var line = Loc.GetString(locKey, ("item", earsMeta.EntityName));
+                args.PushMarkup($"[font size=10]{line}[/font]", priority);
+                priority--;
+            }
+        }
+
+        if (!hasOuter)
+        {
+            foreach (var slot in hiddenIfOuterSlots)
+            {
+                if (!_inventory.TryGetSlotEntity(uid, slot.Key, out var item))
+                    continue;
+                if (!TryComp<MetaDataComponent>(item, out var meta))
+                    continue;
+
+                hasAnyItem = true;
+                var locKey = slot.Value + "-examine";
+                if (selfAware)
+                    locKey += "-selfaware";
+
+                var line = Loc.GetString(locKey, ("item", meta.EntityName));
+                args.PushMarkup($"[font size=10]{line}[/font]", priority);
+                priority--;
+            }
         }
 
         if (!hasAnyItem)
