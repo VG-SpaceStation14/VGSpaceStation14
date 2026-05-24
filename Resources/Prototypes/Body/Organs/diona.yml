@@ -35,6 +35,9 @@
   name: brain
   description: "The central hub of a diona's pseudo-neurological activity, its root-like tendrils search for its former body."
   components:
+  - type: Brain
+  - type: Organ
+    slotId: brain # VG-Tweak
   - type: Item
     size: Small
     heldPrefix: brain
@@ -67,6 +70,11 @@
   name: eyes
   description: "I see you!"
   components:
+  # VG-Tweak Start
+  - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
   - type: Sprite
     layers:
       - state: eyeball-l

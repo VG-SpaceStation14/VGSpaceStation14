@@ -37,6 +37,8 @@
   - type: Item
     size: Small
     heldPrefix: stomach
+  - type: Organ # VG-Tweak
+    slotId: stomach
   - type: Stomach
     digestionDelay: 30
   - type: SolutionContainerManager
@@ -200,6 +202,11 @@
   name: eyes
   description: "Two was already too many."
   components:
+  # VG-Tweak Start
+  - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
   - type: Sprite
     layers:
       - state: eyeball-l

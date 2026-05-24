@@ -10,6 +10,8 @@
     metabolizerTypes: [ Vox ]
   - type: Lung
     alert: LowNitrogen
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Item
     size: Small
     heldPrefix: lungs
@@ -23,6 +25,8 @@
   - type: Metabolizer #Skreeeee!
     metabolizerTypes: [Vox]
   - type: Stomach
+  - type: Organ # VG-Tweak
+    slotId: stomach
     # Bird vs tags
     specialDigestible:
       tags:
@@ -38,6 +42,11 @@
   name: liver
   description: "Smells flammable."
   components:
+  # VG-Tweak Start
+  - type: Liver
+  - type: Organ
+    slotId: liver
+  # VG-Tweak End
   - type: Metabolizer
     metabolizerTypes: [Vox]
   - type: Sprite
@@ -49,6 +58,11 @@
   name: heart
   description: "The strange heart of a vox."
   components:
+  # VG-Tweak Start
+  - type: Heart
+  - type: Organ
+    slotId: heart
+  # VG-Tweak End
   - type: Metabolizer
     metabolizerTypes: [Vox]
   - type: Sprite
@@ -70,6 +84,11 @@
   parent: OrganHumanEyes
   name: eyes
   components:
+  # VG-Tweak Start
+  - type: Organ
+    slotId: eyes
+  - type: Eyes
+  # VG-Tweak End
   - type: Sprite
     sprite: Mobs/Species/Vox/organs.rsi
   - type: Item

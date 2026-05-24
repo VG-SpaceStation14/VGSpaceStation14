@@ -3,6 +3,9 @@
   parent: OrganHumanLungs
   suffix: "rat"
   components:
+  - type: Lung
+  - type: Organ # VG-Tweak
+    slotId: lungs
   - type: Metabolizer
     metabolizerTypes: [ Rat ]
 
@@ -11,6 +14,9 @@
   parent: OrganAnimalStomach
   suffix: "rat"
   components:
+  - type: Stomach
+  - type: Organ # VG-Tweak
+    slotId: stomach
   - type: SolutionContainerManager
     solutions:
       stomach:
