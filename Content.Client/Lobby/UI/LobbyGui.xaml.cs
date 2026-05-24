@@ -269,10 +269,9 @@ namespace Content.Client.Lobby.UI
                 case LobbyGuiState.Default:
                     DefaultState.Visible = true;
                     RightSide.Visible = true;
-                    VGMessageContainer.Visible = true;
-                    MenuControls.Margin = new Thickness(25, MenuControls.Margin.Top, MenuControls.Margin.Right, 45);
-                    ChatContainer.Margin = new Thickness(ChatContainer.Margin.Left, 68, 25, 25);
-                    MusicContainer.Margin = new Thickness(25, 15, MusicContainer.Margin.Right, MusicContainer.Margin.Bottom);
+                    MenuControls.Margin = new Thickness(25, 25, 0, 45);
+                    ChatContainer.Margin = new Thickness(0, 68, 25, 25);
+                    MusicContainer.Margin = new Thickness(25, 15, 0, 0);
                     break;
 
                 case LobbyGuiState.CharacterSetup:
@@ -282,7 +281,6 @@ namespace Content.Client.Lobby.UI
                     break;
 
                 case LobbyGuiState.ScreenSaver:
-                    VGMessageContainer.Visible = false;
                     MenuControls.Visible = false;
                     ChatContainer.Visible = false;
                     MusicContainer.Visible = false;
