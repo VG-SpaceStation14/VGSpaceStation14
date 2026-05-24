@@ -594,6 +594,11 @@ namespace Content.Client._VG.Lobby.UI
             // Поле имени теперь оригинальное, обновляется автоматически
         }
 
+        public void ForceRefreshPreview()
+        {
+            UpdatePreviewInstant();
+        }
+
         public HumanoidProfileEditor GetProfileEditor()
         {
             return _profileEditor;

@@ -1,0 +1,30 @@
+<BoxContainer xmlns="https://spacestation14.io"
+              xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+              Orientation="Vertical"
+              HorizontalExpand="True"
+              Margin="2">
+    <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+        <PanelContainer SetSize="48 48" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center" 
+                        MouseFilter="Ignore">
+            <PanelContainer.PanelOverride>
+                <graphics:StyleBoxFlat BackgroundColor="#1B1B1E" />
+            </PanelContainer.PanelOverride>
+            <TextureRect Name="MarkingTexture" 
+                         Stretch="KeepAspect" 
+                         HorizontalAlignment="Center" 
+                         VerticalAlignment="Center" 
+                         SetSize="48 48" />
+        </PanelContainer>
+        <Button Name="SelectButton" Access="Public" ToggleMode="True" HorizontalExpand="True" />
+        <Button Name="ColorsButton" Access="Public" ToggleMode="True" Visible="False">
+            <TextureRect TexturePath="/Textures/Interface/palette.svg.png" 
+                         HorizontalAlignment="Center" 
+                         VerticalAlignment="Center" 
+                         Stretch="KeepAspect" 
+                         SetSize="24 24" />
+        </Button>
+    </BoxContainer>
+    <BoxContainer Name="ColorsContainer" Access="Public" Visible="False" Orientation="Vertical" Margin="4 0 0 4" />
+</BoxContainer>
