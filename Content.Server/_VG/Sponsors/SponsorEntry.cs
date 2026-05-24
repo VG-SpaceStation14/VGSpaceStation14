@@ -14,6 +14,8 @@ public sealed class SponsorEntry
     // Custom loadouts available to this specific player
     public List<string> CustomLoadouts { get; set; } = new();
 
+    public string? OOCColor { get; set; }
+
     [JsonIgnore]
     public NetUserId? NetUserId => Guid.TryParse(UserId, out var guid) ? new NetUserId(guid) : null;
 }

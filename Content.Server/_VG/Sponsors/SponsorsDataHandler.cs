@@ -74,7 +74,9 @@ public sealed class SponsorsDataHandler
         return _sponsors.FirstOrDefault(s => s.UserId == userIdStr);
     }
 
-    public void AddOrUpdateSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
+    public void AddOrUpdateSponsor(NetUserId userId, string username, int tier, 
+        DateTime? expireDate = null, string? notes = null, 
+        List<string>? customLoadouts = null, string? oocColor = null)
     {
         var userIdStr = userId.ToString();
         var existing = _sponsors.FirstOrDefault(s => s.UserId == userIdStr);
@@ -86,6 +88,8 @@ public sealed class SponsorsDataHandler
             existing.Username = username;
             if (customLoadouts != null)
                 existing.CustomLoadouts = customLoadouts;
+            if (oocColor != null)
+                existing.OOCColor = oocColor;
         }
         else
         {
@@ -96,7 +100,8 @@ public sealed class SponsorsDataHandler
                 Tier = tier,
                 ExpireDate = expireDate,
                 Notes = notes,
-                CustomLoadouts = customLoadouts ?? new()
+                CustomLoadouts = customLoadouts ?? new(),
+                OOCColor = oocColor
             });
         }
         Save();

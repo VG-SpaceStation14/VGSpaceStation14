@@ -35,7 +35,7 @@ public sealed class SponsorsManager : ISponsorsManager
     private Dictionary<string, List<PendingSponsorAction>> _pendingActions = new();
     private readonly string _pendingActionsPath = "data/pending_sponsor_actions.json";
 
-    private static readonly Dictionary<int, string> TierColors = new()
+    private static readonly Dictionary<int, string> DefaultTierColors = new()
     {
         { 1, "#33ccff" },
         { 2, "#3366ff" }, 
@@ -169,7 +169,7 @@ public sealed class SponsorsManager : ISponsorsManager
                 switch (action)
                 {
                     case AddSponsorAction add:
-                        AddSponsor(userId, username, add.Tier, add.ExpireDate, add.Notes, null);
+                        AddSponsor(userId, username, add.Tier, add.ExpireDate, add.Notes, null, add.OOCColor);
                         break;
                     case RemoveSponsorAction:
                         RemoveSponsor(userId);
@@ -313,20 +313,23 @@ public sealed class SponsorsManager : ISponsorsManager
             _sawmill.Warning($"Sponsor markings not cached for user {username}, sponsor may not see sponsor-only markings");
         }
 
+        // Get OOC color: use custom color from JSON if available, otherwise use default tier color
+        var oocColor = GetOOCColor(entry);
+
         var info = new SponsorInfo
         {
             Tier = entry.Tier,
-            OOCColor = TierColors.GetValueOrDefault(entry.Tier, "#ffffff"),
+            OOCColor = oocColor,
             AllowJob = entry.Tier >= 2,
             ExtraSlots = entry.Tier >= 3 ? 2 : (entry.Tier >= 2 ? 1 : 0),
             ExpireDate = entry.ExpireDate ?? DateTime.MaxValue,
             CharacterName = entry.Username,
-            CustomLoadouts = entry.CustomLoadouts.ToArray(),
+            CustomLoadouts = entry.CustomLoadouts?.ToArray() ?? Array.Empty<string>(),
             AllowedMarkings = allowedMarkings
         };
 
         _cachedSponsors[userId] = info;
-        _sawmill.Info($"Sponsor {username} (Tier {entry.Tier}) connected with {entry.CustomLoadouts.Count} custom loadouts, {allowedMarkings.Length} sponsor markings available");
+        _sawmill.Info($"Sponsor {username} (Tier {entry.Tier}) connected with custom color {oocColor}, {entry.CustomLoadouts?.Count ?? 0} custom loadouts, {allowedMarkings.Length} sponsor markings available");
 
         var msgSponsor = new MsgSponsorInfo { Info = info };
         _netMgr.ServerSendMessage(msgSponsor, e.Channel);
@@ -335,6 +338,28 @@ public sealed class SponsorsManager : ISponsorsManager
     private void OnDisconnect(object? sender, NetDisconnectedArgs e)
     {
         _cachedSponsors.Remove(e.Channel.UserId);
+    }
+
+    #endregion
+
+    #region Helper Methods
+
+    private string GetOOCColor(SponsorEntry entry)
+    {
+        // Priority 1: Custom color from JSON
+        if (!string.IsNullOrEmpty(entry.OOCColor))
+        {
+            // Validate hex color format (basic validation)
+            var color = entry.OOCColor.Trim();
+            if (color.StartsWith('#') && (color.Length == 4 || color.Length == 7 || color.Length == 9))
+            {
+                return color;
+            }
+            _sawmill.Warning($"Invalid OOCColor format '{color}' for user {entry.Username}, using default tier color");
+        }
+        
+        // Priority 2: Default tier color
+        return DefaultTierColors.GetValueOrDefault(entry.Tier, "#ffffff");
     }
 
     #endregion
@@ -392,18 +417,21 @@ public sealed class SponsorsManager : ISponsorsManager
 
     #region Admin Commands (Direct)
 
-    public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null)
+    public void AddSponsor(NetUserId userId, string username, int tier, DateTime? expireDate = null, string? notes = null, List<string>? customLoadouts = null, string? oocColor = null)
     {
-        _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes, customLoadouts);
+        _dataHandler.AddOrUpdateSponsor(userId, username, tier, expireDate, notes, customLoadouts, oocColor);
 
         EnsureSponsorMarkingsCached();
 
         var allowedMarkings = _isSponsorMarkingsCached ? _sponsorOnlyMarkingIds : Array.Empty<string>();
+        
+        // Get OOC color: use custom color if provided, otherwise use default tier color
+        var finalColor = !string.IsNullOrEmpty(oocColor) ? oocColor : DefaultTierColors.GetValueOrDefault(tier, "#ffffff");
 
         var info = new SponsorInfo
         {
             Tier = tier,
-            OOCColor = TierColors.GetValueOrDefault(tier, "#ffffff"),
+            OOCColor = finalColor,
             AllowJob = tier >= 2,
             ExtraSlots = tier >= 3 ? 2 : (tier >= 2 ? 1 : 0),
             ExpireDate = expireDate ?? DateTime.MaxValue,
@@ -418,7 +446,7 @@ public sealed class SponsorsManager : ISponsorsManager
         {
             var msg = new MsgSponsorInfo { Info = info };
             _netMgr.ServerSendMessage(msg, session.Channel);
-            _sawmill.Info($"Sent updated sponsor info to {username} (Tier {tier})");
+            _sawmill.Info($"Sent updated sponsor info to {username} (Tier {tier}) with color {finalColor}");
         }
     }
 

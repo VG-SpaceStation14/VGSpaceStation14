@@ -17,6 +17,7 @@ public sealed class AddSponsorAction : PendingSponsorAction
     public int Tier { get; set; }
     public DateTime? ExpireDate { get; set; }
     public string? Notes { get; set; }
+    public string? OOCColor { get; set; }
 }
 
 public sealed class RemoveSponsorAction : PendingSponsorAction
