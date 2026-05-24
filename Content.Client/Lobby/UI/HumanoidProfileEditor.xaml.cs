@@ -860,52 +860,6 @@ namespace Content.Client.Lobby.UI
 
         #endregion
 
-        #region Voice
-
-        private void RefreshVoiceTab()
-        {
-            if (!_cfgManager.GetCVar(CCCVars.TTSEnabled))
-                return;
-
-            _ttsTab = new TTSTab();
-            var children = new List<Control>();
-            foreach (var child in TabContainer.Children)
-                children.Add(child);
-
-            TabContainer.RemoveAllChildren();
-
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (i == 1)
-                {
-                    TabContainer.AddChild(_ttsTab);
-                }
-                TabContainer.AddChild(children[i]);
-            }
-
-            _ttsTab.OnVoiceSelected += voiceId =>
-            {
-                SetVoice(voiceId);
-                _ttsTab.SetSelectedVoice(voiceId);
-            };
-
-            _ttsTab.OnPreviewRequested += voiceId =>
-            {
-                _entManager.System<TTSSystem>().RequestPreviewTTS(voiceId);
-            };
-        }
-
-        private void UpdateTTSVoicesControls()
-        {
-            if (Profile is null || _ttsTab is null)
-                return;
-
-            _ttsTab.UpdateControls(Profile, Profile.Sex, Profile.Species);
-            _ttsTab.SetSelectedVoice(Profile.Voice);
-        }
-
-        #endregion
-
         #region Profile Management
 
         private void SetDirty()
@@ -1609,34 +1563,6 @@ namespace Content.Client.Lobby.UI
                 dict.Add(DefaultSpeciesGuidebook, guideRoot);
                 guidebookController.OpenGuidebook(dict, includeChildren: true, selected: page);
             }
-        }
-
-        #endregion
-
-        #region Bark
-
-        private void InitializeBarks()
-        {
-            // ADT Barks initialization
-        }
-
-        private void UpdateBarkVoicesControls()
-        {
-            // ADT Barks update
-        }
-
-        #endregion
-
-        #region Languages
-
-        private void RefreshLanguages()
-        {
-            // ADT Languages refresh
-        }
-
-        private void OnLanguagesSearchTextChanged(LineEdit.LineEditEventArgs args)
-        {
-            // ADT Languages search
         }
 
         #endregion
