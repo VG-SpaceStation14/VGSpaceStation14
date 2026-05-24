@@ -48,9 +48,9 @@ public sealed partial class VGLayerMarkingItem : BoxContainer
         {
             var sponsorManager = IoCManager.Resolve<SponsorsManager>();
             bool hasSponsor = sponsorManager.TryGetInfo(out var info) && info.AllowedMarkings.Contains(prototype.ID);
+            SelectButton.Text = baseName + " (СПОНСОР)";
             if (!hasSponsor)
             {
-                SelectButton.Text = baseName + " (СПОНСОР)";
                 SelectButton.Disabled = true;
                 ColorsButton.Disabled = true;
             }
