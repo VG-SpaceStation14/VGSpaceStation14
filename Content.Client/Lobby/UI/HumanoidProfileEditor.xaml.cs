@@ -939,6 +939,8 @@ namespace Content.Client.Lobby.UI
 
             // Check and set the dirty flag to enable the save/reset buttons as appropriate.
             SetDirty();
+            // VG-Tweak: fire even when profile reverts to saved state (SetDirty skips it then)
+            if (!IsDirty) ProfileChanged?.Invoke();
         }
 
         private void OnSpeciesInfoButtonPressed(BaseButton.ButtonEventArgs args)

@@ -5,6 +5,7 @@ markings-remove = Remove Marking
 markings-rank-up = Up
 markings-rank-down = Down
 markings-search = Search
+markings-reorder = Reorder
 marking-points-remaining = Markings left: {$points}
 marking-used = {$marking-name}
 marking-used-forced = {$marking-name} (Forced)

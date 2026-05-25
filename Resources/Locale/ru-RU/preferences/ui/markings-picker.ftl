@@ -5,6 +5,7 @@ markings-remove = Убрать черту
 markings-rank-up = Вверх
 markings-rank-down = Вниз
 markings-search = Поиск
+markings-reorder = Порядок
 marking-points-remaining = Черт осталось: { $points }
 marking-used = { $marking-name }
 marking-used-forced = { $marking-name } (Принудительно)

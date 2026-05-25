@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Content.Client.Humanoid;
 using Content.Client.Info.PlaytimeStats;
 using Content.Client.Lobby;
 using Content.Client.Lobby.UI;
@@ -38,6 +39,14 @@ namespace Content.Client._VG.Lobby.UI
         private const float FadeDuration = 0.3f;
         private EntityUid? _oldPreviewDummy;
         private EntityUid? _newPreviewDummy;
+
+        // Tracks last "heavy" state to detect when a full respawn is needed
+        private string _lastPreviewSpecies = "";
+        private bool _lastPreviewShowClothes = true;
+
+        // Deduplication: process at most one appearance update per frame
+        private bool _appearanceUpdatePending;
+        private bool _fullRespawnPending;
 
         private bool _pdaPreviewActive;
         private PanelContainer? _pdaScreen;
@@ -105,7 +114,7 @@ namespace Content.Client._VG.Lobby.UI
                     UpdatePreviewInstant();
                 };
 
-            _profileEditor.ProfileChanged += () => UpdatePreviewInstant();
+            _profileEditor.ProfileChanged += OnProfileChangedLight;
 
             if (_profileEditor.ShowClothes != null)
                 _profileEditor.ShowClothes.OnToggled += _ => UpdatePreviewInstant();
@@ -461,8 +470,11 @@ namespace Content.Client._VG.Lobby.UI
             var profile = _profileEditor.Profile;
             if (profile == null) return;
 
-            var controller = UserInterfaceManager.GetUIController<LobbyUIController>();
             bool clothes = _profileEditor.ShowClothes?.Pressed ?? true;
+            _lastPreviewSpecies = profile.Species;
+            _lastPreviewShowClothes = clothes;
+
+            var controller = UserInterfaceManager.GetUIController<LobbyUIController>();
             var newDummy = controller.LoadProfileEntity(profile, null, clothes);
 
             if (_previewDummy == null)
@@ -475,8 +487,8 @@ namespace Content.Client._VG.Lobby.UI
 
             if (_fadingPreview)
             {
-                if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy);
-                if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy);
+                if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy.Value);
+                if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy.Value);
             }
 
             _oldPreviewDummy = _previewDummy;
@@ -488,26 +500,83 @@ namespace Content.Client._VG.Lobby.UI
             PreviewSprite.ModulateSelfOverride = Color.White.WithAlpha(0f);
         }
 
+        // Called on appearance-only changes (markings, skin color, eye color) — no entity respawn.
+        // Deduplicates: schedules at most one update per frame.
+        private void OnProfileChangedLight()
+        {
+            var profile = _profileEditor.Profile;
+            if (profile == null) return;
+
+            bool showClothes = _profileEditor.ShowClothes?.Pressed ?? true;
+
+            // Species or clothes changed → need full respawn
+            if (profile.Species != _lastPreviewSpecies || showClothes != _lastPreviewShowClothes)
+            {
+                _fullRespawnPending = true;
+                _appearanceUpdatePending = false;
+            }
+            else
+            {
+                _appearanceUpdatePending = true;
+            }
+        }
+
         public void UpdatePreviewInstant()
         {
             var profile = _profileEditor.Profile;
             if (profile == null) return;
 
-            if (_previewDummy != null) _entManager.DeleteEntity(_previewDummy);
-            if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy);
-            if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy);
+            _fullRespawnPending = false;
+            _appearanceUpdatePending = false;
+
+            bool clothes = _profileEditor.ShowClothes?.Pressed ?? true;
+            _lastPreviewSpecies = profile.Species;
+            _lastPreviewShowClothes = clothes;
+
+            if (_previewDummy != null) _entManager.DeleteEntity(_previewDummy.Value);
+            if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy.Value);
+            if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy.Value);
             _fadingPreview = false;
+            _oldPreviewDummy = null;
+            _newPreviewDummy = null;
 
             var controller = UserInterfaceManager.GetUIController<LobbyUIController>();
-            bool clothes = _profileEditor.ShowClothes?.Pressed ?? true;
             _previewDummy = controller.LoadProfileEntity(profile, null, clothes);
             PreviewSprite.SetEntity(_previewDummy.Value);
             PreviewSprite.ModulateSelfOverride = Color.White;
         }
 
+        // Updates the existing preview entity in-place — no respawn, no lag.
+        private void UpdatePreviewAppearance()
+        {
+            var profile = _profileEditor.Profile;
+            if (profile == null) return;
+
+            if (_previewDummy == null || !_entManager.EntityExists(_previewDummy.Value))
+            {
+                UpdatePreviewInstant();
+                return;
+            }
+
+            _entManager.System<HumanoidAppearanceSystem>().LoadProfile(_previewDummy.Value, profile);
+        }
+
         protected override void FrameUpdate(FrameEventArgs args)
         {
             base.FrameUpdate(args);
+
+            // Process deferred preview updates — at most once per frame
+            if (_fullRespawnPending)
+            {
+                _fullRespawnPending = false;
+                _appearanceUpdatePending = false;
+                UpdatePreviewInstant();
+            }
+            else if (_appearanceUpdatePending)
+            {
+                _appearanceUpdatePending = false;
+                UpdatePreviewAppearance();
+            }
 
             if (_fadingPreview)
             {
@@ -602,9 +671,9 @@ namespace Content.Client._VG.Lobby.UI
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy);
-            if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy);
-            if (_previewDummy != null) _entManager.DeleteEntity(_previewDummy);
+            if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy.Value);
+            if (_newPreviewDummy != null) _entManager.DeleteEntity(_newPreviewDummy.Value);
+            if (_previewDummy != null) _entManager.DeleteEntity(_previewDummy.Value);
         }
     }
 }
