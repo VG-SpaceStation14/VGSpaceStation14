@@ -29,7 +29,6 @@ using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using VGLobby = Content.Client._VG.Lobby.UI; // VG-Tweak
-using Content.Client._VG.Lobby.UI;
 
 namespace Content.Client.Lobby;
 
@@ -468,11 +467,6 @@ public sealed partial class LobbyUIController : UIController, IOnStateEntered<Lo
         windowGui.UpdateNameField();
         windowGui.ReloadCharacterPickers();
         windowGui.UpdatePdaWallpaperSelection();
-    }
-
-    public VGCharacterSetupWindowGui? GetSetupWindow()
-    {
-        return _setupWindow?.Contents.GetChild(0) as VGCharacterSetupWindowGui;
     }
 
     private void CloseCharacterSetupNewWindow()
