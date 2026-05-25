@@ -33,3 +33,14 @@ cmd-sponsorremoveloadout-help = sponsorremoveloadout <ник> <id_лодаута
 cmd-sponsorremoveloadout-user-not-found = Игрок '{ $username }' не найден!
 cmd-sponsorremoveloadout-success = Лодаут '{ $loadoutId }' удалён у игрока { $username }
 cmd-sponsorremoveloadout-queued = Игрок '{ $username }' не в сети. Удаление лодаута будет применено при его заходе.
+
+cmd-sponsorooccolor-desc = Изменяет цвет OOC-ника спонсора.
+cmd-sponsorooccolor-help = sponsor-ooc-color <имя> <цвет> - Цвет в HEX (например #00ff2a)
+cmd-sponsorooccolor-invalid-color = Некорректный формат цвета "{ $color }". Используйте #RGB, #RRGGBB или #RRGGBBAA.
+cmd-sponsorooccolor-success = Цвет OOC для { $username } изменён на { $color }.
+cmd-sponsorooccolor-queued = Игрок { $username } оффлайн. Смена цвета будет применена при следующем входе.
+
+cmd-sponsorooccolorclear-desc = Сбрасывает кастомный цвет OOC спонсора на стандартный по тиру.
+cmd-sponsorooccolorclear-help = sponsorooccolorclear <имя>
+cmd-sponsorooccolorclear-success = Цвет OOC для { $username } сброшен на стандартный.
+cmd-sponsorooccolorclear-queued = Игрок { $username } оффлайн. Сброс цвета будет выполнен при следующем входе.

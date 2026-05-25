@@ -17,3 +17,7 @@ admin-sponsor-panel-tab-loadout = Лодауты
 admin-sponsor-panel-loadout-id = ID лодаута
 admin-sponsor-panel-add-loadout = Добавить лодаут
 admin-sponsor-panel-remove-loadout = Удалить лодаут
+admin-sponsor-panel-tab-color = Цвет OOC
+admin-sponsor-panel-color-hex = HEX-цвет
+admin-sponsor-panel-apply-color = Применить цвет
+admin-sponsor-panel-clear-color = Очистить

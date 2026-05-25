@@ -33,3 +33,12 @@ public sealed class RemoveLoadoutAction : PendingSponsorAction
 {
     public string LoadoutId { get; set; } = string.Empty;
 }
+
+public sealed class ChangeSponsorColorAction : PendingSponsorAction
+{
+    public string NewColor { get; set; } = string.Empty;
+}
+
+public sealed class ClearSponsorColorAction : PendingSponsorAction
+{
+}

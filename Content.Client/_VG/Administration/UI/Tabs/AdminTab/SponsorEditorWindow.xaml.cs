@@ -30,6 +30,7 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
 
             MainTabContainer.SetTabTitle(0, Loc.GetString("admin-sponsor-panel-tab-sponsor"));
             MainTabContainer.SetTabTitle(1, Loc.GetString("admin-sponsor-panel-tab-loadout"));
+            MainTabContainer.SetTabTitle(2, Loc.GetString("admin-sponsor-panel-tab-color")); // Новая вкладка
 
             WireEvents();
             RefreshButtons();
@@ -52,12 +53,21 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             AddSponsorButton.OnPressed += OnAddSponsor;
             RemoveSponsorButton.OnPressed += OnRemoveSponsor;
 
+            // События для вкладки лодаутов
             LoadoutPlayerNameLine.OnTextChanged += _ => RefreshLoadoutButtons();
             LoadoutIdInput.OnTextChanged += _ => RefreshLoadoutButtons();
             LoadoutPlayerList.OnSelectionChanged += OnLoadoutPlayerSelected;
 
             AddLoadoutButton.OnPressed += OnAddLoadout;
             RemoveLoadoutButton.OnPressed += OnRemoveLoadout;
+
+            // События для вкладки цвета
+            ColorPlayerNameLine.OnTextChanged += _ => RefreshColorButtons();
+            ColorHexInput.OnTextChanged += _ => RefreshColorButtons();
+            ColorPlayerList.OnSelectionChanged += OnColorPlayerSelected;
+
+            ApplyColorButton.OnPressed += OnApplyColor;
+            ClearColorButton.OnPressed += OnClearColor;
         }
 
         private void OnPlayerSelected(PlayerInfo? player)
@@ -70,6 +80,12 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
         {
             LoadoutPlayerNameLine.Text = player?.Username ?? string.Empty;
             RefreshLoadoutButtons();
+        }
+
+        private void OnColorPlayerSelected(PlayerInfo? player)
+        {
+            ColorPlayerNameLine.Text = player?.Username ?? string.Empty;
+            RefreshColorButtons();
         }
 
         private void OnAddSponsor(BaseButton.ButtonEventArgs args)
@@ -147,6 +163,41 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
             LoadoutIdInput.Text = "";
         }
 
+        private void OnApplyColor(BaseButton.ButtonEventArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(ColorPlayerNameLine.Text))
+                return;
+
+            var colorHex = ColorHexInput.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(colorHex))
+                return;
+
+            // Простая валидация HEX
+            if (!colorHex.StartsWith('#') || 
+                (colorHex.Length != 4 && colorHex.Length != 7 && colorHex.Length != 9))
+            {
+                ColorHexInput.Text = "";
+                return;
+            }
+
+            var cmd = $"sponsorooccolor \"{CommandParsing.Escape(ColorPlayerNameLine.Text)}\" {colorHex}";
+            _consoleHost.ExecuteCommand(cmd);
+
+            ColorHexInput.Text = "";
+        }
+
+        private void OnClearColor(BaseButton.ButtonEventArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(ColorPlayerNameLine.Text))
+                return;
+
+            var cmd = $"sponsorooccolorclear \"{CommandParsing.Escape(ColorPlayerNameLine.Text)}\"";
+            _consoleHost.ExecuteCommand(cmd);
+    
+            ColorHexInput.Text = "";
+            RefreshColorButtons();
+        }
+
         private void RefreshButtons()
         {
             var inputValid = !string.IsNullOrWhiteSpace(PlayerNameLine.Text);
@@ -160,6 +211,15 @@ namespace Content.Client.Administration.UI.Tabs.AdminTab
                            !string.IsNullOrWhiteSpace(LoadoutIdInput.Text);
             AddLoadoutButton.Disabled = !inputValid;
             RemoveLoadoutButton.Disabled = !inputValid;
+        }
+
+        private void RefreshColorButtons()
+        {
+            var inputValid = !string.IsNullOrWhiteSpace(ColorPlayerNameLine.Text) && 
+                           !string.IsNullOrWhiteSpace(ColorHexInput.Text);
+            ApplyColorButton.Disabled = !inputValid;
+            // Кнопка очистки всегда активна
+            ClearColorButton.Disabled = false;
         }
 
         private void AdjustDays(int delta)

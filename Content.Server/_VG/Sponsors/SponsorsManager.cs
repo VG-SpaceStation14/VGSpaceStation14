@@ -180,6 +180,12 @@ public sealed class SponsorsManager : ISponsorsManager
                     case RemoveLoadoutAction removeLoadout:
                         RemoveCustomLoadout(userId, removeLoadout.LoadoutId);
                         break;
+                    case ChangeSponsorColorAction colorAction:
+                        ChangeSponsorColor(userId, colorAction.NewColor);
+                        break;
+                    case ClearSponsorColorAction:
+                        ClearSponsorColor(userId);
+                        break;
                     default:
                         _sawmill.Warning($"Unknown pending action type: {action.GetType()}");
                         break;
@@ -460,6 +466,71 @@ public sealed class SponsorsManager : ISponsorsManager
             var msg = new MsgSponsorInfo { Info = null };
             _netMgr.ServerSendMessage(msg, session.Channel);
             _sawmill.Info($"Sent removed sponsor info to {session.Name}");
+        }
+    }
+
+    public void ChangeSponsorColor(NetUserId userId, string newColor)
+    {
+        var entry = _dataHandler.GetRawSponsor(userId);
+        if (entry == null)
+        {
+            _sawmill.Warning($"Cannot change color for non-sponsor {userId}");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newColor) || 
+            !(newColor.StartsWith('#') && (newColor.Length == 4 || newColor.Length == 7 || newColor.Length == 9)))
+        {
+            _sawmill.Warning($"Invalid color format '{newColor}' for user {entry.Username}, ignoring");
+            return;
+        }
+
+        entry.OOCColor = newColor;
+        _dataHandler.Save();
+
+        if (_cachedSponsors.TryGetValue(userId, out var info))
+        {
+            info.OOCColor = newColor;
+            if (_playerManager.TryGetSessionById(userId, out var session))
+            {
+                var msg = new MsgSponsorInfo { Info = info };
+                _netMgr.ServerSendMessage(msg, session.Channel);
+                _sawmill.Info($"Changed OOC color for {entry.Username} to {newColor}");
+            }
+        }
+        else
+        {
+            _sawmill.Info($"Changed OOC color for offline sponsor {entry.Username} to {newColor}");
+        }
+    }
+
+    public void ClearSponsorColor(NetUserId userId)
+    {
+        var entry = _dataHandler.GetRawSponsor(userId);
+        if (entry == null)
+        {
+            _sawmill.Warning($"Cannot clear color for non-sponsor {userId}");
+            return;
+        }
+
+        entry.OOCColor = null;
+        _dataHandler.Save();
+
+        var defaultColor = DefaultTierColors.GetValueOrDefault(entry.Tier, "#ffffff");
+
+        if (_cachedSponsors.TryGetValue(userId, out var info))
+        {
+            info.OOCColor = defaultColor;
+            if (_playerManager.TryGetSessionById(userId, out var session))
+            {
+                var msg = new MsgSponsorInfo { Info = info };
+                _netMgr.ServerSendMessage(msg, session.Channel);
+                _sawmill.Info($"Cleared custom OOC color for {entry.Username}, reset to default {defaultColor}");
+            }
+        }
+        else
+        {
+            _sawmill.Info($"Cleared custom OOC color for offline sponsor {entry.Username}");
         }
     }
 
