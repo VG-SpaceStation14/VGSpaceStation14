@@ -30,10 +30,11 @@
         <PanelContainer Name="DescriptionPanel"
                         StyleClasses="LanguagesEntryDescriptionPanel"
                         Visible="False"
+                        HorizontalExpand="True"
                         Margin="0 4 0 0">
             <RichTextLabel Name="DescriptionLabel"
                            StyleClasses="LanguagesEntryDescriptionLabel"
-                           MaxWidth="1100"
+                           MaxWidth="980"
                            HorizontalAlignment="Left"/>
         </PanelContainer>
     </BoxContainer>
