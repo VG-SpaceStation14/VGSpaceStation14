@@ -14,7 +14,6 @@ public sealed class PdaVisualizerSystem : VisualizerSystem<PdaVisualsComponent>
         const int baseLayer = 0;
         const int flashlightLayer = 1;
         const int idLightLayer = 2;
-        const int overlayLayer = 3;
 
         if (AppearanceSystem.TryGetData<string>(uid, PdaVisuals.PdaType, out var pdaType, args.Component))
             args.Sprite.LayerSetState(baseLayer, pdaType);
@@ -24,6 +23,9 @@ public sealed class PdaVisualizerSystem : VisualizerSystem<PdaVisualsComponent>
 
         if (AppearanceSystem.TryGetData<bool>(uid, PdaVisuals.IdCardInserted, out var isCardInserted, args.Component))
             args.Sprite.LayerSetVisible(idLightLayer, isCardInserted);
+
+        if (!args.Sprite.LayerMapTryGet("PdaVisualLayers.ScreenOverlay", out var overlayLayer))
+            return;
 
         if (AppearanceSystem.TryGetData<string>(uid, PdaVisuals.ScreenOverlay, out var overlay, args.Component))
         {
