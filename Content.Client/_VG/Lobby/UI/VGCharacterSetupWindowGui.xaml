@@ -88,8 +88,8 @@
                 </BoxContainer>
 
                 <!-- Кнопка переключения одежды в правом верхнем углу панели превью -->
-                <Button Name="ClothesToggleButton"
-                        Text="�"
+                <TextureButton Name="ClothesToggleButton"
+                        TexturePath="/Textures/Interface/VerbIcons/vv.svg.192dpi.png"
                         SetSize="32 32"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
