@@ -27,10 +27,6 @@ public sealed partial class CategoryMarkingItem : BoxContainer, ISearchableContr
 
     private List<LegacyColorSelectorSliders>? _colorSliders;
 
-    private bool _colorChangePending;
-    private float _colorThrottleTimer;
-    private const float ColorThrottleDelay = 0.016f;
-
     public event Action<GUIBoundKeyEventArgs, CategoryMarkingItem>? Pressed;
     public event Action<GUIBoundKeyEventArgs, CategoryMarkingItem>? Unpressed;
 
@@ -170,8 +166,11 @@ public sealed partial class CategoryMarkingItem : BoxContainer, ISearchableContr
 
             selector.OnColorChanged += _ =>
             {
-                _colorChangePending = true;
-                _colorThrottleTimer = ColorThrottleDelay;
+                if (_colorSliders != null)
+                {
+                    for (var i = 0; i < _colorSliders.Count; i++)
+                        _model.TrySetMarkingColor(_category, _proto.ID, i, _colorSliders[i].Color);
+                }
             };
         }
     }
@@ -196,17 +195,5 @@ public sealed partial class CategoryMarkingItem : BoxContainer, ISearchableContr
     {
         if (args.Function != EngineKeyFunctions.UIClick) return;
         Unpressed?.Invoke(args, this);
-    }
-
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        base.FrameUpdate(args);
-        if (!_colorChangePending) return;
-        _colorThrottleTimer -= args.DeltaSeconds;
-        if (_colorThrottleTimer > 0) return;
-        _colorChangePending = false;
-        if (_colorSliders == null) return;
-        for (var i = 0; i < _colorSliders.Count; i++)
-            _model.TrySetMarkingColor(_category, _proto.ID, i, _colorSliders[i].Color);
     }
 }
