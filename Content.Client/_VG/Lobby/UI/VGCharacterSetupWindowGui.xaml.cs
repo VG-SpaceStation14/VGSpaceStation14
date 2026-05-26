@@ -40,11 +40,9 @@ namespace Content.Client._VG.Lobby.UI
         private EntityUid? _oldPreviewDummy;
         private EntityUid? _newPreviewDummy;
 
-        // Tracks last "heavy" state to detect when a full respawn is needed
         private string _lastPreviewSpecies = "";
         private bool _lastPreviewShowClothes = true;
 
-        // Deduplication: process at most one appearance update per frame
         private bool _appearanceUpdatePending;
         private bool _fullRespawnPending;
 
@@ -91,33 +89,31 @@ namespace Content.Client._VG.Lobby.UI
             ImportButton.OnPressed += _ => _profileEditor.TriggerImport();
             ExportButton.OnPressed += _ => _profileEditor.TriggerExport();
 
-            StatsButton.OnPressed += _ =>
-            {
-                new PlaytimeStatsWindow().OpenCentered();
-            };
-            AdminRemarksButton.OnPressed += _ =>
-            {
-                _consoleHost.ExecuteCommand("adminremarks");
-            };
+            StatsButton.OnPressed += _ => new PlaytimeStatsWindow().OpenCentered();
+            AdminRemarksButton.OnPressed += _ => _consoleHost.ExecuteCommand("adminremarks");
 
             InsertOriginalButton(_profileEditor.NameRandomize, NameRandomize);
             InsertOriginalButton(_profileEditor.RandomizeEverythingButton, RandomizeEverythingButton);
 
             if (_profileEditor.NameRandomize != null)
-                _profileEditor.NameRandomize.OnPressed += _ =>
-                {
-                    UpdatePreviewInstant();
-                };
+                _profileEditor.NameRandomize.OnPressed += _ => UpdatePreviewInstant();
             if (_profileEditor.RandomizeEverythingButton != null)
-                _profileEditor.RandomizeEverythingButton.OnPressed += _ =>
-                {
-                    UpdatePreviewInstant();
-                };
+                _profileEditor.RandomizeEverythingButton.OnPressed += _ => UpdatePreviewInstant();
 
             _profileEditor.ProfileChanged += OnProfileChangedLight;
 
             if (_profileEditor.ShowClothes != null)
                 _profileEditor.ShowClothes.OnToggled += _ => UpdatePreviewInstant();
+
+            // VG-Tweak: Кнопка переключения одежды в панели превью
+            ClothesToggleButton.OnPressed += _ =>
+            {
+                if (_profileEditor.ShowClothes != null)
+                {
+                    _profileEditor.ShowClothes.Pressed = !_profileEditor.ShowClothes.Pressed;
+                    UpdatePreviewInstant();
+                }
+            };
 
             var warningMsg = new FormattedMessage();
             warningMsg.AddMarkup($"[color=red]{Loc.GetString("humanoid-profile-editor-naming-rules-warning")}[/color]");
@@ -172,12 +168,9 @@ namespace Content.Client._VG.Lobby.UI
                 var slots = _preferencesManager.Preferences.Characters.Keys.OrderBy(k => k).ToList();
                 int currentIndex = slots.IndexOf(selectedSlot.Value);
                 int newSlot = -1;
-                if (currentIndex > 0)
-                    newSlot = slots[currentIndex - 1];
-                else if (currentIndex < slots.Count - 1)
-                    newSlot = slots[currentIndex + 1];
-                else
-                    return;
+                if (currentIndex > 0) newSlot = slots[currentIndex - 1];
+                else if (currentIndex < slots.Count - 1) newSlot = slots[currentIndex + 1];
+                else return;
 
                 _preferencesManager.SelectCharacter(newSlot);
                 DeleteCharacter?.Invoke(selectedSlot.Value);
@@ -215,9 +208,7 @@ namespace Content.Client._VG.Lobby.UI
             if (_resourceCache.TryGetResource<RSIResource>("/Textures/_VG/Objects/Devices/pda.rsi", out var pdaRsi))
             {
                 if (pdaRsi.RSI.TryGetState("pda", out var state))
-                {
                     PdaWallpaperButton.TextureNormal = state.Frame0;
-                }
             }
 
             InitPdaWallpaper();
@@ -260,37 +251,21 @@ namespace Content.Client._VG.Lobby.UI
                 };
 
                 if (_resourceCache.TryGetResource<TextureResource>(new ResPath(path), out var texRes))
-                {
                     textureButton.TextureNormal = texRes;
-                }
 
-                textureButton.OnPressed += _ =>
-                {
-                    SelectWallpaper(path);
-                };
+                textureButton.OnPressed += _ => SelectWallpaper(path);
 
                 highlight.AddChild(textureButton);
                 PdaWallpaperButtons.AddChild(highlight);
                 _wallpaperButtons.Add((path, textureButton, highlight));
             }
 
-            PdaWallpaperButton.OnPressed += _ =>
-            {
-                TogglePdaPreview();
-            };
+            PdaWallpaperButton.OnPressed += _ => TogglePdaPreview();
         }
 
         private void SelectWallpaper(string path)
         {
-            if (_currentWallpaperPath == path)
-            {
-                _currentWallpaperPath = null;
-            }
-            else
-            {
-                _currentWallpaperPath = path;
-            }
-
+            _currentWallpaperPath = _currentWallpaperPath == path ? null : path;
             _profileEditor.SetPdaWallpaperPath(_currentWallpaperPath);
             UpdatePdaPreviewImage(_currentWallpaperPath, true);
             UpdateWallpaperButtonHighlight();
@@ -300,38 +275,18 @@ namespace Content.Client._VG.Lobby.UI
         {
             foreach (var (path, _, highlight) in _wallpaperButtons)
             {
-                if (path == _currentWallpaperPath)
-                {
-                    highlight.PanelOverride = new StyleBoxFlat
-                    {
-                        BackgroundColor = Color.FromHex("#505050"),
-                        ContentMarginLeftOverride = 2,
-                        ContentMarginTopOverride = 2,
-                        ContentMarginRightOverride = 2,
-                        ContentMarginBottomOverride = 2
-                    };
-                }
-                else
-                {
-                    highlight.PanelOverride = new StyleBoxFlat
-                    {
-                        BackgroundColor = Color.Transparent,
-                        ContentMarginLeftOverride = 2,
-                        ContentMarginTopOverride = 2,
-                        ContentMarginRightOverride = 2,
-                        ContentMarginBottomOverride = 2
-                    };
-                }
+                highlight.PanelOverride = path == _currentWallpaperPath
+                    ? new StyleBoxFlat { BackgroundColor = Color.FromHex("#505050"), ContentMarginLeftOverride = 2, ContentMarginTopOverride = 2, ContentMarginRightOverride = 2, ContentMarginBottomOverride = 2 }
+                    : new StyleBoxFlat { BackgroundColor = Color.Transparent, ContentMarginLeftOverride = 2, ContentMarginTopOverride = 2, ContentMarginRightOverride = 2, ContentMarginBottomOverride = 2 };
             }
         }
 
         private void TogglePdaPreview()
         {
-            bool newActive = !_pdaPreviewActive;
-            _pdaPreviewActive = newActive;
-            PdaWallpaperPanel.Visible = newActive;
+            _pdaPreviewActive = !_pdaPreviewActive;
+            PdaWallpaperPanel.Visible = _pdaPreviewActive;
 
-            if (newActive)
+            if (_pdaPreviewActive)
             {
                 CharacterPreviewContent.Visible = false;
                 CharacterPreviewContent.ModulateSelfOverride = Color.White;
@@ -352,10 +307,8 @@ namespace Content.Client._VG.Lobby.UI
             PdaPreviewContent.PanelOverride = new StyleBoxFlat
             {
                 BackgroundColor = Color.FromHex("#717059"),
-                ContentMarginLeftOverride = 6,
-                ContentMarginTopOverride = 6,
-                ContentMarginRightOverride = 6,
-                ContentMarginBottomOverride = 6
+                ContentMarginLeftOverride = 6, ContentMarginTopOverride = 6,
+                ContentMarginRightOverride = 6, ContentMarginBottomOverride = 6
             };
 
             var innerFrame = new PanelContainer
@@ -363,10 +316,8 @@ namespace Content.Client._VG.Lobby.UI
                 PanelOverride = new StyleBoxFlat
                 {
                     BackgroundColor = Color.FromHex("#000000"),
-                    ContentMarginLeftOverride = 4,
-                    ContentMarginTopOverride = 4,
-                    ContentMarginRightOverride = 4,
-                    ContentMarginBottomOverride = 4
+                    ContentMarginLeftOverride = 4, ContentMarginTopOverride = 4,
+                    ContentMarginRightOverride = 4, ContentMarginBottomOverride = 4
                 }
             };
 
@@ -381,27 +332,18 @@ namespace Content.Client._VG.Lobby.UI
 
         private void UpdatePdaPreviewImage(string? path, bool animate = true)
         {
-            if (_pdaScreen == null)
-                return;
+            if (_pdaScreen == null) return;
 
             StyleBox newStyle;
             if (string.IsNullOrEmpty(path))
-            {
                 newStyle = new StyleBoxFlat { BackgroundColor = Color.FromHex("#25252a") };
-            }
             else if (_resourceCache.TryGetResource<TextureResource>(new ResPath(path), out var textureResource))
             {
-                var styleBox = new StyleBoxTexture
-                {
-                    Texture = textureResource.Texture,
-                };
-                styleBox.SetPatchMargin(StyleBox.Margin.All, 0);
-                newStyle = styleBox;
+                newStyle = new StyleBoxTexture { Texture = textureResource.Texture };
+                ((StyleBoxTexture)newStyle).SetPatchMargin(StyleBox.Margin.All, 0);
             }
             else
-            {
                 newStyle = new StyleBoxFlat { BackgroundColor = Color.FromHex("#25252a") };
-            }
 
             if (!_pdaPreviewActive || !animate)
             {
@@ -473,6 +415,7 @@ namespace Content.Client._VG.Lobby.UI
             bool clothes = _profileEditor.ShowClothes?.Pressed ?? true;
             _lastPreviewSpecies = profile.Species;
             _lastPreviewShowClothes = clothes;
+            ClothesToggleButton.Pressed = !clothes;
 
             var controller = UserInterfaceManager.GetUIController<LobbyUIController>();
             var newDummy = controller.LoadProfileEntity(profile, null, clothes);
@@ -500,8 +443,6 @@ namespace Content.Client._VG.Lobby.UI
             PreviewSprite.ModulateSelfOverride = Color.White.WithAlpha(0f);
         }
 
-        // Called on appearance-only changes (markings, skin color, eye color) — no entity respawn.
-        // Deduplicates: schedules at most one update per frame.
         private void OnProfileChangedLight()
         {
             var profile = _profileEditor.Profile;
@@ -509,7 +450,6 @@ namespace Content.Client._VG.Lobby.UI
 
             bool showClothes = _profileEditor.ShowClothes?.Pressed ?? true;
 
-            // Species or clothes changed → need full respawn
             if (profile.Species != _lastPreviewSpecies || showClothes != _lastPreviewShowClothes)
             {
                 _fullRespawnPending = true;
@@ -532,6 +472,7 @@ namespace Content.Client._VG.Lobby.UI
             bool clothes = _profileEditor.ShowClothes?.Pressed ?? true;
             _lastPreviewSpecies = profile.Species;
             _lastPreviewShowClothes = clothes;
+            ClothesToggleButton.Pressed = !clothes;
 
             if (_previewDummy != null) _entManager.DeleteEntity(_previewDummy.Value);
             if (_oldPreviewDummy != null) _entManager.DeleteEntity(_oldPreviewDummy.Value);
@@ -546,7 +487,6 @@ namespace Content.Client._VG.Lobby.UI
             PreviewSprite.ModulateSelfOverride = Color.White;
         }
 
-        // Updates the existing preview entity in-place — no respawn, no lag.
         private void UpdatePreviewAppearance()
         {
             var profile = _profileEditor.Profile;
@@ -565,7 +505,6 @@ namespace Content.Client._VG.Lobby.UI
         {
             base.FrameUpdate(args);
 
-            // Process deferred preview updates — at most once per frame
             if (_fullRespawnPending)
             {
                 _fullRespawnPending = false;
@@ -597,15 +536,9 @@ namespace Content.Client._VG.Lobby.UI
             {
                 _fadePdaTimer += args.DeltaSeconds;
                 float progress = Math.Min(_fadePdaTimer / FadePdaDuration, 1f);
-
-                if (_pdaPreviewActive)
-                {
-                    PdaPreviewContent.ModulateSelfOverride = Color.White.WithAlpha(progress);
-                }
-                else
-                {
-                    PdaPreviewContent.ModulateSelfOverride = Color.White.WithAlpha(1f - progress);
-                }
+                PdaPreviewContent.ModulateSelfOverride = _pdaPreviewActive
+                    ? Color.White.WithAlpha(progress)
+                    : Color.White.WithAlpha(1f - progress);
 
                 if (progress >= 1f)
                 {

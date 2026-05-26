@@ -55,7 +55,7 @@
                 </BoxContainer>
             </PanelContainer>
 
-            <!-- Превью (чёрная панель, размер не меняется) -->
+            <!-- Превью (чёрная панель, размер не меняется) с кнопкой одежды в углу -->
             <PanelContainer Name="PreviewPanel" MinSize="220 340" StyleClasses="AngleRect">
                 <PanelContainer.PanelOverride>
                     <graphics:StyleBoxFlat BackgroundColor="#000000"
@@ -66,6 +66,8 @@
                                            ContentMarginRightOverride="4"
                                            ContentMarginBottomOverride="4" />
                 </PanelContainer.PanelOverride>
+                
+                <!-- Основной контент превью -->
                 <BoxContainer Name="PreviewContainer" Orientation="Vertical"
                               HorizontalAlignment="Center" VerticalAlignment="Center">
                     <BoxContainer Name="CharacterPreviewContent" Orientation="Vertical"
@@ -84,6 +86,15 @@
                         </PanelContainer.PanelOverride>
                     </PanelContainer>
                 </BoxContainer>
+
+                <!-- Кнопка переключения одежды в правом верхнем углу панели превью -->
+                <Button Name="ClothesToggleButton"
+                        Text="�"
+                        SetSize="32 32"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0 4 4 0"
+                        ToolTip="{Loc 'humanoid-profile-editor-clothing'}" />
             </PanelContainer>
 
             <!-- Панель выбора обоев КПК (горизонтальный скролл) -->
