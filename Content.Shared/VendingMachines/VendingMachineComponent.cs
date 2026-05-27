@@ -59,6 +59,14 @@ namespace Content.Shared.VendingMachines
         [DataField("speedLimiter")]
         public bool CanShoot = false;
 
+        // VG-Tweak Start
+        /// <summary>
+        ///     The entity that is currently buying an item (used for delayed ejection).
+        /// </summary>
+        [DataField]
+        public EntityUid? CurrentBuyer;
+        // VG-Tweak End
+
         public bool ThrowNextItem = false;
 
         /// <summary>

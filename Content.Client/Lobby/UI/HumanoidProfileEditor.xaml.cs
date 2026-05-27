@@ -53,6 +53,7 @@ using Content.Client.Corvax.TTS; // Corvax-TTS
 using Content.Client.ADT.UserInterface.Controls;
 using Content.Client.ADT.CharecterFlavor;
 using Content.Shared.ADT.CharecterFlavor;
+using Robust.Client.ResourceManagement; // VG-Tweak
 
 namespace Content.Client.Lobby.UI
 {
@@ -136,6 +137,8 @@ namespace Content.Client.Lobby.UI
         private ISawmill _sawmill;
 
         private SpeciesWindow? _speciesWindow;  // ADT Species window
+
+        private const string AntagIconPath = "/Textures/_VG/Antagonists/antag_icons.rsi"; // VG-Tweak
 
 
         public HumanoidProfileEditor(
@@ -767,69 +770,88 @@ namespace Content.Client.Lobby.UI
             }
         }
 
+        // VG-Tweak Start
         public void RefreshAntags()
         {
-            AntagList.RemoveAllChildren();
-            var items = new[]
+            AntagGrid.RemoveAllChildren();
+
+            var antags = _prototypeManager.EnumeratePrototypes<AntagPrototype>()
+                .Where(a => a.SetPreference)
+                .OrderBy(a => Loc.GetString(a.Name))
+                .ToList();
+
+            if (antags.Count == 0)
             {
-                ("humanoid-profile-editor-antag-preference-yes-button", 0),
-                ("humanoid-profile-editor-antag-preference-no-button", 1)
-            };
-
-            foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().OrderBy(a => Loc.GetString(a.Name)))
-            {
-                if (!antag.SetPreference)
-                    continue;
-
-                var antagContainer = new BoxContainer()
+                AntagGrid.AddChild(new Label
                 {
-                    Orientation = LayoutOrientation.Horizontal,
-                };
-
-                var selector = new RequirementsSelector()
-                {
-                    Margin = new Thickness(3f, 3f, 3f, 0f),
-                };
-                selector.OnOpenGuidebook += OnOpenGuidebook;
-
-                var title = Loc.GetString(antag.Name);
-                var description = Loc.GetString(antag.Objective);
-                selector.Setup(items, title, 250, description, guides: antag.Guides);
-                selector.Select(Profile?.AntagPreferences.Contains(antag.ID) == true ? 0 : 1);
-
-                if (!_requirements.IsAllowed(
-                        antag,
-                        (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter,
-                        out var reason))
-                {
-                    selector.LockRequirements(reason);
-                    Profile = Profile?.WithAntagPreference(antag.ID, false);
-                    SetDirty();
-                }
-                else
-                {
-                    selector.UnlockRequirements();
-                }
-
-                selector.OnSelected += preference =>
-                {
-                    Profile = Profile?.WithAntagPreference(antag.ID, preference == 0);
-                    SetDirty();
-                };
-
-                antagContainer.AddChild(selector);
-
-                antagContainer.AddChild(new Button()
-                {
-                    Disabled = true,
-                    Text = Loc.GetString("loadout-window"),
-                    HorizontalAlignment = HAlignment.Right,
-                    Margin = new Thickness(3f, 0f, 0f, 0f),
+                    Text = Loc.GetString("humanoid-profile-editor-no-antags"),
+                    FontColorOverride = Color.Gray,
+                    HorizontalAlignment = HAlignment.Center
                 });
+                return;
+            }
 
-                AntagList.AddChild(antagContainer);
+            const int columns = 4;
+            var row = (BoxContainer?)null;
+            var count = 0;
+
+            var cache = IoCManager.Resolve<IResourceCache>();
+
+            foreach (var antag in antags)
+            {
+                if (count % columns == 0)
+                {
+                    row = new BoxContainer
+                    {
+                        Orientation = LayoutOrientation.Horizontal,
+                        SeparationOverride = 8,
+                        HorizontalAlignment = HAlignment.Center
+                    };
+                    AntagGrid.AddChild(row);
+                }
+
+                bool isAvailable = _requirements.IsAllowed(antag, (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter, out _);
+                bool isEnabled = Profile?.AntagPreferences.Contains(antag.ID) == true;
+
+                string state;
+                if (!isAvailable)
+                    state = $"{antag.ID}-disable";
+                else if (isEnabled)
+                    state = $"{antag.ID}-on";
+                else
+                    state = $"{antag.ID}-off";
+
+                var button = new TextureButton
+                {
+                    SetSize = new Vector2(200, 200),
+                    ToolTip = Loc.GetString(antag.Name),
+                    Disabled = !isAvailable
+                };
+
+                if (cache.TryGetResource<RSIResource>(new ResPath(AntagIconPath), out var rsi))
+                {
+                    RSI.State? rsiState = null;
+                    if (!rsi.RSI.TryGetState(state, out rsiState))
+                    {
+                        rsi.RSI.TryGetState($"{antag.ID}-off", out rsiState);
+                    }
+                    if (rsiState != null)
+                        button.TextureNormal = rsiState.Frame0;
+                }
+
+                button.OnPressed += _ =>
+                {
+                    bool newState = !(Profile?.AntagPreferences.Contains(antag.ID) == true);
+                    Profile = Profile?.WithAntagPreference(antag.ID, newState);
+                    SetDirty();
+                    RefreshAntags();
+                };
+
+                row!.AddChild(button);
+                count++;
             }
         }
+        // VG-Tweak End
 
         private void SetDirty()
         {

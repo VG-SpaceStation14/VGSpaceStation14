@@ -1,0 +1,119 @@
+{
+    "version": 1,
+    "license": "CC-BY-NC-SA-4.0",
+    "copyright": "by Albuka, VanGuard Project",
+    "size": {
+        "x": 64,
+        "y": 64
+    },
+    "states": [
+        {
+            "name": "Heretic-disable"
+        },
+        {
+            "name": "Heretic-off"
+        },
+        {
+            "name": "Heretic-on"
+        },
+        {
+            "name": "Nukeops-disable"
+        },
+        {
+            "name": "Nukeops-off"
+        },
+        {
+            "name": "Nukeops-on"
+        },
+        {
+            "name": "NukeopsMedic-disable"
+        },
+        {
+            "name": "NukeopsMedic-off"
+        },
+        {
+            "name": "NukeopsMedic-on"
+        },
+        {
+            "name": "NukeopsCommander-disable"
+        },
+        {
+            "name": "NukeopsCommander-off"
+        },
+        {
+            "name": "NukeopsCommander-on"
+        },
+        {
+            "name": "Traitor-disable"
+        },
+        {
+            "name": "Traitor-off"
+        },
+        {
+            "name": "Traitor-on"
+        },
+        {
+            "name": "TraitorSleeper-disable"
+        },
+        {
+            "name": "TraitorSleeper-off"
+        },
+        {
+            "name": "TraitorSleeper-on"
+        },
+        {
+            "name": "Thief-disable"
+        },
+        {
+            "name": "Thief-off"
+        },
+        {
+            "name": "Thief-on"
+        },
+        {
+            "name": "Conspirator-disable"
+        },
+        {
+            "name": "Conspirator-off"
+        },
+        {
+            "name": "Conspirator-on"
+        },
+        {
+            "name": "HeadRev-disable"
+        },
+        {
+            "name": "HeadRev-off"
+        },
+        {
+            "name": "HeadRev-on"
+        },
+        {
+            "name": "MothershipCore-disable"
+        },
+        {
+            "name": "MothershipCore-off"
+        },
+        {
+            "name": "MothershipCore-on"
+        },
+        {
+            "name": "Xenoborg-disable"
+        },
+        {
+            "name": "Xenoborg-off"
+        },
+        {
+            "name": "Xenoborg-on"
+        },
+        {
+            "name": "InitialInfected-disable"
+        },
+        {
+            "name": "InitialInfected-off"
+        },
+        {
+            "name": "InitialInfected-on"
+        }
+    ]
+}
