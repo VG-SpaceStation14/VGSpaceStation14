@@ -35,9 +35,10 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using Content.Shared.Hands.EntitySystems;
+// VG-Tweak Start
 using Content.Shared.Hands.Components;
-using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Hands.EntitySystems;
+// VG-Tweak End
 
 namespace Content.Server.VendingMachines
 {
@@ -61,7 +62,6 @@ namespace Content.Server.VendingMachines
 
         // VG-Tweak Start
         [Dependency] private readonly SharedHandsSystem _handsSystem = default!;
-        [Dependency] private readonly SharedStorageSystem _storageSystem = default!;
         // VG-Tweak End
 
         private const float WallVendEjectDistanceFromWall = 1f;
@@ -501,8 +501,8 @@ namespace Content.Server.VendingMachines
             {
                 vendComponent.NextItemToEject = item.ID;
                 vendComponent.ThrowNextItem = throwItem;
-                // VG-Tweak Start
-                vendComponent.CurrentBuyer = null; // forced eject has no buyer
+                // VG-Tweak Start: forced eject has no buyer
+                vendComponent.CurrentBuyer = null;
                 // VG-Tweak End
                 var entry = GetEntry(uid, item.ID, item.Type, vendComponent);
                 if (entry != null)
@@ -515,13 +515,12 @@ namespace Content.Server.VendingMachines
             }
         }
 
-        // VG-Tweak Start - Modified to try handing item to buyer's hand
+        // VG-Tweak Start - Simplified: try to place item into buyer's hand, otherwise drop normally (no animation)
         private void EjectItem(EntityUid uid, int count, VendingMachineComponent? vendComponent = null, bool forceEject = false)
         {
             if (!Resolve(uid, ref vendComponent))
                 return;
 
-            // No need to update the visual state because we never changed it during a forced eject
             if (!forceEject)
                 TryUpdateVisualState(uid, vendComponent);
 
@@ -532,11 +531,9 @@ namespace Content.Server.VendingMachines
                 return;
             }
 
-            // Default spawn coordinates
             var xform = Transform(uid);
             var spawnCoordinates = xform.Coordinates;
 
-            //Make sure the wallvends spawn outside of the wall.
             if (TryComp<WallMountComponent>(uid, out var wallMountComponent))
             {
                 var offset = (wallMountComponent.Direction + xform.LocalRotation - Math.PI / 2).ToVec() * WallVendEjectDistanceFromWall;
@@ -545,28 +542,23 @@ namespace Content.Server.VendingMachines
 
             var buyer = vendComponent.CurrentBuyer;
             bool handedOut = false;
+
             // Try to give the item directly to the buyer's hand if there is a buyer
             if (buyer != null && TryComp<HandsComponent>(buyer, out var hands))
             {
-                // TryGetEmptyHand expects Entity<HandsComponent?> as first argument
-                var buyerEntity = new Entity<HandsComponent?>(buyer.Value, hands);
-                if (_handsSystem.TryGetEmptyHand(buyerEntity, out var emptyHand))
+                if (_handsSystem.TryGetEmptyHand((buyer.Value, hands), out var emptyHand))
                 {
                     var item = Spawn(vendComponent.NextItemToEject, spawnCoordinates);
                     if (_handsSystem.TryPickupAnyHand(buyer.Value, item, handsComp: hands))
                     {
                         handedOut = true;
-                        // Pickup animation is played by SharedHandsSystem
+                        // No animation, item just appears in hand.
                     }
-                    else
+                    else if (vendComponent.ThrowNextItem)
                     {
-                        // Failed to pick up – fallback to normal ejection
-                        if (vendComponent.ThrowNextItem)
-                        {
-                            var range = vendComponent.NonLimitedEjectRange;
-                            var direction = new Vector2(_random.NextFloat(-range, range), _random.NextFloat(-range, range));
-                            _throwingSystem.TryThrow(item, direction, vendComponent.NonLimitedEjectForce);
-                        }
+                        var range = vendComponent.NonLimitedEjectRange;
+                        var direction = new Vector2(_random.NextFloat(-range, range), _random.NextFloat(-range, range));
+                        _throwingSystem.TryThrow(item, direction, vendComponent.NonLimitedEjectForce);
                     }
                 }
             }
@@ -675,7 +667,6 @@ namespace Content.Server.VendingMachines
         {
             List<double> priceSets = new();
 
-            // Find the most expensive inventory and use that as the highest price.
             foreach (var vendingInventory in component.CanRestock)
             {
                 double total = 0;
