@@ -21,6 +21,7 @@ public sealed partial class JukeboxMenu : FancyWindow
 
     private bool _playState;
     private List<JukeboxPrototype> _allSongs = new();
+    private JukeboxRepeatMode _repeatMode = JukeboxRepeatMode.NoRepeat;
 
     public event Action<bool>? OnPlayPressed;
     public event Action? OnStopPressed;
@@ -42,7 +43,6 @@ public sealed partial class JukeboxMenu : FancyWindow
         IoCManager.InjectDependencies(this);
         _audioSystem = _entManager.System<AudioSystem>();
 
-        // ТОЧНО КАК В ОРИГИНАЛЕ
         MusicList.OnItemSelected += args =>
         {
             var entry = MusicList[args.ItemIndex];
@@ -79,34 +79,19 @@ public sealed partial class JukeboxMenu : FancyWindow
             _lockTimer = 0.5f;
         };
 
-        // ТОЧНО КАК В ОРИГИНАЛЕ
-        RepeatButton.OnToggled += args =>
+        RepeatButton.OnPressed += _ =>
         {
-            JukeboxRepeatMode newMode;
-            if (!args.Pressed)
+            _repeatMode = _repeatMode switch
             {
-                newMode = JukeboxRepeatMode.NoRepeat;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
-            }
-            else if (RepeatButton.Text == Loc.GetString("jukebox-menu-buttonrepeat-off"))
-            {
-                newMode = JukeboxRepeatMode.RepeatAll;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-all");
-            }
-            else if (RepeatButton.Text == Loc.GetString("jukebox-menu-buttonrepeat-all"))
-            {
-                newMode = JukeboxRepeatMode.RepeatOne;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-one");
-            }
-            else
-            {
-                newMode = JukeboxRepeatMode.NoRepeat;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
-            }
-            OnRepeatModeChanged?.Invoke(newMode);
+                JukeboxRepeatMode.NoRepeat => JukeboxRepeatMode.RepeatAll,
+                JukeboxRepeatMode.RepeatAll => JukeboxRepeatMode.RepeatOne,
+                JukeboxRepeatMode.RepeatOne => JukeboxRepeatMode.NoRepeat,
+                _ => JukeboxRepeatMode.NoRepeat
+            };
+            UpdateRepeatButtonText();
+            OnRepeatModeChanged?.Invoke(_repeatMode);
         };
 
-        // ТОЧНО КАК В ОРИГИНАЛЕ
         ShuffleButton.OnToggled += args =>
         {
             OnShuffleToggled?.Invoke(args.Pressed);
@@ -169,21 +154,19 @@ public sealed partial class JukeboxMenu : FancyWindow
 
     public void SetRepeatMode(JukeboxRepeatMode mode)
     {
-        switch (mode)
+        _repeatMode = mode;
+        UpdateRepeatButtonText();
+    }
+
+    private void UpdateRepeatButtonText()
+    {
+        RepeatButton.Text = _repeatMode switch
         {
-            case JukeboxRepeatMode.NoRepeat:
-                RepeatButton.Pressed = false;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-off");
-                break;
-            case JukeboxRepeatMode.RepeatOne:
-                RepeatButton.Pressed = true;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-one");
-                break;
-            case JukeboxRepeatMode.RepeatAll:
-                RepeatButton.Pressed = true;
-                RepeatButton.Text = Loc.GetString("jukebox-menu-buttonrepeat-all");
-                break;
-        }
+            JukeboxRepeatMode.NoRepeat => Loc.GetString("jukebox-menu-buttonrepeat-off"),
+            JukeboxRepeatMode.RepeatAll => Loc.GetString("jukebox-menu-buttonrepeat-all"),
+            JukeboxRepeatMode.RepeatOne => Loc.GetString("jukebox-menu-buttonrepeat-one"),
+            _ => Loc.GetString("jukebox-menu-buttonrepeat-off")
+        };
     }
 
     public void SetShuffleEnabled(bool enabled)

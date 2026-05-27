@@ -41,15 +41,12 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
             SendMessage(new JukeboxStopMessage());
         };
 
-        // VG-Tweak start - изменена логика
-        _menu.OnSongSelected += SelectSong; 
-        _menu.OnPlaySelected += PlaySelectedSong; 
-        // VG-Tweak end
+        _menu.OnSongSelected += SelectSong;
+        _menu.OnPlaySelected += PlaySelectedSong;
 
         _menu.SetTime += SetTime;
-        _menu.SetVolume += SetVolume; // ADT-Tweak
+        _menu.SetVolume += SetVolume;
 
-        // VG-Tweak start
         _menu.OnRepeatModeChanged += mode =>
         {
             SendMessage(new JukeboxSetRepeatMessage(mode));
@@ -69,39 +66,30 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         {
             SendMessage(new JukeboxPrevTrackMessage());
         };
-        // VG-Tweak end
 
         PopulateMusic();
         Reload();
     }
 
-    // VG-Tweak start
     private void PlaySelectedSong(ProtoId<JukeboxPrototype> songid)
     {
         SendMessage(new JukeboxPlaySelectedMessage(songid));
     }
-    // VG-Tweak end
 
-    /// <summary>
-    /// Reloads the attached menu if it exists.
-    /// </summary>
     public void Reload()
     {
         if (_menu == null || !EntMan.TryGetComponent(Owner, out JukeboxComponent? jukebox))
             return;
 
         _menu.SetAudioStream(jukebox.AudioStream);
-        _menu.SetVolumeSlider(jukebox.Volume); // ADT-Tweak
-
-        // VG-Tweak start
+        _menu.SetVolumeSlider(jukebox.Volume);
         _menu.SetRepeatMode(jukebox.RepeatMode);
         _menu.SetShuffleEnabled(jukebox.ShuffleEnabled);
-        // VG-Tweak end
 
         if (_protoManager.Resolve(jukebox.SelectedSongId, out var songProto))
         {
             var length = EntMan.System<AudioSystem>().GetAudioLength(songProto.Path.Path.ToString());
-            _menu.SetSelectedSong(songProto.Name, (float)length.TotalSeconds); // ADT-Tweak
+            _menu.SetSelectedSong(songProto.Name, (float)length.TotalSeconds);
         }
         else
         {
@@ -132,7 +120,6 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
         SendMessage(new JukeboxSetTimeMessage(sentTime));
     }
 
-    /// ADT-Tweak start
     public void SetVolume(float volume)
     {
         var sentVolume = volume;
@@ -145,5 +132,4 @@ public sealed class JukeboxBoundUserInterface : BoundUserInterface
 
         SendMessage(new JukeboxSetVolumeMessage(sentVolume));
     }
-    /// ADT-Tweak end
 }

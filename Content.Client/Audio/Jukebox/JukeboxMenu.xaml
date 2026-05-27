@@ -36,7 +36,7 @@
         <!-- Режимы -->
         <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" HorizontalAlignment="Center">
             <Button Name="RepeatButton" Text="{Loc 'jukebox-menu-buttonrepeat-off'}" 
-                    ToggleMode="True" StyleClasses="ButtonSquare" MinWidth="80" />
+                    StyleClasses="ButtonSquare" MinWidth="80" />
             <Button Name="ShuffleButton" Text="{Loc 'jukebox-menu-buttonshuffle'}" 
                     ToggleMode="True" StyleClasses="ButtonSquare" MinWidth="80" />
         </BoxContainer>
