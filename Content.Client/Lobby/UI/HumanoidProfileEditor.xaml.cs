@@ -895,6 +895,7 @@ namespace Content.Client.Lobby.UI
 
             // Check and set the dirty flag to enable the save/reset buttons as appropriate.
             SetDirty();
+            ProfileChanged?.Invoke(); // VG-Tweak
         }
 
         /// <summary>
