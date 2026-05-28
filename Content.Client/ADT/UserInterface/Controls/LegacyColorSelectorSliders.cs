@@ -7,11 +7,12 @@ using Robust.Shared.ColorNaming;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
 using Robust.Shared.Maths;
+using Robust.Shared.Timing; // VG-Tweak
 
 namespace Content.Client.ADT.UserInterface.Controls;
 
 // condensed version of the original ColorSlider set
-public sealed class LegacyColorSelectorSliders : Control
+public sealed partial class LegacyColorSelectorSliders : Control
 {
     [Dependency] private readonly ILocalizationManager _localization = default!;
 
@@ -96,6 +97,13 @@ public sealed class LegacyColorSelectorSliders : Control
     private ColorSelectorStyleBox _middleStyle;
     private ColorSelectorStyleBox _bottomStyle;
 
+    // VG-Tweak Start
+    private bool _colorChangePending;
+    private float _colorThrottleTimer;
+    private const float ColorThrottleDelay = 0.001f;
+    private ColorSliderOrder _lastOrder;
+    // VG-Tweak End
+
     public LegacyColorSelectorSliders()
     {
         IoCManager.InjectDependencies(this);
@@ -131,10 +139,12 @@ public sealed class LegacyColorSelectorSliders : Control
             MaxValue = 1.0f,
         };
 
-        _topColorSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Top); };
-        _middleColorSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Middle); };
-        _bottomColorSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Bottom); };
-        _alphaSlider.OnValueChanged += r => { OnSliderValueChanged(ColorSliderOrder.Alpha); };
+        // VG-Tweak Start
+        _topColorSlider.OnValueChanged += r => { OnSliderValueChangedThrottled(ColorSliderOrder.Top); };
+        _middleColorSlider.OnValueChanged += r => { OnSliderValueChangedThrottled(ColorSliderOrder.Middle); };
+        _bottomColorSlider.OnValueChanged += r => { OnSliderValueChangedThrottled(ColorSliderOrder.Bottom); };
+        _alphaSlider.OnValueChanged += r => { OnSliderValueChangedThrottled(ColorSliderOrder.Alpha); };
+        // VG-Tweak End
 
         _topColorSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
         _middleColorSlider.OnReleased += _ => OnColorReleased?.Invoke(_currentColor);
@@ -208,19 +218,16 @@ public sealed class LegacyColorSelectorSliders : Control
 
         // pita
         var topSliderBox = new BoxContainer();
-
         topSliderBox.AddChild(_topSliderLabel);
         topSliderBox.AddChild(_topColorSlider);
         topSliderBox.AddChild(_topInputBox);
 
         var middleSliderBox = new BoxContainer();
-
         middleSliderBox.AddChild(_middleSliderLabel);
         middleSliderBox.AddChild(_middleColorSlider);
         middleSliderBox.AddChild(_middleInputBox);
 
         var bottomSliderBox = new BoxContainer();
-
         bottomSliderBox.AddChild(_bottomSliderLabel);
         bottomSliderBox.AddChild(_bottomColorSlider);
         bottomSliderBox.AddChild(_bottomInputBox);
@@ -240,6 +247,29 @@ public sealed class LegacyColorSelectorSliders : Control
         UpdateType();
         Color = _currentColor;
     }
+
+    // VG-Tweak Start
+    private void OnSliderValueChangedThrottled(ColorSliderOrder order)
+    {
+        _colorChangePending = true;
+        _colorThrottleTimer = ColorThrottleDelay;
+        _lastOrder = order;
+    }
+    // VG-Tweak End
+
+    // VG-Tweak Start
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
+        if (!_colorChangePending) return;
+        
+        _colorThrottleTimer -= args.DeltaSeconds;
+        if (_colorThrottleTimer > 0) return;
+        
+        _colorChangePending = false;
+        OnSliderValueChanged(_lastOrder);
+    }
+    // VG-Tweak End
 
     private ColorSliderStrategy GetStrategy()
     {
