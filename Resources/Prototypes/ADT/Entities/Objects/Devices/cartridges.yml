@@ -11,6 +11,7 @@
     ui: !type:BankUi
   - type: Cartridge
     programName: bank-program-name
+    screenOverlay: "bank" # VG-Tweak
     icon:
       sprite: ADT/Structures/Machines/atm.rsi
       state: atm_off
@@ -30,6 +31,7 @@
   - type: NanoChatCartridge
   - type: Cartridge
     programName: nano-chat-program-name
+    screenOverlay: "nanochat" # VG-Tweak
     icon:
       sprite: ADT/Misc/program_icons.rsi
       state: nanochat

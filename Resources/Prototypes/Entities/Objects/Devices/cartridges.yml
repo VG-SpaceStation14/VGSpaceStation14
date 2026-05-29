@@ -20,6 +20,7 @@
     ui: !type:NotekeeperUi
   - type: Cartridge
     programName: notekeeper-program-name
+    screenOverlay: "green" # VG-Tweak
     icon:
       sprite:  Objects/Misc/books.rsi
       state: book_icon
@@ -35,6 +36,7 @@
     state: cart-nav
   - type: Cartridge
     programName: nano-task-program-name
+    screenOverlay: "nanotask" # VG-Tweak
     icon:
       sprite: Interface/Misc/program_icons.rsi
       state: nano_task
@@ -54,6 +56,7 @@
     ui: !type:NewsReaderUi
   - type: Cartridge
     programName: news-read-program-name
+    screenOverlay: "blue" # VG-Tweak
     icon:
       sprite: Interface/Misc/program_icons.rsi
       state: news_read
@@ -71,6 +74,7 @@
       ui: !type:CrewManifestUi
     - type: Cartridge
       programName: crew-manifest-program-name
+      screenOverlay: "crew" # VG-Tweak
       icon:
         sprite: Interface/Misc/program_icons.rsi
         state: crew_manifest
@@ -88,6 +92,7 @@
       ui: !type:NetProbeUi
     - type: Cartridge
       programName: net-probe-program-name
+      screenOverlay: "yellow" # VG-Tweak
       icon:
         sprite: Structures/Machines/server.rsi
         state: server
@@ -108,6 +113,7 @@
       ui: !type:LogProbeUi
     - type: Cartridge
       programName: log-probe-program-name
+      screenOverlay: "red" # VG-Tweak
       icon:
         sprite: Structures/Doors/Airlocks/Standard/security.rsi
         state: closed
@@ -131,6 +137,7 @@
     ui: !type:WantedListUi
   - type: Cartridge
     programName: wanted-list-program-name
+    screenOverlay: "red" # VG-Tweak
     icon:
       sprite: Objects/Misc/books.rsi
       state: icon_magnifier
@@ -151,6 +158,7 @@
       state: cart-med
     - type: Cartridge
       programName: med-tek-program-name
+      screenOverlay: "med" # VG-Tweak
       icon:
         sprite: Objects/Specific/Medical/healthanalyzer.rsi
         state: icon
@@ -169,6 +177,7 @@
       state: cart-nav
     - type: Cartridge
       programName: astro-nav-program-name
+      screenOverlay: "map" # VG-Tweak
       icon:
         sprite: Objects/Devices/gps.rsi
         state: icon
