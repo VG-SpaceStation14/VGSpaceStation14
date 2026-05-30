@@ -68,8 +68,8 @@
             Quartermaster: [ 1, 1 ]
             SalvageSpecialist: [ 3, 3 ]
             CargoTechnician: [ 2, 2 ]
-            ADTMiner: [ 4, 4 ]
-            #civillian
+            ADTMiner: [ 3, 3 ]
+            #civilian
             Passenger: [ -1, -1 ]
             Clown: [ 1, 1 ]
             Mime: [ 1, 1 ]
