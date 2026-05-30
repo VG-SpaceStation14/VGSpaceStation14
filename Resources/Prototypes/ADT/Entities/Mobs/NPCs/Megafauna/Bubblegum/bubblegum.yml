@@ -87,8 +87,6 @@
     rootTask:
       task: ADTBubblegumCompound
   - type: Megafauna
-  - type: ArmorPenetration
-    penetration: 0.5
   - type: Bubblegum
   - type: BubblegumTripleCharge
   - type: BubblegumHallucinationCharge
