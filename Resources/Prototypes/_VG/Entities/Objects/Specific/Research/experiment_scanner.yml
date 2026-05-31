@@ -4,6 +4,8 @@
   name: experiment scanner
   description: A research scanner that issues and tracks field experiments.
   components:
+  - type: RadioJobIconOverride 
+    iconId: JobIconMachine
   - type: Sprite
     sprite: _VG/Objects/Specific/Research/experimentscanner.rsi
     state: icon
