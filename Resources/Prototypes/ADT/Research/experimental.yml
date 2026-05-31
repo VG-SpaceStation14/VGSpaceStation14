@@ -2,11 +2,11 @@
   id: CrystalManipulation
   name: research-technology-crystal-manipulation
   icon:
-    sprite: ADT/Objects/Materials/crystal_art.rsi
+    sprite: ADT/Objects/Materials/crystal.rsi # VG-Tweak 
     state: crystal
   discipline: Experimental
   tier: 2
-  cost: 15000
+  cost: 20000 # VG-Tweak 15000 > 20000
   recipeUnlocks:
   - ADTMaterialBScrystalArt
   position: 2,-2
