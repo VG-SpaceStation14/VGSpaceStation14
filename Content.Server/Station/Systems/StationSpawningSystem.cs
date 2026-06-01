@@ -107,6 +107,28 @@ public sealed class StationSpawningSystem : SharedStationSpawningSystem
             }
         }
 
+        // VG-Tweak Start
+        if (profile != null && loadout != null)
+        {
+            var globalLoadout = profile.GetLoadoutOrDefault("GlobalLoadout", _actors.GetSession(entity), _prototypeManager);
+            var finalLoadout = loadout.Clone();
+            
+            var groupsToMerge = new[] { "ADTBottom", "ADTTop", "ADTSocks" };
+            foreach (var groupId in groupsToMerge)
+            {
+                if (!finalLoadout.SelectedLoadouts.ContainsKey(groupId) || finalLoadout.SelectedLoadouts[groupId].Count == 0)
+                {
+                    if (globalLoadout.SelectedLoadouts.TryGetValue(groupId, out var globalGroupLoadouts))
+                    {
+                        finalLoadout.SelectedLoadouts[groupId] = new List<Loadout>(globalGroupLoadouts);
+                    }
+                }
+            }
+            
+            loadout = finalLoadout;
+        }
+        // VG-Tweak End
+
         // If we're not spawning a humanoid, we're gonna exit early without doing all the humanoid stuff.
         if (prototype?.JobEntity != null)
         {
@@ -141,11 +163,9 @@ public sealed class StationSpawningSystem : SharedStationSpawningSystem
             if (profile.FlavorText != "" && _configurationManager.GetCVar(CCVars.FlavorText))
             {
                 //ADT-tweak-start: Реворк флаворов
-                // AddComp<DetailExaminableComponent>(entity.Value).Content = profile.FlavorText;
                 var flavor = EnsureComp<CharacterFlavorComponent>(entity.Value);
                 flavor.FlavorText = profile.FlavorText;
                 flavor.HeadshotUrl = profile.HeadshotUrl;
-                //возможное TODO: добавить кастомное описание рас
                 //ADT-tweak-end
             }
         }

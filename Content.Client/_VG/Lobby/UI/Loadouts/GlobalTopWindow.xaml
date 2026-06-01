@@ -1,0 +1,13 @@
+<loadout:BaseLoadoutWindow xmlns="https://spacestation14.io"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:loadout="clr-namespace:Content.Client.Lobby.UI.Loadouts"
+         SetSize="500 600"
+         MinSize="400 500"
+         Title="{Loc 'global-top-window-title'}">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <Label Text="{Loc 'global-top-description'}" Margin="0 0 0 10" />
+        <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
+            <BoxContainer Name="GroupsContainer" Orientation="Vertical" />
+        </ScrollContainer>
+    </BoxContainer>
+</loadout:BaseLoadoutWindow>

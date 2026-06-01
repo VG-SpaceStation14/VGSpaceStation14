@@ -1,0 +1,7 @@
+- type: roleLoadout
+  id: GlobalLoadout
+  canCustomizeName: false
+  groups:
+  - ADTBottom
+  - ADTTop
+  - ADTSocks

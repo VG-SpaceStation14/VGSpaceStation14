@@ -1064,5 +1064,35 @@ namespace Content.Shared.Preferences
             return -count;
         }
         // ADT end
+
+        // VG-Tweak Start
+        public RoleLoadout GetLoadoutOrDefault(ProtoId<RoleLoadoutPrototype> roleId, ICommonSession? session, IPrototypeManager protoManager)
+        {
+            if (!_loadouts.TryGetValue(roleId, out var loadout))
+            {
+                loadout = new RoleLoadout(roleId);
+                loadout.SetDefault(this, session, protoManager, true);
+            }
+            loadout.SetDefault(this, session, protoManager);
+            return loadout;
+        }
+
+        public RoleLoadout GetEffectiveLoadout(ProtoId<RoleLoadoutPrototype> roleId, ICommonSession? session, IPrototypeManager protoManager)
+        {
+            var global = GetLoadoutOrDefault("GlobalLoadout", session, protoManager);
+            if (!_loadouts.TryGetValue(roleId, out var roleLoadout))
+                return global;
+
+            var effective = global.Clone();
+            foreach (var (group, loadouts) in roleLoadout.SelectedLoadouts)
+            {
+                effective.SelectedLoadouts[group] = new List<Loadout>(loadouts);
+            }
+            effective.EntityName = roleLoadout.EntityName ?? effective.EntityName;
+            foreach (var kv in roleLoadout.ExtraData)
+                effective.ExtraData[kv.Key] = kv.Value;
+            return effective;
+        }
+        // VG-Tweak End
     }
 }

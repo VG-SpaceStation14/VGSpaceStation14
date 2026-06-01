@@ -29,7 +29,7 @@
                 </BoxContainer>
             </PanelContainer>
 
-            <!-- Панель кнопок кастомизации (тёмный фон, слева кнопка КПК) -->
+            <!-- Панель кнопок кастомизации (тёмный фон) -->
             <PanelContainer StyleClasses="BackgroundDark">
                 <PanelContainer.PanelOverride>
                     <graphics:StyleBoxFlat BackgroundColor="#1A1A1A"
@@ -38,7 +38,8 @@
                                            ContentMarginRightOverride="6"
                                            ContentMarginBottomOverride="4" />
                 </PanelContainer.PanelOverride>
-                <BoxContainer Orientation="Horizontal">
+                <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4">
+                    <!-- Кнопка КПК слева -->
                     <PanelContainer>
                         <PanelContainer.PanelOverride>
                             <graphics:StyleBoxFlat BackgroundColor="#2D2D2D"
@@ -52,6 +53,51 @@
                                        HorizontalAlignment="Left"
                                        ToolTip="{Loc 'pda-wallpaper-title'}" />
                     </PanelContainer>
+                    
+                    <!-- Растягивающийся отступ, чтобы прижать кнопки к правому краю -->
+                    <Control HorizontalExpand="True" />
+                    
+                    <!-- VG-Tweak Start: Кнопки глобальных лодаутов (прижаты к правому краю, порядок: носки, бельё, футболки) -->
+                    <PanelContainer>
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#2D2D2D"
+                                                   ContentMarginLeftOverride="4"
+                                                   ContentMarginTopOverride="4"
+                                                   ContentMarginRightOverride="4"
+                                                   ContentMarginBottomOverride="4" />
+                        </PanelContainer.PanelOverride>
+                        <TextureButton Name="GlobalSocksButton"
+                                       SetSize="55 55"
+                                       HorizontalAlignment="Left"
+                                       ToolTip="{Loc 'loadout-group-socks-adt'}" />
+                    </PanelContainer>
+                    <PanelContainer>
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#2D2D2D"
+                                                   ContentMarginLeftOverride="4"
+                                                   ContentMarginTopOverride="4"
+                                                   ContentMarginRightOverride="4"
+                                                   ContentMarginBottomOverride="4" />
+                        </PanelContainer.PanelOverride>
+                        <TextureButton Name="GlobalBottomButton"
+                                       SetSize="55 55"
+                                       HorizontalAlignment="Left"
+                                       ToolTip="{Loc 'loadout-group-bottom-adt'}" />
+                    </PanelContainer>
+                    <PanelContainer>
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#2D2D2D"
+                                                   ContentMarginLeftOverride="4"
+                                                   ContentMarginTopOverride="4"
+                                                   ContentMarginRightOverride="4"
+                                                   ContentMarginBottomOverride="4" />
+                        </PanelContainer.PanelOverride>
+                        <TextureButton Name="GlobalTopButton"
+                                       SetSize="55 55"
+                                       HorizontalAlignment="Left"
+                                       ToolTip="{Loc 'loadout-group-top-adt'}" />
+                    </PanelContainer>
+                    <!-- VG-Tweak End -->
                 </BoxContainer>
             </PanelContainer>
 
