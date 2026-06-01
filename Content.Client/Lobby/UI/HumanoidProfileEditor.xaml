@@ -178,7 +178,7 @@
                 <BoxContainer Orientation="Vertical" Margin="10">
                     <Label Text="{Loc 'humanoid-profile-editor-antags-tab'}" StyleClasses="LabelHeading" Margin="0 0 0 10" />
                     <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                        <BoxContainer Name="AntagGrid" Orientation="Vertical" SeparationOverride="4" />
+                        <BoxContainer Name="AntagGrid" Orientation="Vertical" SeparationOverride="8" />
                     </ScrollContainer>
                 </BoxContainer>
 

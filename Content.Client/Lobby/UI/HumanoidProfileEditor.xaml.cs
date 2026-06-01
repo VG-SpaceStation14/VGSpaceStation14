@@ -792,9 +792,8 @@ namespace Content.Client.Lobby.UI
             }
 
             const int columns = 4;
-            var row = (BoxContainer?)null;
+            BoxContainer? row = null;
             var count = 0;
-
             var cache = IoCManager.Resolve<IResourceCache>();
 
             foreach (var antag in antags)
@@ -804,13 +803,14 @@ namespace Content.Client.Lobby.UI
                     row = new BoxContainer
                     {
                         Orientation = LayoutOrientation.Horizontal,
-                        SeparationOverride = 8,
+                        SeparationOverride = 20,
                         HorizontalAlignment = HAlignment.Center
                     };
                     AntagGrid.AddChild(row);
                 }
 
-                bool isAvailable = _requirements.IsAllowed(antag, (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter, out _);
+                bool isAvailable = _requirements.IsAllowed(antag,
+                    (HumanoidCharacterProfile?)_preferencesManager.Preferences?.SelectedCharacter, out var reason);
                 bool isEnabled = Profile?.AntagPreferences.Contains(antag.ID) == true;
 
                 string state;
@@ -821,10 +821,19 @@ namespace Content.Client.Lobby.UI
                 else
                     state = $"{antag.ID}-off";
 
+                var container = new BoxContainer
+                {
+                    Orientation = LayoutOrientation.Vertical,
+                    SeparationOverride = 6,
+                    HorizontalAlignment = HAlignment.Center,
+                    MinWidth = 150
+                };
+
                 var button = new TextureButton
                 {
-                    SetSize = new Vector2(200, 200),
-                    ToolTip = Loc.GetString(antag.Name),
+                    SetSize = new Vector2(100, 100),
+                    HorizontalAlignment = HAlignment.Center,
+                    ToolTip = !isAvailable ? (reason?.ToString() ?? "") : Loc.GetString(antag.Objective),
                     Disabled = !isAvailable
                 };
 
@@ -832,22 +841,32 @@ namespace Content.Client.Lobby.UI
                 {
                     RSI.State? rsiState = null;
                     if (!rsi.RSI.TryGetState(state, out rsiState))
-                    {
                         rsi.RSI.TryGetState($"{antag.ID}-off", out rsiState);
-                    }
                     if (rsiState != null)
                         button.TextureNormal = rsiState.Frame0;
                 }
 
                 button.OnPressed += _ =>
                 {
+                    if (!isAvailable) return;
                     bool newState = !(Profile?.AntagPreferences.Contains(antag.ID) == true);
                     Profile = Profile?.WithAntagPreference(antag.ID, newState);
                     SetDirty();
                     RefreshAntags();
                 };
 
-                row!.AddChild(button);
+                var label = new RichTextLabel
+                {
+                    HorizontalAlignment = HAlignment.Center,
+                    MaxWidth = 175
+                };
+                var msg = new FormattedMessage();
+                msg.AddMarkup($"[color={(isAvailable ? "white" : "gray")}]{Loc.GetString(antag.Name)}[/color]");
+                label.SetMessage(msg);
+
+                container.AddChild(button);
+                container.AddChild(label);
+                row!.AddChild(container);
                 count++;
             }
         }
