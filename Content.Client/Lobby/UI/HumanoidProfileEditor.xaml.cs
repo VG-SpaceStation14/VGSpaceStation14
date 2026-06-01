@@ -791,7 +791,7 @@ namespace Content.Client.Lobby.UI
                 return;
             }
 
-            const int columns = 4;
+            const int columns = 6;
             BoxContainer? row = null;
             var count = 0;
             var cache = IoCManager.Resolve<IResourceCache>();
@@ -861,7 +861,7 @@ namespace Content.Client.Lobby.UI
                     MaxWidth = 175
                 };
                 var msg = new FormattedMessage();
-                msg.AddMarkup($"[color={(isAvailable ? "white" : "gray")}]{Loc.GetString(antag.Name)}[/color]");
+                msg.AddMarkup($"[font size=11][color={(isAvailable ? "white" : "gray")}]{Loc.GetString(antag.Name)}[/color][/font]");
                 label.SetMessage(msg);
 
                 container.AddChild(button);
